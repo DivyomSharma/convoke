@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum UserRole {
@@ -51,50 +52,50 @@ enum MerchStatus {
 }
 
 model User {
-  id             String          @id @default(cuid())
-  clerkId        String?         @unique
-  email          String          @unique
-  username       String          @unique
-  name           String
-  headline       String?
-  imageUrl       String?
-  role           UserRole        @default(ATTENDEE)
-  profile        Profile?
-  memberships    Membership[]
-  registrations  Registration[]
-  volunteerApps  VolunteerApplication[]
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  id            String                 @id @default(cuid())
+  clerkId       String?                @unique
+  email         String                 @unique
+  username      String                 @unique
+  name          String
+  headline      String?
+  imageUrl      String?
+  role          UserRole               @default(ATTENDEE)
+  profile       Profile?
+  memberships   Membership[]
+  registrations Registration[]
+  volunteerApps VolunteerApplication[]
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
 }
 
 model Profile {
-  id             String   @id @default(cuid())
-  userId         String   @unique
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  bio            String?
-  linkedinUrl    String?
-  discordHandle  String?
-  githubUrl      String?
-  twitterUrl     String?
-  instagramUrl   String?
-  youtubeUrl     String?
-  portfolioUrl   String?
-  skills         String[]
-  badges         String[]
-  reputation     Float    @default(0)
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio           String?
+  linkedinUrl   String?
+  discordHandle String?
+  githubUrl     String?
+  twitterUrl    String?
+  instagramUrl  String?
+  youtubeUrl    String?
+  portfolioUrl  String?
+  skills        String[]
+  badges        String[]
+  reputation    Float    @default(0)
 }
 
 model Organization {
-  id          String       @id @default(cuid())
-  slug        String       @unique
-  name        String
-  type        String
-  description String?
-  members     Membership[]
-  events      Event[]
-  sponsorLeads SponsorLead[]
+  id             String         @id @default(cuid())
+  slug           String         @unique
+  name           String
+  type           String
+  description    String?
+  members        Membership[]
+  events         Event[]
+  sponsorLeads   SponsorLead[]
   merchInquiries MerchInquiry[]
-  createdAt   DateTime     @default(now())
+  createdAt      DateTime       @default(now())
 }
 
 model Membership {
@@ -109,49 +110,49 @@ model Membership {
 }
 
 model Event {
-  id              String         @id @default(cuid())
-  organizationId  String
-  organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  slug            String         @unique
-  title           String
-  category        String
-  city            String
-  mode            EventMode
-  startsAt        DateTime
-  endsAt          DateTime?
-  isPaid          Boolean        @default(false)
-  inviteOnly      Boolean        @default(false)
-  approvalBased   Boolean        @default(false)
-  heroImageUrl    String?
-  blocks          Json
-  registrations   Registration[]
-  sponsorLeads    SponsorLead[]
-  volunteerApps   VolunteerApplication[]
-  ticketTypes     TicketType[]
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  id             String                 @id @default(cuid())
+  organizationId String
+  organization   Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  slug           String                 @unique
+  title          String
+  category       String
+  city           String
+  mode           EventMode
+  startsAt       DateTime
+  endsAt         DateTime?
+  isPaid         Boolean                @default(false)
+  inviteOnly     Boolean                @default(false)
+  approvalBased  Boolean                @default(false)
+  heroImageUrl   String?
+  blocks         Json
+  registrations  Registration[]
+  sponsorLeads   SponsorLead[]
+  volunteerApps  VolunteerApplication[]
+  ticketTypes    TicketType[]
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
 }
 
 model TicketType {
-  id        String   @id @default(cuid())
-  eventId   String
-  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  name      String
-  priceInr  Int      @default(0)
-  capacity  Int?
+  id       String @id @default(cuid())
+  eventId  String
+  event    Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name     String
+  priceInr Int    @default(0)
+  capacity Int?
 }
 
 model Registration {
-  id          String             @id @default(cuid())
-  userId      String
-  eventId     String
+  id           String             @id @default(cuid())
+  userId       String
+  eventId      String
   ticketTypeId String?
-  status      RegistrationStatus @default(PENDING)
-  qrCode      String             @unique
-  tags        String[]
-  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  event       Event              @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  createdAt   DateTime           @default(now())
+  status       RegistrationStatus @default(PENDING)
+  qrCode       String             @unique
+  tags         String[]
+  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event        Event              @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  createdAt    DateTime           @default(now())
 }
 
 model SponsorLead {
@@ -170,27 +171,27 @@ model SponsorLead {
 }
 
 model VolunteerApplication {
-  id          String   @id @default(cuid())
-  userId      String
-  eventId     String
-  role        String
-  status      String   @default("PENDING")
-  hours       Int      @default(0)
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  id      String @id @default(cuid())
+  userId  String
+  eventId String
+  role    String
+  status  String @default("PENDING")
+  hours   Int    @default(0)
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
 }
 
 model MerchInquiry {
-  id             String      @id @default(cuid())
-  organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
-  apparelType    String
-  quantity       Int
-  budget         String
-  timeline       String
-  city           String
-  references     String[]
+  id               String        @id @default(cuid())
+  organizationId   String?
+  organization     Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  apparelType      String
+  quantity         Int
+  budget           String
+  timeline         String
+  city             String
+  references       String[]
   stylePreferences String?
-  status         MerchStatus  @default(INQUIRY_RECEIVED)
-  createdAt      DateTime     @default(now())
+  status           MerchStatus   @default(INQUIRY_RECEIVED)
+  createdAt        DateTime      @default(now())
 }

@@ -55,11 +55,27 @@ export default function WorkspacePage() {
                   </h1>
                 </div>
                 <div className="flex gap-2">
-                  {[Send, Bell, ScanLine].map((Icon, index) => (
-                    <button key={index} className="grid size-11 place-items-center rounded-full border border-line bg-white/[0.035] text-muted hover:text-foreground">
-                      <Icon className="size-4" />
-                    </button>
-                  ))}
+                  <a
+                    href="mailto:sponsors@example.com?subject=Convoke sponsor update"
+                    className="grid size-11 place-items-center rounded-full border border-line bg-white/[0.035] text-muted hover:text-foreground"
+                    aria-label="Send sponsor update"
+                  >
+                    <Send className="size-4" />
+                  </a>
+                  <a
+                    href="/workspace#announcements"
+                    className="grid size-11 place-items-center rounded-full border border-line bg-white/[0.035] text-muted hover:text-foreground"
+                    aria-label="Open announcements"
+                  >
+                    <Bell className="size-4" />
+                  </a>
+                  <a
+                    href="/workspace#registrations"
+                    className="grid size-11 place-items-center rounded-full border border-line bg-white/[0.035] text-muted hover:text-foreground"
+                    aria-label="Open check-in"
+                  >
+                    <ScanLine className="size-4" />
+                  </a>
                 </div>
               </div>
             </Panel>

@@ -45,9 +45,15 @@ export default async function ProfilePage({ params }: PageProps) {
                   </p>
                   <div className="mt-7 flex gap-3">
                     {socials.map((Icon, index) => (
-                      <button key={index} className="grid size-10 place-items-center rounded-full border border-line text-muted hover:text-foreground">
+                      <a
+                        key={index}
+                        href={["https://linkedin.com", "https://github.com", "https://instagram.com", "https://youtube.com"][index]}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="grid size-10 place-items-center rounded-full border border-line text-muted hover:text-foreground"
+                      >
                         <Icon className="size-4" />
-                      </button>
+                      </a>
                     ))}
                   </div>
                 </div>

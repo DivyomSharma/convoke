@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import { ArrowRight, MessageCircle, Upload } from "lucide-react";
 import { Footer } from "@/components/marketing/footer";
 import { SiteHeader } from "@/components/marketing/site-header";
-import { Button } from "@/components/ui/button";
 import { Panel } from "@/components/ui/panel";
 import { merchProducts } from "@/data/platform";
 
@@ -18,6 +17,7 @@ export default function MerchPage() {
     timeline: "3 weeks",
     city: "Bengaluru",
   });
+  const [fileName, setFileName] = useState<string | null>(null);
 
   const whatsappUrl = useMemo(() => {
     const message = `Convoke merch inquiry:%0AProduct: ${form.product}%0AQuantity: ${form.quantity}%0ABudget: ${form.budget}%0ATimeline: ${form.timeline}%0ACity: ${form.city}`;
@@ -76,10 +76,17 @@ export default function MerchPage() {
                   </label>
                 );
               })}
-              <div className="rounded-[8px] border border-dashed border-line p-4 text-sm text-muted md:col-span-2">
+              <label className="cursor-pointer rounded-[8px] border border-dashed border-line p-4 text-sm text-muted transition hover:border-bronze/60 md:col-span-2">
                 <Upload className="mb-3 size-5 text-steel" />
-                UploadThing-ready reference uploads, tech packs, moodboards, and logos.
-              </div>
+                {fileName
+                  ? `Attached: ${fileName}`
+                  : "Attach reference uploads, tech packs, moodboards, and logos."}
+                <input
+                  type="file"
+                  className="sr-only"
+                  onChange={(event) => setFileName(event.target.files?.[0]?.name ?? null)}
+                />
+              </label>
             </div>
             <a
               href={whatsappUrl}
@@ -90,10 +97,15 @@ export default function MerchPage() {
               <MessageCircle className="size-4" />
               Continue on WhatsApp
             </a>
-            <Button className="mt-3 w-full" variant="secondary">
+            <a
+              href="https://merch.theplotarmour.xyz"
+              target="_blank"
+              rel="noreferrer"
+              className="mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full border border-line bg-white/[0.035] px-5 text-sm font-medium text-foreground transition hover:border-bronze/60 hover:bg-white/[0.08]"
+            >
               Redirect to merch portal
               <ArrowRight className="size-4" />
-            </Button>
+            </a>
           </Panel>
         </div>
       </main>

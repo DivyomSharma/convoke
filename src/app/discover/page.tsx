@@ -41,13 +41,14 @@ export default function DiscoverPage() {
               </div>
               <div className="mt-5 space-y-3">
                 {filters.map((filter) => (
-                  <button
-                    key={filter}
-                    className="flex w-full items-center justify-between rounded-[8px] border border-line bg-white/[0.025] px-4 py-3 text-left text-sm text-muted transition hover:border-bronze/50 hover:text-foreground"
-                  >
-                    {filter}
-                    <span>+</span>
-                  </button>
+                <a
+                  key={filter}
+                  href={`/discover?filter=${encodeURIComponent(filter.toLowerCase())}`}
+                  className="flex w-full items-center justify-between rounded-[8px] border border-line bg-white/[0.025] px-4 py-3 text-left text-sm text-muted transition hover:border-bronze/50 hover:text-foreground"
+                >
+                  {filter}
+                  <span>+</span>
+                </a>
                 ))}
               </div>
               <div className="mt-6 flex flex-wrap gap-2">
