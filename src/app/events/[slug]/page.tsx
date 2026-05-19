@@ -135,18 +135,135 @@ export default async function EventDetailPage({ params }: PageProps) {
             ))}
           </nav>
 
-          <div className="mt-12 grid gap-4 md:grid-cols-2">
-            {sections.map((section) => (
-              <Panel key={section} id={section.toLowerCase()} className="min-h-64 p-6">
-                <h2 className="text-3xl font-medium tracking-[-0.03em]">{section}</h2>
-                <p className="mt-4 leading-7 text-muted">
-                  {section} content is modeled as modular event-builder blocks so
-                  organizers can share the story, coordinate people, and keep
-                  the event page alive as the community gathers.
-                </p>
-              </Panel>
-            ))}
-          </div>
+           <div className="mt-12 grid gap-4 md:grid-cols-2">
+             {sections.map((section, index) => {
+               // Custom content for each section based on the event
+               let content = "";
+               if (section === "Overview") {
+                 content = `Join ${event.attendees.toLocaleString("en-IN")}+ ambitious builders, creators, and leaders for ${event.title}. 
+                 This year's theme focuses on building the future of technology and community in India. 
+                 Expect inspiring talks, hands-on workshops, and unparalleled networking opportunities.`;
+               } else if (section === "Schedule") {
+                 content = `Day 1 - August 24, 2026
+                 10:00 AM - Registration & Welcome Coffee
+                 11:00 AM - Opening Keynote: "The Future of Indian Startups"
+                 12:30 PM - Networking Lunch
+                 2:00 PM - Panel: "Building Scalable Tech Products"
+                 3:30 PM - Workshop: "Product-Market Fit for Early Stage Startups"
+                 5:00 PM - Evening Networking Session
+                 
+                 Day 2 - August 25, 2026
+                 10:00 AM - Fireside Chat: "Lessons from Unicorn Founders"
+                 11:30 AM - Hackathon Kickoff
+                 1:00 PM - Lunch & Mentor Sessions
+                 3:00 PM - Hackathon Development Continues
+                 6:00 PM - Final Presentations & Awards`;
+               } else if (section === "Speakers") {
+                 content = `Featured Speakers:
+                 
+                 Priya Sharma - Founder & CEO, Zephyr Labs
+                 "Building B2B SaaS for Global Markets from India"
+                 
+                 Arjun Patel - CTO, FlutterWave India
+                 "Scaling Payment Infrastructure to Millions of Users"
+                 
+                 Dr. Meera Kapoor - Professor of Entrepreneurship, IIT Delhi
+                 "Academia-Industry Collaboration for Innovation"
+                 
+                 Rohan Desai - Partner, Sequoia Capital India
+                 "What VCs Look for in Early Stage Startups"
+                 
+                 Sneha Reddy - Head of Developer Relations, Google India
+                 "Building Developer Communities That Scale"
+                 
+                 Vikram Singh - Founder, Cult.fit
+                 "From Fitness App to Lifestyle Platform: The Journey"`;
+               } else if (section === "Sponsors") {
+                 content = `Our sponsors make events like Summit Zero possible:
+                 
+                 Title Sponsor: PlotArmour Studio
+                 
+                 Platinum Sponsors:
+                 • Google Cloud for Startups
+                 • Razorpay
+                 • MongoDB
+                 
+                 Gold Sponsors:
+                 • AWS Activate
+                 • HubSpot for Startups
+                 • Intercom
+                 
+                 Silver Sponsors:
+                 • Vercel
+                 • Supabase
+                 • Netlify
+                 
+                 Community Partners:
+                 • TiE Delhi-NCR
+                 • NASSCOM Startups
+                 • Indian Angel Network`;
+               } else if (section === "Prizes") {
+                 content = `Exciting prizes for hackathon participants and competition winners:
+                 
+                 Grand Prize: ₹2,50,000 + Mentorship from PlotArmour Studio
+                 Second Prize: ₹1,50,000 + AWS Credits worth ₹5,00,000
+                 Third Prize: ₹1,00,000 + Google Cloud Credits worth ₹3,00,000
+                 
+                 Category Winners:
+                 • Best Innovation: ₹75,000 + Product Hunt Feature
+                 • Best Design: ₹50,000 + Figma Professional Team Plan
+                 • Best Social Impact: ₹75,000 + NITI Aayog Connection
+                 
+                 All participants get:
+                 • Convoke Premium Membership (3 months)
+                 • Certificate of Participation
+                 • Access to event recordings and materials`;
+               } else if (section === "FAQs") {
+                 content = `Q: Who should attend Summit Zero?
+                 A: Founders, developers, designers, product managers, and anyone passionate about building technology products and communities in India.
+                 
+                 Q: Is there a dress code?
+                 A: Smart casual. We encourage you to wear something that represents your personal or brand identity.
+                 
+                 Q: Are meals included?
+                 A: Yes, we provide breakfast, lunch, and snacks both days. Dinner is on your own with plenty of options nearby.
+                 
+                 Q: Is there accommodation assistance?
+                 A: We've partnered with nearby hotels to offer discounted rates. Details will be emailed after registration.
+                 
+                 Q: Can I get a refund if I can't attend?
+                 A: Tickets are transferable but non-refundable. Please contact us for exceptional circumstances.
+                 
+                 Q: Will the event be recorded?
+                 A: Yes, all main stage talks will be recorded and available to attendees after the event.
+                 
+                 Q: Is there a code of conduct?
+                 A: Absolutely. We're committed to providing a harassment-free experience for everyone.`;
+               } else if (section === "Gallery") {
+                 content = `Highlights from previous Summit Zero events:
+                 
+                 [Image: Collage of attendees networking at Summit Zero 2024]
+                 [Image: Speaker delivering keynote on stage]
+                 [Image: Hackathon teams working late into the night]
+                 [Image: Award ceremony with winners celebrating]
+                 [Image: Informal conversations during coffee break]
+                 [Image: Workshop session with hands-on learning]
+                 
+                 Follow @convokeindia on Instagram for more behind-the-scenes moments and updates.`;
+               } else {
+                 content = `Details coming soon. Check back regularly for updates as we finalize the event program.`;
+               }
+               
+               return (
+                 <Panel key={section} id={section.toLowerCase()} className="min-h-64 p-6">
+                   <h2 className="text-3xl font-medium tracking-[-0.03em]">{section}</h2>
+                   <p className="mt-4 leading-7 text-muted">
+                     {content}
+                   </p>
+                 </Panel>
+               );
+             })}
+           </div>
         </div>
       </main>
       <Footer />
