@@ -1,4 +1,4 @@
-import { ArrowRight, Building2, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Briefcase, Building2, CheckCircle2, MapPin, Users } from "lucide-react";
 import Image from "next/image";
 import { ButtonLink } from "@/components/ui/button";
 import { Panel } from "@/components/ui/panel";
@@ -8,9 +8,13 @@ import { MotionShell } from "@/components/marketing/motion-shell";
 import { SiteHeader } from "@/components/marketing/site-header";
 import {
   categories,
+  communities,
   communityMoments,
   featuredEvents,
+  opportunities,
+  opportunityTypeColors,
   platformModules,
+  seedPeople,
   workflowCards,
 } from "@/data/platform";
 import { formatInr } from "@/lib/utils";
@@ -155,6 +159,57 @@ export default function Home() {
           </div>
         </section>
 
+        {/* ── Hot Opportunities ───────────────────────────────────── */}
+        <section className="border-y border-line bg-[#080808] px-5 py-24 md:px-8">
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-10 flex flex-col justify-between gap-5 md:flex-row md:items-end">
+              <h2 className="max-w-2xl text-4xl font-medium tracking-[-0.03em] md:text-6xl">
+                Hot opportunities right now.
+              </h2>
+              <ButtonLink href="/opportunities" variant="secondary">
+                View all
+              </ButtonLink>
+            </div>
+            <div className="grid gap-4 md:grid-cols-3">
+              {opportunities.slice(0, 3).map((opp, index) => (
+                <MotionShell key={opp.id} delay={index * 0.05}>
+                  <a href="/opportunities">
+                    <Panel className="group flex h-full flex-col justify-between p-5 transition hover:-translate-y-1 hover:border-bronze/50">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`rounded-full border px-3 py-1 text-xs font-medium ${opportunityTypeColors[opp.type]}`}
+                          >
+                            {opp.type}
+                          </span>
+                          {opp.isRemote && (
+                            <span className="rounded-full border border-line bg-white/[0.04] px-3 py-1 text-xs text-muted">
+                              Remote
+                            </span>
+                          )}
+                        </div>
+                        <h3 className="mt-4 text-2xl font-medium tracking-[-0.02em]">
+                          {opp.title}
+                        </h3>
+                        <p className="mt-2 text-sm text-muted">{opp.organization}</p>
+                      </div>
+                      <div className="mt-8 flex items-center justify-between border-t border-line pt-5 text-sm">
+                        <span className="font-mono text-bronze">
+                          {opp.stipend ?? "Unpaid"}
+                        </span>
+                        <span className="flex items-center gap-1.5 text-muted">
+                          <Briefcase className="size-3.5" />
+                          {opp.applicants} applied
+                        </span>
+                      </div>
+                    </Panel>
+                  </a>
+                </MotionShell>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <section className="bg-[#0a0908] px-5 py-24 md:px-8">
           <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
             <MotionShell>
@@ -179,6 +234,57 @@ export default function Home() {
                       </p>
                     </div>
                   </Panel>
+                </MotionShell>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── Active Communities ──────────────────────────────────── */}
+        <section className="px-5 py-24 md:px-8">
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-10 flex flex-col justify-between gap-5 md:flex-row md:items-end">
+              <h2 className="max-w-2xl text-4xl font-medium tracking-[-0.03em] md:text-6xl">
+                Active communities.
+              </h2>
+              <ButtonLink href="/communities" variant="secondary">
+                Browse all
+              </ButtonLink>
+            </div>
+            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-none">
+              {communities.map((community, index) => (
+                <MotionShell key={community.slug} delay={index * 0.04}>
+                  <a
+                    href={`/communities/${community.slug}`}
+                    className="group block w-[280px] shrink-0"
+                  >
+                    <Panel className="h-full overflow-hidden p-0 transition hover:-translate-y-1 hover:border-bronze/50">
+                      <div className="relative h-40 overflow-hidden">
+                        <Image
+                          src={community.image}
+                          alt={community.name}
+                          fill
+                          className="object-cover transition duration-700 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+                      </div>
+                      <div className="p-4">
+                        <h3 className="text-lg font-medium tracking-tight">
+                          {community.name}
+                        </h3>
+                        <div className="mt-3 flex items-center gap-3 text-xs text-muted">
+                          <span className="flex items-center gap-1">
+                            <Users className="size-3" />
+                            {community.members.toLocaleString()}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <MapPin className="size-3" />
+                            {community.location}
+                          </span>
+                        </div>
+                      </div>
+                    </Panel>
+                  </a>
                 </MotionShell>
               ))}
             </div>
@@ -234,6 +340,32 @@ export default function Home() {
           </div>
         </section>
 
+        {/* ── People Building Momentum ────────────────────────────── */}
+        <section className="border-t border-line bg-[#080808] px-5 py-24 md:px-8">
+          <div className="mx-auto max-w-7xl">
+            <MotionShell>
+              <h2 className="mb-10 max-w-3xl text-4xl font-medium tracking-[-0.03em] md:text-6xl">
+                People building momentum.
+              </h2>
+            </MotionShell>
+            <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-none">
+              {seedPeople.map((person, index) => (
+                <MotionShell key={person.initials} delay={index * 0.03}>
+                  <div className="flex w-[140px] shrink-0 flex-col items-center text-center">
+                    <span className="grid size-16 place-items-center rounded-full bg-gradient-to-br from-bronze to-rust text-lg font-semibold text-black">
+                      {person.initials}
+                    </span>
+                    <p className="mt-3 text-sm font-medium leading-tight">
+                      {person.name}
+                    </p>
+                    <p className="mt-1 text-xs text-muted">{person.role}</p>
+                  </div>
+                </MotionShell>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <section className="px-5 pb-24 md:px-8">
           <div className="mx-auto max-w-7xl overflow-hidden rounded-[8px] border border-bronze/30 bg-[linear-gradient(135deg,rgba(198,161,111,0.18),rgba(185,101,53,0.12)_38%,rgba(141,161,184,0.08))] p-8 md:p-12">
             <div className="grid gap-10 lg:grid-cols-[1fr_0.8fr] lg:items-center">
@@ -246,6 +378,15 @@ export default function Home() {
                   into the story, coordinate volunteers, launch merch, and turn
                   participation into reputation.
                 </p>
+                <div className="mt-6 flex flex-wrap gap-x-4 gap-y-2 text-sm font-medium text-bronze">
+                  <span>8 communities</span>
+                  <span className="text-line">·</span>
+                  <span>12 opportunities</span>
+                  <span className="text-line">·</span>
+                  <span>3,800+ people</span>
+                  <span className="text-line">·</span>
+                  <span>8 upcoming events</span>
+                </div>
               </div>
               <div className="space-y-3">
                 {[

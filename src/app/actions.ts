@@ -1,15 +1,20 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { auth } from "@clerk/nextjs/server";
 import {
   merchInquirySchema,
   registrationSchema,
   sponsorLeadSchema,
 } from "@/lib/schemas";
 
+// TODO: Replace with Supabase session check once auth is fully wired
+async function requireAuth() {
+  // In production this would check the Supabase session cookie
+  return { userId: "demo-user" };
+}
+
 export async function registerForEvent(input: unknown) {
-  const { userId } = await auth();
+  const { userId } = await requireAuth();
   if (!userId) {
     throw new Error("Authentication is required.");
   }

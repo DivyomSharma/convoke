@@ -1,255 +1,205 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+import { Bookmark, Briefcase, Clock, MapPin, Search, SlidersHorizontal, Sparkles, TrendingUp, Users } from "lucide-react";
+import { Footer } from "@/components/marketing/footer";
+import { SiteHeader } from "@/components/marketing/site-header";
+import { Panel } from "@/components/ui/panel";
+import { ButtonLink } from "@/components/ui/button";
+import { SaveButton } from "@/components/ui/save-button";
+import { ApplyButton } from "@/components/ui/apply-button";
+import { opportunities, opportunityTypeColors, communities } from "@/data/platform";
+
+export const metadata: Metadata = {
+  title: "Opportunities — Internships, Roles & Collaborations",
+  description: "Discover internships, startup roles, ambassador programs, freelance gigs, and volunteer openings from India's most ambitious communities.",
+};
+
+const typeFilters = ["All", "Internship", "Full-time", "Freelance", "Volunteer", "Ambassador"];
 
 export default function OpportunitiesPage() {
   return (
-    <div className="container mx-auto px-6 py-12">
-      <header className="mb-12 text-center">
-        <h1 className="text-4xl font-bold text-foreground mb-4">
-          Opportunities
-        </h1>
-        <p className="text-xl text-muted max-w-2xl mx-auto">
-          Discover internships, startup roles, creator collaborations, and more
-          from ambitious communities across India.
-        </p>
-      </header>
-
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {/* Opportunity Card 1 */}
-        <Link href="/opportunities/google-summer-of-code" className="group">
-          <div className="border border-white/[0.08] rounded-xl p-6 hover:border-bronze/40 transition-group">
-            <div className="flex items-start gap-4 mb-4">
-              <div className="grid size-10 place-items-center rounded-lg bg-bronze/10 text-bronze">
-                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-foreground group-hover:text-bronze transition">
-                  Google Summer of Code
-                </h3>
-                <p className="text-sm text-muted">
-                  Open source internship program for students
-                </p>
-                <span className="inline-flex items-center gap-2 mt-2 text-xs text-bronze">
-                  <span>•</span>
-                  <span>Remote</span>
-                  <span>•</span>
-                  <span>Summer 2026</span>
-                </span>
-              </div>
+    <>
+      <SiteHeader />
+      <main className="min-h-screen px-5 pb-24 pt-28 md:px-8">
+        <div className="mx-auto max-w-7xl">
+          {/* Hero */}
+          <div className="mb-12">
+            <div className="flex items-center gap-3 text-sm text-bronze">
+              <Sparkles className="size-4" />
+              <span>{opportunities.length} active opportunities across {communities.length} communities</span>
             </div>
-            <p className="text-sm text-muted line-clamp-3">
-              GSoC is a global program focused on bringing more student developers into open source software development.
+            <h1 className="mt-4 max-w-4xl text-5xl font-semibold tracking-[-0.04em] md:text-7xl">
+              Opportunities that match your ambition.
+            </h1>
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-muted">
+              Internships, startup roles, creator collaborations, ambassador programs,
+              and volunteer openings from communities building the next thing.
             </p>
-            <ButtonLink href="#" className="mt-4">
-              Learn More
-            </ButtonLink>
           </div>
-        </Link>
 
-        {/* Opportunity Card 2 */}
-        <Link href="/opportunities/microsoft-engage" className="group">
-          <div className="border border-white/[0.08] rounded-xl p-6 hover:border-bronze/40 transition-group">
-            <div className="flex items-start gap-4 mb-4">
-              <div className="grid size-10 place-items-center rounded-lg bg-bronze/10 text-bronze">
-                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-foreground group-hover:text-bronze transition">
-                  Microsoft Engage
-                </h3>
-                <p className="text-sm text-muted">
-                  Mentorship program for women in tech
-                </p>
-                <span className="inline-flex items-center gap-2 mt-2 text-xs text-bronze">
-                  <span>•</span>
-                  <span>Hybrid</span>
-                  <span>•</span>
-                  <span>Spring 2026</span>
-                </span>
-              </div>
+          {/* Filters + Search Bar */}
+          <div className="mb-10 space-y-4">
+            <div className="flex items-center gap-3 rounded-xl border border-line bg-white/[0.025] px-5 py-4">
+              <Search className="size-5 text-muted" />
+              <span className="flex-1 text-sm text-muted">Search roles, skills, or organizations...</span>
+              <SlidersHorizontal className="size-4 text-muted" />
             </div>
-            <p className="text-sm text-muted line-clamp-3">
-              Microsoft Engage is a mentorship program that aims to encourage and motivate women to pursue careers in technology.
-            </p>
-            <ButtonLink href="#" className="mt-4">
-              Learn More
-            </ButtonLink>
-          </div>
-        </Link>
-
-        {/* Opportunity Card 3 */}
-        <Link href="/opportunities/amazon-wow" className="group">
-          <div className="border border-white/[0.08] rounded-xl p-6 hover:border-bronze/40 transition-group">
-            <div className="flex items-start gap-4 mb-4">
-              <div className="grid size-10 place-items-center rounded-lg bg-bronze/10 text-bronze">
-                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                  <path d="M12 2l30 9H4L12 2z"/>
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-foreground group-hover:text-bronze transition">
-                  Amazon Women of Wisdom
-                </h3>
-                <p className="text-sm text-muted">
-                  Leadership development program
-                </p>
-                <span className="inline-flex items-center gap-2 mt-2 text-xs text-bronze">
-                  <span>•</span>
-                  <span>Online</span>
-                  <span>•</span>
-                  <span>Fall 2026</span>
+            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+              {typeFilters.map((filter) => (
+                <span
+                  key={filter}
+                  className={`shrink-0 cursor-pointer rounded-full border px-4 py-2 text-sm transition hover:border-bronze/60 hover:text-foreground ${
+                    filter === "All"
+                      ? "border-bronze/50 bg-bronze/10 text-bronze"
+                      : "border-line bg-white/[0.025] text-muted"
+                  }`}
+                >
+                  {filter}
                 </span>
-              </div>
+              ))}
             </div>
-            <p className="text-sm text-muted line-clamp-3">
-              Amazon WOW is a pre-placement internship program for female engineering students in their pre-final year.
-            </p>
-            <ButtonLink href="#" className="mt-4">
-              Learn More
-            </ButtonLink>
           </div>
-        </Link>
 
-        {/* Opportunity Card 4 */}
-        <Link href="/opportunities/adobe-india-women-in-technology" className="group">
-          <div className="border border-white/[0.08] rounded-xl p-6 hover:border-bronze/40 transition-group">
-            <div className="flex items-start gap-4 mb-4">
-              <div className="grid size-10 place-items-center rounded-lg bg-bronze/10 text-bronze">
-                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                  <circle cx="12" cy="12" r="10"/>
-                  <path d="M12 16v-4"/>
-                  <path d="M8 12h8"/>
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-foreground group-hover:text-bronze transition">
-                  Adobe India Women in Technology
-                </h3>
-                <p className="text-sm text-muted">
-                  Internship and mentorship program
+          {/* Main Grid */}
+          <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
+            {/* Opportunity Cards */}
+            <div className="space-y-4">
+              {opportunities.map((opp) => (
+                <Panel key={opp.id} className="group p-0 transition hover:-translate-y-0.5 hover:border-bronze/40">
+                  <div className="p-6">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${opportunityTypeColors[opp.type]}`}>
+                            {opp.type}
+                          </span>
+                          {opp.isRemote && (
+                            <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs text-emerald-400">
+                              Remote
+                            </span>
+                          )}
+                        </div>
+                        <h3 className="mt-3 text-xl font-semibold tracking-[-0.02em] text-foreground group-hover:text-bronze transition">
+                          {opp.title}
+                        </h3>
+                        <Link
+                          href={`/communities/${opp.organizationSlug}`}
+                          className="mt-1 inline-flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition"
+                        >
+                          <span className="grid size-5 place-items-center rounded bg-bronze/10 text-[10px] font-bold text-bronze">
+                            {opp.organization[0]}
+                          </span>
+                          {opp.organization}
+                        </Link>
+                      </div>
+                      <div className="shrink-0 w-10">
+                        <SaveButton iconOnly />
+                      </div>
+                    </div>
+
+                    <p className="mt-4 text-sm leading-6 text-muted line-clamp-2">
+                      {opp.description}
+                    </p>
+
+                    <div className="mt-4 flex flex-wrap gap-1.5">
+                      {opp.skills.slice(0, 4).map((skill) => (
+                        <span key={skill} className="rounded-md bg-white/[0.06] px-2.5 py-1 text-xs text-muted">
+                          {skill}
+                        </span>
+                      ))}
+                      {opp.skills.length > 4 && (
+                        <span className="rounded-md bg-white/[0.06] px-2.5 py-1 text-xs text-muted">
+                          +{opp.skills.length - 4}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="mt-5 flex items-center justify-between border-t border-line pt-4">
+                      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-muted">
+                        <span className="inline-flex items-center gap-1.5">
+                          <MapPin className="size-3.5" />
+                          {opp.location}
+                        </span>
+                        {opp.stipend && (
+                          <span className="inline-flex items-center gap-1.5 font-medium text-bronze">
+                            <Briefcase className="size-3.5" />
+                            {opp.stipend}
+                          </span>
+                        )}
+                        <span className="inline-flex items-center gap-1.5">
+                          <Clock className="size-3.5" />
+                          Deadline: {opp.deadline}
+                        </span>
+                        <span className="inline-flex items-center gap-1.5">
+                          <Users className="size-3.5" />
+                          {opp.applicants} applied
+                        </span>
+                        <span className="ml-auto text-muted/60">{opp.postedAgo}</span>
+                      </div>
+                      <div className="ml-4 shrink-0 mt-3 sm:mt-0">
+                        <ApplyButton label="Apply" className="h-8 px-4 text-xs w-auto" />
+                      </div>
+                    </div>
+                  </div>
+                </Panel>
+              ))}
+            </div>
+
+            {/* Sidebar */}
+            <div className="hidden space-y-4 lg:block">
+              {/* Trending */}
+              <Panel className="p-5">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <TrendingUp className="size-4 text-bronze" />
+                  Trending this week
+                </div>
+                <div className="mt-4 space-y-3">
+                  {[
+                    { label: "Frontend Intern at PlotArmour", apps: "142 applied" },
+                    { label: "Campus Ambassador — Convoke", apps: "567 applied" },
+                    { label: "AI/ML Research Intern", apps: "234 applied" },
+                  ].map((item) => (
+                    <div key={item.label} className="flex items-center justify-between rounded-lg border border-line bg-black/30 px-4 py-3 text-sm">
+                      <span className="text-foreground">{item.label}</span>
+                      <span className="text-xs text-bronze">{item.apps}</span>
+                    </div>
+                  ))}
+                </div>
+              </Panel>
+
+              {/* Quick Stats */}
+              <Panel className="p-5">
+                <h3 className="text-sm font-medium">Ecosystem pulse</h3>
+                <div className="mt-4 grid grid-cols-2 gap-3">
+                  {[
+                    ["Active roles", "12"],
+                    ["Communities hiring", "8"],
+                    ["Avg. applicants", "147"],
+                    ["This week", "+4 new"],
+                  ].map(([label, value]) => (
+                    <div key={label} className="rounded-lg border border-line bg-black/30 p-3 text-center">
+                      <p className="text-lg font-semibold text-foreground">{value}</p>
+                      <p className="mt-1 text-xs text-muted">{label}</p>
+                    </div>
+                  ))}
+                </div>
+              </Panel>
+
+              {/* For Organizers */}
+              <Panel className="bg-gradient-to-br from-bronze/10 via-transparent to-rust/5 p-5">
+                <h3 className="text-sm font-medium">Hiring for your community?</h3>
+                <p className="mt-2 text-sm leading-6 text-muted">
+                  Post internships, volunteer roles, or ambassador programs and reach thousands of ambitious students.
                 </p>
-                <span className="inline-flex items-center gap-2 mt-2 text-xs text-bronze">
-                  <span>•</span>
-                  <span>Hybrid</span>
-                  <span>•</span>
-                  <span>Winter 2026</span>
-                </span>
-              </div>
+                <ButtonLink href="/workspace" className="mt-4 w-full" variant="secondary">
+                  Post an opportunity
+                </ButtonLink>
+              </Panel>
             </div>
-            <p className="text-sm text-muted line-clamp-3">
-              Adobe India Women in Technology program aims to nurture and develop female tech talent in India.
-            </p>
-            <ButtonLink href="#" className="mt-4">
-              Learn More
-            </ButtonLink>
           </div>
-        </Link>
-
-        {/* Opportunity Card 5 */}
-        <Link href="/opportunities/flipkart-grid" className="group">
-          <div className="border border-white/[0.08] rounded-xl p-6 hover:border-bronze/40 transition-group">
-            <div className="flex items-start gap-4 mb-4">
-              <div className="grid size-10 place-items-center rounded-lg bg-bronze/10 text-bronze">
-                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-foreground group-hover:text-bronze transition">
-                  Flipkart GRiD
-                </h3>
-                <p className="text-sm text-muted">
-                  Graduate recruitment program
-                </p>
-                <span className="inline-flex items-center gap-2 mt-2 text-xs text-bronze">
-                  <span>•</span>
-                  <span>Bangalore</span>
-                  <span>•</span>
-                  <span>Summer 2026</span>
-                </span>
-              </div>
-            </div>
-            <p className="text-sm text-muted line-clamp-3">
-              Flipkart GRiD is a holistic learning and development program designed for fresh graduates.
-            </p>
-            <ButtonLink href="#" className="mt-4">
-              Learn More
-            </ButtonLink>
-          </div>
-        </Link>
-
-        {/* Opportunity Card 6 */}
-        <Link href="/opportunities/tesla-internship" className="group">
-          <div className="border border-white/[0.08] rounded-xl p-6 hover:border-bronze/40 transition-group">
-            <div className="flex items-start gap-4 mb-4">
-              <div className="grid size-10 place-items-center rounded-lg bg-bronze/10 text-bronze">
-                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                  <path d="M4.93 9.07l13.06 7.55a1 1 0 001.5-.43L22 7l-4-5-10.07 5.8a1 1 0 00-.79.24l-5 3a1 1 0 00-.21.43v2l7.36 4.25a1 1 0 01-.5 1.81l-8.43-4.88a1 1 0 01-.5-1.81V8l7.36-4.25a1 1 0 00.21-.43L16 4l4 5z"/>
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-foreground group-hover:text-bronze transition">
-                  Tesla Internship Program
-                </h3>
-                <p className="text-sm text-muted">
-                  Engineering and business internships
-                </p>
-                <span className="inline-flex items-center gap-2 mt-2 text-xs text-bronze">
-                  <span>•</span>
-                  <span>Various Locations</span>
-                  <span>•</span>
-                  <span>Year Round</span>
-                </span>
-              </div>
-            </div>
-            <p className="text-sm text-muted line-clamp-3">
-              Tesla offers internships across engineering, manufacturing, business, and more for students and recent graduates.
-            </p>
-            <ButtonLink href="#" className="mt-4">
-              Learn More
-            </ButtonLink>
-          </div>
-        </Link>
-      </div>
-
-      {/* Call to Action */}
-      <div className="mt-16 text-center">
-        <h2 className="text-3xl font-bold text-foreground mb-6">
-          Have an opportunity to share?
-        </h2>
-        <p className="text-lg text-muted max-w-2xl mx-auto mb-8">
-          Post internships, jobs, collaborations, or programs to reach our community of ambitious students and creators.
-        </p>
-        <ButtonLink href="/workspace" className="inline-flex items-center gap-2">
-          Post an Opportunity
-          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-            <path d="M12 5v14M5 12h14"/>
-          </svg>
-        </ButtonLink>
-      </div>
-    </div>
-  );
-}
-
-// ButtonLink component (simple version for this page)
-function ButtonLink({ 
-  href, 
-  children, 
-  className = "" 
-}: {
-  href: string;
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <a 
-      href={href} 
-      className={`inline-flex items-center justify-center rounded-md border border-transparent bg-bronze px-4 py-2 text-sm font-medium text-background hover:bg-bronze/90 focus:outline-none focus:ring-2 focus:ring-bronze focus:ring-offset-2 disabled:opacity-50 transition-colors ${className}`}
-    >
-      {children}
-    </a>
+        </div>
+      </main>
+      <Footer />
+    </>
   );
 }

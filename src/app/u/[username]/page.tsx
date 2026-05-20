@@ -1,24 +1,52 @@
+import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { Badge, BarChart3, Camera, Code2, Link2, Shirt, Trophy, Users, Workflow, CalendarDays } from "lucide-react";
+import { BadgeCheck, BarChart3, Camera, Code2, Link2, Shirt, Trophy, Users, Workflow, CalendarDays } from "lucide-react";
 import { Footer } from "@/components/marketing/footer";
 import { SiteHeader } from "@/components/marketing/site-header";
 import { Panel } from "@/components/ui/panel";
+import { seedPeople } from "@/data/platform";
 
 type PageProps = {
   params: Promise<{ username: string }>;
 };
 
+// Generate slugs for seed people
+function generateUsername(name: string) {
+  return name.toLowerCase().replace(/\s+/g, "");
+}
+
+export async function generateStaticParams() {
+  return seedPeople.map((p) => ({
+    username: generateUsername(p.name),
+  }));
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { username } = await params;
+  const person = seedPeople.find(p => generateUsername(p.name) === username);
+  
+  if (!person) {
+    return {
+      title: "User Not Found — Convoke",
+      description: "Profile not found.",
+    };
+  }
+
   return {
-    title: `@${username}`,
-    description: "Convoke community reputation profile.",
+    title: `${person.name} (@${username}) — Convoke`,
+    description: `Convoke community reputation profile for ${person.name}. ${person.role}.`,
   };
 }
 
 export default async function ProfilePage({ params }: PageProps) {
   const { username } = await params;
-  const socials = [Link2, Code2, Camera, Badge];
+  const person = seedPeople.find(p => generateUsername(p.name) === username);
+
+  if (!person) {
+    notFound();
+  }
+
+  const socials = [Link2, Code2, Camera, BadgeCheck];
 
   return (
     <>
@@ -30,17 +58,17 @@ export default async function ProfilePage({ params }: PageProps) {
             <div className="p-6 md:p-8">
               <div className="-mt-20 size-32 rounded-[8px] border border-bronze/50 bg-gradient-to-br from-bronze via-rust to-steel p-1">
                 <div className="grid size-full place-items-center rounded-[6px] bg-black text-5xl font-semibold">
-                  AS
+                  {person.initials}
                 </div>
               </div>
               <div className="mt-6 grid gap-8 lg:grid-cols-[1fr_320px]">
                 <div>
                   <h1 className="text-5xl font-semibold tracking-[-0.04em]">
-                    Arya Sen
+                    {person.name}
                   </h1>
                   <p className="mt-2 text-muted">@{username}</p>
                   <p className="mt-6 max-w-2xl text-lg leading-8 text-muted">
-                    Founder & Community Builder | Ex-Google Developer Relations | 
+                    {person.role} at {person.community} | Ex-Google Developer Relations | 
                     Building India's nextgen startup ecosystem through Convoke
                   </p>
                   <div className="mt-7 flex gap-3">
@@ -48,10 +76,10 @@ export default async function ProfilePage({ params }: PageProps) {
                       <a
                         key={index}
                         href={[
-                          "https://linkedin.com/in/aryasen",
-                          "https://github.com/aryasen",
-                          "https://instagram.com/aryasen_",
-                          "https://youtube.com/@aryasen"
+                          `https://linkedin.com/in/${username}`,
+                          `https://github.com/${username}`,
+                          `https://instagram.com/${username}_`,
+                          `https://youtube.com/@${username}`
                         ][index]}
                         target="_blank"
                         rel="noreferrer"
@@ -64,10 +92,10 @@ export default async function ProfilePage({ params }: PageProps) {
                 </div>
                 <div className="grid gap-3">
                   {[
-                    ["Reputation", "9.4"],
-                    ["Events Organized", "12"],
-                    ["Volunteer Hours", "420"],
-                    ["Communities Led", "5"],
+                    ["Reputation", (Math.random() * 2 + 8).toFixed(1)],
+                    ["Events Organized", Math.floor(Math.random() * 20)],
+                    ["Volunteer Hours", Math.floor(Math.random() * 500)],
+                    ["Communities Led", Math.floor(Math.random() * 5) + 1],
                   ].map(([label, value]) => (
                     <div key={label} className="flex items-center justify-between rounded-[8px] border border-line bg-black/35 px-4 py-3">
                       <span className="text-sm text-muted">{label}</span>
@@ -86,8 +114,8 @@ export default async function ProfilePage({ params }: PageProps) {
               <div className="mt-4 space-y-3">
                 <div className="border-l-2 border-bronze/20 pl-4">
                   <p className="text-sm text-muted">2026</p>
-                  <h3 className="font-medium text-foreground">Founded Convoke</h3>
-                  <p className="text-sm text-muted">Building India's premier student ecosystem platform</p>
+                  <h3 className="font-medium text-foreground">{person.role}</h3>
+                  <p className="text-sm text-muted">{person.community}</p>
                 </div>
                 <div className="border-l-2 border-bronze/20 pl-4">
                   <p className="text-sm text-muted">2024-2025</p>
@@ -108,20 +136,16 @@ export default async function ProfilePage({ params }: PageProps) {
               <h2 className="mt-8 text-2xl font-medium">Communities</h2>
               <div className="mt-4 space-y-3">
                 <div className="flex justify-between">
+                  <span className="text-sm font-medium">{person.community}</span>
+                  <span className="text-sm text-muted">Core Member</span>
+                </div>
+                <div className="flex justify-between">
                   <span className="text-sm font-medium">North Grid Societies</span>
                   <span className="text-sm text-muted">Advisor</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm font-medium">Women in Tech India</span>
                   <span className="text-sm text-muted">Mentor</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium">Delhi Startup Founders</span>
-                  <span className="text-sm text-muted">Core Member</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium">IIT Delhi Entrepreneurship Cell</span>
-                  <span className="text-sm text-muted">Alumni Mentor</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm font-medium">Creator Collective India</span>
@@ -136,24 +160,20 @@ export default async function ProfilePage({ params }: PageProps) {
               <h2 className="mt-8 text-2xl font-medium">Events participated</h2>
               <div className="mt-4 space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-sm font-medium">Summit Zero 2025</span>
+                  <span className="text-sm font-medium">Summit Zero 2026</span>
                   <span className="text-sm text-muted">Speaker & Organizer</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm font-medium">Forge Hack 2025</span>
+                  <span className="text-sm font-medium">Forge Hack 2026</span>
                   <span className="text-sm text-muted">Judge & Mentor</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm font-medium">Campus Protocol 2025</span>
+                  <span className="text-sm font-medium">Campus Protocol 2026</span>
                   <span className="text-sm text-muted">Workshop Facilitator</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm font-medium">Google I/O Extended Delhi</span>
-                  <span className="text-sm text-muted">Community Lead</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium">Flutter Fest India 2025</span>
-                  <span className="text-sm text-muted">Keynote Speaker</span>
+                  <span className="text-sm font-medium">Neural Nights 2026</span>
+                  <span className="text-sm text-muted">Hacker</span>
                 </div>
               </div>
             </Panel>
@@ -169,7 +189,7 @@ export default async function ProfilePage({ params }: PageProps) {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm font-muted">Campus Connect</span>
-                  <span className="text-sm text-muted">Networking app for college students across India</span>
+                  <span className="text-sm text-muted">Networking app for college students</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm font-medium">OpenSource India</span>
@@ -177,7 +197,7 @@ export default async function ProfilePage({ params }: PageProps) {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm font-medium">EcoTrack</span>
-                  <span className="text-sm text-muted">Carbon footprint tracker for university campuses</span>
+                  <span className="text-sm text-muted">Carbon footprint tracker for campuses</span>
                 </div>
               </div>
             </Panel>
@@ -214,15 +234,6 @@ export default async function ProfilePage({ params }: PageProps) {
                     </div>
                   </div>
                 </div>
-                <div className="border border-white/[0.08] rounded-lg p-4">
-                  <div className="flex items-center gap-3">
-                    <Shirt className="h-5 w-5 text-bronze" />
-                    <div>
-                      <h3 className="text-sm font-medium text-foreground">Culture Champion</h3>
-                      <p className="text-xs text-muted">Promotes diversity and inclusion in tech spaces</p>
-                    </div>
-                  </div>
-                </div>
               </div>
             </Panel>
             
@@ -234,19 +245,19 @@ export default async function ProfilePage({ params }: PageProps) {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-sm font-medium">Profile Views (Monthly)</span>
-                    <span className="text-sm font-mono text-bronze">2.4K</span>
+                    <span className="text-sm font-mono text-bronze">{(Math.random() * 5 + 1).toFixed(1)}K</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm font-medium">Connection Requests</span>
-                    <span className="text-sm font-mono text-bronze">156</span>
+                    <span className="text-sm font-mono text-bronze">{Math.floor(Math.random() * 500)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm font-medium">Post Engagement Rate</span>
-                    <span className="text-sm font-mono text-bronze">8.7%</span>
+                    <span className="text-sm font-mono text-bronze">{(Math.random() * 10 + 5).toFixed(1)}%</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm font-medium">Community Growth Impact</span>
-                    <span className="text-sm font-mono text-bronze">12K+</span>
+                    <span className="text-sm font-mono text-bronze">{(Math.random() * 20 + 5).toFixed(1)}K+</span>
                   </div>
                 </div>
               </div>
