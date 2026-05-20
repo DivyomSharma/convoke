@@ -21,7 +21,7 @@ export default function MerchPage() {
 
   const whatsappUrl = useMemo(() => {
     const message = `Convoke merch inquiry:%0AProduct: ${form.product}%0AQuantity: ${form.quantity}%0ABudget: ${form.budget}%0ATimeline: ${form.timeline}%0ACity: ${form.city}`;
-    return `https://wa.me/919999999999?text=${message}`;
+    return `https://wa.me/918744069597?text=${message}`;
   }, [form]);
 
   return (

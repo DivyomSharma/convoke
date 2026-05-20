@@ -1,668 +1,438 @@
-import { PrismaClient } from '@prisma/client'
+import {
+  ApplicationStatus,
+  EventMode,
+  MerchStatus,
+  NotificationStatus,
+  OpportunityType,
+  PrismaClient,
+  RegistrationStatus,
+  SponsorStage,
+  TicketTypeCategory,
+  UserRole,
+} from "@prisma/client";
+import {
+  seedAnnouncements,
+  seedEventFaqs,
+  seedEventSchedules,
+  seedGalleryImages,
+  seedMerchInquiries,
+  seedOpportunities,
+  seedOrganizations,
+  seedSponsorLeads,
+  seedUsers,
+  seedVolunteerApplications,
+} from "../src/lib/platform-seed";
+import { featuredEvents } from "../src/data/platform";
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Starting database seeding...')
-  
-  // Create sample users
-  const users = await Promise.all([
-    prisma.user.create({
-      data: {
-        email: 'attendee@example.com',
-        username: 'attendee',
-        name: 'Alex Johnson',
-        headline: 'Tech Enthusiast & Event Attendee',
-        role: 'ATTENDEE',
-        bio: 'Passionate about technology, innovation, and networking. I love attending events to learn new things and meet like-minded people.',
-        imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
-      }
-    }),
-    prisma.user.create({
-      data: {
-        email: 'organizer@example.com',
-        username: 'organizer',
-        name: 'Sarah Chen',
-        headline: 'Event Organizer & Community Builder',
-        role: 'ORGANIZER',
-        bio: 'Experienced event organizer with a passion for creating meaningful experiences that connect people and foster collaboration.',
-        imageUrl: 'https://images.unsplash.com/photo-1494790108755-2616b612b5d3?w=400&h=400&fit=crop&crop=face',
-      }
-    }),
-    prisma.user.create({
-      data: {
-        email: 'volunteer@example.com',
-        username: 'volunteer',
-        name: 'Marcus Rodriguez',
-        headline: 'Community Volunteer & Student Leader',
-        role: 'VOLUNTEER',
-        bio: 'Dedicated volunteer committed to making a difference in the community through service and leadership.',
-        imageUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face',
-      }
-    }),
-    prisma.user.create({
-      data: {
-        email: 'sponsor@example.com',
-        username: 'sponsor',
-        name: 'Priya Sharma',
-        headline: 'Corporate Sponsorship Manager',
-        role: 'SPONSOR',
-        bio: 'Strategic partnership professional focused on creating mutually beneficial relationships between brands and events.',
-        imageUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop&crop=face',
-      }
-    }),
-    prisma.user.create({
-      data: {
-        email: 'admin@example.com',
-        username: 'admin',
-        name: 'David Kim',
-        headline: 'Platform Administrator',
-        role: 'ADMIN',
-        bio: 'Platform administrator responsible for maintaining and improving the Convoke ecosystem.',
-        imageUrl: 'https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=400&h=400&fit=crop&crop=face',
-      }
-    })
-  ])
+  await prisma.reaction.deleteMany();
+  await prisma.comment.deleteMany();
+  await prisma.follow.deleteMany();
+  await prisma.notification.deleteMany();
+  await prisma.certificate.deleteMany();
+  await prisma.bookmark.deleteMany();
+  await prisma.opportunityApplication.deleteMany();
+  await prisma.opportunity.deleteMany();
+  await prisma.merchInquiry.deleteMany();
+  await prisma.volunteerApplication.deleteMany();
+  await prisma.sponsorLead.deleteMany();
+  await prisma.eventSponsor.deleteMany();
+  await prisma.eventSpeaker.deleteMany();
+  await prisma.eventSchedule.deleteMany();
+  await prisma.registration.deleteMany();
+  await prisma.ticketType.deleteMany();
+  await prisma.galleryItem.deleteMany();
+  await prisma.gallery.deleteMany();
+  await prisma.announcement.deleteMany();
+  await prisma.event.deleteMany();
+  await prisma.membership.deleteMany();
+  await prisma.organization.deleteMany();
+  await prisma.project.deleteMany();
+  await prisma.education.deleteMany();
+  await prisma.experience.deleteMany();
+  await prisma.profile.deleteMany();
+  await prisma.user.deleteMany();
 
-  // Create profiles for users
-  await Promise.all(
-    users.map(user => 
-      prisma.profile.create({
+  for (const organization of seedOrganizations) {
+    await prisma.organization.create({
+      data: {
+        slug: organization.slug,
+        name: organization.name,
+        type: organization.type,
+        description: organization.description,
+        website: organization.website,
+        avatarUrl: organization.avatarUrl,
+        bannerUrl: organization.bannerUrl,
+        membersCount: organization.membersCount,
+        eventsCount: organization.eventsCount,
+        opportunitiesCount: organization.opportunitiesCount,
+      },
+    });
+  }
+
+  for (const user of seedUsers) {
+    const createdUser = await prisma.user.create({
+      data: {
+        email: user.email,
+        username: user.username,
+        name: user.name,
+        headline: user.headline,
+        bio: user.bio,
+        role: user.role as UserRole,
+        profile: {
+          create: {
+            headline: user.headline,
+            location: user.location,
+            website: user.website,
+            linkedinUrl: user.socials.linkedin,
+            githubUrl: user.socials.github,
+            instagramUrl: user.socials.instagram,
+            portfolioUrl: user.website,
+            skills: user.skills,
+            badges: user.badges,
+            reputation: 8.2,
+            eventsAttended: user.stats.eventsAttended,
+            eventsOrganized: user.stats.eventsOrganized,
+            volunteerHours: user.stats.volunteerHours,
+            communitiesJoined: user.stats.communitiesJoined,
+          },
+        },
+      },
+    });
+
+    await prisma.experience.create({
+      data: {
+        userId: createdUser.id,
+        company: user.experience.company,
+        position: user.experience.position,
+        location: user.location,
+        current: true,
+        description: user.experience.description,
+      },
+    });
+
+    await prisma.project.create({
+      data: {
+        userId: createdUser.id,
+        name: user.project.name,
+        description: user.project.description,
+        url: user.website,
+        technologies: user.project.technologies,
+      },
+    });
+
+    if (user.organizationSlug) {
+      const organization = await prisma.organization.findUniqueOrThrow({
+        where: { slug: user.organizationSlug },
+      });
+
+      await prisma.membership.create({
+        data: {
+          userId: createdUser.id,
+          organizationId: organization.id,
+          role: user.role === "ORGANIZER" ? "Owner" : user.role === "VOLUNTEER" ? "Volunteer" : "Member",
+        },
+      });
+    }
+  }
+
+  for (const [index, event] of featuredEvents.entries()) {
+    const organization = await prisma.organization.findUniqueOrThrow({
+      where: { slug: event.organizerSlug },
+    });
+    const organizerMembership = await prisma.membership.findFirst({
+      where: { organizationId: organization.id },
+      include: { user: true },
+    });
+
+    const createdEvent = await prisma.event.create({
+      data: {
+        organizationId: organization.id,
+        organizerId: organizerMembership?.userId,
+        slug: event.slug,
+        title: event.title,
+        category: event.category,
+        city: event.city,
+        mode: event.mode as EventMode,
+        startsAt: new Date(Date.UTC(2026, 7 + index, 12, 4)),
+        endsAt: new Date(Date.UTC(2026, 7 + index, 12, 12)),
+        isPaid: event.price > 0,
+        heroImageUrl: event.image,
+      },
+    });
+
+    await prisma.ticketType.create({
+      data: {
+        eventId: createdEvent.id,
+        name: event.price > 0 ? "General pass" : "Registration",
+        category: TicketTypeCategory.GENERAL,
+        priceInr: event.price,
+        capacity: event.attendees + 150,
+        sold: event.attendees,
+      },
+    });
+
+    const schedules = seedEventSchedules.find((item) => item.eventSlug === event.slug)?.items ?? [];
+    for (const schedule of schedules) {
+      await prisma.eventSchedule.create({
+        data: {
+          eventId: createdEvent.id,
+          title: schedule.title,
+          description: schedule.description,
+          startsAt: new Date(schedule.startsAt),
+          endsAt: new Date(schedule.endsAt),
+          location: schedule.location,
+        },
+      });
+    }
+
+    const speakerUsers = await prisma.user.findMany({ take: 4, orderBy: { createdAt: "asc" } });
+    for (const speakerUser of speakerUsers) {
+      await prisma.eventSpeaker.create({
+        data: {
+          eventId: createdEvent.id,
+          userId: speakerUser.id,
+          name: speakerUser.name,
+          title: speakerUser.headline,
+          organization: speakerUser.username,
+          talkTitle: `${event.title} perspective`,
+          bio: speakerUser.bio,
+        },
+      });
+    }
+
+    const leadSponsors = seedSponsorLeads.filter((lead) => lead.eventSlug === event.slug);
+    for (const lead of leadSponsors) {
+      await prisma.eventSponsor.create({
+        data: {
+          eventId: createdEvent.id,
+          companyName: lead.companyName,
+          tier: lead.stage,
+          benefits: ["Brand visibility", "Access to builders"],
+        },
+      });
+    }
+
+    const gallery = await prisma.gallery.create({
+      data: {
+        organizationId: organization.id,
+        eventId: createdEvent.id,
+        title: `${event.title} gallery`,
+      },
+    });
+
+    const galleryImages = seedGalleryImages[event.slug] ?? [event.image];
+    for (const [galleryIndex, image] of galleryImages.entries()) {
+      await prisma.galleryItem.create({
+        data: {
+          galleryId: gallery.id,
+          url: image,
+          order: galleryIndex,
+        },
+      });
+    }
+  }
+
+  for (const opportunity of seedOpportunities) {
+    const organization = await prisma.organization.findUniqueOrThrow({
+      where: { slug: opportunity.organizationSlug },
+    });
+
+    await prisma.opportunity.create({
+      data: {
+        organizationId: organization.id,
+        title: opportunity.title,
+        type: opportunity.type
+          .toUpperCase()
+          .replace(/[^A-Z]+/g, "_")
+          .replace(/^FULL_TIME$/, "STARTUP_JOB")
+          .replace(/^HACKATHON_TEAM$/, "CONTEST") as OpportunityType,
+        location: opportunity.location,
+        isRemote: opportunity.isRemote,
+        description: opportunity.description,
+        requirements: opportunity.skills,
+        skills: opportunity.skills,
+        stipend: opportunity.stipend ?? undefined,
+        applicationDeadline: opportunity.applicationDeadline
+          ? new Date(opportunity.applicationDeadline)
+          : undefined,
+        positionsAvailable: 3,
+        applicationsCount: opportunity.applicants,
+        featured: opportunity.featured,
+      },
+    });
+  }
+
+  for (const volunteerApplication of seedVolunteerApplications) {
+    const user = await prisma.user.findUniqueOrThrow({
+      where: { username: volunteerApplication.username },
+    });
+    const event = await prisma.event.findUniqueOrThrow({
+      where: { slug: volunteerApplication.eventSlug },
+    });
+
+    await prisma.volunteerApplication.create({
+      data: {
+        userId: user.id,
+        eventId: event.id,
+        role: volunteerApplication.role,
+        status: volunteerApplication.status,
+        hours: volunteerApplication.hours,
+      },
+    });
+  }
+
+  for (const sponsorLead of seedSponsorLeads) {
+    const organization = await prisma.organization.findUniqueOrThrow({
+      where: { slug: sponsorLead.organizationSlug },
+    });
+    const event = sponsorLead.eventSlug
+      ? await prisma.event.findUnique({ where: { slug: sponsorLead.eventSlug } })
+      : null;
+
+    await prisma.sponsorLead.create({
+      data: {
+        organizationId: organization.id,
+        eventId: event?.id,
+        companyName: sponsorLead.companyName,
+        contactEmail: sponsorLead.contactEmail,
+        stage: sponsorLead.stage as SponsorStage,
+        valueInr: sponsorLead.valueInr,
+      },
+    });
+  }
+
+  for (const merchInquiry of seedMerchInquiries) {
+    const organization = merchInquiry.organizationSlug
+      ? await prisma.organization.findUnique({ where: { slug: merchInquiry.organizationSlug } })
+      : null;
+
+    await prisma.merchInquiry.create({
+      data: {
+        organizationId: organization?.id,
+        apparelType: merchInquiry.apparelType,
+        quantity: merchInquiry.quantity,
+        budget: merchInquiry.budget,
+        timeline: merchInquiry.timeline,
+        city: merchInquiry.city,
+        references: merchInquiry.references,
+        stylePreferences: merchInquiry.stylePreferences,
+        status: merchInquiry.status as MerchStatus,
+      },
+    });
+  }
+
+  const users = await prisma.user.findMany({ orderBy: { createdAt: "asc" } });
+  const events = await prisma.event.findMany({ include: { ticketTypes: true }, orderBy: { startsAt: "asc" } });
+  const dbOpportunities = await prisma.opportunity.findMany({ orderBy: { createdAt: "asc" } });
+
+  for (const [index, user] of users.entries()) {
+    const event = events[index % events.length];
+    const ticketType = event.ticketTypes[0];
+    await prisma.registration.create({
+      data: {
+        userId: user.id,
+        eventId: event.id,
+        ticketTypeId: ticketType?.id,
+        status: [RegistrationStatus.APPROVED, RegistrationStatus.PENDING, RegistrationStatus.WAITLISTED][index % 3],
+        qrCode: `QR-${user.username}-${event.slug}`,
+        tags: [event.category, "seeded"],
+      },
+    });
+
+    const opportunity = dbOpportunities[index % dbOpportunities.length];
+    await prisma.opportunityApplication.create({
+      data: {
+        userId: user.id,
+        opportunityId: opportunity.id,
+        status: [
+          ApplicationStatus.APPLIED,
+          ApplicationStatus.REVIEWING,
+          ApplicationStatus.SHORTLISTED,
+        ][index % 3],
+        coverLetter: `I want to contribute to ${opportunity.title} through Convoke.`,
+        portfolioUrl: `https://portfolio.theconvoke.xyz/${user.username}`,
+      },
+    });
+
+    if (index < 4) {
+      await prisma.bookmark.create({
         data: {
           userId: user.id,
-          headline: user.headline,
-          avatarUrl: user.imageUrl,
-          location: 'San Francisco, CA',
-          website: 'https://example.com',
-          linkedinUrl: `https://linkedin.com/in/${user.username}`,
-          twitterUrl: `https://twitter.com/${user.username}`,
-          skills: ['Leadership', 'Communication', 'Networking'],
-          badges: ['Early Adopter', 'Community Contributor'],
-          eventsAttended: Math.floor(Math.random() * 10),
-          eventsOrganized: Math.floor(Math.random() * 5),
-          volunteerHours: Math.floor(Math.random() * 50),
-          communitiesJoined: Math.floor(Math.random() * 3)
-        }
-      })
-    )
-  )
+          eventId: events[(index + 1) % events.length].id,
+          opportunityId: dbOpportunities[(index + 1) % dbOpportunities.length].id,
+          organizationId: (
+            await prisma.organization.findUniqueOrThrow({
+              where: { slug: seedOrganizations[index % seedOrganizations.length].slug },
+            })
+          ).id,
+        },
+      });
+    }
 
-  // Create sample organizations
-  const organizations = await Promise.all([
-    prisma.organization.create({
+    await prisma.notification.create({
       data: {
-        name: 'Tech Innovators Collective',
-        slug: 'tech-innovators',
-        type: 'Technology Community',
-        description: 'A community of technology enthusiasts, innovators, and thought leaders dedicated to advancing technology and fostering innovation.',
-        website: 'https://techinnovators.example.com',
-        avatarUrl: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=400&h=400&fit=crop&crop=face',
-        bannerUrl: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1200&h=400&fit=crop',
-      }
-    }),
-    prisma.organization.create({
-      data: {
-        name: 'Green Future Initiative',
-        slug: 'green-future',
-        type: 'Environmental Organization',
-        description: 'Dedicated to promoting sustainability and environmental awareness through education, advocacy, and community action.',
-        website: 'https://greenfuture.example.com',
-        avatarUrl: 'https://images.unsplash.com/photo-1448315640896-05b2c30e5d62?w=400&h=400&fit=crop&crop=face',
-        bannerUrl: 'https://images.unsplash.com/photo-1448315640896-05b2c30e5d62?w=1200&h=400&fit=crop',
-      }
-    }),
-    prisma.organization.create({
-      data: {
-        name: 'Creative Arts Alliance',
-        slug: 'creative-arts',
-        type: 'Arts & Culture Organization',
-        description: 'A vibrant community of artists, creators, and cultural enthusiasts celebrating creativity in all its forms.',
-        website: 'https://creativearts.example.com',
-        avatarUrl: 'https://images.unsplash.com/photo-1518563548045-01d2ec5e6af2?w=400&h=400&fit=crop&crop=face',
-        bannerUrl: 'https://images.unsplash.com/photo-1518563548045-01d2ec5e6af2?w=1200&h=400&fit=crop',
-      }
-    })
-  ])
+        userId: user.id,
+        type: "APPLICATION_UPDATE",
+        title: "Your application moved forward",
+        message: `${opportunity.title} is now in ${[
+          "reviewing",
+          "shortlisted",
+          "applied",
+        ][index % 3]} state.`,
+        status: index % 2 === 0 ? NotificationStatus.UNREAD : NotificationStatus.READ,
+      },
+    });
 
-  // Create memberships
-  await Promise.all([
-    prisma.membership.create({
+    await prisma.certificate.create({
       data: {
-        userId: users[0].id, // attendee
-        organizationId: organizations[0].id,
-        role: 'Member'
-      }
-    }),
-    prisma.membership.create({
-      data: {
-        userId: users[1].id, // organizer
-        organizationId: organizations[0].id,
-        role: 'Organizer'
-      }
-    }),
-    prisma.membership.create({
-      data: {
-        userId: users[2].id, // volunteer
-        organizationId: organizations[1].id,
-        role: 'Volunteer Coordinator'
-      }
-    }),
-    prisma.membership.create({
-      data: {
-        userId: users[3].id, // sponsor
-        organizationId: organizations[2].id,
-        role: 'Sponsor Relations'
-      }
-    })
-  ])
+        userId: user.id,
+        eventId: event.id,
+        type: "PARTICIPATION",
+        title: `${event.title} participation certificate`,
+        description: `Issued to ${user.name} through Convoke.`,
+      },
+    });
+  }
 
-  // Create sample events
-  const now = new Date()
-  const events = await Promise.all([
-    prisma.event.create({
-      data: {
-        organizationId: organizations[0].id,
-        organizerId: users[1].id,
-        title: 'Future of AI Conference 2026',
-        slug: 'future-of-ai-2026',
-        category: 'Technology',
-        city: 'San Francisco',
-        mode: 'HYBRID',
-        startsAt: new Date(now.getFullYear(), now.getMonth() + 2, 15),
-        endsAt: new Date(now.getFullYear(), now.getMonth() + 2, 17),
-        isPaid: true,
-        inviteOnly: false,
-        approvalBased: false,
-        heroImageUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&h=600&fit=crop',
-      }
-    }),
-    prisma.event.create({
-      data: {
-        organizationId: organizations[1].id,
-        organizerId: users[2].id,
-        title: 'Sustainability Summit',
-        slug: 'sustainability-summit-2026',
-        category: 'Environment',
-        city: 'Portland',
-        mode: 'OFFLINE',
-        startsAt: new Date(now.getFullYear(), now.getMonth() + 3, 10),
-        endsAt: new Date(now.getFullYear(), now.getMonth() + 3, 12),
-        isPaid: false,
-        inviteOnly: false,
-        approvalBased: true,
-        heroImageUrl: 'https://images.unsplash.com/photo-1448315640896-05b2c30e5d62?w=1200&h=600&fit=crop',
-      }
-    }),
-    prisma.event.create({
-      data: {
-        organizationId: organizations[2].id,
-        organizerId: users[0].id,
-        title: 'Digital Arts Festival',
-        slug: 'digital-arts-festival-2026',
-        category: 'Arts & Culture',
-        city: 'New York',
-        mode: 'ONLINE',
-        startsAt: new Date(now.getFullYear(), now.getMonth() + 1, 5),
-        endsAt: new Date(now.getFullYear(), now.getMonth() + 1, 7),
-        isPaid: true,
-        inviteOnly: false,
-        approvalBased: false,
-        heroImageUrl: 'https://images.unsplash.com/photo-1518563548045-01d2ec5e6af2?w=1200&h=600&fit=crop',
-      }
-    })
-  ])
+  for (const announcement of seedAnnouncements) {
+    const organization = await prisma.organization.findUniqueOrThrow({
+      where: { slug: announcement.organizationSlug },
+    });
 
-  // Create ticket types
-  await Promise.all([
-    prisma.ticketType.create({
+    await prisma.announcement.create({
       data: {
-        eventId: events[0].id,
-        name: 'General Admission',
-        category: 'GENERAL',
-        priceInr: 5000,
-        capacity: 200,
-        sold: 75
-      }
-    }),
-    prisma.ticketType.create({
-      data: {
-        eventId: events[0].id,
-        name: 'VIP Pass',
-        category: 'VIP',
-        priceInr: 15000,
-        capacity: 50,
-        sold: 20
-      }
-    }),
-    prisma.ticketType.create({
-      data: {
-        eventId: events[1].id,
-        name: 'Free Registration',
-        category: 'GENERAL',
-        priceInr: 0,
-        capacity: 500,
-        sold: 300
-      }
-    })
-  ])
-
-  // Create event schedules
-  await Promise.all([
-    prisma.eventSchedule.create({
-      data: {
-        eventId: events[0].id,
-        title: 'Opening Keynote: The Future of AI',
-        description: 'Visionary talk on where AI is headed and what it means for humanity.',
-        startsAt: new Date(now.getFullYear(), now.getMonth() + 2, 15, 9, 0),
-        endsAt: new Date(now.getFullYear(), now.getMonth() + 2, 15, 10, 0)
-      }
-    }),
-    prisma.eventSchedule.create({
-      data: {
-        eventId: events[0].id,
-        title: 'Networking Break',
-        description: 'Coffee and networking session.',
-        startsAt: new Date(now.getFullYear(), now.getMonth() + 2, 15, 10, 0),
-        endsAt: new Date(now.getFullYear(), now.getMonth() + 2, 15, 10, 30),
-        isBreak: true
-      }
-    }),
-    prisma.eventSchedule.create({
-      data: {
-        eventId: events[0].id,
-        title: 'Panel Discussion: AI Ethics',
-        description: 'Experts discuss the ethical implications of AI development.',
-        startsAt: new Date(now.getFullYear(), now.getMonth() + 2, 15, 11, 0),
-        endsAt: new Date(now.getFullYear(), now.getMonth() + 2, 15, 12, 0)
-      }
-    })
-  ])
-
-  // Create event speakers
-  await Promise.all([
-    prisma.eventSpeaker.create({
-      data: {
-        eventId: events[0].id,
-        userId: users[0].id,
-        name: 'Dr. Elena Rodriguez',
-        title: 'AI Research Director',
-        organization: 'Tech Innovators Collective',
-        bio: 'Leading researcher in artificial intelligence with over 15 years of experience in the field.',
-        talkTitle: 'The Future of AI: Opportunities and Challenges',
-        talkDescription: 'Exploring the potential of AI to transform industries while addressing ethical considerations.',
-        avatarUrl: 'https://images.unsplash.com/photo-1494790108755-2616b612b5d3?w=400&h=400&fit=crop&crop=face'
-      }
-    }),
-    prisma.eventSpeaker.create({
-      data: {
-        eventId: events[0].id,
-        name: 'James Wilson',
-        title: 'Senior AI Engineer',
-        organization: 'NVIDIA',
-        bio: 'AI engineer specializing in machine learning and deep learning applications.',
-        talkTitle: 'Practical Applications of AI in Industry',
-        talkDescription: 'Real-world examples of how AI is being used to solve business problems.',
-        avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face'
-      }
-    })
-  ])
-
-  // Create event sponsors
-  await Promise.all([
-    prisma.eventSponsor.create({
-      data: {
-        eventId: events[0].id,
-        organizationId: organizations[0].id,
-        companyName: 'Tech Innovators Collective',
-        tier: 'Platinum',
-        benefits: ['Booth space', 'Speaking opportunity', 'Logo on all materials'],
-        logoUrl: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=200&h=200&fit=crop'
-      }
-    }),
-    prisma.eventSponsor.create({
-      data: {
-        eventId: events[0].id,
-        companyName: 'NVIDIA',
-        tier: 'Gold',
-        benefits: ['Booth space', 'Logo on website and social media'],
-        logoUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=200&h=200&fit=crop'
-      }
-    }),
-    prisma.eventSponsor.create({
-      data: {
-        eventId: events[0].id,
-        companyName: 'Microsoft',
-        tier: 'Silver',
-        benefits: ['Logo on event materials'],
-        logoUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=200&h=200&fit=crop'
-      }
-    })
-  ])
-
-  // Create volunteer applications
-  await Promise.all([
-    prisma.volunteerApplication.create({
-      data: {
-        userId: users[2].id,
-        eventId: events[0].id,
-        role: 'Registration Assistant',
-        status: 'APPROVED',
-        hours: 8
-      }
-    }),
-    prisma.volunteerApplication.create({
-      data: {
-        userId: users[0].id,
-        eventId: events[1].id,
-        role: 'Event Setup Crew',
-        status: 'PENDING',
-        hours: 0
-      }
-    })
-  ])
-
-  // Create sponsor leads
-  await Promise.all([
-    prisma.sponsorLead.create({
-      data: {
-        organizationId: organizations[0].id,
-        eventId: events[0].id,
-        companyName: 'Google',
-        contactEmail: 'partnerships@google.com',
-        stage: 'CONTACTED',
-        valueInr: 50000,
-        notes: 'Interested in sponsoring the AI track of the conference.'
-      }
-    }),
-    prisma.sponsorLead.create({
-      data: {
-        organizationId: organizations[1].id,
-        companyName: 'Patagonia',
-        contactEmail: 'environmental@patagonia.com',
-        stage: 'PROSPECTING',
-        valueInr: 30000,
-        notes: 'Outdoor apparel company interested in environmental events.'
-      }
-    })
-  ])
-
-  // Create opportunities
-  const opportunities = await Promise.all([
-    prisma.opportunity.create({
-      data: {
-        organizationId: organizations[0].id,
-        title: 'Software Engineering Internship',
-        type: 'INTERNSHIP',
-        location: 'San Francisco, CA',
-        isRemote: false,
-        description: 'Join our engineering team to work on cutting-edge technology projects.',
-        requirements: ['Currently pursuing CS degree', 'Knowledge of JavaScript/Python', 'Strong problem-solving skills'],
-        skills: ['JavaScript', 'Python', 'React', 'Node.js'],
-        stipend: '30000 INR/month',
-        duration: '3 months',
-        startsAt: new Date(now.getFullYear(), now.getMonth() + 1, 1),
-        endsAt: new Date(now.getFullYear(), now.getMonth() + 4, 31),
-        applicationDeadline: new Date(now.getFullYear(), now.getMonth() + 0, 15),
-        positionsAvailable: 3,
-        featured: true
-      }
-    }),
-    prisma.opportunity.create({
-      data: {
-        organizationId: organizations[1].id,
-        title: 'Environmental Research Volunteer',
-        type: 'VOLUNTEER',
-        location: 'Remote',
-        isRemote: true,
-        description: 'Help us conduct research on sustainable practices and environmental impact.',
-        requirements: ['Passion for environmental issues', 'Research experience preferred', 'Ability to work independently'],
-        skills: ['Research', 'Data Analysis', 'Environmental Science'],
-        stipend: 'Unpaid',
-        duration: '6 months',
-        startsAt: new Date(now.getFullYear(), now.getMonth() + 0, 15),
-        endsAt: new Date(now.getFullYear(), now.getMonth() + 6, 15),
-        applicationDeadline: new Date(now.getFullYear(), now.getMonth() + 0, 30),
-        positionsAvailable: 5,
-        featured: true
-      }
-    }),
-    prisma.opportunity.create({
-      data: {
-        organizationId: organizations[2].id,
-        title: 'Digital Marketing Ambassador',
-        type: 'AMBASSADOR',
-        location: 'New York, NY',
-        isRemote: false,
-        description: 'Represent our organization at events and on social media to promote digital arts initiatives.',
-        requirements: ['Strong social media presence', 'Excellent communication skills', 'Passion for the arts'],
-        skills: ['Social Media Marketing', 'Content Creation', 'Public Speaking'],
-        stipend: '15000 INR/month + benefits',
-        duration: '12 months',
-        startsAt: new Date(now.getFullYear(), now.getMonth() + 0, 1),
-        endsAt: new Date(now.getFullYear(), now.getMonth() + 12, 31),
-        applicationDeadline: new Date(now.getFullYear(), now.getMonth() + 1, 15),
-        positionsAvailable: 2,
-        featured: false
-      }
-    })
-  ])
-
-  // Create opportunity applications
-  await Promise.all([
-    prisma.opportunityApplication.create({
-      data: {
-        userId: users[0].id,
-        opportunityId: opportunities[0].id,
-        status: 'APPLIED',
-        coverLetter: 'I am excited to apply for this internship opportunity...',
-        resumeUrl: 'https://example.com/resumes/alex-johnson.pdf',
-        portfolioUrl: 'https://example.com/portfolios/alex-johnson'
-      }
-    }),
-    prisma.opportunityApplication.create({
-      data: {
-        userId: users[2].id,
-        opportunityId: opportunities[1].id,
-        status: 'SHORTLISTED',
-        coverLetter: 'As an environmental science student, I am passionate about...',
-        resumeUrl: 'https://example.com/resumes/marcus-rodriguez.pdf'
-      }
-    })
-  ])
-
-  // Create announcements
-  await Promise.all([
-    prisma.announcement.create({
-      data: {
-        organizationId: organizations[0].id,
-        title: 'Welcome to Our New Website!',
-        content: 'We are excited to announce the launch of our new website with improved features and user experience.',
+        organizationId: organization.id,
+        title: announcement.title,
+        content: announcement.content,
         published: true,
-        publishedAt: new Date(now.getFullYear(), now.getMonth() - 1, 15)
-      }
-    }),
-    prisma.announcement.create({
-      data: {
-        organizationId: organizations[1].id,
-        title: 'Upcoming Beach Cleanup Event',
-        content: 'Join us this Saturday for a beach cleanup event to help protect our marine ecosystems.',
-        published: true,
-        publishedAt: new Date(now.getFullYear(), now.getMonth() - 0, 10)
-      }
-    })
-  ])
+        publishedAt: new Date(announcement.publishedAt),
+      },
+    });
+  }
 
-  // Create galleries
-  const galleries = await Promise.all([
-    prisma.gallery.create({
+  for (const [eventSlug, faqs] of Object.entries(seedEventFaqs)) {
+    const event = await prisma.event.findUnique({ where: { slug: eventSlug } });
+    if (!event) continue;
+    await prisma.event.update({
+      where: { id: event.id },
       data: {
-        organizationId: organizations[0].id,
-        eventId: events[0].id,
-        title: 'Future of AI Conference 2026 - Day 1',
-        description: 'Photos from the first day of our AI conference.'
-      }
-    }),
-    prisma.gallery.create({
-      data: {
-        organizationId: organizations[1].id,
-        title: 'Green Future Initiative - Volunteer Activities',
-        description: 'Photos from our recent volunteer activities and community events.'
-      }
-    })
-  ])
-
-  // Create gallery items
-  await Promise.all([
-    prisma.galleryItem.create({
-      data: {
-        galleryId: galleries[0].id,
-        url: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=600&fit=crop',
-        caption: 'Keynote speaker presenting on the future of AI',
-        order: 0
-      }
-    }),
-    prisma.galleryItem.create({
-      data: {
-        galleryId: galleries[0].id,
-        url: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&h=600&fit=crop',
-        caption: 'Attendees networking during the coffee break',
-        order: 1
-      }
-    }),
-    prisma.galleryItem.create({
-      data: {
-        galleryId: galleries[1].id,
-        url: 'https://images.unsplash.com/photo-1448315640896-05b2c30e5d62?w=800&h=600&fit=crop',
-        caption: 'Volunteers planting trees in the community park',
-        order: 0
-      }
-    })
-  ])
-
-  // Create notifications
-  await Promise.all([
-    prisma.notification.create({
-      data: {
-        userId: users[0].id,
-        type: 'EVENT_REMINDER',
-        title: 'Future of AI Conference Reminder',
-        message: 'The Future of AI Conference starts in 3 days!',
-        data: { eventId: events[0].id },
-        status: 'UNREAD'
-      }
-    }),
-    prisma.notification.create({
-      data: {
-        userId: users[1].id,
-        type: 'APPLICATION_UPDATE',
-        title: 'Internship Application Update',
-        message: 'Your application for the Software Engineering Internship has been reviewed.',
-        data: { opportunityId: opportunities[0].id },
-        status: 'UNREAD'
-      }
-    })
-  ])
-
-  // Create bookmarks
-  await Promise.all([
-    prisma.bookmark.create({
-      data: {
-        userId: users[0].id,
-        eventId: events[1].id
-      }
-    }),
-    prisma.bookmark.create({
-      data: {
-        userId: users[0].id,
-        opportunityId: opportunities[1].id
-      }
-    })
-  ])
-
-  // Create certificates
-  await Promise.all([
-    prisma.certificate.create({
-      data: {
-        userId: users[2].id,
-        eventId: events[0].id,
-        type: 'VOLUNTEER',
-        title: 'Volunteer Certificate of Appreciation',
-        description: 'Awarded for outstanding service as a Registration Assistant at the Future of AI Conference 2026.',
-        certificateUrl: 'https://example.com/certificates/volunteer-marcus-rodriguez.pdf'
-      }
-    }),
-    prisma.certificate.create({
-      data: {
-        userId: users[0].id,
-        eventId: events[0].id,
-        type: 'PARTICIPATION',
-        title: 'Participation Certificate',
-        description: 'Awarded for participation in the Future of AI Conference 2026.',
-        certificateUrl: 'https://example.com/certificates/participant-alex-johnson.pdf'
-      }
-    })
-  ])
-
-  // Create follows
-  await Promise.all([
-    prisma.follow.create({
-      data: {
-        followerId: users[0].id,
-        followingId: users[1].id
-      }
-    }),
-    prisma.follow.create({
-      data: {
-        followerId: users[2].id,
-        followingId: users[0].id
-      }
-    })
-  ])
-
-  // Create comments
-  await Promise.all([
-    prisma.comment.create({
-      data: {
-        userId: users[0].id,
-        eventId: events[0].id,
-        content: 'This conference was amazing! Learned so much about AI.',
-      }
-    }),
-    prisma.comment.create({
-      data: {
-        userId: users[1].id,
-        eventId: events[0].id,
-        content: 'Thanks for attending! We hope to see you at our next event.',
-      }
-    })
-  ])
-
-  // Create reactions
-  await Promise.all([
-    prisma.reaction.create({
-      data: {
-        userId: users[1].id,
-        commentId: (await prisma.comment.findFirst({ where: { userId: users[0].id, eventId: events[0].id }}))!.id,
-        type: 'like'
-      }
-    }),
-    prisma.reaction.create({
-      data: {
-        userId: users[2].id,
-        commentId: (await prisma.comment.findFirst({ where: { userId: users[0].id, eventId: events[0].id }}))!.id,
-        type: 'celebrate'
-      }
-    })
-  ])
-
-  console.log('Database seeding completed successfully!')
+        blocks: {
+          faqs,
+        },
+      },
+    });
+  }
 }
 
 main()
-  .catch(e => {
-    console.error('Error during seeding:', e)
-    process.exit(1)
+  .then(async () => {
+    await prisma.$disconnect();
   })
-  .finally(async () => {
-    await prisma.$disconnect()
-  })
+  .catch(async (error) => {
+    console.error(error);
+    await prisma.$disconnect();
+    process.exit(1);
+  });

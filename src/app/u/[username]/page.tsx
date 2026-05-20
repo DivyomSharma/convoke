@@ -1,52 +1,34 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { BadgeCheck, BarChart3, Camera, Code2, Link2, Trophy, Users, Workflow, CalendarDays } from "lucide-react";
+import Link from "next/link";
+import { Award, Briefcase, Link2, Users, Workflow } from "lucide-react";
 import { Footer } from "@/components/marketing/footer";
 import { SiteHeader } from "@/components/marketing/site-header";
 import { Panel } from "@/components/ui/panel";
-import { seedPeople } from "@/data/platform";
+import { getProfilePageData } from "@/lib/platform-service";
 
 type PageProps = {
   params: Promise<{ username: string }>;
 };
 
-// Generate slugs for seed people
-function generateUsername(name: string) {
-  return name.toLowerCase().replace(/\s+/g, "");
-}
-
-export async function generateStaticParams() {
-  return seedPeople.map((p) => ({
-    username: generateUsername(p.name),
-  }));
-}
-
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { username } = await params;
-  const person = seedPeople.find(p => generateUsername(p.name) === username);
-  
-  if (!person) {
-    return {
-      title: "User Not Found — Convoke",
-      description: "Profile not found.",
-    };
-  }
+  const profile = await getProfilePageData(username);
 
   return {
-    title: `${person.name} (@${username}) — Convoke`,
-    description: `Convoke community reputation profile for ${person.name}. ${person.role}.`,
+    title: profile ? `${profile.name}` : "Profile",
+    description:
+      profile?.bio || "Portfolio-first ecosystem profile on Convoke.",
   };
 }
 
 export default async function ProfilePage({ params }: PageProps) {
   const { username } = await params;
-  const person = seedPeople.find(p => generateUsername(p.name) === username);
+  const profile = await getProfilePageData(username);
 
-  if (!person) {
+  if (!profile) {
     notFound();
   }
-
-  const socials = [Link2, Code2, Camera, BadgeCheck];
 
   return (
     <>
@@ -58,208 +40,126 @@ export default async function ProfilePage({ params }: PageProps) {
             <div className="p-6 md:p-8">
               <div className="-mt-20 size-32 rounded-[8px] border border-bronze/50 bg-gradient-to-br from-bronze via-rust to-steel p-1">
                 <div className="grid size-full place-items-center rounded-[6px] bg-black text-5xl font-semibold">
-                  {person.initials}
+                  {profile.avatarFallback}
                 </div>
               </div>
               <div className="mt-6 grid gap-8 lg:grid-cols-[1fr_320px]">
                 <div>
-                  <h1 className="text-5xl font-semibold tracking-[-0.04em]">
-                    {person.name}
-                  </h1>
-                  <p className="mt-2 text-muted">@{username}</p>
-                  <p className="mt-6 max-w-2xl text-lg leading-8 text-muted">
-                    {person.role} at {person.community} | Ex-Google Developer Relations | 
-                    Building India's nextgen startup ecosystem through Convoke
-                  </p>
-                  <div className="mt-7 flex gap-3">
-                    {socials.map((Icon, index) => (
+                  <h1 className="text-5xl font-semibold tracking-[-0.04em]">{profile.name}</h1>
+                  <p className="mt-2 text-muted">@{profile.username}</p>
+                  <p className="mt-4 text-xl text-bronze">{profile.headline}</p>
+                  <p className="mt-6 max-w-2xl text-lg leading-8 text-muted">{profile.bio}</p>
+                  <div className="mt-7 flex flex-wrap gap-3">
+                    {profile.socials.map((social) => (
                       <a
-                        key={index}
-                        href={[
-                          `https://linkedin.com/in/${username}`,
-                          `https://github.com/${username}`,
-                          `https://instagram.com/${username}_`,
-                          `https://youtube.com/@${username}`
-                        ][index]}
+                        key={social.label}
+                        href={social.href}
                         target="_blank"
                         rel="noreferrer"
-                        className="grid size-10 place-items-center rounded-full border border-line text-muted hover:text-foreground"
+                        className="inline-flex items-center gap-2 rounded-full border border-line px-4 py-2 text-sm text-muted transition hover:border-bronze/50 hover:text-foreground"
                       >
-                        <Icon className="size-4" />
+                        <Link2 className="size-4" />
+                        {social.label}
                       </a>
                     ))}
                   </div>
                 </div>
                 <div className="grid gap-3">
-                  {[
-                    ["Reputation", (Math.random() * 2 + 8).toFixed(1)],
-                    ["Events Organized", Math.floor(Math.random() * 20)],
-                    ["Volunteer Hours", Math.floor(Math.random() * 500)],
-                    ["Communities Led", Math.floor(Math.random() * 5) + 1],
-                  ].map(([label, value]) => (
-                    <div key={label} className="flex items-center justify-between rounded-[8px] border border-line bg-black/35 px-4 py-3">
-                      <span className="text-sm text-muted">{label}</span>
-                      <span className="font-mono text-bronze">{value}</span>
+                  {profile.stats.map((stat) => (
+                    <div key={stat.label} className="flex items-center justify-between rounded-[8px] border border-line bg-black/35 px-4 py-3">
+                      <span className="text-sm text-muted">{stat.label}</span>
+                      <span className="font-mono text-bronze">{stat.value}</span>
                     </div>
                   ))}
                 </div>
               </div>
             </div>
           </Panel>
+
           <div className="mt-4 grid gap-4 lg:grid-cols-3">
-            {/* Experience Timeline */}
-            <Panel key="Experience timeline" className="min-h-52 p-5">
-              <Trophy className="size-5 text-rust" />
-              <h2 className="mt-8 text-2xl font-medium">Experience timeline</h2>
-              <div className="mt-4 space-y-3">
-                <div className="border-l-2 border-bronze/20 pl-4">
-                  <p className="text-sm text-muted">2026</p>
-                  <h3 className="font-medium text-foreground">{person.role}</h3>
-                  <p className="text-sm text-muted">{person.community}</p>
-                </div>
-                <div className="border-l-2 border-bronze/20 pl-4">
-                  <p className="text-sm text-muted">2024-2025</p>
-                  <h3 className="font-medium text-foreground">Developer Relations Lead</h3>
-                  <p className="text-sm text-muted">Google for Startups Accelerator Program</p>
-                </div>
-                <div className="border-l-2 border-bronze/20 pl-4">
-                  <p className="text-sm text-muted">2023</p>
-                  <h3 className="font-medium text-foreground">Community Manager</h3>
-                  <p className="text-sm text-muted">Zephyr Labs - Grew developer community to 15K+ members</p>
-                </div>
+            <Panel className="p-5 lg:col-span-2">
+              <div className="flex items-center gap-2 text-2xl font-medium">
+                <Briefcase className="size-5 text-rust" />
+                Experience
+              </div>
+              <div className="mt-5 space-y-4">
+                {profile.experiences.map((experience) => (
+                  <div key={experience.id} className="border-l-2 border-bronze/20 pl-4">
+                    <p className="text-sm text-muted">{experience.period}</p>
+                    <h2 className="mt-1 text-lg font-medium">{experience.title}</h2>
+                    <p className="text-sm text-muted">{experience.org}</p>
+                    {experience.description ? (
+                      <p className="mt-2 text-sm leading-6 text-muted">{experience.description}</p>
+                    ) : null}
+                  </div>
+                ))}
               </div>
             </Panel>
-            
-            {/* Communities */}
-            <Panel key="Communities" className="min-h-52 p-5">
-              <Users className="size-5 text-rust" />
-              <h2 className="mt-8 text-2xl font-medium">Communities</h2>
-              <div className="mt-4 space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium">{person.community}</span>
-                  <span className="text-sm text-muted">Core Member</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium">North Grid Societies</span>
-                  <span className="text-sm text-muted">Advisor</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium">Women in Tech India</span>
-                  <span className="text-sm text-muted">Mentor</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium">Creator Collective India</span>
-                  <span className="text-sm text-muted">Founding Member</span>
-                </div>
+
+            <Panel className="p-5">
+              <div className="flex items-center gap-2 text-2xl font-medium">
+                <Users className="size-5 text-rust" />
+                Communities
+              </div>
+              <div className="mt-5 space-y-3">
+                {profile.communities.map((community) => (
+                  <Link
+                    key={community.id}
+                    href={`/communities/${community.slug}`}
+                    className="flex items-center justify-between rounded-[8px] border border-line bg-black/30 px-4 py-3 text-sm transition hover:border-bronze/50"
+                  >
+                    <span>{community.name}</span>
+                    <span className="text-muted">{community.role}</span>
+                  </Link>
+                ))}
               </div>
             </Panel>
-            
-            {/* Events Participated */}
-            <Panel key="Events participated" className="min-h-52 p-5">
-              <CalendarDays className="size-5 text-rust" />
-              <h2 className="mt-8 text-2xl font-medium">Events participated</h2>
-              <div className="mt-4 space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium">Summit Zero 2026</span>
-                  <span className="text-sm text-muted">Speaker & Organizer</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium">Forge Hack 2026</span>
-                  <span className="text-sm text-muted">Judge & Mentor</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium">Campus Protocol 2026</span>
-                  <span className="text-sm text-muted">Workshop Facilitator</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium">Neural Nights 2026</span>
-                  <span className="text-sm text-muted">Hacker</span>
-                </div>
+
+            <Panel className="p-5 lg:col-span-2">
+              <div className="flex items-center gap-2 text-2xl font-medium">
+                <Workflow className="size-5 text-rust" />
+                Projects
               </div>
-            </Panel>
-            
-            {/* Projects */}
-            <Panel key="Projects" className="min-h-52 p-5">
-              <Workflow className="size-5 text-rust" />
-              <h2 className="mt-8 text-2xl font-medium">Projects</h2>
-              <div className="mt-4 space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium">Convoke Opportunities Portal</span>
-                  <span className="text-sm text-muted">Internship matching platform for students</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm font-muted">Campus Connect</span>
-                  <span className="text-sm text-muted">Networking app for college students</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium">OpenSource India</span>
-                  <span className="text-sm text-muted">Directory of Indian open source contributors</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium">EcoTrack</span>
-                  <span className="text-sm text-muted">Carbon footprint tracker for campuses</span>
-                </div>
-              </div>
-            </Panel>
-            
-            {/* Badges */}
-            <Panel key="Badges" className="min-h-52 p-5">
-              <BadgeCheck className="size-5 text-rust" />
-              <h2 className="mt-8 text-2xl font-medium">Badges</h2>
-              <div className="mt-4 grid gap-3">
-                <div className="border border-white/[0.08] rounded-lg p-4">
-                  <div className="flex items-center gap-3">
-                    <BadgeCheck className="h-5 w-5 text-bronze" />
-                    <div>
-                      <h3 className="text-sm font-medium text-foreground">Community Builder</h3>
-                      <p className="text-xs text-muted">Built thriving student communities across 10+ cities</p>
+              <div className="mt-5 grid gap-4 md:grid-cols-2">
+                {profile.projects.map((project) => (
+                  <div key={project.id} className="rounded-[8px] border border-line bg-black/30 p-4">
+                    <h2 className="text-lg font-medium">{project.name}</h2>
+                    <p className="mt-2 text-sm leading-6 text-muted">{project.description}</p>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {project.technologies.map((technology) => (
+                        <span key={technology} className="rounded-full bg-white/[0.06] px-3 py-1 text-xs text-muted">
+                          {technology}
+                        </span>
+                      ))}
                     </div>
+                    {project.url ? (
+                      <a
+                        href={project.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-4 inline-flex items-center gap-2 text-sm text-bronze"
+                      >
+                        View project
+                      </a>
+                    ) : null}
                   </div>
-                </div>
-                <div className="border border-white/[0.08] rounded-lg p-4">
-                  <div className="flex items-center gap-3">
-                    <Trophy className="h-5 w-5 text-bronze" />
-                    <div>
-                      <h3 className="text-sm font-medium text-foreground">Event Excellence</h3>
-                      <p className="text-xs text-muted">Organized 5+ successful tech conferences</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="border border-white/[0.08] rounded-lg p-4">
-                  <div className="flex items-center gap-3">
-                    <Code2 className="h-5 w-5 text-bronze" />
-                    <div>
-                      <h3 className="text-sm font-medium text-foreground">Open Source Advocate</h3>
-                      <p className="text-xs text-muted">Maintains popular dev tools with 5K+ weekly downloads</p>
-                    </div>
-                  </div>
-                </div>
+                ))}
               </div>
             </Panel>
-            
-            {/* Analytics */}
-            <Panel key="Analytics" className="min-h-52 p-5">
-              <BarChart3 className="size-5 text-rust" />
-              <h2 className="mt-8 text-2xl font-medium">Analytics</h2>
-              <div className="mt-4">
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium">Profile Views (Monthly)</span>
-                    <span className="text-sm font-mono text-bronze">{(Math.random() * 5 + 1).toFixed(1)}K</span>
+
+            <Panel className="p-5">
+              <div className="flex items-center gap-2 text-2xl font-medium">
+                <Award className="size-5 text-rust" />
+                Certificates
+              </div>
+              <div className="mt-5 space-y-3">
+                {profile.certificates.map((certificate) => (
+                  <div key={certificate.id} className="rounded-[8px] border border-line bg-black/30 p-4">
+                    <p className="font-medium">{certificate.title}</p>
+                    <p className="mt-1 text-sm text-muted">{certificate.type}</p>
+                    <p className="mt-2 text-xs text-bronze">{certificate.issuedAt}</p>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium">Connection Requests</span>
-                    <span className="text-sm font-mono text-bronze">{Math.floor(Math.random() * 500)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium">Post Engagement Rate</span>
-                    <span className="text-sm font-mono text-bronze">{(Math.random() * 10 + 5).toFixed(1)}%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium">Community Growth Impact</span>
-                    <span className="text-sm font-mono text-bronze">{(Math.random() * 20 + 5).toFixed(1)}K+</span>
-                  </div>
-                </div>
+                ))}
               </div>
             </Panel>
           </div>
