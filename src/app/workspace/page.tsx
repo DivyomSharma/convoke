@@ -4,15 +4,15 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
-  ArrowRight, BadgeCheck, BarChart3, Bell, Bookmark, CalendarDays,
-  CheckCircle2, Clock, FileText, Megaphone, MessageCircle, QrCode,
+  ArrowRight, BadgeCheck, BarChart3, Bell, CalendarDays,
+  FileText, Megaphone,
   ScanLine, Send, Settings, ShieldCheck, Shirt, Users,
 } from "lucide-react";
 import { SiteHeader } from "@/components/marketing/site-header";
 import { Panel } from "@/components/ui/panel";
 import {
   dashboardStats, roles, sponsorPipeline, activityFeed,
-  featuredEvents, opportunities, communities, seedPeople,
+  featuredEvents, opportunities, seedPeople,
 } from "@/data/platform";
 
 const tabs = [

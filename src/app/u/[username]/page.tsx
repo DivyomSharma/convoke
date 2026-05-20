@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { BadgeCheck, BarChart3, Camera, Code2, Link2, Shirt, Trophy, Users, Workflow, CalendarDays } from "lucide-react";
+import { BadgeCheck, BarChart3, Camera, Code2, Link2, Trophy, Users, Workflow, CalendarDays } from "lucide-react";
 import { Footer } from "@/components/marketing/footer";
 import { SiteHeader } from "@/components/marketing/site-header";
 import { Panel } from "@/components/ui/panel";

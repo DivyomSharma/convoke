@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Bookmark, Briefcase, Clock, MapPin, Search, SlidersHorizontal, Sparkles, TrendingUp, Users } from "lucide-react";
+import { Briefcase, Clock, MapPin, Search, SlidersHorizontal, Sparkles, TrendingUp, Users } from "lucide-react";
 import { Footer } from "@/components/marketing/footer";
 import { SiteHeader } from "@/components/marketing/site-header";
 import { Panel } from "@/components/ui/panel";
