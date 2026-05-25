@@ -46,8 +46,8 @@ export function StudentWorkspace({ dashboard }: { dashboard: any }) {
               dashboard.applications.map((app: any) => (
                 <div key={app.id} className="rounded-lg border border-line bg-black/20 p-3 flex justify-between items-center transition-colors hover:bg-white/5">
                   <div>
-                    <p className="font-medium text-sm">{app.opportunity.title}</p>
-                    <p className="text-xs text-muted mt-1">{app.opportunity.organization.name}</p>
+                    <p className="font-medium text-sm">{app.title}</p>
+                    <p className="text-xs text-muted mt-1">{app.organization}</p>
                   </div>
                   <span className="text-xs px-2 py-1 rounded bg-white/10">{app.status}</span>
                 </div>
@@ -72,8 +72,8 @@ export function StudentWorkspace({ dashboard }: { dashboard: any }) {
             {dashboard.registrations.length > 0 ? (
               dashboard.registrations.map((reg: any) => (
                 <div key={reg.id} className="rounded-lg border border-line bg-black/20 p-3 transition-colors hover:bg-white/5">
-                  <p className="font-medium text-sm">{reg.event.title}</p>
-                  <p className="text-xs text-muted mt-1">{new Date(reg.event.startsAt).toLocaleDateString()}</p>
+                  <p className="font-medium text-sm">{reg.eventTitle}</p>
+                  <p className="text-xs text-muted mt-1">{reg.createdAt}</p>
                 </div>
               ))
             ) : (
