@@ -213,9 +213,7 @@ export async function applyToOpportunity(input: {
     return { ok: true, applicationId: existing.id, status: existing.status };
   }
 
-  const profile = await prisma.profile.findUnique({
-    where: { userId: user.id },
-  });
+  
 
   const application = await prisma.opportunityApplication.create({
     data: {
@@ -223,7 +221,7 @@ export async function applyToOpportunity(input: {
       opportunityId: input.opportunityId,
       status: "APPLIED",
       coverLetter: input.coverLetter || "Applying through Convoke.",
-      portfolioUrl: profile?.portfolioUrl || profile?.website || undefined,
+      portfolioUrl: (user.socials as any)?.portfolioUrl || undefined,
     },
   });
 
@@ -340,7 +338,7 @@ export async function createCommunity(input: unknown) {
 
   await prisma.user.update({
     where: { id: user.id },
-    data: { primaryRole: "COMMUNITY_ADMIN" },
+    data: { role: "COMMUNITY_ADMIN" },
   });
 
   revalidatePath("/communities");
@@ -412,7 +410,7 @@ export async function createEvent(input: unknown) {
         userId: user.id,
         communityId: event.communityId,
         eventId: event.id,
-        actorName: user.name,
+        actorName: user.displayName,
         action: "published an event",
         detail: `${event.title} is now open for discovery and registrations.`,
       },
@@ -480,7 +478,7 @@ export async function createOpportunity(input: unknown) {
         userId: user.id,
         communityId: data.communityId,
         opportunityId: opportunity.id,
-        actorName: user.name,
+        actorName: user.displayName,
         action: "opened an opportunity",
         detail: `${opportunity.title} is now accepting applications on Convoke.`,
       },

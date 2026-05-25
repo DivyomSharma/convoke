@@ -9,13 +9,17 @@ datasource db {
 }
 
 enum UserRole {
-  PARTICIPANT
+  STUDENT
   ORGANIZER
-  COMMUNITY_ADMIN
+  FOUNDER
+  CREATOR
   VOLUNTEER
+  DEVELOPER
+  DESIGNER
+  PARTICIPANT
+  COMMUNITY_ADMIN
   SPONSOR
   STARTUP
-  CREATOR
   PLATFORM_ADMIN
 }
 
@@ -146,15 +150,25 @@ enum StudioRequestType {
 
 model User {
   id                     String                   @id @default(cuid())
-  clerkId                String?                  @unique
+  clerkId                String                   @unique
   email                  String                   @unique
   username               String                   @unique
-  name                   String
+  displayName            String
   headline               String?
   bio                    String?
-  imageUrl               String?
-  primaryRole            UserRole                 @default(PARTICIPANT)
-  profile                Profile?
+  avatarUrl              String?
+  bannerUrl              String?
+  city                   String?
+  role                   UserRole                 @default(STUDENT)
+  interests              String[]
+  skills                 String[]
+  badges                 String[]
+  socials                Json?
+  reputation             Int                      @default(0)
+  onboardingDone         Boolean                  @default(false)
+  experience             Json?
+  projectsData           Json?
+
   memberships            Membership[]
   communityMemberships   CommunityMembership[]
   ledEvents              Event[]                  @relation("EventOwner")
@@ -170,29 +184,6 @@ model User {
   teamMemberships        TeamMember[]
   createdAt              DateTime                 @default(now())
   updatedAt              DateTime                 @updatedAt
-}
-
-model Profile {
-  id                String   @id @default(cuid())
-  userId            String   @unique
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  avatarUrl         String?
-  bannerUrl         String?
-  location          String?
-  city              String?
-  website           String?
-  linkedinUrl       String?
-  githubUrl         String?
-  instagramUrl      String?
-  twitterUrl        String?
-  discordHandle     String?
-  portfolioUrl      String?
-  skills            String[]
-  badges            String[]
-  interests         String[]
-  reputation        Int      @default(0)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
 }
 
 model Organization {

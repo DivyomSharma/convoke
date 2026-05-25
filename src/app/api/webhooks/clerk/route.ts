@@ -64,8 +64,8 @@ export async function POST(req: Request) {
         clerkId: id,
         email,
         username: username || email.split('@')[0],
-        name,
-        imageUrl: image_url,
+        displayName: name,
+        avatarUrl: image_url,
       }
     });
   }
@@ -80,8 +80,8 @@ export async function POST(req: Request) {
       data: {
         email,
         username: username || email.split('@')[0],
-        name,
-        imageUrl: image_url,
+        displayName: name,
+        avatarUrl: image_url,
       }
     });
   }

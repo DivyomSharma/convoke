@@ -288,7 +288,7 @@ export async function listHomeData() {
         take: 8,
         orderBy: [{ createdAt: "desc" }],
         include: {
-          profile: true,
+          
           communityMemberships: { include: { community: true } },
         },
       }),
@@ -315,12 +315,12 @@ export async function listHomeData() {
       people: people.map((person) => ({
         id: person.id,
         username: person.username,
-        name: person.name,
-        initials: initials(person.name),
-        role: formatRole(person.primaryRole),
+        name: person.displayName,
+        initials: initials(person.displayName),
+        role: formatRole(person.role),
         headline: person.headline ?? "Community member",
         community: person.communityMemberships[0]?.community.name,
-        reputation: person.profile?.reputation ?? 0,
+        reputation: person.reputation ?? 0,
       })),
       activity: activity.map((item) => ({
         id: item.id,
@@ -499,7 +499,7 @@ export async function getCommunityPageData(slug: string): Promise<CommunityView 
         organization: true,
         members: {
           include: {
-            user: { include: { profile: true } },
+            user: true,
           },
           take: 10,
           orderBy: { joinedAt: "desc" },
@@ -573,12 +573,12 @@ export async function getCommunityPageData(slug: string): Promise<CommunityView 
       members: community.members.map((membership) => ({
         id: membership.user.id,
         username: membership.user.username,
-        name: membership.user.name,
-        initials: initials(membership.user.name),
+        name: membership.user.displayName,
+        initials: initials(membership.user.displayName),
         role: formatRole(membership.role),
-        headline: membership.user.headline ?? membership.user.profile?.website ?? "Community member",
+        headline: membership.user.headline ?? membership.user.bannerUrl ?? "Community member",
         community: community.name,
-        reputation: membership.user.profile?.reputation ?? 0,
+        reputation: membership.user.reputation ?? 0,
       })),
       announcements: community.announcements.map((announcement) => ({
         id: announcement.id,
@@ -707,7 +707,7 @@ export async function getProfilePageData(username: string): Promise<ProfileView 
     const user = await prisma.user.findUnique({
       where: { username },
       include: {
-        profile: true,
+        
         communityMemberships: { include: { community: true } },
         memberships: { include: { organization: true } },
         projects: true,
@@ -719,7 +719,7 @@ export async function getProfilePageData(username: string): Promise<ProfileView 
 
     if (!user) return null;
 
-    const visibleRole = formatRole(user.primaryRole);
+    const visibleRole = formatRole(user.role);
     const eventRoles = user.registrations.map((registration) => ({
       id: registration.event.id,
       title: registration.event.title,
@@ -757,25 +757,25 @@ export async function getProfilePageData(username: string): Promise<ProfileView 
     return {
       id: user.id,
       username: user.username,
-      name: user.name,
+      name: user.displayName,
       role: visibleRole,
       headline: user.headline ?? "Community member",
       bio: user.bio ?? "Building through communities, opportunities, and events on Convoke.",
-      avatarFallback: initials(user.name),
-      location: user.profile?.location ?? undefined,
-      website: user.profile?.website ?? undefined,
-      reputation: user.profile?.reputation ?? 0,
+      avatarFallback: initials(user.displayName),
+      location: user.city ?? undefined,
+      website: user.bannerUrl ?? undefined,
+      reputation: user.reputation ?? 0,
       socials: [
-        user.profile?.linkedinUrl ? { label: "LinkedIn", href: user.profile.linkedinUrl } : null,
-        user.profile?.githubUrl ? { label: "GitHub", href: user.profile.githubUrl } : null,
-        user.profile?.instagramUrl ? { label: "Instagram", href: user.profile.instagramUrl } : null,
-        user.profile?.portfolioUrl ? { label: "Portfolio", href: user.profile.portfolioUrl } : null,
+        user.bannerUrl ? { label: "LinkedIn", href: (user.socials as any)?.linkedinUrl } : null,
+        user.bannerUrl ? { label: "GitHub", href: (user.socials as any)?.githubUrl } : null,
+        user.bannerUrl ? { label: "Instagram", href: (user.socials as any)?.instagramUrl } : null,
+        user.bannerUrl ? { label: "Portfolio", href: (user.socials as any)?.portfolioUrl } : null,
       ].filter(Boolean) as { label: string; href: string }[],
-      badges: user.profile?.badges ?? [],
-      skills: user.profile?.skills ?? [],
-      interests: user.profile?.interests ?? [],
+      badges: user.badges ?? [],
+      skills: user.skills ?? [],
+      interests: user.interests ?? [],
       stats: [
-        { label: "Reputation", value: String(user.profile?.reputation ?? 0) },
+        { label: "Reputation", value: String(user.reputation ?? 0) },
         { label: "Communities", value: String(user.communityMemberships.length) },
         { label: "Events", value: String(user.registrations.length) },
         { label: "Certificates", value: String(user.certificates.length) },
@@ -787,13 +787,7 @@ export async function getProfilePageData(username: string): Promise<ProfileView 
         period: `Joined ${formatDate(membership.joinedAt)}`,
         description: membership.organization.description,
       })),
-      projects: user.projects.map((project) => ({
-        id: project.id,
-        name: project.name,
-        description: project.description,
-        url: project.url ?? undefined,
-        technologies: project.technologies,
-      })),
+      projects: (user.projectsData as any[]) || [],
       communities: user.communityMemberships.map((membership) => ({
         id: membership.community.id,
         name: membership.community.name,
@@ -849,7 +843,7 @@ export async function getDashboardData(): Promise<DashboardView> {
     const user = await prisma.user.findUnique({
       where: { id: viewer.userId },
       include: {
-        profile: true,
+        
         memberships: { include: { organization: true } },
         communityMemberships: { include: { community: true } },
       },
@@ -915,21 +909,21 @@ export async function getDashboardData(): Promise<DashboardView> {
       viewer: {
         id: user.id,
         username: user.username,
-        name: user.name,
-        initials: initials(user.name),
-        role: formatRole(user.primaryRole),
+        name: user.displayName,
+        initials: initials(user.displayName),
+        role: formatRole(user.role),
         headline: user.headline ?? "Community member",
         community: user.communityMemberships[0]?.community.name,
-        reputation: user.profile?.reputation ?? 0,
+        reputation: user.reputation ?? 0,
       },
-      role: user.primaryRole,
+      role: user.role,
       metrics: [
         { label: "Applications", value: String(applications.length), detail: "Active opportunity pipeline across the ecosystem" },
         { label: "Registrations", value: String(registrations.length), detail: "Events you are already attached to" },
         { label: "Communities", value: String(user.communityMemberships.length), detail: "Rooms where your identity now compounds" },
-        { label: "Reputation", value: String(user.profile?.reputation ?? 0), detail: "Public proof from participation and output" },
+        { label: "Reputation", value: String(user.reputation ?? 0), detail: "Public proof from participation and output" },
       ],
-      roleActions: roleActions(user.primaryRole),
+      roleActions: roleActions(user.role),
       activity: activity.map((item) => ({
         id: item.id,
         actor: item.actorName,
@@ -978,7 +972,7 @@ export async function getDashboardData(): Promise<DashboardView> {
       })),
     };
 
-    if (([UserRole.ORGANIZER, UserRole.COMMUNITY_ADMIN, UserRole.PLATFORM_ADMIN] as UserRole[]).includes(user.primaryRole)) {
+    if (([UserRole.ORGANIZER, UserRole.COMMUNITY_ADMIN, UserRole.PLATFORM_ADMIN] as UserRole[]).includes(user.role)) {
       const organizationIds = user.memberships.map((membership) => membership.organizationId);
       const [orgEvents, orgOpportunities, orgRegistrations, volunteerApplications, opportunityApplications, sponsorLeads, merchInquiries, studioRequests] = await Promise.all([
         prisma.event.findMany({
@@ -1037,14 +1031,14 @@ export async function getDashboardData(): Promise<DashboardView> {
         opportunities: orgOpportunities.map((opportunity) => mapOpportunityCard(opportunity)),
         registrations: orgRegistrations.map((registration) => ({
           id: registration.id,
-          userName: registration.user.name,
+          userName: registration.user.displayName,
           userEmail: registration.user.email,
           status: formatRole(registration.status),
           eventTitle: registration.event.title,
         })),
         volunteerApplications: volunteerApplications.map((application) => ({
           id: application.id,
-          userName: application.user.name,
+          userName: application.user.displayName,
           userEmail: application.user.email,
           eventTitle: application.event.title,
           role: application.role,
@@ -1052,7 +1046,7 @@ export async function getDashboardData(): Promise<DashboardView> {
         })),
         applications: opportunityApplications.map((application) => ({
           id: application.id,
-          applicantName: application.user.name,
+          applicantName: application.user.displayName,
           applicantEmail: application.user.email,
           opportunityTitle: application.opportunity.title,
           status: formatRole(application.status),

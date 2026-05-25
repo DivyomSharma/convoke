@@ -5,6 +5,14 @@ export const metadata: Metadata = {
   description: "A collaborative Convoke hub for event teams, volunteers, sponsors, merch plans, and community momentum.",
 };
 
-export default function WorkspaceLayout({ children }: { children: React.ReactNode }) {
+import { redirect } from "next/navigation";
+import { getAuthenticatedDbUser } from "@/lib/viewer";
+
+export default async function WorkspaceLayout({ children }: { children: React.ReactNode }) {
+  const user = await getAuthenticatedDbUser();
+  if (user && !user.onboardingDone) {
+    redirect("/onboarding");
+  }
+  
   return children;
 }

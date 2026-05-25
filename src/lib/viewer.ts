@@ -24,29 +24,21 @@ export async function getAuthenticatedDbUser() {
       where: { email },
       update: {
         clerkId: userId,
-        imageUrl: clerk.imageUrl,
-        name,
+        avatarUrl: clerk.imageUrl,
+        displayName: name,
         username,
       },
       create: {
         clerkId: userId,
         email,
         username,
-        name,
+        displayName: name,
         headline: "Building through communities, opportunities, and events",
-        primaryRole: UserRole.PARTICIPANT,
-        imageUrl: clerk.imageUrl,
-        profile: {
-          create: {
-            avatarUrl: clerk.imageUrl,
-            skills: [],
-            badges: [],
-            interests: [],
-          },
-        },
+        role: UserRole.STUDENT,
+        avatarUrl: clerk.imageUrl,
       },
       include: {
-        profile: true,
+        
         memberships: true,
         communityMemberships: true,
       },
@@ -73,28 +65,21 @@ export async function getAuthenticatedDbUser() {
   return prisma.user.upsert({
     where: { email: user.email },
     update: {
-      name,
+      displayName: name,
       username,
-      imageUrl: user.user_metadata?.avatar_url || null,
+      avatarUrl: user.user_metadata?.avatar_url || null,
     },
     create: {
+      clerkId: `supabase_${user.id}`,
       email: user.email,
       username,
-      name,
+      displayName: name,
       headline: "Building through communities, opportunities, and events",
-      primaryRole: UserRole.PARTICIPANT,
-      imageUrl: user.user_metadata?.avatar_url || null,
-      profile: {
-        create: {
-          avatarUrl: user.user_metadata?.avatar_url || null,
-          skills: [],
-          badges: [],
-          interests: [],
-        },
-      },
+      role: UserRole.STUDENT,
+      avatarUrl: user.user_metadata?.avatar_url || null,
     },
     include: {
-      profile: true,
+      
       memberships: true,
       communityMemberships: true,
     },
