@@ -8,6 +8,16 @@ export async function getAuthenticatedDbUser() {
   const { userId } = await auth();
 
   if (userId) {
+    const existingUser = await prisma.user.findUnique({
+      where: { clerkId: userId },
+      include: {
+        memberships: true,
+        communityMemberships: true,
+      },
+    });
+
+    if (existingUser) return existingUser;
+
     const clerk = await currentUser();
     const email = clerk?.emailAddresses[0]?.emailAddress;
     if (!email) return null;
@@ -38,7 +48,6 @@ export async function getAuthenticatedDbUser() {
         avatarUrl: clerk.imageUrl,
       },
       include: {
-        
         memberships: true,
         communityMemberships: true,
       },
@@ -53,6 +62,15 @@ export async function getAuthenticatedDbUser() {
   } = await supabase.auth.getUser();
 
   if (!user?.email) return null;
+
+  const existingSupabaseUser = await prisma.user.findUnique({
+    where: { email: user.email },
+    include: {
+      memberships: true,
+      communityMemberships: true,
+    },
+  });
+  if (existingSupabaseUser) return existingSupabaseUser;
 
   const username =
     user.user_metadata?.username ||
@@ -79,7 +97,6 @@ export async function getAuthenticatedDbUser() {
       avatarUrl: user.user_metadata?.avatar_url || null,
     },
     include: {
-      
       memberships: true,
       communityMemberships: true,
     },
