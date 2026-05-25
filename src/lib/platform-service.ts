@@ -727,6 +727,33 @@ export async function getProfilePageData(username: string): Promise<ProfileView 
       slug: registration.event.slug,
     }));
 
+    const activityTimeline = [
+      ...user.registrations.map(r => ({
+        id: `reg-${r.id}`,
+        type: 'event',
+        title: r.event.title,
+        date: formatDate(r.createdAt),
+        description: `Registered for event`,
+        timestamp: r.createdAt.getTime()
+      })),
+      ...user.communityMemberships.map(m => ({
+        id: `com-${m.id}`,
+        type: 'community',
+        title: m.community.name,
+        date: formatDate(m.joinedAt),
+        description: `Joined community`,
+        timestamp: m.joinedAt.getTime()
+      })),
+      ...user.opportunityApplications.map(a => ({
+        id: `opp-${a.id}`,
+        type: 'opportunity',
+        title: a.opportunity.title,
+        date: formatDate(a.createdAt),
+        description: `Applied for opportunity`,
+        timestamp: a.createdAt.getTime()
+      }))
+    ].sort((a, b) => b.timestamp - a.timestamp).slice(0, 8);
+
     return {
       id: user.id,
       username: user.username,
@@ -780,6 +807,8 @@ export async function getProfilePageData(username: string): Promise<ProfileView 
         type: formatRole(certificate.type),
         issuedAt: formatDate(certificate.issuedAt),
       })),
+      memberSince: formatDate(user.createdAt),
+      activityTimeline: activityTimeline.map(({ id, type, title, date, description }) => ({ id, type, title, date, description })),
     };
   } catch (error) {
     logDataAccessError("getProfilePageData", error);

@@ -8,7 +8,7 @@ import { listCommunityDirectory } from "@/lib/platform-service";
 
 export const metadata: Metadata = {
   title: "Communities",
-  description: "Explore the real community layer inside Convoke.",
+  description: "Find communities of builders, creators, and students near you.",
 };
 
 type CommunitiesPageProps = {
@@ -36,10 +36,10 @@ export default async function CommunitiesPage({ searchParams }: CommunitiesPageP
       <main className="min-h-screen px-5 pb-24 pt-28 md:px-8">
         <div className="mx-auto max-w-7xl">
           <h1 className="max-w-4xl text-5xl font-semibold tracking-[-0.04em] md:text-7xl">
-            Communities with actual structure.
+            Communities you'll love
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-muted">
-            Members, events, opportunities, announcements, and momentum should all point back to a real community.
+            Join communities of builders, creators, designers, and students. Find your people and grow together.
           </p>
           <form className="mt-10 grid gap-3 rounded-[8px] border border-line bg-white/[0.03] p-4 md:grid-cols-[1fr_180px_180px_auto]">
             <input name="q" defaultValue={filters.q ?? ""} placeholder="Community, category, vibe" className="h-11 rounded-[8px] border border-line bg-black/35 px-4 text-sm outline-none" />
@@ -72,9 +72,9 @@ export default async function CommunitiesPage({ searchParams }: CommunitiesPageP
             </div>
           ) : (
             <Panel className="mt-12 p-8">
-              <p className="text-lg font-medium">No communities have been created yet.</p>
+              <p className="text-lg font-medium">Communities are launching soon.</p>
               <p className="mt-3 max-w-2xl text-sm leading-7 text-muted">
-                This page stays empty until someone actually creates the first community.
+                New communities are being created. Check back soon or start your own.
               </p>
             </Panel>
           )}

@@ -128,14 +128,7 @@ export default function SignInPage() {
             </div>
           ) : null}
 
-          <div className="rounded-[8px] border border-line bg-black/30 p-4 text-sm text-muted">
-            Clerk powers this custom auth surface. OAuth is live now for Google, GitHub, and Discord.
-          </div>
-
-          <Button className="mt-4 w-full" disabled>
-            {status === "oauth" ? <Loader2 className="size-4 animate-spin" /> : null}
-            OAuth-only access
-          </Button>
+          <p className="text-center text-xs text-muted">By continuing, you agree to our Terms of Service and Privacy Policy.</p>
         </Panel>
       </section>
     </main>

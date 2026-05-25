@@ -11,7 +11,7 @@ import { listCommunityDirectory, listHomeData, listOpportunityDirectory } from "
 
 export const metadata: Metadata = {
   title: "Discover",
-  description: "Discover real communities, events, and opportunities across Convoke.",
+  description: "Find events, communities, and opportunities happening near you.",
 };
 
 export default async function DiscoverPage() {
@@ -27,24 +27,25 @@ export default async function DiscoverPage() {
       <main className="min-h-screen px-5 pb-24 pt-28 md:px-8">
         <div className="mx-auto max-w-7xl">
           <h1 className="max-w-4xl text-5xl font-semibold tracking-[-0.04em] md:text-7xl">
-            Discovery that points to action.
+            Discover what's moving
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-muted">
-            Browse the real graph of communities, events, and opportunities. Nothing here is staged to look active.
+            Find events, communities, and opportunities near you.
           </p>
 
-          <div className="mt-10 rounded-xl border border-line bg-white/[0.025] px-5 py-4 text-sm text-muted">
+          <form action="/discover" className="mt-10 rounded-xl border border-line bg-white/[0.025] px-5 py-4">
             <div className="flex items-center gap-3">
-              <Search className="size-5" />
-              Search UI comes next. The underlying discovery surface is now database-first.
+              <Search className="size-5 text-muted" />
+              <input name="q" placeholder="Search events, communities, opportunities..." className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted" />
+              <button type="submit" className="rounded-full bg-foreground px-4 py-1.5 text-xs font-medium text-background transition hover:bg-bronze hover:text-black">Search</button>
             </div>
-          </div>
+          </form>
 
           <section className="mt-14">
             <div className="mb-6 flex items-end justify-between">
               <div>
                 <h2 className="text-3xl font-medium tracking-[-0.03em] md:text-4xl">Events</h2>
-                <p className="mt-2 text-sm text-muted">Registrations, schedules, and waitlists live directly on event records.</p>
+                <p className="mt-2 text-sm text-muted">Hackathons, meetups, workshops, and more happening soon.</p>
               </div>
               <ButtonLink href="/events" variant="secondary">All events</ButtonLink>
             </div>
@@ -75,8 +76,8 @@ export default async function DiscoverPage() {
             </div>
             ) : (
               <Panel className="p-8">
-                <p className="text-lg font-medium">No events have been published yet.</p>
-                <p className="mt-3 text-sm leading-7 text-muted">Once organizers create events, discovery becomes a live operating surface instead of a static directory.</p>
+                <p className="text-lg font-medium">Events are on their way.</p>
+                <p className="mt-3 text-sm leading-7 text-muted">New events are being organized. Check back soon.</p>
               </Panel>
             )}
           </section>
@@ -85,7 +86,7 @@ export default async function DiscoverPage() {
             <div>
               <div className="mb-6">
                 <h2 className="text-3xl font-medium tracking-[-0.03em] md:text-4xl">Communities</h2>
-                <p className="mt-2 text-sm text-muted">Momentum, members, and connected activity live here.</p>
+                <p className="mt-2 text-sm text-muted">Find your people and grow together.</p>
               </div>
               <div className="space-y-4">
                 {communities.length ? (
@@ -107,7 +108,7 @@ export default async function DiscoverPage() {
                   ))
                 ) : (
                   <Panel className="p-6">
-                    <p className="text-sm text-muted">No communities have been created yet.</p>
+                    <p className="text-sm text-muted">Communities are launching soon. Stay tuned.</p>
                   </Panel>
                 )}
               </div>
@@ -116,7 +117,7 @@ export default async function DiscoverPage() {
             <div>
               <div className="mb-6">
                 <h2 className="text-3xl font-medium tracking-[-0.03em] md:text-4xl">Opportunities</h2>
-                <p className="mt-2 text-sm text-muted">Applications and status tracking flow from these records.</p>
+                <p className="mt-2 text-sm text-muted">Internships, roles, and collaborations open now.</p>
               </div>
               <div className="space-y-4">
                 {opportunities.length ? (
@@ -139,7 +140,7 @@ export default async function DiscoverPage() {
                   ))
                 ) : (
                   <Panel className="p-6">
-                    <p className="text-sm text-muted">No opportunities are live yet.</p>
+                    <p className="text-sm text-muted">New opportunities are being posted. Check back soon.</p>
                   </Panel>
                 )}
               </div>

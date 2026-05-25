@@ -3,17 +3,26 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ButtonLink } from "@/components/ui/button";
+import { UserMenu, NavNotificationBell, NavSavedButton } from "./user-menu";
 
-const nav = [
+const publicNav = [
   ["Discover", "/discover"],
   ["Communities", "/communities"],
   ["Events", "/events"],
   ["Opportunities", "/opportunities"],
-  ["Workspace", "/workspace"],
+  ["Merch", "/merch"],
+];
+
+const authedNav = [
+  ["Discover", "/discover"],
+  ["Communities", "/communities"],
+  ["Events", "/events"],
+  ["Opportunities", "/opportunities"],
   ["Organize", "/workspace/organize"],
   ["Merch", "/merch"],
 ];
@@ -21,6 +30,8 @@ const nav = [
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const { isSignedIn } = useAuth();
+  const nav = isSignedIn ? authedNav : publicNav;
 
   return (
     <>
@@ -32,9 +43,12 @@ export function SiteHeader() {
             aria-label="Convoke home"
             onClick={() => setOpen(false)}
           >
-            <span className="grid size-8 place-items-center rounded-[8px] border border-bronze/40 bg-bronze/10 text-sm font-semibold text-bronze">
-              C
-            </span>
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
+              <rect width="32" height="32" rx="8" fill="rgba(198,161,111,0.1)" stroke="rgba(198,161,111,0.4)" strokeWidth="1" />
+              <path d="M16 6 L26 16 L16 26 L6 16 Z" fill="none" stroke="rgba(198,161,111,0.8)" strokeWidth="1.5" />
+              <path d="M16 10 L22 16 L16 22 L10 16 Z" fill="none" stroke="rgba(198,161,111,0.5)" strokeWidth="1" />
+              <circle cx="16" cy="16" r="2.5" fill="rgba(198,161,111,0.9)" />
+            </svg>
             <span className="text-sm font-semibold tracking-[0.18em] text-foreground">
               CONVOKE
             </span>
@@ -55,12 +69,20 @@ export function SiteHeader() {
             ))}
           </nav>
 
-          <div className="hidden items-center gap-2 md:flex">
-            <ButtonLink href="/auth/sign-in" variant="ghost">
-              Sign in
-            </ButtonLink>
-            <ButtonLink href="/workspace">Start Organizing</ButtonLink>
-          </div>
+          {isSignedIn ? (
+            <div className="hidden items-center gap-2 md:flex">
+              <NavNotificationBell />
+              <NavSavedButton />
+              <UserMenu />
+            </div>
+          ) : (
+            <div className="hidden items-center gap-2 md:flex">
+              <ButtonLink href="/auth/sign-in" variant="ghost">
+                Sign in
+              </ButtonLink>
+              <ButtonLink href="/auth/sign-in">Join Convoke</ButtonLink>
+            </div>
+          )}
 
           <button
             onClick={() => setOpen((value) => !value)}
@@ -129,19 +151,35 @@ export function SiteHeader() {
                 <div className="my-8 h-px bg-line" />
               </div>
 
-              <div className="space-y-3 border-t border-line p-5">
-                <ButtonLink
-                  href="/auth/sign-in"
-                  variant="secondary"
-                  className="w-full"
-                  onClick={() => setOpen(false)}
-                >
-                  Sign in
-                </ButtonLink>
-                <ButtonLink href="/workspace" className="w-full" onClick={() => setOpen(false)}>
-                  Start Organizing
-                </ButtonLink>
-              </div>
+              {isSignedIn ? (
+                <div className="space-y-3 border-t border-line p-5">
+                  <ButtonLink
+                    href="/workspace"
+                    className="w-full"
+                    onClick={() => setOpen(false)}
+                  >
+                    Open Workspace
+                  </ButtonLink>
+                </div>
+              ) : (
+                <div className="space-y-3 border-t border-line p-5">
+                  <ButtonLink
+                    href="/auth/sign-in"
+                    variant="secondary"
+                    className="w-full"
+                    onClick={() => setOpen(false)}
+                  >
+                    Sign in
+                  </ButtonLink>
+                  <ButtonLink
+                    href="/auth/sign-in"
+                    className="w-full"
+                    onClick={() => setOpen(false)}
+                  >
+                    Join Convoke
+                  </ButtonLink>
+                </div>
+              )}
             </motion.nav>
           </>
         ) : null}

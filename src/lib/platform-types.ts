@@ -98,6 +98,8 @@ export type ProfileView = {
   communities: { id: string; name: string; role: string; slug: string }[];
   recentEvents: { id: string; title: string; role: string; slug: string }[];
   certificates: { id: string; title: string; type: string; issuedAt: string }[];
+  memberSince?: string;
+  activityTimeline?: { id: string; type: string; title: string; date: string; description: string }[];
 };
 
 export type CommunityView = {

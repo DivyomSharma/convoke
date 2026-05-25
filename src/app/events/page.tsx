@@ -9,7 +9,7 @@ import { listHomeData } from "@/lib/platform-service";
 
 export const metadata: Metadata = {
   title: "Events",
-  description: "Real events, registrations, and community-driven participation on Convoke.",
+  description: "Discover hackathons, meetups, workshops, and conferences happening near you.",
 };
 
 type EventsPageProps = {
@@ -39,10 +39,10 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
       <main className="min-h-screen px-5 pb-24 pt-28 md:px-8">
         <div className="mx-auto max-w-7xl">
           <h1 className="max-w-4xl text-5xl font-semibold tracking-[-0.04em] md:text-7xl">
-            Events that belong to an ecosystem.
+            Upcoming events
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-muted">
-            Every event can carry registrations, volunteers, schedules, waitlists, tracks, announcements, and community context.
+            Hackathons, meetups, workshops, and conferences happening near you.
           </p>
           <form className="mt-10 grid gap-3 rounded-[8px] border border-line bg-white/[0.03] p-4 md:grid-cols-[1fr_180px_180px_auto]">
             <input name="q" defaultValue={filters.q ?? ""} placeholder="Search event, category, organizer" className="h-11 rounded-[8px] border border-line bg-black/35 px-4 text-sm outline-none" />
@@ -81,9 +81,9 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
             </div>
           ) : (
             <Panel className="mt-12 p-8">
-              <p className="text-lg font-medium">No events have been created yet.</p>
+              <p className="text-lg font-medium">Events are on their way.</p>
               <p className="mt-3 max-w-2xl text-sm leading-7 text-muted">
-                This directory stays empty until real organizers publish real events.
+                New events are being organized. Check back soon or create your own.
               </p>
             </Panel>
           )}

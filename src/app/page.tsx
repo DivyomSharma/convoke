@@ -23,18 +23,18 @@ export default async function Home() {
             <MotionShell>
               <div>
                 <h1 className="max-w-5xl text-balance text-6xl font-semibold leading-[0.9] tracking-[-0.04em] text-foreground md:text-8xl lg:text-9xl">
-                  Open daily for what is actually moving.
+                  Where ambition meets opportunity.
                 </h1>
                 <p className="mt-8 max-w-2xl text-lg leading-8 text-muted md:text-xl">
-                  Convoke is a living ecosystem for events, opportunities, communities, volunteers, creators, and organizers. No showcase dashboards, no filler metrics, just real actions tied to real records.
+                  Discover events, communities, and opportunities that move your career forward. Join thousands of students, creators, and founders building momentum together.
                 </p>
                 <div className="mt-10 flex flex-col gap-3 sm:flex-row">
                   <ButtonLink href="/discover" className="group">
-                    Discover momentum
+                    Explore events
                     <ArrowRight className="size-4 transition group-hover:translate-x-1" />
                   </ButtonLink>
-                  <ButtonLink href="/workspace" variant="secondary">
-                    Open workspace
+                  <ButtonLink href="/auth/sign-in" variant="secondary">
+                    Join Convoke
                   </ButtonLink>
                 </div>
                 <div className="mt-8 flex flex-wrap gap-x-4 gap-y-2 text-sm font-medium text-bronze">
@@ -69,15 +69,13 @@ export default async function Home() {
                   </Panel>
                 </Link>
               ) : (
-                <Panel className="flex min-h-[520px] flex-col justify-between p-8">
-                  <div>
-                    <p className="text-sm uppercase tracking-[0.24em] text-bronze">Platform ready</p>
-                    <h2 className="mt-4 text-4xl font-semibold tracking-[-0.04em]">The structure is live. The ecosystem can start now.</h2>
-                    <p className="mt-4 max-w-lg text-sm leading-7 text-muted">
-                      As communities, events, and opportunities are created, this surface fills with real activity instead of hardcoded cards.
-                    </p>
+                <Panel className="flex min-h-[520px] flex-col justify-between overflow-hidden p-0">
+                  <div className="flex h-full flex-col items-center justify-center p-8 text-center">
+                    <CalendarDays className="size-12 text-bronze" />
+                    <h2 className="mt-6 text-3xl font-semibold tracking-[-0.03em]">Events are on their way</h2>
+                    <p className="mt-3 max-w-md text-sm leading-7 text-muted">New events, hackathons, and meetups are launching soon. Be the first to know.</p>
+                    <ButtonLink href="/discover" variant="secondary" className="mt-6">Browse what&apos;s happening</ButtonLink>
                   </div>
-                  <ButtonLink href="/workspace" variant="secondary">Create the first records</ButtonLink>
                 </Panel>
               )}
             </MotionShell>
@@ -89,13 +87,13 @@ export default async function Home() {
             <div className="mb-10 flex items-end justify-between gap-4">
               <div>
                 <h2 className="text-4xl font-medium tracking-[-0.03em] md:text-6xl">
-                  Action-first structure.
+                  What&apos;s happening now
                 </h2>
                 <p className="mt-4 max-w-2xl text-base leading-7 text-muted">
-                  Discovery feeds registrations. Communities host events. Opportunities collect applications. Profiles compound proof. The product is now built around connected workflows instead of isolated sections.
+                  Events, opportunities, and communities that are moving right now.
                 </p>
               </div>
-              <ButtonLink href="/discover" variant="secondary">Open discovery</ButtonLink>
+              <ButtonLink href="/discover" variant="secondary">Explore all</ButtonLink>
             </div>
 
             <div className="grid gap-5 md:grid-cols-3">
@@ -103,17 +101,17 @@ export default async function Home() {
                 {
                   icon: CalendarDays,
                   title: "Events",
-                  copy: "Schedules, registrations, waitlists, volunteers, announcements, and certificates tied to one event entity.",
+                  copy: "Join hackathons, meetups, and workshops. Register, volunteer, and earn certificates.",
                 },
                 {
                   icon: Briefcase,
                   title: "Opportunities",
-                  copy: "Internships, creator collaborations, volunteer roles, and startup hiring tracked with statuses instead of content cards.",
+                  copy: "Discover internships, ambassador programs, creator collaborations, and startup roles.",
                 },
                 {
                   icon: Users,
                   title: "Communities",
-                  copy: "Members, momentum, opportunities, events, and activity attached to the rooms actually creating movement.",
+                  copy: "Find your people. Join communities that match your interests and ambitions.",
                 },
               ].map((item) => (
                 <Panel key={item.title} className="p-6">
@@ -126,18 +124,18 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="px-5 py-24 md:px-8">
-          <div className="mx-auto max-w-7xl">
-            <div className="mb-10 flex items-end justify-between gap-4">
-              <div>
-                <h2 className="text-4xl font-medium tracking-[-0.03em] md:text-6xl">What’s active now</h2>
-                <p className="mt-4 max-w-2xl text-base leading-7 text-muted">
-                  This section only renders real records. If the ecosystem is early, the empty state stays honest.
-                </p>
+        {home.events.length > 0 && (
+          <section className="px-5 py-24 md:px-8">
+            <div className="mx-auto max-w-7xl">
+              <div className="mb-10 flex items-end justify-between gap-4">
+                <div>
+                  <h2 className="text-4xl font-medium tracking-[-0.03em] md:text-6xl">Trending events</h2>
+                  <p className="mt-4 max-w-2xl text-base leading-7 text-muted">
+                    Popular events people are joining right now.
+                  </p>
+                </div>
+                <ButtonLink href="/events" variant="secondary">Browse events</ButtonLink>
               </div>
-              <ButtonLink href="/events" variant="secondary">Browse events</ButtonLink>
-            </div>
-            {home.events.length ? (
               <div className="grid gap-4 md:grid-cols-3">
                 {home.events.slice(0, 3).map((event) => (
                   <Link key={event.id} href={`/events/${event.slug}`}>
@@ -155,23 +153,36 @@ export default async function Home() {
                   </Link>
                 ))}
               </div>
-            ) : (
-              <Panel className="p-8">
-                <p className="text-lg font-medium">No events have been published yet.</p>
-                <p className="mt-3 max-w-2xl text-sm leading-7 text-muted">
-                  Once organizers create their first event, this becomes the living front page of the ecosystem.
-                </p>
-              </Panel>
-            )}
-          </div>
-        </section>
+            </div>
+          </section>
+        )}
+
+        {home.people.length > 0 && (
+          <section className="px-5 py-16 md:px-8">
+            <div className="mx-auto max-w-7xl">
+              <h2 className="text-3xl font-medium tracking-[-0.03em] md:text-4xl">Recently joined</h2>
+              <p className="mt-3 text-sm text-muted">People making moves across the ecosystem.</p>
+              <div className="mt-8 flex flex-wrap gap-4">
+                {home.people.map((person) => (
+                  <Link key={person.id} href={`/u/${person.username}`} className="group flex items-center gap-3 rounded-full border border-line bg-white/[0.03] px-4 py-2.5 transition hover:border-bronze/40 hover:bg-white/[0.06]">
+                    <span className="grid size-9 place-items-center rounded-full bg-gradient-to-br from-bronze to-rust text-xs font-semibold text-black">{person.initials}</span>
+                    <div>
+                      <p className="text-sm font-medium">{person.name}</p>
+                      <p className="text-xs text-muted">{person.role}{person.community ? ` · ${person.community}` : ''}</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         <section className="bg-[#0a0908] px-5 py-24 md:px-8">
           <div className="mx-auto max-w-7xl grid gap-6 lg:grid-cols-[1fr_1fr]">
             <Panel className="p-6">
               <div className="flex items-center gap-2 text-2xl font-medium">
                 <Briefcase className="size-5 text-bronze" />
-                Real opportunity flow
+                Open opportunities
               </div>
               <div className="mt-5 space-y-3">
                 {home.opportunities.length ? (
@@ -183,7 +194,7 @@ export default async function Home() {
                     </div>
                   ))
                 ) : (
-                  <p className="text-sm text-muted">Opportunities appear here once organizations start hiring, recruiting, or opening collaborations.</p>
+                  <p className="text-sm text-muted">More coming soon</p>
                 )}
               </div>
             </Panel>
@@ -191,7 +202,7 @@ export default async function Home() {
             <Panel className="p-6">
               <div className="flex items-center gap-2 text-2xl font-medium">
                 <Sparkles className="size-5 text-bronze" />
-                Actual activity
+                Recent activity
               </div>
               <div className="mt-5 space-y-3">
                 {home.activity.length ? (
@@ -203,7 +214,7 @@ export default async function Home() {
                     </div>
                   ))
                 ) : (
-                  <p className="text-sm text-muted">Activity appears here when people start registering, recruiting, publishing, and organizing.</p>
+                  <p className="text-sm text-muted">More coming soon</p>
                 )}
               </div>
             </Panel>

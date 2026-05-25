@@ -40,7 +40,7 @@ export default async function WorkspacePage() {
               <h1 className="mt-4 text-5xl font-semibold tracking-[-0.05em] md:text-7xl">{dashboard.viewer.name}</h1>
               <p className="mt-3 text-lg text-foreground/90">{dashboard.viewer.headline}</p>
               <p className="mt-6 max-w-3xl text-lg leading-8 text-muted">
-                This is your operating layer for applications, registrations, community presence, certifications, and role-specific next actions.
+                Track your events, applications, communities, and achievements.
               </p>
             </div>
 
@@ -80,7 +80,7 @@ export default async function WorkspacePage() {
                       </Link>
                     ))
                   ) : (
-                    <p className="text-sm text-muted">No registrations yet. Start by joining your first event.</p>
+                    <p className="text-sm text-muted">You haven't joined any events yet.</p>
                   )}
                 </div>
               </Panel>
@@ -102,7 +102,7 @@ export default async function WorkspacePage() {
                       </div>
                     ))
                   ) : (
-                    <p className="text-sm text-muted">No applications yet. The opportunity layer is ready when you are.</p>
+                    <p className="text-sm text-muted">No applications yet. Browse open opportunities.</p>
                   )}
                 </div>
                 <ButtonLink href="/opportunities" variant="secondary" className="mt-5">Browse opportunities</ButtonLink>
@@ -123,7 +123,7 @@ export default async function WorkspacePage() {
                       </div>
                     ))
                   ) : (
-                    <p className="text-sm text-muted">Activity appears here when the communities you belong to actually move.</p>
+                    <p className="text-sm text-muted">Join communities to see activity here.</p>
                   )}
                 </div>
               </Panel>
@@ -150,7 +150,7 @@ export default async function WorkspacePage() {
                       </div>
                     ))
                   ) : (
-                    <p className="text-sm text-muted">Notifications will show up once workflows begin moving.</p>
+                    <p className="text-sm text-muted">No new notifications.</p>
                   )}
                 </div>
               </Panel>
@@ -169,7 +169,7 @@ export default async function WorkspacePage() {
                       </div>
                     ))
                   ) : (
-                    <p className="text-sm text-muted">Certificates will appear once your participation produces them.</p>
+                    <p className="text-sm text-muted">Earn certificates by attending events and volunteering.</p>
                   )}
                 </div>
               </Panel>
@@ -191,7 +191,7 @@ export default async function WorkspacePage() {
                       </Link>
                     ))
                   ) : (
-                    <p className="text-sm text-muted">No community memberships yet.</p>
+                    <p className="text-sm text-muted">You haven't joined any communities yet.</p>
                   )}
                 </div>
               </Panel>
@@ -199,7 +199,7 @@ export default async function WorkspacePage() {
 
             <div className="space-y-6">
               <Panel className="bg-gradient-to-br from-bronze/12 via-transparent to-rust/8 p-5">
-                <h3 className="text-lg font-medium">Role-aware next moves</h3>
+                <h3 className="text-lg font-medium">Suggested for you</h3>
                 <div className="mt-5 space-y-3">
                   {dashboard.roleActions.map((action) => (
                     <Link key={action.href} href={action.href} className="block rounded-[8px] border border-line bg-black/30 px-4 py-4 transition hover:border-bronze/50">
@@ -228,10 +228,7 @@ export default async function WorkspacePage() {
           {dashboard.organizerData ? (
             <section className="mt-16 space-y-6">
               <div>
-                <h2 className="text-3xl font-semibold tracking-[-0.03em] md:text-4xl">Organizer operations</h2>
-                <p className="mt-3 text-sm leading-6 text-muted">
-                  These sections now pull from real organizations, sponsor leads, volunteer applications, merch inquiries, and studio requests.
-                </p>
+                <h2 className="text-3xl font-semibold tracking-[-0.03em] md:text-4xl">Your organizations</h2>
               </div>
 
               <div className="grid gap-6 xl:grid-cols-[1fr_1fr]">
@@ -249,7 +246,7 @@ export default async function WorkspacePage() {
                         </Link>
                       ))
                     ) : (
-                      <p className="text-sm text-muted">No events published yet.</p>
+                      <p className="text-sm text-muted">No events yet. Create your first event.</p>
                     )}
                   </div>
                 </Panel>
@@ -268,7 +265,7 @@ export default async function WorkspacePage() {
                         </Link>
                       ))
                     ) : (
-                      <p className="text-sm text-muted">No opportunities published yet.</p>
+                      <p className="text-sm text-muted">No open opportunities.</p>
                     )}
                   </div>
                 </Panel>
@@ -287,7 +284,7 @@ export default async function WorkspacePage() {
                         </div>
                       ))
                     ) : (
-                      <p className="text-sm text-muted">No sponsor leads yet.</p>
+                      <p className="text-sm text-muted">No sponsors tracked.</p>
                     )}
                   </div>
                 </Panel>
@@ -308,7 +305,7 @@ export default async function WorkspacePage() {
                         </div>
                       ))
                     ) : (
-                      <p className="text-sm text-muted">No volunteer applications yet.</p>
+                      <p className="text-sm text-muted">No volunteer applications.</p>
                     )}
                   </div>
                 </Panel>
@@ -360,7 +357,7 @@ export default async function WorkspacePage() {
                         </div>
                       ))
                     ) : (
-                      <p className="text-sm text-muted">No opportunity applications yet.</p>
+                      <p className="text-sm text-muted">No applications received.</p>
                     )}
                   </div>
                 </Panel>
@@ -382,7 +379,7 @@ export default async function WorkspacePage() {
                         </div>
                       ))
                     ) : (
-                      <p className="text-sm text-muted">No merch requests created yet.</p>
+                      <p className="text-sm text-muted">No merch requests.</p>
                     )}
                   </div>
                 </Panel>
@@ -401,7 +398,7 @@ export default async function WorkspacePage() {
                         </div>
                       ))
                     ) : (
-                      <p className="text-sm text-muted">No studio requests yet.</p>
+                      <p className="text-sm text-muted">No studio requests.</p>
                     )}
                   </div>
                 </Panel>

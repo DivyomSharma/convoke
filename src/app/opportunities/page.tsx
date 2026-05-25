@@ -10,7 +10,7 @@ import { listOpportunityDirectory } from "@/lib/platform-service";
 
 export const metadata: Metadata = {
   title: "Opportunities",
-  description: "Real internships, volunteer roles, hiring asks, and creator collaborations on Convoke.",
+  description: "Find internships, volunteer roles, ambassador programs, and startup hiring on Convoke.",
 };
 
 type OpportunitiesPageProps = {
@@ -42,16 +42,16 @@ export default async function OpportunitiesPage({ searchParams }: OpportunitiesP
       <main className="min-h-screen px-5 pb-24 pt-28 md:px-8">
         <div className="mx-auto max-w-7xl">
           <h1 className="max-w-4xl text-5xl font-semibold tracking-[-0.04em] md:text-7xl">
-            Opportunities built like workflows, not content.
+            Opportunities for you
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-muted">
-            Apply, save, and track status changes across internships, volunteer roles, creator asks, and startup hiring.
+            Find internships, ambassador programs, volunteer roles, creator collaborations, and startup hiring across the ecosystem.
           </p>
 
           <div className="mt-10 rounded-xl border border-line bg-white/[0.025] px-5 py-4 text-sm text-muted">
             <div className="flex items-center gap-3">
               <Search className="size-5" />
-              The browse layer now supports real query filtering on top of live opportunity records.
+              Use filters below to find the right opportunity for you.
             </div>
           </div>
           <form className="mt-6 grid gap-3 rounded-[8px] border border-line bg-white/[0.03] p-4 md:grid-cols-[1fr_180px_180px_auto_auto]">
@@ -124,9 +124,9 @@ export default async function OpportunitiesPage({ searchParams }: OpportunitiesP
           ) : (
             <Panel className="mt-12 p-8">
               <Briefcase className="size-5 text-bronze" />
-              <p className="mt-4 text-lg font-medium">No opportunities are live yet.</p>
+              <p className="mt-4 text-lg font-medium">Opportunities are on their way.</p>
               <p className="mt-3 max-w-2xl text-sm leading-7 text-muted">
-                The platform is ready for real listings, but it won’t invent hiring demand to fill the page.
+                Organizations are preparing new roles and programs. Check back soon.
               </p>
             </Panel>
           )}
