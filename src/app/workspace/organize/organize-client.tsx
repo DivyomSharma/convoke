@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronRight, Globe, MapPin, Users, Video, Briefcase, Calendar, CheckCircle2 } from "lucide-react";
 import { createCommunity, createEvent, createOpportunity } from "@/app/actions";
 import { FormSubmitButton } from "@/components/ui/form-submit-button";
+import { CustomSelect } from "@/components/ui/select";
 
 type Options = {
   organizations: { id: string; name: string; slug: string }[];
@@ -126,20 +127,22 @@ function EventFlow({ options }: { options: Options }) {
           <div className="grid gap-5 md:grid-cols-2">
             <label className="space-y-2">
               <span className="text-xs uppercase tracking-[0.22em] text-muted">Host Organization</span>
-              <select name="organizationId" className="h-12 w-full rounded-[8px] border border-line bg-black/40 px-4 text-sm outline-none" required>
-                {options.organizations.map((item) => (
-                  <option key={item.id} value={item.id}>{item.name}</option>
-                ))}
-              </select>
+              <CustomSelect
+                name="organizationId"
+                required
+                options={options.organizations.map((item) => ({ value: item.id, label: item.name }))}
+              />
             </label>
             <label className="space-y-2">
               <span className="text-xs uppercase tracking-[0.22em] text-muted">Community (Optional)</span>
-              <select name="communityId" className="h-12 w-full rounded-[8px] border border-line bg-black/40 px-4 text-sm outline-none">
-                <option value="">No linked community</option>
-                {options.communities.map((item) => (
-                  <option key={item.id} value={item.id}>{item.name}</option>
-                ))}
-              </select>
+              <CustomSelect
+                name="communityId"
+                defaultValue=""
+                options={[
+                  { value: "", label: "No linked community" },
+                  ...options.communities.map((item) => ({ value: item.id, label: item.name }))
+                ]}
+              />
             </label>
             <label className="space-y-2 md:col-span-2">
               <span className="text-xs uppercase tracking-[0.22em] text-muted">Event Title</span>
@@ -147,22 +150,30 @@ function EventFlow({ options }: { options: Options }) {
             </label>
             <label className="space-y-2">
               <span className="text-xs uppercase tracking-[0.22em] text-muted">Category</span>
-              <select name="category" className="h-12 w-full rounded-[8px] border border-line bg-black/40 px-4 text-sm outline-none" required>
-                <option value="Hackathon">Hackathon</option>
-                <option value="Meetup">Meetup</option>
-                <option value="Workshop">Workshop</option>
-                <option value="Conference">Conference</option>
-                <option value="Festival">Festival</option>
-                <option value="Demo Day">Demo Day</option>
-              </select>
+              <CustomSelect
+                name="category"
+                required
+                options={[
+                  { value: "Hackathon", label: "Hackathon" },
+                  { value: "Meetup", label: "Meetup" },
+                  { value: "Workshop", label: "Workshop" },
+                  { value: "Conference", label: "Conference" },
+                  { value: "Festival", label: "Festival" },
+                  { value: "Demo Day", label: "Demo Day" },
+                ]}
+              />
             </label>
             <label className="space-y-2">
               <span className="text-xs uppercase tracking-[0.22em] text-muted">Format</span>
-              <select name="mode" className="h-12 w-full rounded-[8px] border border-line bg-black/40 px-4 text-sm outline-none" required>
-                <option value="ONLINE">Online</option>
-                <option value="OFFLINE">In-Person</option>
-                <option value="HYBRID">Hybrid</option>
-              </select>
+              <CustomSelect
+                name="mode"
+                required
+                options={[
+                  { value: "ONLINE", label: "Online" },
+                  { value: "OFFLINE", label: "In-Person" },
+                  { value: "HYBRID", label: "Hybrid" },
+                ]}
+              />
             </label>
           </div>
           <div className="mt-8 flex justify-end">
@@ -286,11 +297,14 @@ function CommunityFlow({ options }: { options: Options }) {
             </label>
             <label className="space-y-2">
               <span className="text-xs uppercase tracking-[0.22em] text-muted">Primary Category</span>
-              <select name="category" className="h-12 w-full rounded-[8px] border border-line bg-black/40 px-4 text-sm outline-none" required>
-                {["STARTUP", "COLLEGE", "CREATOR", "AI", "DESIGN", "OPEN_SOURCE", "GAMING", "SOCIAL_IMPACT", "NGO"].map((item) => (
-                  <option key={item} value={item}>{item.replaceAll("_", " ")}</option>
-                ))}
-              </select>
+              <CustomSelect
+                name="category"
+                required
+                options={["STARTUP", "COLLEGE", "CREATOR", "AI", "DESIGN", "OPEN_SOURCE", "GAMING", "SOCIAL_IMPACT", "NGO"].map((item) => ({
+                  value: item,
+                  label: item.replaceAll("_", " ")
+                }))}
+              />
             </label>
             <label className="space-y-2">
               <span className="text-xs uppercase tracking-[0.22em] text-muted">Base City</span>
@@ -315,11 +329,14 @@ function CommunityFlow({ options }: { options: Options }) {
             </label>
             <label className="space-y-2">
               <span className="text-xs uppercase tracking-[0.22em] text-muted">Organization Type</span>
-              <select name="organizationType" className="h-12 w-full rounded-[8px] border border-line bg-black/40 px-4 text-sm outline-none" required>
-                {["COMMUNITY", "STARTUP", "COLLEGE_SOCIETY", "CREATOR_COLLECTIVE", "NGO"].map((item) => (
-                  <option key={item} value={item}>{item.replaceAll("_", " ")}</option>
-                ))}
-              </select>
+              <CustomSelect
+                name="organizationType"
+                required
+                options={["COMMUNITY", "STARTUP", "COLLEGE_SOCIETY", "CREATOR_COLLECTIVE", "NGO"].map((item) => ({
+                  value: item,
+                  label: item.replaceAll("_", " ")
+                }))}
+              />
             </label>
             <label className="space-y-2 md:col-span-2">
               <span className="text-xs uppercase tracking-[0.22em] text-muted">Full Description</span>
@@ -394,22 +411,26 @@ function OpportunityFlow({ options }: { options: Options }) {
             </label>
             <label className="space-y-2">
               <span className="text-xs uppercase tracking-[0.22em] text-muted">Organization</span>
-              <select name="organizationId" className="h-12 w-full rounded-[8px] border border-line bg-black/40 px-4 text-sm outline-none" required>
-                {options.organizations.map((item) => (
-                  <option key={item.id} value={item.id}>{item.name}</option>
-                ))}
-              </select>
+              <CustomSelect
+                name="organizationId"
+                required
+                options={options.organizations.map((item) => ({ value: item.id, label: item.name }))}
+              />
             </label>
             <label className="space-y-2">
               <span className="text-xs uppercase tracking-[0.22em] text-muted">Type</span>
-              <select name="type" className="h-12 w-full rounded-[8px] border border-line bg-black/40 px-4 text-sm outline-none" required>
-                <option value="INTERNSHIP">Internship</option>
-                <option value="AMBASSADOR">Ambassador Program</option>
-                <option value="STARTUP_HIRING">Startup Hiring</option>
-                <option value="VOLUNTEER_ROLE">Volunteer Role</option>
-                <option value="CREATOR_COLLABORATION">Creator Collaboration</option>
-                <option value="FREELANCE_GIG">Freelance Gig</option>
-              </select>
+              <CustomSelect
+                name="type"
+                required
+                options={[
+                  { value: "INTERNSHIP", label: "Internship" },
+                  { value: "AMBASSADOR", label: "Ambassador Program" },
+                  { value: "STARTUP_HIRING", label: "Startup Hiring" },
+                  { value: "VOLUNTEER_ROLE", label: "Volunteer Role" },
+                  { value: "CREATOR_COLLABORATION", label: "Creator Collaboration" },
+                  { value: "FREELANCE_GIG", label: "Freelance Gig" },
+                ]}
+              />
             </label>
             <label className="space-y-2 md:col-span-2">
               <span className="text-xs uppercase tracking-[0.22em] text-muted">Short Description (1 sentence)</span>
