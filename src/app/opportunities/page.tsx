@@ -1,141 +1,135 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Briefcase, Clock, MapPin, Search, Sparkles, Users } from "lucide-react";
+import { ArrowUpRight, Briefcase, MapPin, Search } from "lucide-react";
 import { Footer } from "@/components/marketing/footer";
 import { SiteHeader } from "@/components/marketing/site-header";
 import { ApplyButton } from "@/components/ui/apply-button";
-import { ButtonLink } from "@/components/ui/button";
 import { Panel } from "@/components/ui/panel";
 import { SaveButton } from "@/components/ui/save-button";
 import { listOpportunityDirectory } from "@/lib/platform-service";
 
 export const metadata: Metadata = {
   title: "Opportunities",
-  description: "Internships, hiring, volunteer roles, startup openings, and creator collaborations across the Convoke ecosystem.",
+  description: "Real internships, volunteer roles, hiring asks, and creator collaborations on Convoke.",
 };
 
-export default async function OpportunitiesPage() {
+type OpportunitiesPageProps = {
+  searchParams?: Promise<{ q?: string; location?: string; type?: string; remote?: string }>;
+};
+
+export default async function OpportunitiesPage({ searchParams }: OpportunitiesPageProps) {
   const opportunities = await listOpportunityDirectory();
+  const filters = (await searchParams) ?? {};
+  const q = filters.q?.trim().toLowerCase() ?? "";
+  const location = filters.location?.trim().toLowerCase() ?? "";
+  const type = filters.type?.trim().toLowerCase() ?? "";
+  const remoteOnly = filters.remote === "true";
+  const filtered = opportunities.filter((opportunity) => {
+    const matchesQ = q
+      ? [opportunity.title, opportunity.organization, opportunity.description, ...opportunity.skills].some((value) =>
+          value.toLowerCase().includes(q),
+        )
+      : true;
+    const matchesLocation = location ? opportunity.location.toLowerCase().includes(location) : true;
+    const matchesType = type ? opportunity.type.toLowerCase() === type : true;
+    const matchesRemote = remoteOnly ? opportunity.isRemote : true;
+    return matchesQ && matchesLocation && matchesType && matchesRemote;
+  });
 
   return (
     <>
       <SiteHeader />
       <main className="min-h-screen px-5 pb-24 pt-28 md:px-8">
         <div className="mx-auto max-w-7xl">
-          <div className="mb-12">
-            <div className="flex items-center gap-3 text-sm text-bronze">
-              <Sparkles className="size-4" />
-              <span>{opportunities.length} active opportunities in the ecosystem</span>
-            </div>
-            <h1 className="mt-4 max-w-4xl text-5xl font-semibold tracking-[-0.04em] md:text-7xl">
-              Unstop-style opportunity flow, inside a community graph.
-            </h1>
-            <p className="mt-6 max-w-3xl text-lg leading-8 text-muted">
-              Browse openings, save them, apply, and track status across
-              internships, startup roles, volunteer programs, and creator
-              collaborations.
-            </p>
-          </div>
+          <h1 className="max-w-4xl text-5xl font-semibold tracking-[-0.04em] md:text-7xl">
+            Opportunities built like workflows, not content.
+          </h1>
+          <p className="mt-6 max-w-2xl text-lg leading-8 text-muted">
+            Apply, save, and track status changes across internships, volunteer roles, creator asks, and startup hiring.
+          </p>
 
-          <div className="mb-10 rounded-xl border border-line bg-white/[0.025] px-5 py-4 text-sm text-muted">
+          <div className="mt-10 rounded-xl border border-line bg-white/[0.025] px-5 py-4 text-sm text-muted">
             <div className="flex items-center gap-3">
               <Search className="size-5" />
-              Search roles, skills, communities, or cities
+              The browse layer now supports real query filtering on top of live opportunity records.
             </div>
           </div>
+          <form className="mt-6 grid gap-3 rounded-[8px] border border-line bg-white/[0.03] p-4 md:grid-cols-[1fr_180px_180px_auto_auto]">
+            <input name="q" defaultValue={filters.q ?? ""} placeholder="Role, org, skill" className="h-11 rounded-[8px] border border-line bg-black/35 px-4 text-sm outline-none" />
+            <input name="location" defaultValue={filters.location ?? ""} placeholder="Location" className="h-11 rounded-[8px] border border-line bg-black/35 px-4 text-sm outline-none" />
+            <select name="type" defaultValue={filters.type ?? ""} className="h-11 rounded-[8px] border border-line bg-black/35 px-4 text-sm outline-none">
+              <option value="">Any type</option>
+              <option value="internship">Internship</option>
+              <option value="ambassador">Ambassador</option>
+              <option value="startup hiring">Startup Hiring</option>
+              <option value="volunteer role">Volunteer Role</option>
+              <option value="creator collaboration">Creator Collaboration</option>
+              <option value="freelance gig">Freelance Gig</option>
+            </select>
+            <label className="flex h-11 items-center gap-3 rounded-[8px] border border-line bg-black/35 px-4 text-sm text-muted">
+              <input type="checkbox" name="remote" value="true" defaultChecked={remoteOnly} />
+              Remote only
+            </label>
+            <button type="submit" className="inline-flex h-11 items-center justify-center rounded-full bg-foreground px-5 text-sm font-medium text-background transition hover:bg-bronze hover:text-black">Apply</button>
+          </form>
 
-          <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-            <div className="space-y-4">
-              {opportunities.map((opportunity) => (
-                <Panel key={opportunity.id} className="group p-0 transition hover:border-bronze/40">
-                  <div className="p-6">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs uppercase tracking-wider text-bronze">
-                          {opportunity.type}
-                        </p>
-                        <h2 className="mt-3 text-2xl font-medium tracking-[-0.02em]">
-                          {opportunity.title}
-                        </h2>
-                        <Link
-                          href={`/communities/${opportunity.organizationSlug}`}
-                          className="mt-2 inline-flex items-center gap-2 text-sm text-muted transition hover:text-foreground"
-                        >
-                          <span className="grid size-5 place-items-center rounded bg-bronze/10 text-[10px] font-semibold text-bronze">
-                            {opportunity.organization[0]}
+          {filtered.length ? (
+            <div className="mt-12 grid gap-4">
+              {filtered.map((opportunity) => (
+                <Panel key={opportunity.id} className="panel-hover p-5">
+                  <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-start">
+                    <div>
+                      <p className="text-xs uppercase tracking-wider text-bronze">{opportunity.type}</p>
+                      <Link href={`/opportunities/${opportunity.slug}`} className="mt-2 inline-flex items-center gap-2 text-2xl font-medium hover:text-bronze">
+                        {opportunity.title}
+                        <ArrowUpRight className="size-4" />
+                      </Link>
+                      <div className="mt-2 flex flex-wrap gap-3 text-sm text-muted">
+                        <span>{opportunity.organization}</span>
+                        <span className="inline-flex items-center gap-1.5"><MapPin className="size-3.5" />{opportunity.location}</span>
+                        <span>{opportunity.stipend ?? "Unpaid"}</span>
+                        <span>{opportunity.deadlineLabel}</span>
+                      </div>
+                      <p className="mt-4 max-w-3xl text-sm leading-7 text-muted">{opportunity.description}</p>
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {opportunity.skills.map((skill) => (
+                          <span key={skill} className="rounded-full border border-line px-3 py-1 text-xs text-muted">
+                            {skill}
                           </span>
-                          {opportunity.organization}
-                        </Link>
+                        ))}
                       </div>
-                      <div className="shrink-0">
-                        <SaveButton opportunityId={opportunity.id} initialSaved={opportunity.saved} iconOnly />
+                      <div className="mt-4 flex flex-wrap gap-2 text-xs text-muted">
+                        {opportunity.perks.map((perk) => (
+                          <span key={perk}>{perk}</span>
+                        ))}
                       </div>
                     </div>
-
-                    <p className="mt-4 text-sm leading-6 text-muted">{opportunity.description}</p>
-
-                    <div className="mt-4 flex flex-wrap gap-1.5">
-                      {opportunity.skills.slice(0, 5).map((skill) => (
-                        <span key={skill} className="rounded-md bg-white/[0.06] px-2.5 py-1 text-xs text-muted">
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-
-                    <div className="mt-5 flex flex-col gap-4 border-t border-line pt-4 md:flex-row md:items-center md:justify-between">
-                      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-muted">
-                        <span className="inline-flex items-center gap-1.5">
-                          <MapPin className="size-3.5" />
-                          {opportunity.location}
-                        </span>
-                        <span className="inline-flex items-center gap-1.5">
-                          <Briefcase className="size-3.5" />
-                          {opportunity.stipend ?? "Unpaid"}
-                        </span>
-                        <span className="inline-flex items-center gap-1.5">
-                          <Clock className="size-3.5" />
-                          {opportunity.deadlineLabel}
-                        </span>
-                        <span className="inline-flex items-center gap-1.5">
-                          <Users className="size-3.5" />
-                          {opportunity.applicants} applied
-                        </span>
-                      </div>
+                    <div className="grid gap-3 lg:w-48">
                       <ApplyButton
-                        mode="apply"
                         opportunityId={opportunity.id}
                         initialApplied={opportunity.applied}
-                        className="h-9 w-auto px-4 text-xs"
-                        label={opportunity.applied ? "Applied" : "Apply"}
+                        label={opportunity.applied ? "Applied" : "Apply now"}
                       />
+                      <SaveButton opportunityId={opportunity.id} initialSaved={opportunity.saved} />
+                      {opportunity.communitySlug ? (
+                        <Link href={`/communities/${opportunity.communitySlug}`} className="inline-flex h-10 items-center justify-center rounded-full border border-line px-4 text-sm text-muted transition hover:border-bronze/50 hover:text-foreground">
+                          Related community
+                        </Link>
+                      ) : null}
                     </div>
                   </div>
                 </Panel>
               ))}
             </div>
-
-            <div className="hidden space-y-4 lg:block">
-              <Panel className="p-5">
-                <h3 className="text-lg font-medium">What you can do here</h3>
-                <div className="mt-4 space-y-3 text-sm text-muted">
-                  <p>Save openings and revisit them from your dashboard.</p>
-                  <p>Apply with a portfolio-first profile instead of a dead resume link.</p>
-                  <p>Track progress across all communities in one place.</p>
-                </div>
-              </Panel>
-
-              <Panel className="bg-gradient-to-br from-bronze/10 via-transparent to-rust/5 p-5">
-                <h3 className="text-lg font-medium">Hiring through your community?</h3>
-                <p className="mt-3 text-sm leading-6 text-muted">
-                  Post roles, shortlist applicants, and manage opportunity flows
-                  inside the organizer dashboard.
-                </p>
-                <ButtonLink href="/workspace" className="mt-5 w-full" variant="secondary">
-                  Open dashboard
-                </ButtonLink>
-              </Panel>
-            </div>
-          </div>
+          ) : (
+            <Panel className="mt-12 p-8">
+              <Briefcase className="size-5 text-bronze" />
+              <p className="mt-4 text-lg font-medium">No opportunities are live yet.</p>
+              <p className="mt-3 max-w-2xl text-sm leading-7 text-muted">
+                The platform is ready for real listings, but it won’t invent hiring demand to fill the page.
+              </p>
+            </Panel>
+          )}
         </div>
       </main>
       <Footer />

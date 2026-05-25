@@ -15,29 +15,40 @@ export async function getAuthenticatedDbUser() {
     const username =
       clerk.username ??
       email.split("@")[0].toLowerCase().replace(/[^a-z0-9-]/g, "-");
+    const name =
+      `${clerk.firstName ?? ""} ${clerk.lastName ?? ""}`.trim() ||
+      clerk.fullName ||
+      username;
 
     return prisma.user.upsert({
       where: { email },
       update: {
         clerkId: userId,
         imageUrl: clerk.imageUrl,
-        name:
-          `${clerk.firstName ?? ""} ${clerk.lastName ?? ""}`.trim() ||
-          clerk.fullName ||
-          username,
+        name,
         username,
       },
       create: {
         clerkId: userId,
         email,
         username,
-        name:
-          `${clerk.firstName ?? ""} ${clerk.lastName ?? ""}`.trim() ||
-          clerk.fullName ||
-          username,
-        headline: "Community member",
-        role: UserRole.ATTENDEE,
+        name,
+        headline: "Building through communities, opportunities, and events",
+        primaryRole: UserRole.PARTICIPANT,
         imageUrl: clerk.imageUrl,
+        profile: {
+          create: {
+            avatarUrl: clerk.imageUrl,
+            skills: [],
+            badges: [],
+            interests: [],
+          },
+        },
+      },
+      include: {
+        profile: true,
+        memberships: true,
+        communityMemberships: true,
       },
     });
   }
@@ -70,9 +81,22 @@ export async function getAuthenticatedDbUser() {
       email: user.email,
       username,
       name,
-      headline: "Community member",
-      role: UserRole.ATTENDEE,
+      headline: "Building through communities, opportunities, and events",
+      primaryRole: UserRole.PARTICIPANT,
       imageUrl: user.user_metadata?.avatar_url || null,
+      profile: {
+        create: {
+          avatarUrl: user.user_metadata?.avatar_url || null,
+          skills: [],
+          badges: [],
+          interests: [],
+        },
+      },
+    },
+    include: {
+      profile: true,
+      memberships: true,
+      communityMemberships: true,
     },
   });
 }

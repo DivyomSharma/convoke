@@ -15,24 +15,24 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://convoke.xyz"),
+  metadataBase: new URL("https://convoke.app"),
   title: {
-    default: "Convoke - Events, Ideas, and People Moving Forward",
+    default: "Convoke - Communities, Opportunities, and Events in Motion",
     template: "%s | Convoke",
   },
   description:
-    "Convoke is for events, ideas, and people moving things forward across campuses, creators, startups, NGOs, and ambitious communities.",
+    "Convoke is the ecosystem where ambitious people discover opportunities, communities, collaborators, hackathons, internships, events, and momentum.",
   openGraph: {
     title: "Convoke",
-    description: "For events, ideas, and people moving things forward.",
-    url: "https://convoke.xyz",
+    description: "Communities, opportunities, collaborators, events, and momentum in one living ecosystem.",
+    url: "https://convoke.app",
     siteName: "Convoke",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "Convoke",
-    description: "For events, ideas, and people moving things forward.",
+    description: "Communities, opportunities, collaborators, events, and momentum in one living ecosystem.",
   },
 };
 

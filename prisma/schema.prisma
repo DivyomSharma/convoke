@@ -9,17 +9,48 @@ datasource db {
 }
 
 enum UserRole {
-  ATTENDEE
+  PARTICIPANT
   ORGANIZER
+  COMMUNITY_ADMIN
   VOLUNTEER
   SPONSOR
-  NGO
+  STARTUP
   CREATOR
-  STARTUP_COMMUNITY
+  PLATFORM_ADMIN
+}
+
+enum OrganizationType {
+  STARTUP
+  COMMUNITY
+  COLLEGE_SOCIETY
+  CREATOR_COLLECTIVE
+  NGO
+  BRAND
+  SPONSOR
+  PLATFORM
+  AGENCY
+}
+
+enum MembershipRole {
+  OWNER
   ADMIN
-  COMMUNITY_ADMIN
-  STARTUP_FOUNDER
-  MENTOR
+  OPERATOR
+  VOLUNTEER_LEAD
+  SPONSORSHIP_LEAD
+  CREATOR_LEAD
+  MEMBER
+}
+
+enum CommunityCategory {
+  STARTUP
+  COLLEGE
+  CREATOR
+  AI
+  DESIGN
+  OPEN_SOURCE
+  GAMING
+  SOCIAL_IMPACT
+  NGO
 }
 
 enum EventMode {
@@ -34,6 +65,7 @@ enum RegistrationStatus {
   REJECTED
   WAITLISTED
   CHECKED_IN
+  CANCELLED
 }
 
 enum SponsorStage {
@@ -42,13 +74,13 @@ enum SponsorStage {
   REPLIED
   NEGOTIATING
   CONFIRMED
-  COMPLETED
 }
 
 enum MerchStatus {
   INQUIRY_RECEIVED
   REVIEWING
   QUOTATION_SENT
+  WHATSAPP_CONTINUED
   PRODUCTION
   SHIPPED
   COMPLETED
@@ -56,15 +88,11 @@ enum MerchStatus {
 
 enum OpportunityType {
   INTERNSHIP
-  VOLUNTEER
   AMBASSADOR
-  STARTUP_JOB
-  CREATOR_COLLAB
+  STARTUP_HIRING
+  VOLUNTEER_ROLE
+  CREATOR_COLLABORATION
   FREELANCE_GIG
-  RESEARCH_POSITION
-  MENTORSHIP
-  CONTEST
-  SCHOLARSHIP
 }
 
 enum ApplicationStatus {
@@ -72,10 +100,8 @@ enum ApplicationStatus {
   REVIEWING
   SHORTLISTED
   INTERVIEW
-  OFFER
   ACCEPTED
   REJECTED
-  WITHDRAWN
 }
 
 enum TicketTypeCategory {
@@ -90,20 +116,18 @@ enum CertificateType {
   PARTICIPATION
   VOLUNTEER
   ORGANIZER
-  SPEAKER
-  WINNER
-  MENTOR
+  BADGE
 }
 
 enum NotificationType {
-  EVENT_REMINDER
   APPLICATION_UPDATE
-  NEW_OPPORTUNITY
-  COMMUNITY_INVITE
+  EVENT_REMINDER
   EVENT_UPDATE
-  SPONSOR_RESPONSE
+  COMMUNITY_ANNOUNCEMENT
+  VOLUNTEER_UPDATE
+  SPONSOR_UPDATE
   MERCH_UPDATE
-  SYSTEM_ANNOUNCEMENT
+  STUDIO_UPDATE
 }
 
 enum NotificationStatus {
@@ -112,194 +136,227 @@ enum NotificationStatus {
   ARCHIVED
 }
 
+enum StudioRequestType {
+  BRANDING
+  DEVELOPMENT
+  DESIGN
+  MVP_BUILD
+  GROWTH_SETUP
+}
+
 model User {
-  id            String                 @id @default(cuid())
-  clerkId       String?                @unique
-  email         String                 @unique
-  username      String                 @unique
-  name          String
-  headline      String?
-  imageUrl      String?
-  role          UserRole               @default(ATTENDEE)
-  profile       Profile?
-  bio           String?
-  experiences   Experience[]
-  educations    Education[]
-  projects      Project[]
-  memberships         Membership[]
-  registrations       Registration[]
-  volunteerApps       VolunteerApplication[]
-  opportunityApps     OpportunityApplication[]
-  eventsSpeaking      EventSpeaker[] @relation("EventSpeakerUser")
-  eventsOrganized     Event[]        @relation("EventOrganizerUser")
-  certificatesIssued  Certificate[]  @relation("CertificateUser")
-  notifications       Notification[]
-  bookmarks           Bookmark[]     @relation("UserBookmarks")
-  followers           Follow[]       @relation("Followers")
-  following           Follow[]       @relation("Follows")
-  comments            Comment[]      @relation("UserComments")
-  reactions           Reaction[]     @relation("UserReactions")
-  createdAt           DateTime               @default(now())
-  updatedAt           DateTime               @updatedAt
+  id                     String                   @id @default(cuid())
+  clerkId                String?                  @unique
+  email                  String                   @unique
+  username               String                   @unique
+  name                   String
+  headline               String?
+  bio                    String?
+  imageUrl               String?
+  primaryRole            UserRole                 @default(PARTICIPANT)
+  profile                Profile?
+  memberships            Membership[]
+  communityMemberships   CommunityMembership[]
+  ledEvents              Event[]                  @relation("EventOwner")
+  registrations          Registration[]
+  waitlists              EventWaitlist[]
+  volunteerApplications  VolunteerApplication[]
+  opportunityApplications OpportunityApplication[]
+  certificates           Certificate[]
+  notifications          Notification[]
+  bookmarks              Bookmark[]
+  activities             UserActivity[]
+  projects               Project[]
+  teamMemberships        TeamMember[]
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @updatedAt
 }
 
 model Profile {
-  id            String   @id @default(cuid())
-  userId        String   @unique
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  headline      String?
-  avatarUrl     String?
-  bannerUrl     String?
-  location      String?
-  website       String?
-  // Social links
-  linkedinUrl   String?
-  twitterUrl    String?
-  instagramUrl  String?
-  youtubeUrl    String?
-  githubUrl     String?
-  discordHandle String?
-  portfolioUrl  String?
-  // Skills & badges
-  skills        String[]
-  badges        String[]
-  reputation    Float    @default(0)
-  // Stats
-  eventsAttended      Int    @default(0)
-  eventsOrganized     Int    @default(0)
-  volunteerHours      Int    @default(0)
-  communitiesJoined   Int    @default(0)
-  createdAt           DateTime       @default(now())
-  updatedAt           DateTime       @updatedAt
-}
-
-model Experience {
-  id            String   @id @default(cuid())
-  userId        String
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  company       String
-  position      String
-  location      String?
-  startsAt      DateTime?
-  endsAt        DateTime?
-  current       Boolean  @default(false)
-  description   String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-}
-
-model Education {
-  id            String   @id @default(cuid())
-  userId        String
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  institution   String
-  degree        String
-  fieldOfStudy  String?
-  startsAt      DateTime?
-  endsAt        DateTime?
-  grade         String?
-  activities    String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-}
-
-model Project {
-  id            String   @id @default(cuid())
-  userId        String
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name          String
-  description   String?
-  url           String?
-  technologies  String[]
-  startsAt      DateTime?
-  endsAt        DateTime?
-  visible       Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  avatarUrl         String?
+  bannerUrl         String?
+  location          String?
+  city              String?
+  website           String?
+  linkedinUrl       String?
+  githubUrl         String?
+  instagramUrl      String?
+  twitterUrl        String?
+  discordHandle     String?
+  portfolioUrl      String?
+  skills            String[]
+  badges            String[]
+  interests         String[]
+  reputation        Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
 model Organization {
-  id             String         @id @default(cuid())
-  slug           String         @unique
-  name           String
-  type           String
-  description    String?
-  website        String?
-  avatarUrl      String?
-  bannerUrl      String?
-  // Stats
-  membersCount   Int    @default(0)
-  eventsCount    Int    @default(0)
-  opportunitiesCount Int @default(0)
-  // Relations
-  members        Membership[]
-  events         Event[]
-  opportunities  Opportunity[]
-  sponsorLeads   SponsorLead[]
-  merchInquiries MerchInquiry[]
-  announcements  Announcement[]
-  galleries      Gallery[]
-  certificates   Certificate[] @relation("OrganizationCertificates")
-  eventSponsors  EventSponsor[] @relation("EventSponsorOrganization")
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  id               String          @id @default(cuid())
+  slug             String          @unique
+  name             String
+  type             OrganizationType
+  description      String
+  website          String?
+  city             String?
+  state            String?
+  logoUrl          String?
+  bannerUrl        String?
+  verified         Boolean         @default(false)
+  communities      Community[]
+  memberships      Membership[]
+  events           Event[]
+  opportunities    Opportunity[]
+  announcements    Announcement[]
+  galleries        Gallery[]
+  sponsorLeads     SponsorLead[]
+  merchInquiries   MerchInquiry[]
+  studioRequests   StudioRequest[]
+  teamMembers      TeamMember[]
+  teams            Team[]
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
 }
 
 model Membership {
-  id             String       @id @default(cuid())
+  id             String         @id @default(cuid())
   userId         String
   organizationId String
-  role           String
-  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  joinedAt       DateTime     @default(now())
+  role           MembershipRole @default(MEMBER)
+  title          String?
+  joinedAt       DateTime       @default(now())
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
   @@unique([userId, organizationId])
 }
 
+model Community {
+  id                 String                @id @default(cuid())
+  slug               String                @unique
+  organizationId     String
+  name               String
+  category           CommunityCategory
+  tagline            String
+  description        String
+  city               String
+  isFeatured         Boolean               @default(false)
+  coverImageUrl      String?
+  memberCount        Int                   @default(0)
+  momentumScore      Int                   @default(0)
+  organization       Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  members            CommunityMembership[]
+  events             Event[]
+  opportunities      Opportunity[]
+  announcements      Announcement[]
+  teams              Team[]
+  activities         UserActivity[]
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+}
+
+model CommunityMembership {
+  id          String         @id @default(cuid())
+  userId      String
+  communityId String
+  role        MembershipRole @default(MEMBER)
+  joinedAt    DateTime       @default(now())
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  community   Community      @relation(fields: [communityId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, communityId])
+}
+
+model Team {
+  id            String       @id @default(cuid())
+  communityId    String?
+  eventId        String?
+  organizationId String?
+  name           String
+  purpose        String
+  community      Community?   @relation(fields: [communityId], references: [id], onDelete: SetNull)
+  event          Event?       @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  members        TeamMember[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model TeamMember {
+  id             String         @id @default(cuid())
+  teamId          String
+  userId          String
+  organizationId  String?
+  role            MembershipRole @default(MEMBER)
+  team            Team           @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization    Organization?  @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+
+  @@unique([teamId, userId])
+}
+
 model Event {
-  id             String                 @id @default(cuid())
-  organizationId String
-  organization   Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  slug           String                 @unique
-  title          String
-  category       String
-  city           String
-  mode           EventMode
-  startsAt       DateTime
-  endsAt         DateTime?
-  isPaid         Boolean                @default(false)
-  inviteOnly     Boolean                @default(false)
-  approvalBased  Boolean                @default(false)
-  heroImageUrl   String?
-  // Legacy field - prefer relational tables for new development
-  blocks         Json?
-  // Relations
-  registrations  Registration[]
-  ticketTypes    TicketType[]
-  schedules      EventSchedule[]
-  speakers       EventSpeaker[] @relation("EventSpeakerEvent")
-  sponsors       EventSponsor[] @relation("EventSponsorEvent")
-  volunteerApps  VolunteerApplication[]
-  sponsorLeads   SponsorLead[]
-  certificates   Certificate[] @relation("CertificateEvent")
-  galleries      Gallery[]    @relation("EventGalleries")
-  organizerId    String?
-  organizer      User?        @relation("EventOrganizerUser", fields: [organizerId], references: [id])
-  createdAt      DateTime               @default(now())
-  updatedAt      DateTime               @updatedAt
+  id                   String                 @id @default(cuid())
+  slug                 String                 @unique
+  organizationId       String
+  communityId          String?
+  organizerId          String?
+  title                String
+  shortDescription     String
+  description          String
+  city                 String
+  venue                String?
+  category             String
+  mode                 EventMode
+  startsAt             DateTime
+  endsAt               DateTime
+  heroImageUrl         String?
+  isPaid               Boolean                @default(false)
+  approvalBased        Boolean                @default(false)
+  featured             Boolean                @default(false)
+  certificateEnabled   Boolean                @default(true)
+  registrationsCount   Int                    @default(0)
+  waitlistCount        Int                    @default(0)
+  volunteerCount       Int                    @default(0)
+  organization         Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  community            Community?             @relation(fields: [communityId], references: [id], onDelete: SetNull)
+  organizer            User?                  @relation("EventOwner", fields: [organizerId], references: [id], onDelete: SetNull)
+  registrations        Registration[]
+  waitlistEntries      EventWaitlist[]
+  ticketTypes          TicketType[]
+  schedules            EventSchedule[]
+  tracks               EventTrack[]
+  faqs                 EventFaq[]
+  speakers             EventSpeaker[]
+  judges               EventJudge[]
+  sponsors             EventSponsor[]
+  volunteerApplications VolunteerApplication[]
+  announcements        Announcement[]
+  teams                Team[]
+  galleries            Gallery[]
+  sponsorLeads         SponsorLead[]
+  certificates         Certificate[]
+  activities           UserActivity[]
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
 }
 
 model TicketType {
-  id       String @id @default(cuid())
-  eventId  String
-  event    Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  name     String
-  category TicketTypeCategory @default(GENERAL)
-  priceInr Int    @default(0)
-  capacity Int?
-  sold     Int    @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String             @id @default(cuid())
+  eventId   String
+  name      String
+  category  TicketTypeCategory @default(GENERAL)
+  priceInr  Int                @default(0)
+  capacity  Int?
+  sold      Int                @default(0)
+  event     Event              @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  registrations Registration[]
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
 }
 
 model Registration {
@@ -309,57 +366,179 @@ model Registration {
   ticketTypeId String?
   status       RegistrationStatus @default(PENDING)
   qrCode       String             @unique
-  tags         String[]
   checkedInAt  DateTime?
-  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  event        Event              @relation(fields: [eventId], references: [id], onDelete: Cascade)
   createdAt    DateTime           @default(now())
   updatedAt    DateTime           @updatedAt
+  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event        Event              @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  ticketType   TicketType?        @relation(fields: [ticketTypeId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, eventId])
+}
+
+model EventWaitlist {
+  id        String   @id @default(cuid())
+  userId     String
+  eventId    String
+  reason     String?
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event      Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId])
+}
+
+model EventTrack {
+  id          String   @id @default(cuid())
+  eventId      String
+  name         String
+  description  String?
+  order        Int      @default(0)
+  event        Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
 }
 
 model EventSchedule {
-  id            String   @id @default(cuid())
-  eventId       String
-  event         Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  title         String
-  description   String?
-  startsAt      DateTime
-  endsAt        DateTime
-  location      String?
-  isBreak       Boolean  @default(false)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id          String   @id @default(cuid())
+  eventId      String
+  title        String
+  description  String?
+  startsAt     DateTime
+  endsAt       DateTime
+  location     String?
+  event        Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model EventFaq {
+  id          String   @id @default(cuid())
+  eventId      String
+  question     String
+  answer       String
+  order        Int      @default(0)
+  event        Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
 }
 
 model EventSpeaker {
-  id            String   @id @default(cuid())
+  id           String   @id @default(cuid())
   eventId       String
-  event         Event    @relation(fields: [eventId], references: [id], onDelete: Cascade, name: "EventSpeakerEvent")
-  userId        String?
-  user          User?    @relation(fields: [userId], references: [id], onDelete: SetNull, name: "EventSpeakerUser")
   name          String
   title         String?
   organization  String?
   bio           String?
   avatarUrl     String?
   talkTitle     String?
-  talkDescription String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  event         Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model EventJudge {
+  id           String   @id @default(cuid())
+  eventId       String
+  name          String
+  title         String?
+  organization  String?
+  bio           String?
+  event         Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
 }
 
 model EventSponsor {
-  id            String   @id @default(cuid())
-  eventId       String
-  event         Event    @relation(fields: [eventId], references: [id], onDelete: Cascade, name: "EventSponsorEvent")
-  organizationId String?
-  organization  Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull, name: "EventSponsorOrganization")
-  companyName   String
-  tier          String // e.g., Platinum, Gold, Silver
-  benefits      String[]
-  logoUrl       String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id             String        @id @default(cuid())
+  eventId         String
+  name            String
+  tier            String
+  logoUrl         String?
+  benefits        String[]
+  event           Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model VolunteerApplication {
+  id         String             @id @default(cuid())
+  userId      String
+  eventId     String
+  role        String
+  status      ApplicationStatus @default(APPLIED)
+  hours       Int                @default(0)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event       Event              @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId, role])
+}
+
+model Opportunity {
+  id                    String                    @id @default(cuid())
+  slug                  String                    @unique
+  organizationId        String
+  communityId           String?
+  title                 String
+  type                  OpportunityType
+  location              String
+  isRemote              Boolean                   @default(false)
+  shortDescription      String
+  description           String
+  requirements          String[]
+  skills                String[]
+  perks                 String[]
+  stipend               String?
+  duration              String?
+  applicationDeadline   DateTime?
+  positionsAvailable    Int                       @default(1)
+  featured              Boolean                   @default(false)
+  active                Boolean                   @default(true)
+  organization          Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  community             Community?                @relation(fields: [communityId], references: [id], onDelete: SetNull)
+  applications          OpportunityApplication[]
+  activities            UserActivity[]
+  createdAt             DateTime                  @default(now())
+  updatedAt             DateTime                  @updatedAt
+}
+
+model OpportunityApplication {
+  id             String             @id @default(cuid())
+  userId          String
+  opportunityId   String
+  status          ApplicationStatus @default(APPLIED)
+  coverLetter     String?
+  resumeUrl       String?
+  portfolioUrl    String?
+  notes           String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  opportunity     Opportunity       @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, opportunityId])
+}
+
+model Announcement {
+  id             String       @id @default(cuid())
+  organizationId String
+  communityId    String?
+  eventId        String?
+  title          String
+  content        String
+  publishedAt    DateTime     @default(now())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  community      Community?   @relation(fields: [communityId], references: [id], onDelete: SetNull)
+  event          Event?       @relation(fields: [eventId], references: [id], onDelete: SetNull)
+}
+
+model Gallery {
+  id             String        @id @default(cuid())
+  organizationId String
+  eventId        String?
+  title          String
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  event          Event?        @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  items          GalleryItem[]
+}
+
+model GalleryItem {
+  id         String   @id @default(cuid())
+  galleryId   String
+  url         String
+  caption     String?
+  order       Int      @default(0)
+  gallery     Gallery  @relation(fields: [galleryId], references: [id], onDelete: Cascade)
 }
 
 model SponsorLead {
@@ -377,23 +556,9 @@ model SponsorLead {
   updatedAt      DateTime     @updatedAt
 }
 
-model VolunteerApplication {
-  id      String @id @default(cuid())
-  userId  String
-  eventId String
-  role    String
-  status  String @default("PENDING")
-  hours   Int    @default(0)
-  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  appliedAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 model MerchInquiry {
-  id               String        @id @default(cuid())
+  id               String       @id @default(cuid())
   organizationId   String?
-  organization     Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   apparelType      String
   quantity         Int
   budget           String
@@ -401,173 +566,84 @@ model MerchInquiry {
   city             String
   references       String[]
   stylePreferences String?
-  status           MerchStatus   @default(INQUIRY_RECEIVED)
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
+  status           MerchStatus  @default(INQUIRY_RECEIVED)
+  organization     Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
 }
 
-model Opportunity {
-  id             String                 @id @default(cuid())
-  organizationId String
-  organization   Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  title          String
-  type           OpportunityType
-  location       String
-  isRemote       Boolean                @default(false)
-  description    String
-  requirements   String[]
-  skills         String[]
-  stipend        String? // Monthly stipend in INR
-  duration       String? // e.g., "3 months", "Summer 2026"
-  startsAt       DateTime?
-  endsAt         DateTime?
-  applicationDeadline DateTime?
-  positionsAvailable Int @default(1)
-  applicationsCount  Int @default(0)
-  featured       Boolean @default(false)
-  active         Boolean @default(true)
-  applications   OpportunityApplication[]
-  createdAt      DateTime               @default(now())
-  updatedAt      DateTime               @updatedAt
+model StudioRequest {
+  id               String            @id @default(cuid())
+  organizationId   String?
+  type             StudioRequestType
+  title            String
+  brief            String
+  status           NotificationStatus @default(UNREAD)
+  organization     Organization?      @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
 }
 
-model OpportunityApplication {
-  id            String             @id @default(cuid())
+model Project {
+  id           String   @id @default(cuid())
   userId        String
-  opportunityId String
-  opportunity   Opportunity        @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
-  user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  status        ApplicationStatus  @default(APPLIED)
-  coverLetter   String?
-  resumeUrl     String?
-  portfolioUrl  String?
-  appliedAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
-  // For organizer notes
-  notes         String?
-  interviewedAt DateTime?
-  @@unique([userId, opportunityId])
-}
-
-model Announcement {
-  id            String   @id @default(cuid())
-  organizationId String
-  organization  Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  title         String
-  content       String
-  published     Boolean  @default(false)
-  publishedAt   DateTime?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-}
-
-model Gallery {
-  id            String   @id @default(cuid())
-  organizationId String
-  eventId       String?
-  organization  Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  event         Event?     @relation(fields: [eventId], references: [id], onDelete: SetNull, name: "EventGalleries")
-  title         String
-  description   String?
-  items         GalleryItem[] @relation("GalleryItemGallery")
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-}
-
-model GalleryItem {
-  id            String   @id @default(cuid())
-  galleryId     String
-  gallery       Gallery  @relation(fields: [galleryId], references: [id], onDelete: Cascade, name: "GalleryItemGallery")
-  url           String
-  caption       String?
-  order         Int      @default(0)
-  createdAt     DateTime @default(now())
-}
-
-model Notification {
-  id            String   @id @default(cuid())
-  userId        String
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  type          NotificationType
-  title         String
-  message       String
-  data          Json?    // For additional data like eventId, opportunityId, etc.
-  status        NotificationStatus @default(UNREAD)
-  createdAt     DateTime @default(now())
-  readAt        DateTime?
-}
-
-model Bookmark {
-  id            String   @id @default(cuid())
-  userId        String
-  eventId       String?
-  opportunityId String?
   organizationId String?
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade, name: "UserBookmarks")
-  createdAt     DateTime @default(now())
-  // Note: We enforce at least one reference in the application layer or via a check constraint if the database supports it.
-  // For Prisma, we can use a check constraint in the migration, but we'll handle it in the service layer for simplicity.
+  name         String
+  description  String
+  url          String?
+  technologies String[]
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model Certificate {
-  id            String   @id @default(cuid())
-  userId        String
-  eventId       String?
-  organizationId String?
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade, name: "CertificateUser")
-  event         Event?   @relation(fields: [eventId], references: [id], onDelete: SetNull, name: "CertificateEvent")
-  organization  Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull, name: "OrganizationCertificates")
-  type          CertificateType
-  title         String
-  description   String?
-  issuedAt      DateTime @default(now())
-  certificateUrl String? // URL to PDF/image
-  createdAt     DateTime @default(now())
+  id             String          @id @default(cuid())
+  userId          String
+  eventId         String?
+  type            CertificateType
+  title           String
+  description     String?
+  certificateUrl  String?
+  issuedAt        DateTime        @default(now())
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event           Event?          @relation(fields: [eventId], references: [id], onDelete: SetNull)
 }
 
-model Follow {
-  id            String   @id @default(cuid())
-  followerId    String
-  followingId   String
-  follower      User     @relation("Follows", fields: [followerId], references: [id])
-  following     User     @relation("Followers", fields: [followingId], references: [id])
-  createdAt     DateTime @default(now())
-  
-  @@unique([followerId, followingId])
-  @@index([followerId])
-  @@index([followingId])
+model Notification {
+  id          String              @id @default(cuid())
+  userId       String
+  type         NotificationType
+  title        String
+  message      String
+  status       NotificationStatus @default(UNREAD)
+  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime           @default(now())
+  readAt       DateTime?
 }
 
-model Comment {
-  id            String   @id @default(cuid())
+model Bookmark {
+  id             String   @id @default(cuid())
+  userId          String
+  eventId         String?
+  opportunityId   String?
+  communityId     String?
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt       DateTime @default(now())
+}
+
+model UserActivity {
+  id           String      @id @default(cuid())
   userId        String
+  communityId   String?
   eventId       String?
   opportunityId String?
-  organizationId String?
-  parentId      String?
-  parent        Comment? @relation("Replies", fields: [parentId], references: [id])
-  replies       Comment[] @relation("Replies")
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade, name: "UserComments")
-  reactions     Reaction[] @relation("CommentReactions")
-  content       String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  
-  @@index([eventId])
-  @@index([opportunityId])
-  @@index([organizationId])
-  @@index([parentId])
-}
-
-model Reaction {
-  id            String   @id @default(cuid())
-  userId        String
-  commentId     String
-  comment       Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade, name: "CommentReactions")
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade, name: "UserReactions")
-  type          String   // e.g., 'like', 'celebrate', 'support', 'insightful'
-  createdAt     DateTime @default(now())
-  
-  @@unique([userId, commentId])
-  @@index([commentId])
+  actorName     String
+  action        String
+  detail        String
+  createdAt     DateTime   @default(now())
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  community     Community? @relation(fields: [communityId], references: [id], onDelete: SetNull)
+  event         Event?     @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  opportunity   Opportunity? @relation(fields: [opportunityId], references: [id], onDelete: SetNull)
 }

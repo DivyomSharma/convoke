@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://convoke.xyz/sitemap.xml",
+    sitemap: "https://convoke.app/sitemap.xml",
   };
 }

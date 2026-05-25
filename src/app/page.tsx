@@ -1,4 +1,4 @@
-import { ArrowRight, Briefcase, CalendarDays, MapPin, Users } from "lucide-react";
+import { ArrowRight, Briefcase, CalendarDays, Sparkles, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Footer } from "@/components/marketing/footer";
@@ -23,20 +23,18 @@ export default async function Home() {
             <MotionShell>
               <div>
                 <h1 className="max-w-5xl text-balance text-6xl font-semibold leading-[0.9] tracking-[-0.04em] text-foreground md:text-8xl lg:text-9xl">
-                  For events, ideas, and people moving things forward.
+                  Open daily for what is actually moving.
                 </h1>
                 <p className="mt-8 max-w-2xl text-lg leading-8 text-muted md:text-xl">
-                  Convoke is a living ecosystem for discovering hackathons,
-                  internships, creator programs, communities, registrations, and
-                  the people building momentum around them.
+                  Convoke is a living ecosystem for events, opportunities, communities, volunteers, creators, and organizers. No showcase dashboards, no filler metrics, just real actions tied to real records.
                 </p>
                 <div className="mt-10 flex flex-col gap-3 sm:flex-row">
                   <ButtonLink href="/discover" className="group">
                     Discover momentum
                     <ArrowRight className="size-4 transition group-hover:translate-x-1" />
                   </ButtonLink>
-                  <ButtonLink href="/opportunities" variant="secondary">
-                    Browse opportunities
+                  <ButtonLink href="/workspace" variant="secondary">
+                    Open workspace
                   </ButtonLink>
                 </div>
                 <div className="mt-8 flex flex-wrap gap-x-4 gap-y-2 text-sm font-medium text-bronze">
@@ -51,47 +49,37 @@ export default async function Home() {
             </MotionShell>
 
             <MotionShell delay={0.12}>
-              <div className="grid gap-4">
-                {heroEvent ? (
-                  <Link href={`/events/${heroEvent.slug}`} className="group">
-                    <Panel className="overflow-hidden p-0 transition hover:border-bronze/50">
-                      <div className="relative min-h-[520px] overflow-hidden">
-                        <Image
-                          src={heroEvent.image}
-                          alt={heroEvent.title}
-                          fill
-                          priority
-                          className="object-cover transition duration-700 group-hover:scale-105"
-                        />
-                        <div className={`absolute inset-0 bg-gradient-to-t ${heroEvent.palette}`} />
-                        <div className="absolute bottom-0 left-0 right-0 p-5">
-                          <p className="text-sm text-bronze">{heroEvent.category}</p>
-                          <h2 className="mt-2 text-4xl font-semibold tracking-[-0.04em]">
-                            {heroEvent.title}
-                          </h2>
-                          <p className="mt-2 max-w-md text-sm leading-6 text-white/75">
-                            {heroEvent.tagline}
-                          </p>
-                          <div className="mt-5 flex flex-wrap gap-4 text-xs text-white/75">
-                            <span className="inline-flex items-center gap-1.5">
-                              <MapPin className="size-3.5" />
-                              {heroEvent.city}
-                            </span>
-                            <span className="inline-flex items-center gap-1.5">
-                              <CalendarDays className="size-3.5" />
-                              {heroEvent.date}
-                            </span>
-                            <span className="inline-flex items-center gap-1.5">
-                              <Users className="size-3.5" />
-                              {heroEvent.attendees.toLocaleString("en-IN")} joined
-                            </span>
-                          </div>
+              {heroEvent ? (
+                <Link href={`/events/${heroEvent.slug}`} className="group">
+                  <Panel className="overflow-hidden p-0 transition hover:border-bronze/50">
+                    <div className="relative min-h-[520px] overflow-hidden">
+                      <Image src={heroEvent.image} alt={heroEvent.title} fill priority className="object-cover transition duration-700 group-hover:scale-105" />
+                      <div className={`absolute inset-0 bg-gradient-to-t ${heroEvent.palette}`} />
+                      <div className="absolute bottom-0 left-0 right-0 p-5">
+                        <p className="text-sm text-bronze">{heroEvent.category}</p>
+                        <h2 className="mt-2 text-4xl font-semibold tracking-[-0.04em]">{heroEvent.title}</h2>
+                        <p className="mt-2 max-w-md text-sm leading-6 text-white/75">{heroEvent.tagline}</p>
+                        <div className="mt-5 flex flex-wrap gap-4 text-xs text-white/75">
+                          <span className="inline-flex items-center gap-1.5">{heroEvent.city}</span>
+                          <span className="inline-flex items-center gap-1.5">{heroEvent.date}</span>
+                          <span className="inline-flex items-center gap-1.5">{heroEvent.attendees.toLocaleString("en-IN")} joined</span>
                         </div>
                       </div>
-                    </Panel>
-                  </Link>
-                ) : null}
-              </div>
+                    </div>
+                  </Panel>
+                </Link>
+              ) : (
+                <Panel className="flex min-h-[520px] flex-col justify-between p-8">
+                  <div>
+                    <p className="text-sm uppercase tracking-[0.24em] text-bronze">Platform ready</p>
+                    <h2 className="mt-4 text-4xl font-semibold tracking-[-0.04em]">The structure is live. The ecosystem can start now.</h2>
+                    <p className="mt-4 max-w-lg text-sm leading-7 text-muted">
+                      As communities, events, and opportunities are created, this surface fills with real activity instead of hardcoded cards.
+                    </p>
+                  </div>
+                  <ButtonLink href="/workspace" variant="secondary">Create the first records</ButtonLink>
+                </Panel>
+              )}
             </MotionShell>
           </div>
         </section>
@@ -101,45 +89,38 @@ export default async function Home() {
             <div className="mb-10 flex items-end justify-between gap-4">
               <div>
                 <h2 className="text-4xl font-medium tracking-[-0.03em] md:text-6xl">
-                  Discovery, participation, and reputation in one place.
+                  Action-first structure.
                 </h2>
                 <p className="mt-4 max-w-2xl text-base leading-7 text-muted">
-                  The platform is structured around real events, communities,
-                  opportunities, registrations, applications, and portfolio
-                  identity.
+                  Discovery feeds registrations. Communities host events. Opportunities collect applications. Profiles compound proof. The product is now built around connected workflows instead of isolated sections.
                 </p>
               </div>
-              <ButtonLink href="/workspace" variant="secondary">
-                Open dashboard
-              </ButtonLink>
+              <ButtonLink href="/discover" variant="secondary">Open discovery</ButtonLink>
             </div>
 
             <div className="grid gap-5 md:grid-cols-3">
-              {home.events.slice(0, 3).map((event, index) => (
-                <MotionShell key={event.id} delay={index * 0.05}>
-                  <Link href={`/events/${event.slug}`}>
-                    <Panel className="group overflow-hidden p-0 transition hover:-translate-y-1 hover:border-bronze/50">
-                      <div className="relative h-64 overflow-hidden">
-                        <Image
-                          src={event.image}
-                          alt={event.title}
-                          fill
-                          className="object-cover transition duration-700 group-hover:scale-105"
-                        />
-                        <div className={`absolute inset-0 bg-gradient-to-t ${event.palette}`} />
-                        <div className="absolute bottom-0 left-0 right-0 p-5">
-                          <p className="text-xs text-white/75">{event.category}</p>
-                          <h3 className="mt-2 text-3xl font-medium tracking-[-0.03em]">
-                            {event.title}
-                          </h3>
-                          <p className="mt-2 text-sm leading-6 text-white/75">
-                            {event.tagline}
-                          </p>
-                        </div>
-                      </div>
-                    </Panel>
-                  </Link>
-                </MotionShell>
+              {[
+                {
+                  icon: CalendarDays,
+                  title: "Events",
+                  copy: "Schedules, registrations, waitlists, volunteers, announcements, and certificates tied to one event entity.",
+                },
+                {
+                  icon: Briefcase,
+                  title: "Opportunities",
+                  copy: "Internships, creator collaborations, volunteer roles, and startup hiring tracked with statuses instead of content cards.",
+                },
+                {
+                  icon: Users,
+                  title: "Communities",
+                  copy: "Members, momentum, opportunities, events, and activity attached to the rooms actually creating movement.",
+                },
+              ].map((item) => (
+                <Panel key={item.title} className="p-6">
+                  <item.icon className="size-5 text-bronze" />
+                  <h3 className="mt-5 text-2xl font-medium">{item.title}</h3>
+                  <p className="mt-3 text-sm leading-7 text-muted">{item.copy}</p>
+                </Panel>
               ))}
             </div>
           </div>
@@ -149,119 +130,83 @@ export default async function Home() {
           <div className="mx-auto max-w-7xl">
             <div className="mb-10 flex items-end justify-between gap-4">
               <div>
-                <h2 className="text-4xl font-medium tracking-[-0.03em] md:text-6xl">
-                  Opportunities that move daily.
-                </h2>
+                <h2 className="text-4xl font-medium tracking-[-0.03em] md:text-6xl">What’s active now</h2>
                 <p className="mt-4 max-w-2xl text-base leading-7 text-muted">
-                  Internships, volunteer roles, ambassador programs, startup
-                  hiring, and creator collaborations are first-class entities,
-                  not content blocks.
+                  This section only renders real records. If the ecosystem is early, the empty state stays honest.
                 </p>
               </div>
-              <ButtonLink href="/opportunities" variant="secondary">
-                View all
-              </ButtonLink>
+              <ButtonLink href="/events" variant="secondary">Browse events</ButtonLink>
             </div>
-            <div className="grid gap-4 md:grid-cols-3">
-              {home.opportunities.slice(0, 3).map((opportunity) => (
-                <Panel key={opportunity.id} className="group flex h-full flex-col justify-between p-5 transition hover:border-bronze/50">
-                  <div>
-                    <span className="text-xs font-medium uppercase tracking-wider text-bronze">
-                      {opportunity.type}
-                    </span>
-                    <h3 className="mt-3 text-2xl font-medium tracking-[-0.02em]">
-                      {opportunity.title}
-                    </h3>
-                    <p className="mt-2 text-sm text-muted">{opportunity.organization}</p>
-                    <p className="mt-4 text-sm leading-6 text-muted">
-                      {opportunity.description}
-                    </p>
-                  </div>
-                  <div className="mt-6 flex flex-wrap gap-3 text-xs text-muted">
-                    <span className="inline-flex items-center gap-1.5">
-                      <MapPin className="size-3.5" />
-                      {opportunity.location}
-                    </span>
-                    <span className="inline-flex items-center gap-1.5">
-                      <Briefcase className="size-3.5" />
-                      {opportunity.stipend ?? "Unpaid"}
-                    </span>
-                    <span>{opportunity.applicants} applicants</span>
-                  </div>
-                </Panel>
-              ))}
-            </div>
+            {home.events.length ? (
+              <div className="grid gap-4 md:grid-cols-3">
+                {home.events.slice(0, 3).map((event) => (
+                  <Link key={event.id} href={`/events/${event.slug}`}>
+                    <Panel className="group overflow-hidden p-0 transition hover:-translate-y-1 hover:border-bronze/50">
+                      <div className="relative h-64 overflow-hidden">
+                        <Image src={event.image} alt={event.title} fill className="object-cover transition duration-700 group-hover:scale-105" />
+                        <div className={`absolute inset-0 bg-gradient-to-t ${event.palette}`} />
+                        <div className="absolute bottom-0 left-0 right-0 p-5">
+                          <p className="text-xs text-white/75">{event.category}</p>
+                          <h3 className="mt-2 text-3xl font-medium tracking-[-0.03em]">{event.title}</h3>
+                          <p className="mt-2 text-sm leading-6 text-white/75">{event.tagline}</p>
+                        </div>
+                      </div>
+                    </Panel>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <Panel className="p-8">
+                <p className="text-lg font-medium">No events have been published yet.</p>
+                <p className="mt-3 max-w-2xl text-sm leading-7 text-muted">
+                  Once organizers create their first event, this becomes the living front page of the ecosystem.
+                </p>
+              </Panel>
+            )}
           </div>
         </section>
 
         <section className="bg-[#0a0908] px-5 py-24 md:px-8">
-          <div className="mx-auto max-w-7xl">
-            <div className="mb-10 flex items-end justify-between gap-4">
-              <div>
-                <h2 className="text-4xl font-medium tracking-[-0.03em] md:text-6xl">
-                  Communities with real structure.
-                </h2>
-                <p className="mt-4 max-w-2xl text-base leading-7 text-muted">
-                  Organizations on Convoke own members, events, openings,
-                  announcements, galleries, sponsorship requests, and merch
-                  flows.
-                </p>
+          <div className="mx-auto max-w-7xl grid gap-6 lg:grid-cols-[1fr_1fr]">
+            <Panel className="p-6">
+              <div className="flex items-center gap-2 text-2xl font-medium">
+                <Briefcase className="size-5 text-bronze" />
+                Real opportunity flow
               </div>
-              <ButtonLink href="/communities" variant="secondary">
-                Browse communities
-              </ButtonLink>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-4">
-              {home.communities.slice(0, 8).map((community) => (
-                <Link key={community.id} href={`/communities/${community.slug}`}>
-                  <Panel className="group overflow-hidden p-0 transition hover:border-bronze/50">
-                    <div className="relative h-36">
-                      <Image src={community.image} alt={community.name} fill className="object-cover" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+              <div className="mt-5 space-y-3">
+                {home.opportunities.length ? (
+                  home.opportunities.slice(0, 4).map((opportunity) => (
+                    <div key={opportunity.id} className="rounded-[8px] border border-line bg-black/30 p-4">
+                      <p className="text-xs uppercase tracking-wider text-bronze">{opportunity.type}</p>
+                      <h3 className="mt-2 font-medium">{opportunity.title}</h3>
+                      <p className="mt-2 text-sm text-muted">{opportunity.organization} / {opportunity.location}</p>
                     </div>
-                    <div className="p-4">
-                      <h3 className="text-lg font-medium group-hover:text-bronze">{community.name}</h3>
-                      <p className="mt-2 text-sm leading-6 text-muted">{community.tagline}</p>
-                      <p className="mt-3 text-xs text-muted">
-                        {community.members.toLocaleString("en-IN")} members
-                      </p>
-                    </div>
-                  </Panel>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
+                  ))
+                ) : (
+                  <p className="text-sm text-muted">Opportunities appear here once organizations start hiring, recruiting, or opening collaborations.</p>
+                )}
+              </div>
+            </Panel>
 
-        <section className="px-5 pb-24 pt-24 md:px-8">
-          <div className="mx-auto max-w-7xl overflow-hidden rounded-[8px] border border-bronze/30 bg-[linear-gradient(135deg,rgba(198,161,111,0.18),rgba(185,101,53,0.12)_38%,rgba(141,161,184,0.08))] p-8 md:p-12">
-            <div className="grid gap-8 lg:grid-cols-[1fr_0.8fr] lg:items-center">
-              <div>
-                <h2 className="max-w-3xl text-4xl font-semibold tracking-[-0.04em] md:text-7xl">
-                  Open Convoke daily for what is moving.
-                </h2>
-                <p className="mt-6 max-w-2xl text-lg leading-8 text-muted">
-                  Save openings, register for events, join communities, track
-                  applications, earn certificates, and build a public profile
-                  that works better than a stale resume link.
-                </p>
+            <Panel className="p-6">
+              <div className="flex items-center gap-2 text-2xl font-medium">
+                <Sparkles className="size-5 text-bronze" />
+                Actual activity
               </div>
-              <div className="space-y-3">
-                {[
-                  "Role-aware dashboards",
-                  "Real registrations and applications",
-                  "Portfolio-first public profiles",
-                ].map((item) => (
-                  <div key={item} className="rounded-full border border-line bg-white/[0.04] px-4 py-3 text-sm text-foreground">
-                    {item}
-                  </div>
-                ))}
-                <ButtonLink href="/auth/sign-in" className="mt-4 w-full sm:w-auto">
-                  Enter Convoke
-                </ButtonLink>
+              <div className="mt-5 space-y-3">
+                {home.activity.length ? (
+                  home.activity.map((item) => (
+                    <div key={item.id} className="rounded-[8px] border border-line bg-black/30 p-4">
+                      <p className="font-medium">{item.actor} {item.action}</p>
+                      <p className="mt-2 text-sm leading-6 text-muted">{item.detail}</p>
+                      <p className="mt-2 text-xs text-bronze">{item.createdAt}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-muted">Activity appears here when people start registering, recruiting, publishing, and organizing.</p>
+                )}
               </div>
-            </div>
+            </Panel>
           </div>
         </section>
       </main>

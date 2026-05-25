@@ -2,12 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useSignIn } from "@clerk/nextjs/legacy";
-import { AlertCircle, Loader2, Lock, Mail } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Panel } from "@/components/ui/panel";
-import { getSupabaseBrowserClient } from "@/lib/supabase";
 
 const oauthProviders = [
   {
@@ -19,24 +17,6 @@ const oauthProviders = [
         <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23Z" />
         <path fill="#FBBC05" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.84Z" />
         <path fill="#EA4335" d="M12 5.37c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06L5.84 9.9C6.71 7.3 9.14 5.37 12 5.37Z" />
-      </svg>
-    ),
-  },
-  {
-    label: "Continue with Apple",
-    strategy: "oauth_apple" as const,
-    icon: (
-      <svg viewBox="0 0 24 24" className="size-4 fill-current" aria-hidden="true">
-        <path d="M16.37 12.08c.02 2.18 1.92 2.91 1.94 2.92-.02.05-.3 1.04-.99 2.06-.59.88-1.21 1.76-2.18 1.78-.95.02-1.26-.56-2.36-.56-1.1 0-1.44.54-2.33.58-.94.04-1.66-.95-2.25-1.82-1.2-1.74-2.11-4.91-.88-7.03.61-1.05 1.7-1.71 2.88-1.73.9-.02 1.74.6 2.36.6.61 0 1.76-.74 2.97-.63.51.02 1.95.21 2.87 1.55-.07.05-1.71 1-1.69 2.98ZM14.53 6.27c.49-.59.82-1.41.73-2.23-.71.03-1.56.47-2.07 1.05-.45.52-.84 1.35-.73 2.14.79.06 1.58-.4 2.07-.96Z" />
-      </svg>
-    ),
-  },
-  {
-    label: "Continue with Facebook",
-    strategy: "oauth_facebook" as const,
-    icon: (
-      <svg viewBox="0 0 24 24" className="size-4 fill-current" aria-hidden="true">
-        <path d="M13.5 22v-8h2.7l.4-3h-3.1V9.1c0-.88.24-1.48 1.5-1.48H16.7V4.9c-.3-.04-1.32-.12-2.5-.12-2.48 0-4.2 1.51-4.2 4.29V11H7.2v3H10V22h3.5Z" />
       </svg>
     ),
   },
@@ -61,10 +41,7 @@ const oauthProviders = [
 ];
 
 export default function SignInPage() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [status, setStatus] = useState<"idle" | "login" | "signup" | "oauth">("idle");
+  const [status, setStatus] = useState<"idle" | "oauth">("idle");
   const [message, setMessage] = useState<string | null>(null);
   const { signIn } = useSignIn();
 
@@ -85,42 +62,6 @@ export default function SignInPage() {
     }
   };
 
-  const emailPassword = async (mode: "login" | "signup") => {
-    setMessage(null);
-
-    try {
-      setStatus(mode);
-      const supabase = getSupabaseBrowserClient();
-
-      if (mode === "login") {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        router.push("/workspace");
-        router.refresh();
-        return;
-      }
-
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo:
-            typeof window !== "undefined" ? `${window.location.origin}/workspace` : undefined,
-          data: {
-            username: email.split("@")[0],
-          },
-        },
-      });
-
-      if (error) throw error;
-      setMessage("Account created. Check your inbox if email confirmation is enabled, then continue to your workspace.");
-    } catch (error) {
-      setMessage(readAuthError(error, "Could not continue with email."));
-    } finally {
-      setStatus("idle");
-    }
-  };
-
   return (
     <main className="grid min-h-screen bg-background lg:grid-cols-[1fr_520px]">
       <section className="relative hidden overflow-hidden border-r border-line p-10 lg:block">
@@ -135,8 +76,7 @@ export default function SignInPage() {
               Step into the room.
             </h1>
             <p className="mt-6 max-w-lg text-lg leading-8 text-muted">
-              For organizers, volunteers, sponsors, creators, attendees, NGOs,
-              and student teams gathering around the next thing worth building.
+              For organizers, volunteers, creators, founders, and students gathering around the next thing worth building.
             </p>
             <div className="mt-8 flex -space-x-3">
               {["MK", "AS", "NK", "KS", "SR", "VJ"].map((initials) => (
@@ -179,63 +119,22 @@ export default function SignInPage() {
 
           <div className="my-6 h-px bg-line" />
 
-          <label className="space-y-2">
-            <span className="text-xs uppercase tracking-[0.22em] text-muted">Email</span>
-            <div className="flex h-12 items-center gap-3 rounded-[8px] border border-line bg-black/40 px-4">
-              <Mail className="size-4 text-muted" />
-              <input
-                type="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                placeholder="you@community.org"
-                className="w-full bg-transparent text-sm outline-none placeholder:text-muted/60"
-              />
-            </div>
-          </label>
-
-          <label className="mt-4 block space-y-2">
-            <span className="text-xs uppercase tracking-[0.22em] text-muted">Password</span>
-            <div className="flex h-12 items-center gap-3 rounded-[8px] border border-line bg-black/40 px-4">
-              <Lock className="size-4 text-muted" />
-              <input
-                type="password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                placeholder="Minimum 6 characters"
-                className="w-full bg-transparent text-sm outline-none placeholder:text-muted/60"
-              />
-            </div>
-          </label>
-
           {message ? (
             <div
-              className={`mt-4 flex gap-2 rounded-[8px] border p-3 text-sm ${
-                message.startsWith("Account created")
-                  ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
-                  : "border-rust/30 bg-rust/10 text-muted"
-              }`}
+              className="mt-4 flex gap-2 rounded-[8px] border border-rust/30 bg-rust/10 p-3 text-sm text-muted"
             >
               <AlertCircle className="mt-0.5 size-4 shrink-0 text-rust" />
               <span>{message}</span>
             </div>
           ) : null}
 
-          <Button
-            className="mt-4 w-full"
-            disabled={status !== "idle"}
-            onClick={() => emailPassword("login")}
-          >
-            {status === "login" ? <Loader2 className="size-4 animate-spin" /> : null}
-            Sign in with email
-          </Button>
-          <Button
-            className="mt-3 w-full"
-            disabled={status !== "idle"}
-            onClick={() => emailPassword("signup")}
-            variant="secondary"
-          >
-            {status === "signup" ? <Loader2 className="size-4 animate-spin" /> : null}
-            Create email account
+          <div className="rounded-[8px] border border-line bg-black/30 p-4 text-sm text-muted">
+            Clerk powers this custom auth surface. OAuth is live now for Google, GitHub, and Discord.
+          </div>
+
+          <Button className="mt-4 w-full" disabled>
+            {status === "oauth" ? <Loader2 className="size-4 animate-spin" /> : null}
+            OAuth-only access
           </Button>
         </Panel>
       </section>

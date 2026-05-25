@@ -9,7 +9,7 @@ type SaveButtonProps = {
   iconOnly?: boolean;
   eventId?: string;
   opportunityId?: string;
-  organizationId?: string;
+  communityId?: string;
   initialSaved?: boolean;
 };
 
@@ -17,7 +17,7 @@ export function SaveButton({
   iconOnly = false,
   eventId,
   opportunityId,
-  organizationId,
+  communityId,
   initialSaved = false,
 }: SaveButtonProps) {
   const [saved, setSaved] = useState(initialSaved);
@@ -31,7 +31,7 @@ export function SaveButton({
           const next = !saved;
           setSaved(next);
           try {
-            const result = await toggleBookmark({ eventId, opportunityId, organizationId });
+            const result = await toggleBookmark({ eventId, opportunityId, communityId });
             setSaved(result.saved);
           } catch {
             setSaved(!next);

@@ -13,7 +13,8 @@ const nav = [
   ["Communities", "/communities"],
   ["Events", "/events"],
   ["Opportunities", "/opportunities"],
-  ["Organize", "/workspace"],
+  ["Workspace", "/workspace"],
+  ["Organize", "/workspace/organize"],
   ["Merch", "/merch"],
 ];
 

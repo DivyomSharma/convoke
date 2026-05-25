@@ -6,13 +6,13 @@ import { joinCommunity } from "@/app/actions";
 import { cn } from "@/lib/utils";
 
 type JoinCommunityButtonProps = {
-  organizationId: string;
+  communityId: string;
   initialJoined?: boolean;
   className?: string;
 };
 
 export function JoinCommunityButton({
-  organizationId,
+  communityId,
   initialJoined = false,
   className,
 }: JoinCommunityButtonProps) {
@@ -27,7 +27,7 @@ export function JoinCommunityButton({
         if (joined) return;
         startTransition(async () => {
           try {
-            const result = await joinCommunity({ organizationId });
+            const result = await joinCommunity({ communityId });
             setJoined(result.joined);
           } catch {
             setJoined(false);

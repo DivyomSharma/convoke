@@ -25,7 +25,7 @@ export default function Image() {
           CONVOKE
         </div>
         <div style={{ fontSize: 84, fontWeight: 700, lineHeight: 0.95, textAlign: "center" }}>
-          For events, ideas, and people moving things forward.
+          Communities, opportunities, events, and momentum.
         </div>
       </div>
     ),

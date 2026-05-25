@@ -1,15 +1,45 @@
 import type { MetadataRoute } from "next";
-import { featuredEvents } from "@/data/platform";
+import { getPrisma } from "@/lib/prisma";
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const base = "https://convoke.xyz";
-  const staticRoutes = ["", "/discover", "/communities/north-grid", "/merch", "/workspace", "/auth/sign-in"];
-  const eventRoutes = featuredEvents.map((event) => `/events/${event.slug}`);
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const baseUrl = "https://convoke.app";
+  const staticRoutes = ["", "/discover", "/events", "/opportunities", "/communities", "/merch", "/workspace", "/workspace/organize", "/auth/sign-in"];
 
-  return [...staticRoutes, ...eventRoutes].map((route) => ({
-    url: `${base}${route}`,
-    lastModified: new Date(),
-    changeFrequency: route.startsWith("/events") ? "weekly" : "daily",
-    priority: route === "" ? 1 : 0.8,
-  }));
+  if (!process.env.DATABASE_URL) {
+    return staticRoutes.map((route) => ({
+      url: `${baseUrl}${route}`,
+      lastModified: new Date(),
+    }));
+  }
+
+  const prisma = getPrisma();
+  const [events, communities, profiles, opportunities] = await Promise.all([
+    prisma.event.findMany({ select: { slug: true, updatedAt: true } }),
+    prisma.community.findMany({ select: { slug: true, updatedAt: true } }),
+    prisma.user.findMany({ select: { username: true, updatedAt: true } }),
+    prisma.opportunity.findMany({ select: { slug: true, updatedAt: true } }),
+  ]);
+
+  return [
+    ...staticRoutes.map((route) => ({
+      url: `${baseUrl}${route}`,
+      lastModified: new Date(),
+    })),
+    ...events.map((event) => ({
+      url: `${baseUrl}/events/${event.slug}`,
+      lastModified: event.updatedAt,
+    })),
+    ...communities.map((community) => ({
+      url: `${baseUrl}/communities/${community.slug}`,
+      lastModified: community.updatedAt,
+    })),
+    ...opportunities.map((opportunity) => ({
+      url: `${baseUrl}/opportunities/${opportunity.slug}`,
+      lastModified: opportunity.updatedAt,
+    })),
+    ...profiles.map((profile) => ({
+      url: `${baseUrl}/u/${profile.username}`,
+      lastModified: profile.updatedAt,
+    })),
+  ];
 }
