@@ -18,6 +18,10 @@ type ViewerContext = {
   username: string | null;
 };
 
+function logDataAccessError(scope: string, error: unknown) {
+  console.error(`[platform-service:${scope}]`, error);
+}
+
 function prismaSafe() {
   try {
     if (!process.env.DATABASE_URL) return null;
@@ -223,12 +227,17 @@ async function getBookmarkState(viewerId: string | null) {
     return { eventIds: new Set<string>(), opportunityIds: new Set<string>(), communityIds: new Set<string>() };
   }
 
-  const bookmarks = await prisma.bookmark.findMany({ where: { userId: viewerId } });
-  return {
-    eventIds: new Set(bookmarks.map((bookmark) => bookmark.eventId).filter(Boolean) as string[]),
-    opportunityIds: new Set(bookmarks.map((bookmark) => bookmark.opportunityId).filter(Boolean) as string[]),
-    communityIds: new Set(bookmarks.map((bookmark) => bookmark.communityId).filter(Boolean) as string[]),
-  };
+  try {
+    const bookmarks = await prisma.bookmark.findMany({ where: { userId: viewerId } });
+    return {
+      eventIds: new Set(bookmarks.map((bookmark) => bookmark.eventId).filter(Boolean) as string[]),
+      opportunityIds: new Set(bookmarks.map((bookmark) => bookmark.opportunityId).filter(Boolean) as string[]),
+      communityIds: new Set(bookmarks.map((bookmark) => bookmark.communityId).filter(Boolean) as string[]),
+    };
+  } catch (error) {
+    logDataAccessError("getBookmarkState", error);
+    return { eventIds: new Set<string>(), opportunityIds: new Set<string>(), communityIds: new Set<string>() };
+  }
 }
 
 export async function listHomeData() {
@@ -244,491 +253,538 @@ export async function listHomeData() {
     };
   }
 
-  const viewer = await resolveViewer();
-  const bookmarkState = await getBookmarkState(viewer.userId);
+  try {
+    const viewer = await resolveViewer();
+    const bookmarkState = await getBookmarkState(viewer.userId);
 
-  const [events, opportunities, communities, people, activity] = await Promise.all([
-    prisma.event.findMany({
-      where: { featured: true },
-      take: 6,
-      orderBy: [{ startsAt: "asc" }],
-      include: {
-        organization: true,
-        community: true,
-        ticketTypes: true,
-        registrations: { where: { userId: viewer.userId ?? "" }, select: { id: true } },
-      },
-    }),
-    prisma.opportunity.findMany({
-      where: { active: true },
-      take: 6,
-      orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
-      include: {
-        organization: true,
-        community: true,
-        _count: { select: { applications: true } },
-        applications: { where: { userId: viewer.userId ?? "" }, select: { id: true } },
-      },
-    }),
-    prisma.community.findMany({
-      take: 6,
-      orderBy: [{ isFeatured: "desc" }, { momentumScore: "desc" }],
-    }),
-    prisma.user.findMany({
-      take: 8,
-      orderBy: [{ createdAt: "desc" }],
-      include: {
-        profile: true,
-        communityMemberships: { include: { community: true } },
-      },
-    }),
-    prisma.userActivity.findMany({
-      take: 6,
-      orderBy: { createdAt: "desc" },
-    }),
-  ]);
+    const [events, opportunities, communities, people, activity] = await Promise.all([
+      prisma.event.findMany({
+        where: { featured: true },
+        take: 6,
+        orderBy: [{ startsAt: "asc" }],
+        include: {
+          organization: true,
+          community: true,
+          ticketTypes: true,
+          registrations: { where: { userId: viewer.userId ?? "" }, select: { id: true } },
+        },
+      }),
+      prisma.opportunity.findMany({
+        where: { active: true },
+        take: 6,
+        orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
+        include: {
+          organization: true,
+          community: true,
+          _count: { select: { applications: true } },
+          applications: { where: { userId: viewer.userId ?? "" }, select: { id: true } },
+        },
+      }),
+      prisma.community.findMany({
+        take: 6,
+        orderBy: [{ isFeatured: "desc" }, { momentumScore: "desc" }],
+      }),
+      prisma.user.findMany({
+        take: 8,
+        orderBy: [{ createdAt: "desc" }],
+        include: {
+          profile: true,
+          communityMemberships: { include: { community: true } },
+        },
+      }),
+      prisma.userActivity.findMany({
+        take: 6,
+        orderBy: { createdAt: "desc" },
+      }),
+    ]);
 
-  return {
-    events: events.map((event, index) =>
-      mapEventCard(event, index, {
-        saved: bookmarkState.eventIds.has(event.id),
-        registered: Array.isArray(event.registrations) ? event.registrations.length > 0 : false,
-      }),
-    ),
-    opportunities: opportunities.map((opportunity) =>
-      mapOpportunityCard(opportunity, {
-        saved: bookmarkState.opportunityIds.has(opportunity.id),
-        applied: Array.isArray(opportunity.applications) ? opportunity.applications.length > 0 : false,
-      }),
-    ),
-    communities: communities.map((community) => mapCommunityCard(community)),
-    people: people.map((person) => ({
-      id: person.id,
-      username: person.username,
-      name: person.name,
-      initials: initials(person.name),
-      role: formatRole(person.primaryRole),
-      headline: person.headline ?? "Community member",
-      community: person.communityMemberships[0]?.community.name,
-      reputation: person.profile?.reputation ?? 0,
-    })),
-    activity: activity.map((item) => ({
-      id: item.id,
-      actor: item.actorName,
-      action: item.action,
-      detail: item.detail,
-      createdAt: relativeDate(item.createdAt),
-    })),
-    counts: {
-      communities: communities.length,
-      opportunities: opportunities.length,
-      people: people.length,
-      events: events.length,
-    },
-  };
+    return {
+      events: events.map((event, index) =>
+        mapEventCard(event, index, {
+          saved: bookmarkState.eventIds.has(event.id),
+          registered: Array.isArray(event.registrations) ? event.registrations.length > 0 : false,
+        }),
+      ),
+      opportunities: opportunities.map((opportunity) =>
+        mapOpportunityCard(opportunity, {
+          saved: bookmarkState.opportunityIds.has(opportunity.id),
+          applied: Array.isArray(opportunity.applications) ? opportunity.applications.length > 0 : false,
+        }),
+      ),
+      communities: communities.map((community) => mapCommunityCard(community)),
+      people: people.map((person) => ({
+        id: person.id,
+        username: person.username,
+        name: person.name,
+        initials: initials(person.name),
+        role: formatRole(person.primaryRole),
+        headline: person.headline ?? "Community member",
+        community: person.communityMemberships[0]?.community.name,
+        reputation: person.profile?.reputation ?? 0,
+      })),
+      activity: activity.map((item) => ({
+        id: item.id,
+        actor: item.actorName,
+        action: item.action,
+        detail: item.detail,
+        createdAt: relativeDate(item.createdAt),
+      })),
+      counts: {
+        communities: communities.length,
+        opportunities: opportunities.length,
+        people: people.length,
+        events: events.length,
+      },
+    };
+  } catch (error) {
+    logDataAccessError("listHomeData", error);
+    return {
+      events: [] as EventCard[],
+      opportunities: [] as OpportunityCard[],
+      communities: [] as CommunityCard[],
+      people: [] as SpotlightPerson[],
+      activity: [] as DashboardView["activity"],
+      counts: { communities: 0, opportunities: 0, people: 0, events: 0 },
+    };
+  }
 }
 
 export async function getHomepageStats() {
   const prisma = prismaSafe();
   if (!prisma) return ["0 communities", "0 opportunities", "0 active profiles", "0 live events"];
-  const [communities, opportunities, users, events] = await Promise.all([
-    prisma.community.count(),
-    prisma.opportunity.count({ where: { active: true } }),
-    prisma.user.count(),
-    prisma.event.count(),
-  ]);
-  return [`${communities} communities`, `${opportunities} opportunities`, `${users} active profiles`, `${events} live events`];
+  try {
+    const [communities, opportunities, users, events] = await Promise.all([
+      prisma.community.count(),
+      prisma.opportunity.count({ where: { active: true } }),
+      prisma.user.count(),
+      prisma.event.count(),
+    ]);
+    return [`${communities} communities`, `${opportunities} opportunities`, `${users} active profiles`, `${events} live events`];
+  } catch (error) {
+    logDataAccessError("getHomepageStats", error);
+    return ["0 communities", "0 opportunities", "0 active profiles", "0 live events"];
+  }
 }
 
 export async function listOpportunityDirectory() {
   const prisma = prismaSafe();
   if (!prisma) return [] as OpportunityCard[];
-  const viewer = await resolveViewer();
-  const bookmarkState = await getBookmarkState(viewer.userId);
-  const appliedIds = viewer.userId
-    ? new Set(
-        (
-          await prisma.opportunityApplication.findMany({
-            where: { userId: viewer.userId },
-            select: { opportunityId: true },
-          })
-        ).map((application) => application.opportunityId),
-      )
-    : new Set<string>();
+  try {
+    const viewer = await resolveViewer();
+    const bookmarkState = await getBookmarkState(viewer.userId);
+    const appliedIds = viewer.userId
+      ? new Set(
+          (
+            await prisma.opportunityApplication.findMany({
+              where: { userId: viewer.userId },
+              select: { opportunityId: true },
+            })
+          ).map((application) => application.opportunityId),
+        )
+      : new Set<string>();
 
-  const opportunities = await prisma.opportunity.findMany({
-    where: { active: true },
-    orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
-    include: {
-      organization: true,
-      community: true,
-      _count: { select: { applications: true } },
-    },
-  });
+    const opportunities = await prisma.opportunity.findMany({
+      where: { active: true },
+      orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
+      include: {
+        organization: true,
+        community: true,
+        _count: { select: { applications: true } },
+      },
+    });
 
-  return opportunities.map((opportunity) =>
-    mapOpportunityCard(opportunity, {
-      saved: bookmarkState.opportunityIds.has(opportunity.id),
-      applied: appliedIds.has(opportunity.id),
-    }),
-  );
+    return opportunities.map((opportunity) =>
+      mapOpportunityCard(opportunity, {
+        saved: bookmarkState.opportunityIds.has(opportunity.id),
+        applied: appliedIds.has(opportunity.id),
+      }),
+    );
+  } catch (error) {
+    logDataAccessError("listOpportunityDirectory", error);
+    return [] as OpportunityCard[];
+  }
 }
 
 export async function getOpportunityPageData(slug: string): Promise<OpportunityView | null> {
   const prisma = prismaSafe();
   if (!prisma) return null;
-  const viewer = await resolveViewer();
-  const bookmarkState = await getBookmarkState(viewer.userId);
+  try {
+    const viewer = await resolveViewer();
+    const bookmarkState = await getBookmarkState(viewer.userId);
 
-  const opportunity = await prisma.opportunity.findUnique({
-    where: { slug },
-    include: {
-      organization: true,
-      community: true,
-      _count: { select: { applications: true } },
-    },
-  });
+    const opportunity = await prisma.opportunity.findUnique({
+      where: { slug },
+      include: {
+        organization: true,
+        community: true,
+        _count: { select: { applications: true } },
+      },
+    });
 
-  if (!opportunity) return null;
+    if (!opportunity) return null;
 
-  const applied = viewer.userId
-    ? Boolean(
-        await prisma.opportunityApplication.findFirst({
-          where: { userId: viewer.userId, opportunityId: opportunity.id },
-          select: { id: true },
-        }),
-      )
-    : false;
+    const applied = viewer.userId
+      ? Boolean(
+          await prisma.opportunityApplication.findFirst({
+            where: { userId: viewer.userId, opportunityId: opportunity.id },
+            select: { id: true },
+          }),
+        )
+      : false;
 
-  const relatedItems = await prisma.opportunity.findMany({
-    where: {
-      active: true,
-      id: { not: opportunity.id },
-      OR: [
-        { organizationId: opportunity.organizationId },
-        ...(opportunity.communityId ? [{ communityId: opportunity.communityId }] : []),
-        { type: opportunity.type },
-      ],
-    },
-    include: {
-      organization: true,
-      community: true,
-      _count: { select: { applications: true } },
-    },
-    orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
-    take: 3,
-  });
+    const relatedItems = await prisma.opportunity.findMany({
+      where: {
+        active: true,
+        id: { not: opportunity.id },
+        OR: [
+          { organizationId: opportunity.organizationId },
+          ...(opportunity.communityId ? [{ communityId: opportunity.communityId }] : []),
+          { type: opportunity.type },
+        ],
+      },
+      include: {
+        organization: true,
+        community: true,
+        _count: { select: { applications: true } },
+      },
+      orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
+      take: 3,
+    });
 
-  return {
-    ...mapOpportunityCard(opportunity, {
-      saved: bookmarkState.opportunityIds.has(opportunity.id),
-      applied,
-    }),
-    organizationDescription: opportunity.organization.description,
-    positionsAvailable: opportunity.positionsAvailable,
-    duration: opportunity.duration,
-    requirements: opportunity.requirements,
-    related: relatedItems.map((item) =>
-      mapOpportunityCard(item, {
-        saved: bookmarkState.opportunityIds.has(item.id),
+    return {
+      ...mapOpportunityCard(opportunity, {
+        saved: bookmarkState.opportunityIds.has(opportunity.id),
+        applied,
       }),
-    ),
-  };
+      organizationDescription: opportunity.organization.description,
+      positionsAvailable: opportunity.positionsAvailable,
+      duration: opportunity.duration,
+      requirements: opportunity.requirements,
+      related: relatedItems.map((item) =>
+        mapOpportunityCard(item, {
+          saved: bookmarkState.opportunityIds.has(item.id),
+        }),
+      ),
+    };
+  } catch (error) {
+    logDataAccessError("getOpportunityPageData", error);
+    return null;
+  }
 }
 
 export async function listCommunityDirectory() {
   const prisma = prismaSafe();
   if (!prisma) return [] as CommunityCard[];
-  const communities = await prisma.community.findMany({
-    orderBy: [{ isFeatured: "desc" }, { momentumScore: "desc" }, { memberCount: "desc" }],
-  });
-  return communities.map((community) => mapCommunityCard(community));
+  try {
+    const communities = await prisma.community.findMany({
+      orderBy: [{ isFeatured: "desc" }, { momentumScore: "desc" }, { memberCount: "desc" }],
+    });
+    return communities.map((community) => mapCommunityCard(community));
+  } catch (error) {
+    logDataAccessError("listCommunityDirectory", error);
+    return [] as CommunityCard[];
+  }
 }
 
 export async function getCommunityPageData(slug: string): Promise<CommunityView | null> {
   const prisma = prismaSafe();
   if (!prisma) return null;
-  const viewer = await resolveViewer();
-  const bookmarkState = await getBookmarkState(viewer.userId);
+  try {
+    const viewer = await resolveViewer();
+    const bookmarkState = await getBookmarkState(viewer.userId);
 
-  const community = await prisma.community.findUnique({
-    where: { slug },
-    include: {
-      organization: true,
-      members: {
-        include: {
-          user: { include: { profile: true } },
+    const community = await prisma.community.findUnique({
+      where: { slug },
+      include: {
+        organization: true,
+        members: {
+          include: {
+            user: { include: { profile: true } },
+          },
+          take: 10,
+          orderBy: { joinedAt: "desc" },
         },
-        take: 10,
-        orderBy: { joinedAt: "desc" },
+        events: {
+          orderBy: { startsAt: "asc" },
+          include: { organization: true, community: true, ticketTypes: true },
+        },
+        opportunities: {
+          where: { active: true },
+          orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
+          include: { organization: true, community: true, _count: { select: { applications: true } } },
+        },
+        announcements: {
+          orderBy: { publishedAt: "desc" },
+          take: 6,
+        },
       },
-      events: {
-        orderBy: { startsAt: "asc" },
-        include: { organization: true, community: true, ticketTypes: true },
-      },
-      opportunities: {
-        where: { active: true },
-        orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
-        include: { organization: true, community: true, _count: { select: { applications: true } } },
-      },
-      announcements: {
-        orderBy: { publishedAt: "desc" },
-        take: 6,
-      },
-    },
-  });
+    });
 
-  if (!community) return null;
+    if (!community) return null;
 
-  const joined = viewer.userId
-    ? Boolean(
-        await prisma.communityMembership.findFirst({
-          where: { userId: viewer.userId, communityId: community.id },
-          select: { id: true },
-        }),
-      )
-    : false;
+    const joined = viewer.userId
+      ? Boolean(
+          await prisma.communityMembership.findFirst({
+            where: { userId: viewer.userId, communityId: community.id },
+            select: { id: true },
+          }),
+        )
+      : false;
 
-  const galleries = await prisma.gallery.findMany({
-    where: {
-      OR: [
-        { event: { is: { communityId: community.id } } },
-        { organizationId: community.organizationId },
+    const galleries = await prisma.gallery.findMany({
+      where: {
+        OR: [
+          { event: { is: { communityId: community.id } } },
+          { organizationId: community.organizationId },
+        ],
+      },
+      take: 2,
+      include: { items: { orderBy: { order: "asc" } } },
+    });
+
+    return {
+      id: community.id,
+      slug: community.slug,
+      name: community.name,
+      type: formatRole(community.category),
+      description: community.description,
+      website: community.organization.website ?? undefined,
+      avatarUrl: community.organization.logoUrl ?? undefined,
+      bannerUrl: community.coverImageUrl ?? community.organization.bannerUrl ?? undefined,
+      location: community.city,
+      momentum: community.momentumScore,
+      joined,
+      stats: [
+        { label: "Members", value: community.memberCount.toLocaleString("en-IN") },
+        { label: "Momentum", value: `${community.momentumScore}/100` },
+        { label: "Events", value: String(community.events.length) },
+        { label: "Opportunities", value: String(community.opportunities.length) },
       ],
-    },
-    take: 2,
-    include: { items: { orderBy: { order: "asc" } } },
-  });
-
-  return {
-    id: community.id,
-    slug: community.slug,
-    name: community.name,
-    type: formatRole(community.category),
-    description: community.description,
-    website: community.organization.website ?? undefined,
-    avatarUrl: community.organization.logoUrl ?? undefined,
-    bannerUrl: community.coverImageUrl ?? community.organization.bannerUrl ?? undefined,
-    location: community.city,
-    momentum: community.momentumScore,
-    joined,
-    stats: [
-      { label: "Members", value: community.memberCount.toLocaleString("en-IN") },
-      { label: "Momentum", value: `${community.momentumScore}/100` },
-      { label: "Events", value: String(community.events.length) },
-      { label: "Opportunities", value: String(community.opportunities.length) },
-    ],
-    links: [
-      ...(community.organization.website ? [{ label: "Website", href: community.organization.website }] : []),
-      { label: "Organization", href: `/communities/${community.slug}` },
-    ],
-    events: community.events.map((event, index) =>
-      mapEventCard(event, index, { saved: bookmarkState.eventIds.has(event.id) }),
-    ),
-    opportunities: community.opportunities.map((opportunity) =>
-      mapOpportunityCard(opportunity, { saved: bookmarkState.opportunityIds.has(opportunity.id) }),
-    ),
-    members: community.members.map((membership) => ({
-      id: membership.user.id,
-      username: membership.user.username,
-      name: membership.user.name,
-      initials: initials(membership.user.name),
-      role: formatRole(membership.role),
-      headline: membership.user.headline ?? membership.user.profile?.website ?? "Community member",
-      community: community.name,
-      reputation: membership.user.profile?.reputation ?? 0,
-    })),
-    announcements: community.announcements.map((announcement) => ({
-      id: announcement.id,
-      title: announcement.title,
-      content: announcement.content,
-      publishedAt: formatDate(announcement.publishedAt),
-    })),
-    galleries: galleries.map((gallery) => ({
-      id: gallery.id,
-      title: gallery.title,
-      items: gallery.items.map((item) => item.url),
-    })),
-  };
+      links: [
+        ...(community.organization.website ? [{ label: "Website", href: community.organization.website }] : []),
+        { label: "Organization", href: `/communities/${community.slug}` },
+      ],
+      events: community.events.map((event, index) =>
+        mapEventCard(event, index, { saved: bookmarkState.eventIds.has(event.id) }),
+      ),
+      opportunities: community.opportunities.map((opportunity) =>
+        mapOpportunityCard(opportunity, { saved: bookmarkState.opportunityIds.has(opportunity.id) }),
+      ),
+      members: community.members.map((membership) => ({
+        id: membership.user.id,
+        username: membership.user.username,
+        name: membership.user.name,
+        initials: initials(membership.user.name),
+        role: formatRole(membership.role),
+        headline: membership.user.headline ?? membership.user.profile?.website ?? "Community member",
+        community: community.name,
+        reputation: membership.user.profile?.reputation ?? 0,
+      })),
+      announcements: community.announcements.map((announcement) => ({
+        id: announcement.id,
+        title: announcement.title,
+        content: announcement.content,
+        publishedAt: formatDate(announcement.publishedAt),
+      })),
+      galleries: galleries.map((gallery) => ({
+        id: gallery.id,
+        title: gallery.title,
+        items: gallery.items.map((item) => item.url),
+      })),
+    };
+  } catch (error) {
+    logDataAccessError("getCommunityPageData", error);
+    return null;
+  }
 }
 
 export async function getEventPageData(slug: string): Promise<EventView | null> {
   const prisma = prismaSafe();
   if (!prisma) return null;
-  const viewer = await resolveViewer();
-  const bookmarkState = await getBookmarkState(viewer.userId);
+  try {
+    const viewer = await resolveViewer();
+    const bookmarkState = await getBookmarkState(viewer.userId);
 
-  const event = await prisma.event.findUnique({
-    where: { slug },
-    include: {
-      organization: true,
-      community: true,
-      ticketTypes: true,
-      schedules: { orderBy: { startsAt: "asc" } },
-      tracks: { orderBy: { order: "asc" } },
-      faqs: { orderBy: { order: "asc" } },
-      speakers: true,
-      judges: true,
-      sponsors: true,
-      galleries: { include: { items: { orderBy: { order: "asc" } } } },
-    },
-  });
+    const event = await prisma.event.findUnique({
+      where: { slug },
+      include: {
+        organization: true,
+        community: true,
+        ticketTypes: true,
+        schedules: { orderBy: { startsAt: "asc" } },
+        tracks: { orderBy: { order: "asc" } },
+        faqs: { orderBy: { order: "asc" } },
+        speakers: true,
+        judges: true,
+        sponsors: true,
+        galleries: { include: { items: { orderBy: { order: "asc" } } } },
+      },
+    });
 
-  if (!event) return null;
+    if (!event) return null;
 
-  const registration = viewer.userId
-    ? await prisma.registration.findFirst({ where: { userId: viewer.userId, eventId: event.id } })
-    : null;
+    const registration = viewer.userId
+      ? await prisma.registration.findFirst({ where: { userId: viewer.userId, eventId: event.id } })
+      : null;
 
-  return {
-    id: event.id,
-    slug: event.slug,
-    title: event.title,
-    tagline: event.shortDescription,
-    city: event.city,
-    venue: event.venue ?? undefined,
-    date: `${formatDate(event.startsAt, true)} to ${formatDate(event.endsAt, true)}`,
-    category: event.category,
-    mode: formatRole(event.mode),
-    organizer: event.organization.name,
-    organizerSlug: event.organization.slug,
-    community: event.community?.name,
-    communitySlug: event.community?.slug,
-    description: event.description,
-    image: event.heroImageUrl ?? "/window.svg",
-    palette: palette(0),
-    attendees: event.registrationsCount,
-    volunteers: event.volunteerCount,
-    price: event.ticketTypes[0]?.priceInr ?? 0,
-    waitlist: event.waitlistCount,
-    saved: bookmarkState.eventIds.has(event.id),
-    registered: Boolean(registration),
-    ticketTypes: event.ticketTypes.map((ticket) => ({
-      id: ticket.id,
-      name: ticket.name,
-      priceInr: ticket.priceInr,
-      sold: ticket.sold,
-      capacity: ticket.capacity,
-    })),
-    schedules: event.schedules.map((schedule) => ({
-      id: schedule.id,
-      title: schedule.title,
-      description: schedule.description ?? undefined,
-      startsAt: formatDate(schedule.startsAt, true),
-      endsAt: formatDate(schedule.endsAt, true),
-      location: schedule.location ?? undefined,
-    })),
-    tracks: event.tracks.map((track) => ({
-      id: track.id,
-      name: track.name,
-      description: track.description ?? undefined,
-    })),
-    speakers: event.speakers.map((speaker) => ({
-      id: speaker.id,
-      name: speaker.name,
-      title: speaker.title ?? "",
-      organization: speaker.organization ?? undefined,
-      bio: speaker.bio ?? undefined,
-      talkTitle: speaker.talkTitle ?? undefined,
-    })),
-    judges: event.judges.map((judge) => ({
-      id: judge.id,
-      name: judge.name,
-      title: judge.title ?? undefined,
-      organization: judge.organization ?? undefined,
-      bio: judge.bio ?? undefined,
-    })),
-    sponsors: event.sponsors.map((sponsor) => ({
-      id: sponsor.id,
-      companyName: sponsor.name,
-      tier: sponsor.tier,
-      benefits: sponsor.benefits,
-    })),
-    faqs: event.faqs.map((faq) => ({ q: faq.question, a: faq.answer })),
-    galleries: event.galleries.flatMap((gallery) => gallery.items.map((item) => item.url)),
-  };
+    return {
+      id: event.id,
+      slug: event.slug,
+      title: event.title,
+      tagline: event.shortDescription,
+      city: event.city,
+      venue: event.venue ?? undefined,
+      date: `${formatDate(event.startsAt, true)} to ${formatDate(event.endsAt, true)}`,
+      category: event.category,
+      mode: formatRole(event.mode),
+      organizer: event.organization.name,
+      organizerSlug: event.organization.slug,
+      community: event.community?.name,
+      communitySlug: event.community?.slug,
+      description: event.description,
+      image: event.heroImageUrl ?? "/window.svg",
+      palette: palette(0),
+      attendees: event.registrationsCount,
+      volunteers: event.volunteerCount,
+      price: event.ticketTypes[0]?.priceInr ?? 0,
+      waitlist: event.waitlistCount,
+      saved: bookmarkState.eventIds.has(event.id),
+      registered: Boolean(registration),
+      ticketTypes: event.ticketTypes.map((ticket) => ({
+        id: ticket.id,
+        name: ticket.name,
+        priceInr: ticket.priceInr,
+        sold: ticket.sold,
+        capacity: ticket.capacity,
+      })),
+      schedules: event.schedules.map((schedule) => ({
+        id: schedule.id,
+        title: schedule.title,
+        description: schedule.description ?? undefined,
+        startsAt: formatDate(schedule.startsAt, true),
+        endsAt: formatDate(schedule.endsAt, true),
+        location: schedule.location ?? undefined,
+      })),
+      tracks: event.tracks.map((track) => ({
+        id: track.id,
+        name: track.name,
+        description: track.description ?? undefined,
+      })),
+      speakers: event.speakers.map((speaker) => ({
+        id: speaker.id,
+        name: speaker.name,
+        title: speaker.title ?? "",
+        organization: speaker.organization ?? undefined,
+        bio: speaker.bio ?? undefined,
+        talkTitle: speaker.talkTitle ?? undefined,
+      })),
+      judges: event.judges.map((judge) => ({
+        id: judge.id,
+        name: judge.name,
+        title: judge.title ?? undefined,
+        organization: judge.organization ?? undefined,
+        bio: judge.bio ?? undefined,
+      })),
+      sponsors: event.sponsors.map((sponsor) => ({
+        id: sponsor.id,
+        companyName: sponsor.name,
+        tier: sponsor.tier,
+        benefits: sponsor.benefits,
+      })),
+      faqs: event.faqs.map((faq) => ({ q: faq.question, a: faq.answer })),
+      galleries: event.galleries.flatMap((gallery) => gallery.items.map((item) => item.url)),
+    };
+  } catch (error) {
+    logDataAccessError("getEventPageData", error);
+    return null;
+  }
 }
 
 export async function getProfilePageData(username: string): Promise<ProfileView | null> {
   const prisma = prismaSafe();
   if (!prisma) return null;
-  const user = await prisma.user.findUnique({
-    where: { username },
-    include: {
-      profile: true,
-      communityMemberships: { include: { community: true } },
-      memberships: { include: { organization: true } },
-      projects: true,
-      registrations: { include: { event: true }, orderBy: { createdAt: "desc" }, take: 6 },
-      certificates: { orderBy: { issuedAt: "desc" }, take: 8 },
-      opportunityApplications: { include: { opportunity: true }, orderBy: { createdAt: "desc" }, take: 5 },
-    },
-  });
+  try {
+    const user = await prisma.user.findUnique({
+      where: { username },
+      include: {
+        profile: true,
+        communityMemberships: { include: { community: true } },
+        memberships: { include: { organization: true } },
+        projects: true,
+        registrations: { include: { event: true }, orderBy: { createdAt: "desc" }, take: 6 },
+        certificates: { orderBy: { issuedAt: "desc" }, take: 8 },
+        opportunityApplications: { include: { opportunity: true }, orderBy: { createdAt: "desc" }, take: 5 },
+      },
+    });
 
-  if (!user) return null;
+    if (!user) return null;
 
-  const visibleRole = formatRole(user.primaryRole);
-  const eventRoles = user.registrations.map((registration) => ({
-    id: registration.event.id,
-    title: registration.event.title,
-    role: formatRole(registration.status),
-    slug: registration.event.slug,
-  }));
+    const visibleRole = formatRole(user.primaryRole);
+    const eventRoles = user.registrations.map((registration) => ({
+      id: registration.event.id,
+      title: registration.event.title,
+      role: formatRole(registration.status),
+      slug: registration.event.slug,
+    }));
 
-  return {
-    id: user.id,
-    username: user.username,
-    name: user.name,
-    role: visibleRole,
-    headline: user.headline ?? "Community member",
-    bio: user.bio ?? "Building through communities, opportunities, and events on Convoke.",
-    avatarFallback: initials(user.name),
-    location: user.profile?.location ?? undefined,
-    website: user.profile?.website ?? undefined,
-    reputation: user.profile?.reputation ?? 0,
-    socials: [
-      user.profile?.linkedinUrl ? { label: "LinkedIn", href: user.profile.linkedinUrl } : null,
-      user.profile?.githubUrl ? { label: "GitHub", href: user.profile.githubUrl } : null,
-      user.profile?.instagramUrl ? { label: "Instagram", href: user.profile.instagramUrl } : null,
-      user.profile?.portfolioUrl ? { label: "Portfolio", href: user.profile.portfolioUrl } : null,
-    ].filter(Boolean) as { label: string; href: string }[],
-    badges: user.profile?.badges ?? [],
-    skills: user.profile?.skills ?? [],
-    interests: user.profile?.interests ?? [],
-    stats: [
-      { label: "Reputation", value: String(user.profile?.reputation ?? 0) },
-      { label: "Communities", value: String(user.communityMemberships.length) },
-      { label: "Events", value: String(user.registrations.length) },
-      { label: "Certificates", value: String(user.certificates.length) },
-    ],
-    experiences: user.memberships.map((membership) => ({
-      id: membership.id,
-      title: membership.title ?? formatRole(membership.role),
-      org: membership.organization.name,
-      period: `Joined ${formatDate(membership.joinedAt)}`,
-      description: membership.organization.description,
-    })),
-    projects: user.projects.map((project) => ({
-      id: project.id,
-      name: project.name,
-      description: project.description,
-      url: project.url ?? undefined,
-      technologies: project.technologies,
-    })),
-    communities: user.communityMemberships.map((membership) => ({
-      id: membership.community.id,
-      name: membership.community.name,
-      role: formatRole(membership.role),
-      slug: membership.community.slug,
-    })),
-    recentEvents: eventRoles,
-    certificates: user.certificates.map((certificate) => ({
-      id: certificate.id,
-      title: certificate.title,
-      type: formatRole(certificate.type),
-      issuedAt: formatDate(certificate.issuedAt),
-    })),
-  };
+    return {
+      id: user.id,
+      username: user.username,
+      name: user.name,
+      role: visibleRole,
+      headline: user.headline ?? "Community member",
+      bio: user.bio ?? "Building through communities, opportunities, and events on Convoke.",
+      avatarFallback: initials(user.name),
+      location: user.profile?.location ?? undefined,
+      website: user.profile?.website ?? undefined,
+      reputation: user.profile?.reputation ?? 0,
+      socials: [
+        user.profile?.linkedinUrl ? { label: "LinkedIn", href: user.profile.linkedinUrl } : null,
+        user.profile?.githubUrl ? { label: "GitHub", href: user.profile.githubUrl } : null,
+        user.profile?.instagramUrl ? { label: "Instagram", href: user.profile.instagramUrl } : null,
+        user.profile?.portfolioUrl ? { label: "Portfolio", href: user.profile.portfolioUrl } : null,
+      ].filter(Boolean) as { label: string; href: string }[],
+      badges: user.profile?.badges ?? [],
+      skills: user.profile?.skills ?? [],
+      interests: user.profile?.interests ?? [],
+      stats: [
+        { label: "Reputation", value: String(user.profile?.reputation ?? 0) },
+        { label: "Communities", value: String(user.communityMemberships.length) },
+        { label: "Events", value: String(user.registrations.length) },
+        { label: "Certificates", value: String(user.certificates.length) },
+      ],
+      experiences: user.memberships.map((membership) => ({
+        id: membership.id,
+        title: membership.title ?? formatRole(membership.role),
+        org: membership.organization.name,
+        period: `Joined ${formatDate(membership.joinedAt)}`,
+        description: membership.organization.description,
+      })),
+      projects: user.projects.map((project) => ({
+        id: project.id,
+        name: project.name,
+        description: project.description,
+        url: project.url ?? undefined,
+        technologies: project.technologies,
+      })),
+      communities: user.communityMemberships.map((membership) => ({
+        id: membership.community.id,
+        name: membership.community.name,
+        role: formatRole(membership.role),
+        slug: membership.community.slug,
+      })),
+      recentEvents: eventRoles,
+      certificates: user.certificates.map((certificate) => ({
+        id: certificate.id,
+        title: certificate.title,
+        type: formatRole(certificate.type),
+        issuedAt: formatDate(certificate.issuedAt),
+      })),
+    };
+  } catch (error) {
+    logDataAccessError("getProfilePageData", error);
+    return null;
+  }
 }
 
 function emptyDashboard(): DashboardView {
@@ -757,258 +813,262 @@ function emptyDashboard(): DashboardView {
 export async function getDashboardData(): Promise<DashboardView> {
   const prisma = prismaSafe();
   if (!prisma) return emptyDashboard();
+  try {
+    const viewer = await resolveViewer();
+    let user = viewer.userId
+      ? await prisma.user.findUnique({
+          where: { id: viewer.userId },
+          include: {
+            profile: true,
+            memberships: { include: { organization: true } },
+            communityMemberships: { include: { community: true } },
+          },
+        })
+      : null;
 
-  const viewer = await resolveViewer();
-  let user = viewer.userId
-    ? await prisma.user.findUnique({
-        where: { id: viewer.userId },
+    if (!user) {
+      user = await prisma.user.findFirst({
         include: {
           profile: true,
           memberships: { include: { organization: true } },
           communityMemberships: { include: { community: true } },
         },
-      })
-    : null;
+        orderBy: { createdAt: "asc" },
+      });
+    }
 
-  if (!user) {
-    user = await prisma.user.findFirst({
-      include: {
-        profile: true,
-        memberships: { include: { organization: true } },
-        communityMemberships: { include: { community: true } },
-      },
-      orderBy: { createdAt: "asc" },
-    });
-  }
+    if (!user) return emptyDashboard();
 
-  if (!user) return emptyDashboard();
+    const bookmarkState = await getBookmarkState(user.id);
 
-  const bookmarkState = await getBookmarkState(user.id);
-
-  const [savedEvents, savedOpportunities, savedCommunities, registrations, applications, certificates, notifications, activity] = await Promise.all([
-    bookmarkState.eventIds.size
-      ? prisma.event.findMany({
-          where: { id: { in: [...bookmarkState.eventIds] } },
-          include: { organization: true, community: true, ticketTypes: true },
-        })
-      : Promise.resolve([]),
-    bookmarkState.opportunityIds.size
-      ? prisma.opportunity.findMany({
-          where: { id: { in: [...bookmarkState.opportunityIds] } },
-          include: { organization: true, community: true, _count: { select: { applications: true } } },
-        })
-      : Promise.resolve([]),
-    bookmarkState.communityIds.size
-      ? prisma.community.findMany({
-          where: { id: { in: [...bookmarkState.communityIds] } },
-        })
-      : Promise.resolve([]),
-    prisma.registration.findMany({
-      where: { userId: user.id },
-      include: { event: true, ticketType: true },
-      orderBy: { createdAt: "desc" },
-      take: 8,
-    }),
-    prisma.opportunityApplication.findMany({
-      where: { userId: user.id },
-      include: { opportunity: { include: { organization: true } } },
-      orderBy: { createdAt: "desc" },
-      take: 8,
-    }),
-    prisma.certificate.findMany({
-      where: { userId: user.id },
-      orderBy: { issuedAt: "desc" },
-      take: 8,
-    }),
-    prisma.notification.findMany({
-      where: { userId: user.id },
-      orderBy: { createdAt: "desc" },
-      take: 8,
-    }),
-    prisma.userActivity.findMany({
-      where: {
-        OR: [
-          { userId: user.id },
-          { communityId: { in: user.communityMemberships.map((membership) => membership.communityId) } },
-        ],
-      },
-      orderBy: { createdAt: "desc" },
-      take: 8,
-    }),
-  ]);
-
-  const dashboard: DashboardView = {
-    viewer: {
-      id: user.id,
-      username: user.username,
-      name: user.name,
-      initials: initials(user.name),
-      role: formatRole(user.primaryRole),
-      headline: user.headline ?? "Community member",
-      community: user.communityMemberships[0]?.community.name,
-      reputation: user.profile?.reputation ?? 0,
-    },
-    role: user.primaryRole,
-    metrics: [
-      { label: "Applications", value: String(applications.length), detail: "Active opportunity pipeline across the ecosystem" },
-      { label: "Registrations", value: String(registrations.length), detail: "Events you are already attached to" },
-      { label: "Communities", value: String(user.communityMemberships.length), detail: "Rooms where your identity now compounds" },
-      { label: "Reputation", value: String(user.profile?.reputation ?? 0), detail: "Public proof from participation and output" },
-    ],
-    roleActions: roleActions(user.primaryRole),
-    activity: activity.map((item) => ({
-      id: item.id,
-      actor: item.actorName,
-      action: item.action,
-      detail: item.detail,
-      createdAt: relativeDate(item.createdAt),
-    })),
-    bookmarks: {
-      events: savedEvents.map((event, index) => mapEventCard(event, index, { saved: true })),
-      opportunities: savedOpportunities.map((opportunity) => mapOpportunityCard(opportunity, { saved: true })),
-      communities: savedCommunities.map((community) => mapCommunityCard(community)),
-    },
-    registrations: registrations.map((registration) => ({
-      id: registration.id,
-      eventTitle: registration.event.title,
-      eventSlug: registration.event.slug,
-      status: formatRole(registration.status),
-      ticketType: registration.ticketType?.name,
-      createdAt: formatDate(registration.createdAt),
-    })),
-    applications: applications.map((application) => ({
-      id: application.id,
-      title: application.opportunity.title,
-      organization: application.opportunity.organization.name,
-      status: formatRole(application.status),
-      appliedAt: formatDate(application.createdAt),
-    })),
-    certificates: certificates.map((certificate) => ({
-      id: certificate.id,
-      title: certificate.title,
-      type: formatRole(certificate.type),
-      issuedAt: formatDate(certificate.issuedAt),
-    })),
-    communities: user.communityMemberships.map((membership) => ({
-      id: membership.community.id,
-      slug: membership.community.slug,
-      name: membership.community.name,
-      role: formatRole(membership.role),
-    })),
-    notifications: notifications.map((notification) => ({
-      id: notification.id,
-      title: notification.title,
-      message: notification.message,
-      createdAt: relativeDate(notification.createdAt),
-      unread: notification.status === NotificationStatus.UNREAD,
-    })),
-  };
-
-  if (([UserRole.ORGANIZER, UserRole.COMMUNITY_ADMIN, UserRole.PLATFORM_ADMIN] as UserRole[]).includes(user.primaryRole)) {
-    const organizationIds = user.memberships.map((membership) => membership.organizationId);
-    const [orgEvents, orgOpportunities, orgRegistrations, volunteerApplications, opportunityApplications, sponsorLeads, merchInquiries, studioRequests] = await Promise.all([
-      prisma.event.findMany({
-        where: { organizationId: { in: organizationIds } },
-        include: { organization: true, community: true, ticketTypes: true },
-        orderBy: { startsAt: "asc" },
-      }),
-      prisma.opportunity.findMany({
-        where: { organizationId: { in: organizationIds } },
-        include: { organization: true, community: true, _count: { select: { applications: true } } },
-        orderBy: { createdAt: "desc" },
-      }),
+    const [savedEvents, savedOpportunities, savedCommunities, registrations, applications, certificates, notifications, activity] = await Promise.all([
+      bookmarkState.eventIds.size
+        ? prisma.event.findMany({
+            where: { id: { in: [...bookmarkState.eventIds] } },
+            include: { organization: true, community: true, ticketTypes: true },
+          })
+        : Promise.resolve([]),
+      bookmarkState.opportunityIds.size
+        ? prisma.opportunity.findMany({
+            where: { id: { in: [...bookmarkState.opportunityIds] } },
+            include: { organization: true, community: true, _count: { select: { applications: true } } },
+          })
+        : Promise.resolve([]),
+      bookmarkState.communityIds.size
+        ? prisma.community.findMany({
+            where: { id: { in: [...bookmarkState.communityIds] } },
+          })
+        : Promise.resolve([]),
       prisma.registration.findMany({
-        where: { event: { is: { organizationId: { in: organizationIds } } } },
-        include: { user: true, event: true },
+        where: { userId: user.id },
+        include: { event: true, ticketType: true },
         orderBy: { createdAt: "desc" },
-        take: 12,
-      }),
-      prisma.volunteerApplication.findMany({
-        where: { event: { is: { organizationId: { in: organizationIds } } } },
-        include: { user: true, event: true },
-        orderBy: { createdAt: "desc" },
-        take: 12,
+        take: 8,
       }),
       prisma.opportunityApplication.findMany({
-        where: { opportunity: { is: { organizationId: { in: organizationIds } } } },
-        include: { user: true, opportunity: true },
+        where: { userId: user.id },
+        include: { opportunity: { include: { organization: true } } },
         orderBy: { createdAt: "desc" },
-        take: 15,
+        take: 8,
       }),
-      prisma.sponsorLead.findMany({
-        where: { organizationId: { in: organizationIds } },
-        include: { event: true },
-        orderBy: { updatedAt: "desc" },
-        take: 10,
+      prisma.certificate.findMany({
+        where: { userId: user.id },
+        orderBy: { issuedAt: "desc" },
+        take: 8,
       }),
-      prisma.merchInquiry.findMany({
-        where: { organizationId: { in: organizationIds } },
-        orderBy: { updatedAt: "desc" },
-        take: 10,
+      prisma.notification.findMany({
+        where: { userId: user.id },
+        orderBy: { createdAt: "desc" },
+        take: 8,
       }),
-      prisma.studioRequest.findMany({
-        where: { organizationId: { in: organizationIds } },
-        orderBy: { updatedAt: "desc" },
-        take: 10,
+      prisma.userActivity.findMany({
+        where: {
+          OR: [
+            { userId: user.id },
+            { communityId: { in: user.communityMemberships.map((membership) => membership.communityId) } },
+          ],
+        },
+        orderBy: { createdAt: "desc" },
+        take: 8,
       }),
     ]);
 
-    dashboard.organizerData = {
-      organizations: user.memberships.map((membership) => ({
-        id: membership.organization.id,
-        slug: membership.organization.slug,
-        name: membership.organization.name,
+    const dashboard: DashboardView = {
+      viewer: {
+        id: user.id,
+        username: user.username,
+        name: user.name,
+        initials: initials(user.name),
+        role: formatRole(user.primaryRole),
+        headline: user.headline ?? "Community member",
+        community: user.communityMemberships[0]?.community.name,
+        reputation: user.profile?.reputation ?? 0,
+      },
+      role: user.primaryRole,
+      metrics: [
+        { label: "Applications", value: String(applications.length), detail: "Active opportunity pipeline across the ecosystem" },
+        { label: "Registrations", value: String(registrations.length), detail: "Events you are already attached to" },
+        { label: "Communities", value: String(user.communityMemberships.length), detail: "Rooms where your identity now compounds" },
+        { label: "Reputation", value: String(user.profile?.reputation ?? 0), detail: "Public proof from participation and output" },
+      ],
+      roleActions: roleActions(user.primaryRole),
+      activity: activity.map((item) => ({
+        id: item.id,
+        actor: item.actorName,
+        action: item.action,
+        detail: item.detail,
+        createdAt: relativeDate(item.createdAt),
       })),
-      events: orgEvents.map((event, index) => mapEventCard(event, index)),
-      opportunities: orgOpportunities.map((opportunity) => mapOpportunityCard(opportunity)),
-      registrations: orgRegistrations.map((registration) => ({
+      bookmarks: {
+        events: savedEvents.map((event, index) => mapEventCard(event, index, { saved: true })),
+        opportunities: savedOpportunities.map((opportunity) => mapOpportunityCard(opportunity, { saved: true })),
+        communities: savedCommunities.map((community) => mapCommunityCard(community)),
+      },
+      registrations: registrations.map((registration) => ({
         id: registration.id,
-        userName: registration.user.name,
-        userEmail: registration.user.email,
-        status: formatRole(registration.status),
         eventTitle: registration.event.title,
+        eventSlug: registration.event.slug,
+        status: formatRole(registration.status),
+        ticketType: registration.ticketType?.name,
+        createdAt: formatDate(registration.createdAt),
       })),
-      volunteerApplications: volunteerApplications.map((application) => ({
+      applications: applications.map((application) => ({
         id: application.id,
-        userName: application.user.name,
-        userEmail: application.user.email,
-        eventTitle: application.event.title,
-        role: application.role,
+        title: application.opportunity.title,
+        organization: application.opportunity.organization.name,
         status: formatRole(application.status),
+        appliedAt: formatDate(application.createdAt),
       })),
-      applications: opportunityApplications.map((application) => ({
-        id: application.id,
-        applicantName: application.user.name,
-        applicantEmail: application.user.email,
-        opportunityTitle: application.opportunity.title,
-        status: formatRole(application.status),
-        portfolioUrl: application.portfolioUrl ?? undefined,
-        createdAt: formatDate(application.createdAt),
+      certificates: certificates.map((certificate) => ({
+        id: certificate.id,
+        title: certificate.title,
+        type: formatRole(certificate.type),
+        issuedAt: formatDate(certificate.issuedAt),
       })),
-      sponsorLeads: sponsorLeads.map((lead) => ({
-        id: lead.id,
-        companyName: lead.companyName,
-        stage: formatRole(lead.stage),
-        contactEmail: lead.contactEmail,
-        eventTitle: lead.event?.title,
+      communities: user.communityMemberships.map((membership) => ({
+        id: membership.community.id,
+        slug: membership.community.slug,
+        name: membership.community.name,
+        role: formatRole(membership.role),
       })),
-      merchInquiries: merchInquiries.map((inquiry) => ({
-        id: inquiry.id,
-        apparelType: inquiry.apparelType,
-        quantity: inquiry.quantity,
-        status: formatRole(inquiry.status),
-        city: inquiry.city,
-      })),
-      studioRequests: studioRequests.map((request) => ({
-        id: request.id,
-        title: request.title,
-        type: formatRole(request.type),
-        status: formatRole(request.status),
+      notifications: notifications.map((notification) => ({
+        id: notification.id,
+        title: notification.title,
+        message: notification.message,
+        createdAt: relativeDate(notification.createdAt),
+        unread: notification.status === NotificationStatus.UNREAD,
       })),
     };
-  }
 
-  return dashboard;
+    if (([UserRole.ORGANIZER, UserRole.COMMUNITY_ADMIN, UserRole.PLATFORM_ADMIN] as UserRole[]).includes(user.primaryRole)) {
+      const organizationIds = user.memberships.map((membership) => membership.organizationId);
+      const [orgEvents, orgOpportunities, orgRegistrations, volunteerApplications, opportunityApplications, sponsorLeads, merchInquiries, studioRequests] = await Promise.all([
+        prisma.event.findMany({
+          where: { organizationId: { in: organizationIds } },
+          include: { organization: true, community: true, ticketTypes: true },
+          orderBy: { startsAt: "asc" },
+        }),
+        prisma.opportunity.findMany({
+          where: { organizationId: { in: organizationIds } },
+          include: { organization: true, community: true, _count: { select: { applications: true } } },
+          orderBy: { createdAt: "desc" },
+        }),
+        prisma.registration.findMany({
+          where: { event: { is: { organizationId: { in: organizationIds } } } },
+          include: { user: true, event: true },
+          orderBy: { createdAt: "desc" },
+          take: 12,
+        }),
+        prisma.volunteerApplication.findMany({
+          where: { event: { is: { organizationId: { in: organizationIds } } } },
+          include: { user: true, event: true },
+          orderBy: { createdAt: "desc" },
+          take: 12,
+        }),
+        prisma.opportunityApplication.findMany({
+          where: { opportunity: { is: { organizationId: { in: organizationIds } } } },
+          include: { user: true, opportunity: true },
+          orderBy: { createdAt: "desc" },
+          take: 15,
+        }),
+        prisma.sponsorLead.findMany({
+          where: { organizationId: { in: organizationIds } },
+          include: { event: true },
+          orderBy: { updatedAt: "desc" },
+          take: 10,
+        }),
+        prisma.merchInquiry.findMany({
+          where: { organizationId: { in: organizationIds } },
+          orderBy: { updatedAt: "desc" },
+          take: 10,
+        }),
+        prisma.studioRequest.findMany({
+          where: { organizationId: { in: organizationIds } },
+          orderBy: { updatedAt: "desc" },
+          take: 10,
+        }),
+      ]);
+
+      dashboard.organizerData = {
+        organizations: user.memberships.map((membership) => ({
+          id: membership.organization.id,
+          slug: membership.organization.slug,
+          name: membership.organization.name,
+        })),
+        events: orgEvents.map((event, index) => mapEventCard(event, index)),
+        opportunities: orgOpportunities.map((opportunity) => mapOpportunityCard(opportunity)),
+        registrations: orgRegistrations.map((registration) => ({
+          id: registration.id,
+          userName: registration.user.name,
+          userEmail: registration.user.email,
+          status: formatRole(registration.status),
+          eventTitle: registration.event.title,
+        })),
+        volunteerApplications: volunteerApplications.map((application) => ({
+          id: application.id,
+          userName: application.user.name,
+          userEmail: application.user.email,
+          eventTitle: application.event.title,
+          role: application.role,
+          status: formatRole(application.status),
+        })),
+        applications: opportunityApplications.map((application) => ({
+          id: application.id,
+          applicantName: application.user.name,
+          applicantEmail: application.user.email,
+          opportunityTitle: application.opportunity.title,
+          status: formatRole(application.status),
+          portfolioUrl: application.portfolioUrl ?? undefined,
+          createdAt: formatDate(application.createdAt),
+        })),
+        sponsorLeads: sponsorLeads.map((lead) => ({
+          id: lead.id,
+          companyName: lead.companyName,
+          stage: formatRole(lead.stage),
+          contactEmail: lead.contactEmail,
+          eventTitle: lead.event?.title,
+        })),
+        merchInquiries: merchInquiries.map((inquiry) => ({
+          id: inquiry.id,
+          apparelType: inquiry.apparelType,
+          quantity: inquiry.quantity,
+          status: formatRole(inquiry.status),
+          city: inquiry.city,
+        })),
+        studioRequests: studioRequests.map((request) => ({
+          id: request.id,
+          title: request.title,
+          type: formatRole(request.type),
+          status: formatRole(request.status),
+        })),
+      };
+    }
+
+    return dashboard;
+  } catch (error) {
+    logDataAccessError("getDashboardData", error);
+    return emptyDashboard();
+  }
 }
 
 export async function getOrganizerFormOptions() {
@@ -1022,31 +1082,36 @@ export async function getOrganizerFormOptions() {
     return { organizations: [], communities: [] as { id: string; name: string; organizationId: string; slug: string }[] };
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: viewer.userId },
-    include: {
-      memberships: { include: { organization: true } },
-    },
-  });
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: viewer.userId },
+      include: {
+        memberships: { include: { organization: true } },
+      },
+    });
 
-  if (!user) {
+    if (!user) {
+      return { organizations: [], communities: [] as { id: string; name: string; organizationId: string; slug: string }[] };
+    }
+
+    const organizations = user.memberships.map((membership) => ({
+      id: membership.organization.id,
+      name: membership.organization.name,
+      slug: membership.organization.slug,
+      role: formatRole(membership.role),
+    }));
+
+    const communities = organizations.length
+      ? await prisma.community.findMany({
+          where: { organizationId: { in: organizations.map((organization) => organization.id) } },
+          orderBy: { name: "asc" },
+          select: { id: true, name: true, organizationId: true, slug: true },
+        })
+      : [];
+
+    return { organizations, communities };
+  } catch (error) {
+    logDataAccessError("getOrganizerFormOptions", error);
     return { organizations: [], communities: [] as { id: string; name: string; organizationId: string; slug: string }[] };
   }
-
-  const organizations = user.memberships.map((membership) => ({
-    id: membership.organization.id,
-    name: membership.organization.name,
-    slug: membership.organization.slug,
-    role: formatRole(membership.role),
-  }));
-
-  const communities = organizations.length
-    ? await prisma.community.findMany({
-        where: { organizationId: { in: organizations.map((organization) => organization.id) } },
-        orderBy: { name: "asc" },
-        select: { id: true, name: true, organizationId: true, slug: true },
-      })
-    : [];
-
-  return { organizations, communities };
 }
