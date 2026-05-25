@@ -844,27 +844,16 @@ export async function getDashboardData(): Promise<DashboardView> {
   if (!prisma) return emptyDashboard();
   try {
     const viewer = await resolveViewer();
-    let user = viewer.userId
-      ? await prisma.user.findUnique({
-          where: { id: viewer.userId },
-          include: {
-            profile: true,
-            memberships: { include: { organization: true } },
-            communityMemberships: { include: { community: true } },
-          },
-        })
-      : null;
+    if (!viewer.userId) return emptyDashboard();
 
-    if (!user) {
-      user = await prisma.user.findFirst({
-        include: {
-          profile: true,
-          memberships: { include: { organization: true } },
-          communityMemberships: { include: { community: true } },
-        },
-        orderBy: { createdAt: "asc" },
-      });
-    }
+    const user = await prisma.user.findUnique({
+      where: { id: viewer.userId },
+      include: {
+        profile: true,
+        memberships: { include: { organization: true } },
+        communityMemberships: { include: { community: true } },
+      },
+    });
 
     if (!user) return emptyDashboard();
 
@@ -1095,6 +1084,7 @@ export async function getDashboardData(): Promise<DashboardView> {
 
     return dashboard;
   } catch (error) {
+    console.error("[getDashboardData] Hydration error:", error);
     logDataAccessError("getDashboardData", error);
     return emptyDashboard();
   }

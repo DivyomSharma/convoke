@@ -6,6 +6,7 @@ import { MotionShell } from "@/components/marketing/motion-shell";
 import { SiteHeader } from "@/components/marketing/site-header";
 import { ButtonLink } from "@/components/ui/button";
 import { Panel } from "@/components/ui/panel";
+import { Marquee } from "@/components/ui/marquee";
 import { getHomepageStats, listHomeData } from "@/lib/platform-service";
 
 export default async function Home() {
@@ -156,6 +157,28 @@ export default async function Home() {
             </div>
           </section>
         )}
+
+        {/* Marquee Section */}
+        <section className="relative flex flex-col items-center justify-center overflow-hidden py-10 md:py-16 bg-[#030304]">
+          <div className="absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
+          <div className="absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+          
+          <Marquee repeat={5} className="[--duration:30s] opacity-70 hover:opacity-100 transition duration-500">
+            {["HACKATHONS", "INTERNSHIPS", "FOUNDERS", "CREATORS", "COMMUNITIES", "BUILDERS", "ENGINEERS", "DESIGNERS"].map((term) => (
+              <span key={term} className="mx-4 text-3xl font-black italic tracking-widest text-transparent [-webkit-text-stroke:1px_rgba(255,255,255,0.15)] hover:[-webkit-text-stroke:1px_rgba(198,161,111,0.5)] transition duration-300">
+                {term}
+              </span>
+            ))}
+          </Marquee>
+          
+          <Marquee reverse repeat={5} className="[--duration:25s] mt-4 opacity-70 hover:opacity-100 transition duration-500">
+            {["ACCELERATORS", "INCUBATORS", "WORKSHOPS", "CONFERENCES", "FELLOWSHIPS", "GRANTS", "RESIDENCIES", "SHOWCASES"].map((term) => (
+              <span key={term} className="mx-4 text-3xl font-black italic tracking-widest text-transparent [-webkit-text-stroke:1px_rgba(255,255,255,0.15)] hover:[-webkit-text-stroke:1px_rgba(198,161,111,0.5)] transition duration-300">
+                {term}
+              </span>
+            ))}
+          </Marquee>
+        </section>
 
         {home.people.length > 0 && (
           <section className="px-5 py-16 md:px-8">

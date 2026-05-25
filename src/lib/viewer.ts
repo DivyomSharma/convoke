@@ -14,7 +14,7 @@ export async function getAuthenticatedDbUser() {
 
     const username =
       clerk.username ??
-      email.split("@")[0].toLowerCase().replace(/[^a-z0-9-]/g, "-");
+      `${email.split("@")[0].toLowerCase().replace(/[^a-z0-9-]/g, "-")}-${Math.floor(Math.random() * 10000)}`;
     const name =
       `${clerk.firstName ?? ""} ${clerk.lastName ?? ""}`.trim() ||
       clerk.fullName ||
@@ -64,7 +64,7 @@ export async function getAuthenticatedDbUser() {
 
   const username =
     user.user_metadata?.username ||
-    user.email.split("@")[0].toLowerCase().replace(/[^a-z0-9-]/g, "-");
+    `${user.email.split("@")[0].toLowerCase().replace(/[^a-z0-9-]/g, "-")}-${Math.floor(Math.random() * 10000)}`;
   const name =
     user.user_metadata?.full_name ||
     user.user_metadata?.name ||

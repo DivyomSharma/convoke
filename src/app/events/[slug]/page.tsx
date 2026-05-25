@@ -53,9 +53,15 @@ export default async function EventPage({ params }: PageProps) {
                   <MapPin className="size-4 text-bronze" />
                   {event.venue ? `${event.venue}, ${event.city}` : event.city}
                 </span>
-                <span className="inline-flex items-center gap-2">
-                  <Users className="size-4 text-bronze" />
-                  {event.attendees.toLocaleString("en-IN")} registered
+                <span className="inline-flex items-center gap-3">
+                  <div className="flex -space-x-2">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="size-6 rounded-full border-2 border-background bg-bronze/20 flex items-center justify-center overflow-hidden">
+                        <Users className="size-3 text-bronze" />
+                      </div>
+                    ))}
+                  </div>
+                  <span className="font-medium text-foreground">{event.attendees.toLocaleString("en-IN")} <span className="text-muted font-normal">registered</span></span>
                 </span>
               </div>
             </div>

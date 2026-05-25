@@ -80,7 +80,10 @@ export default async function WorkspacePage() {
                       </Link>
                     ))
                   ) : (
-                    <p className="text-sm text-muted">You haven't joined any events yet.</p>
+                    <div className="rounded-[8px] border border-dashed border-line p-6 text-center">
+                      <p className="text-sm font-medium text-foreground">Your next collaboration starts here.</p>
+                      <p className="mt-1 text-xs text-muted">Join events to build your network and momentum.</p>
+                    </div>
                   )}
                 </div>
               </Panel>
@@ -102,7 +105,10 @@ export default async function WorkspacePage() {
                       </div>
                     ))
                   ) : (
-                    <p className="text-sm text-muted">No applications yet. Browse open opportunities.</p>
+                    <div className="rounded-[8px] border border-dashed border-line p-6 text-center">
+                      <p className="text-sm font-medium text-foreground">Ambition needs an outlet.</p>
+                      <p className="mt-1 text-xs text-muted">Find internships and roles to accelerate your growth.</p>
+                    </div>
                   )}
                 </div>
                 <ButtonLink href="/opportunities" variant="secondary" className="mt-5">Browse opportunities</ButtonLink>
@@ -123,7 +129,10 @@ export default async function WorkspacePage() {
                       </div>
                     ))
                   ) : (
-                    <p className="text-sm text-muted">Join communities to see activity here.</p>
+                    <div className="rounded-[8px] border border-dashed border-line p-6 text-center">
+                      <p className="text-sm font-medium text-foreground">The ecosystem is waiting.</p>
+                      <p className="mt-1 text-xs text-muted">Join communities to see live activity around you.</p>
+                    </div>
                   )}
                 </div>
               </Panel>
@@ -150,7 +159,10 @@ export default async function WorkspacePage() {
                       </div>
                     ))
                   ) : (
-                    <p className="text-sm text-muted">No new notifications.</p>
+                    <div className="rounded-[8px] border border-dashed border-line p-6 text-center">
+                      <p className="text-sm font-medium text-foreground">All caught up.</p>
+                      <p className="mt-1 text-xs text-muted">We'll let you know when momentum shifts.</p>
+                    </div>
                   )}
                 </div>
               </Panel>
@@ -169,7 +181,10 @@ export default async function WorkspacePage() {
                       </div>
                     ))
                   ) : (
-                    <p className="text-sm text-muted">Earn certificates by attending events and volunteering.</p>
+                    <div className="rounded-[8px] border border-dashed border-line p-6 text-center">
+                      <p className="text-sm font-medium text-foreground">Proof of work.</p>
+                      <p className="mt-1 text-xs text-muted">Earn certificates by participating in the ecosystem.</p>
+                    </div>
                   )}
                 </div>
               </Panel>
@@ -191,7 +206,10 @@ export default async function WorkspacePage() {
                       </Link>
                     ))
                   ) : (
-                    <p className="text-sm text-muted">You haven't joined any communities yet.</p>
+                    <div className="rounded-[8px] border border-dashed border-line p-6 text-center">
+                      <p className="text-sm font-medium text-foreground">Find your people.</p>
+                      <p className="mt-1 text-xs text-muted">Join rooms where ambitious builders gather.</p>
+                    </div>
                   )}
                 </div>
               </Panel>

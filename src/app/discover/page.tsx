@@ -7,6 +7,7 @@ import { MotionShell } from "@/components/marketing/motion-shell";
 import { SiteHeader } from "@/components/marketing/site-header";
 import { ButtonLink } from "@/components/ui/button";
 import { Panel } from "@/components/ui/panel";
+import { Marquee } from "@/components/ui/marquee";
 import { listCommunityDirectory, listHomeData, listOpportunityDirectory } from "@/lib/platform-service";
 
 export const metadata: Metadata = {
@@ -41,7 +42,18 @@ export default async function DiscoverPage() {
             </div>
           </form>
 
-          <section className="mt-14">
+          {/* Marquee Section */}
+          <div className="mt-16 overflow-hidden rounded-3xl border border-white/[0.05] bg-black/50 py-8 backdrop-blur-xl">
+            <Marquee repeat={6} className="[--duration:20s] opacity-60 hover:opacity-100 transition duration-500">
+              {["TECH TALKS", "DEMO DAYS", "MATCHMAKING", "VCS", "ANGELS", "CO-FOUNDERS"].map((term) => (
+                <span key={term} className="mx-3 text-xl font-bold tracking-widest text-transparent [-webkit-text-stroke:1px_rgba(255,255,255,0.2)] hover:[-webkit-text-stroke:1px_rgba(198,161,111,0.6)] transition duration-300">
+                  {term}
+                </span>
+              ))}
+            </Marquee>
+          </div>
+
+          <section className="mt-16">
             <div className="mb-6 flex items-end justify-between">
               <div>
                 <h2 className="text-3xl font-medium tracking-[-0.03em] md:text-4xl">Events</h2>
