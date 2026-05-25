@@ -539,3 +539,28 @@ export async function updateOpportunityApplicationStatus(input: unknown) {
 
   return { ok: true };
 }
+
+export async function updatePublicProfile(data: {
+  bio: string;
+  skills: string[];
+  experience: { title: string; org: string; period: string; description: string }[];
+  socials: { label: string; href: string }[];
+}) {
+  const user = await requireDbUser();
+  const prisma = getPrisma();
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      bio: data.bio,
+      skills: data.skills,
+      experience: data.experience,
+      socials: data.socials,
+    },
+  });
+
+  revalidatePath(`/u/${user.username}`);
+  revalidatePath("/workspace/profile");
+
+  return { ok: true };
+}

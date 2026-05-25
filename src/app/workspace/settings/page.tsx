@@ -33,8 +33,8 @@ export default async function SettingsPage() {
             </nav>
 
             <Panel className="p-6">
-              <h2 className="text-xl font-medium">Profile Details</h2>
-              <p className="mt-2 text-sm text-muted">Update your public identity on Convoke.</p>
+              <h2 className="text-xl font-medium">Account Preferences</h2>
+              <p className="mt-2 text-sm text-muted">Manage your basic account details.</p>
 
               <form className="mt-8 space-y-6">
                 <div>
@@ -48,14 +48,15 @@ export default async function SettingsPage() {
                   <input type="text" defaultValue={`@${dashboard.viewer.username}`} disabled className="mt-2 w-full rounded-lg border border-line bg-black/40 px-4 py-3 text-foreground opacity-70" />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-muted">Headline</label>
-                  <input type="text" defaultValue={dashboard.viewer.headline} className="mt-2 w-full rounded-lg border border-line bg-white/[0.02] px-4 py-3 text-foreground focus:border-bronze/50 focus:outline-none" />
+                <div className="rounded-xl border border-line bg-white/5 p-5">
+                  <h3 className="font-medium">Public Profile & Portfolio</h3>
+                  <p className="mt-1 text-sm text-muted mb-4">
+                    Your bio, skills, experience timeline, and social links are managed in the Portfolio Builder.
+                  </p>
+                  <Link href="/workspace/profile" className="rounded-full bg-bronze/10 text-bronze px-5 py-2 text-sm font-medium transition hover:bg-bronze/20 inline-flex items-center gap-2">
+                    <User className="size-4" /> Open Portfolio Builder
+                  </Link>
                 </div>
-
-                <button type="button" className="rounded-full bg-foreground px-6 py-2.5 text-sm font-medium text-background transition hover:bg-foreground/90">
-                  Save changes
-                </button>
               </form>
             </Panel>
           </div>

@@ -20,14 +20,16 @@ import {
 } from "lucide-react";
 
 const menuItems = [
-  { label: "Profile", href: "/u/[username]", icon: User, section: "main" },
+  { label: "Public Profile", href: "/u/[username]", icon: User, section: "main" },
+  { label: "Edit Portfolio", href: "/workspace/profile", icon: User, section: "main" },
   { label: "Workspace", href: "/workspace", icon: LayoutDashboard, section: "main" },
+  { label: "Saved Items", href: "/workspace/saved", icon: Bookmark, section: "tracking" },
   { label: "Applications", href: "/workspace/applications", icon: Briefcase, section: "tracking" },
   { label: "Registrations", href: "/workspace/registrations", icon: CalendarDays, section: "tracking" },
   { label: "Certificates", href: "/workspace/certificates", icon: FileBadge2, section: "tracking" },
   { label: "Communities", href: "/workspace/communities", icon: Users, section: "tracking" },
   { label: "Organizer Tools", href: "/workspace/organize", icon: Wrench, section: "tools" },
-  { label: "Settings", href: "/workspace/settings", icon: Settings, section: "tools" },
+  { label: "Account Settings", href: "/workspace/settings", icon: Settings, section: "tools" },
 ];
 
 export function UserMenu() {
@@ -55,7 +57,7 @@ export function UserMenu() {
 
   const profileHref = user.username ? `/u/${user.username}` : "/workspace";
   const dynamicMenuItems = menuItems.map((item) =>
-    item.label === "Profile" ? { ...item, href: profileHref } : item,
+    item.label === "Public Profile" ? { ...item, href: profileHref } : item,
   );
 
   const staggerVariants = {
