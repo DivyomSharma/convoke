@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter_Tight, Instrument_Serif, JetBrains_Mono } from "next/font/google";
+import { Inter_Tight, Newsreader, JetBrains_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
@@ -9,9 +9,8 @@ const fontSans = Inter_Tight({
   subsets: ["latin"],
 });
 
-const fontSerif = Instrument_Serif({
+const fontSerif = Newsreader({
   variable: "--font-serif",
-  weight: ["400"],
   subsets: ["latin"],
   style: ["normal", "italic"],
 });
