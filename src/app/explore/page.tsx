@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Shell } from "@/components/Shell";
 import { Avatar } from "@/components/Avatar";
+import { FloatingArt } from "@/components/FloatingArt";
 import { prisma } from "@/lib/prisma";
 
 const filters = ["All", "Events", "Roles", "Hackathons", "Projects", "Drops", "Vouches", "Office hours"] as const;
@@ -63,8 +64,14 @@ export default async function Explore(props: { searchParams?: Promise<{ f?: stri
 
   return (
     <Shell>
-      <div className="mx-auto max-w-[760px] px-5 sm:px-8 py-12">
-        <div className="flex items-baseline justify-between hairline-b pb-5">
+      <div className="mx-auto max-w-[840px] px-5 sm:px-8 py-12 relative">
+        
+        {/* Background Arts */}
+        <FloatingArt shape="squiggle" className="absolute top-10 -left-20 w-48 h-20 opacity-20 pointer-events-none -rotate-12" color="var(--brand)" />
+        <FloatingArt shape="circle" className="absolute top-40 -right-20 w-64 h-64 opacity-10 pointer-events-none" />
+        <FloatingArt shape="dots" className="absolute bottom-40 -left-10 w-24 h-24 opacity-30 pointer-events-none" color="var(--brand)" />
+
+        <div className="flex items-baseline justify-between hairline-b pb-5 relative z-10">
           <h1 className="serif text-4xl">Explore</h1>
           <span className="eyebrow">{items.length} items</span>
         </div>
@@ -84,33 +91,33 @@ export default async function Explore(props: { searchParams?: Promise<{ f?: stri
           ))}
         </div>
 
-        <ul className="divide-y divide-g3">
+        <ul className="flex flex-col gap-6 mt-8 relative z-10">
           {items.length === 0 && (
             <div className="py-20 text-center text-g5 eyebrow">No items found. Try adjusting your filters.</div>
           )}
           {items.map((it) => (
-            <li key={it.id} className="py-7">
-              <div className="flex items-center gap-3 mb-3">
+            <li key={it.id} className="bg-white border border-g3 rounded-2xl p-6 md:p-8 hover:border-[var(--brand)] hover:shadow-[6px_6px_0_0_var(--brand)] transition-all duration-300">
+              <div className="flex items-center gap-3 mb-4">
                 <Link href={`/profile/${it.who.handle}`}>
-                  <Avatar src={it.who.avatar} name={it.who.name} size={28} />
+                  <Avatar src={it.who.avatar} name={it.who.name} size={32} />
                 </Link>
-                <Link href={`/profile/${it.who.handle}`} className="text-[14px] text-ink hover:underline">
+                <Link href={`/profile/${it.who.handle}`} className="text-[15px] font-medium text-ink hover:underline">
                   {it.who.name}
                 </Link>
                 <span className="text-g4 text-[12px]">·</span>
-                <span className="text-[12px] text-g5">{it.who.role}</span>
+                <span className="text-[13px] text-g5">{it.who.role}</span>
                 <span className="text-g4 text-[12px]">·</span>
-                <span className="text-[12px] text-g4 mono">{it.at}</span>
-                <span className="ml-auto mono text-[10px] uppercase tracking-wider text-g4">{it.kind}</span>
+                <span className="text-[13px] text-g4 mono">{it.at}</span>
+                <span className="ml-auto mono text-[11px] font-medium bg-[var(--brand)]/10 text-[var(--brand)] px-3 py-1 rounded-full uppercase tracking-wider">{it.kind}</span>
               </div>
-              <h3 className="serif text-[26px] md:text-[30px] leading-[1.1]">{it.title}</h3>
-              {it.body && <p className="text-g5 text-[15px] mt-2 max-w-[60ch]">{it.body}</p>}
+              <h3 className="serif text-[28px] md:text-[34px] leading-[1.1]">{it.title}</h3>
+              {it.body && <p className="text-g5 text-[16px] mt-3 max-w-[65ch] leading-relaxed">{it.body}</p>}
               {it.cover && (
-                <div className="mt-4 overflow-hidden">
+                <div className="mt-5 overflow-hidden rounded-xl border border-g3">
                   <img src={it.cover} alt="" loading="lazy" className="w-full max-h-[420px] object-cover grayscale hover:grayscale-0 transition-all duration-500" />
                 </div>
               )}
-              {it.meta && <div className="mt-4 mono text-[12px] text-g5">{it.meta}</div>}
+              {it.meta && <div className="mt-5 mono text-[13px] text-g5 font-medium">{it.meta}</div>}
             </li>
           ))}
         </ul>

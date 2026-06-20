@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Shell } from "@/components/Shell";
 import { Avatar } from "@/components/Avatar";
+import { FloatingArt } from "@/components/FloatingArt";
+import { Briefcase, BriefcaseBusiness, Code, ClipboardList, Users, GraduationCap } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
 export default async function Landing() {
@@ -26,24 +28,62 @@ export default async function Landing() {
 
   return (
     <Shell wide>
-      <section className="mx-auto max-w-[1440px] px-5 sm:px-8 pt-10 pb-16">
+      <section className="mx-auto max-w-[1440px] px-5 sm:px-8 pt-10 pb-16 relative overflow-hidden">
+        {/* Floating Arts */}
+        <FloatingArt shape="circle" className="absolute top-0 right-0 w-64 h-64 opacity-10 pointer-events-none translate-x-1/3 -translate-y-1/3" />
+        <FloatingArt shape="star" className="absolute top-20 left-10 w-12 h-12 opacity-20 pointer-events-none -rotate-12" color="var(--brand)" />
+        <FloatingArt shape="dots" className="absolute bottom-20 right-20 w-24 h-24 opacity-30 pointer-events-none" />
+
         {/* Hero Section */}
-        <div className="pt-10 pb-8">
+        <div className="pt-10 pb-8 relative z-10">
           <h1 className="serif text-6xl md:text-8xl lg:text-9xl leading-[0.9] max-w-[14ch] tracking-tight">
-            Find your <span className="text-[var(--brand)] italic pr-4">life&apos;s work.</span>
+            Find your <span className="text-[var(--brand)] italic pr-4 relative">
+              life&apos;s work.
+              <FloatingArt shape="squiggle" className="absolute -bottom-6 left-0 w-full h-8 opacity-40 pointer-events-none" color="var(--brand)" />
+            </span>
           </h1>
           <p className="mt-6 text-g5 text-lg md:text-xl max-w-[40ch] leading-relaxed">
             The premium network for builders, hackers, and creators. Discover opportunities, join spaces, and launch your next project.
           </p>
 
-          {/* Unstop-style Category Row (but editorial) */}
-          <div className="flex gap-3 mt-12 overflow-x-auto pb-4 -mx-5 sm:mx-0 px-5 sm:px-0" style={{ scrollbarWidth: 'none' }}>
-            <Link href="/explore?f=Internships" className="stamp">Internships</Link>
-            <Link href="/explore?f=Jobs" className="stamp">Jobs</Link>
-            <Link href="/explore?f=Hackathons" className="stamp">Hackathons</Link>
-            <Link href="/explore?f=MockTests" className="stamp">Mock Tests</Link>
-            <Link href="/explore?f=Mentorships" className="stamp">Mentorships</Link>
-            <Link href="/explore?f=Courses" className="stamp">Courses</Link>
+          {/* Unstop-style Category Cards */}
+          <div className="flex gap-4 mt-16 overflow-x-auto pb-6 -mx-5 sm:mx-0 px-5 sm:px-0" style={{ scrollbarWidth: 'none' }}>
+            <Link href="/explore?f=Internships" className="group flex-shrink-0 w-40 h-40 bg-white border border-g3 rounded-2xl p-5 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-[4px_4px_0_0_var(--brand)] transition-all duration-300">
+              <div className="w-12 h-12 rounded-full bg-[var(--brand)]/10 text-[var(--brand)] flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Briefcase size={24} strokeWidth={1.5} />
+              </div>
+              <span className="font-medium text-ink">Internships</span>
+            </Link>
+            <Link href="/explore?f=Jobs" className="group flex-shrink-0 w-40 h-40 bg-white border border-g3 rounded-2xl p-5 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-[4px_4px_0_0_var(--brand)] transition-all duration-300">
+              <div className="w-12 h-12 rounded-full bg-[var(--brand)]/10 text-[var(--brand)] flex items-center justify-center group-hover:scale-110 transition-transform">
+                <BriefcaseBusiness size={24} strokeWidth={1.5} />
+              </div>
+              <span className="font-medium text-ink">Jobs</span>
+            </Link>
+            <Link href="/explore?f=Hackathons" className="group flex-shrink-0 w-40 h-40 bg-white border border-g3 rounded-2xl p-5 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-[4px_4px_0_0_var(--brand)] transition-all duration-300">
+              <div className="w-12 h-12 rounded-full bg-[var(--brand)]/10 text-[var(--brand)] flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Code size={24} strokeWidth={1.5} />
+              </div>
+              <span className="font-medium text-ink">Hackathons</span>
+            </Link>
+            <Link href="/explore?f=MockTests" className="group flex-shrink-0 w-40 h-40 bg-white border border-g3 rounded-2xl p-5 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-[4px_4px_0_0_var(--brand)] transition-all duration-300">
+              <div className="w-12 h-12 rounded-full bg-[var(--brand)]/10 text-[var(--brand)] flex items-center justify-center group-hover:scale-110 transition-transform">
+                <ClipboardList size={24} strokeWidth={1.5} />
+              </div>
+              <span className="font-medium text-ink">Mock Tests</span>
+            </Link>
+            <Link href="/explore?f=Mentorships" className="group flex-shrink-0 w-40 h-40 bg-white border border-g3 rounded-2xl p-5 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-[4px_4px_0_0_var(--brand)] transition-all duration-300">
+              <div className="w-12 h-12 rounded-full bg-[var(--brand)]/10 text-[var(--brand)] flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Users size={24} strokeWidth={1.5} />
+              </div>
+              <span className="font-medium text-ink">Mentorships</span>
+            </Link>
+            <Link href="/explore?f=Courses" className="group flex-shrink-0 w-40 h-40 bg-white border border-g3 rounded-2xl p-5 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-[4px_4px_0_0_var(--brand)] transition-all duration-300">
+              <div className="w-12 h-12 rounded-full bg-[var(--brand)]/10 text-[var(--brand)] flex items-center justify-center group-hover:scale-110 transition-transform">
+                <GraduationCap size={24} strokeWidth={1.5} />
+              </div>
+              <span className="font-medium text-ink">Courses</span>
+            </Link>
           </div>
         </div>
         
