@@ -27,8 +27,28 @@ export default async function Landing() {
   return (
     <Shell wide>
       <section className="mx-auto max-w-[1440px] px-5 sm:px-8 pt-10 pb-16">
-        {/* Editorial masthead — a single line of typography, no hero copy block */}
-        <div className="flex items-baseline justify-between flex-wrap gap-y-3 hairline-b pb-6">
+        {/* Hero Section */}
+        <div className="pt-10 pb-8">
+          <h1 className="serif text-6xl md:text-8xl lg:text-9xl leading-[0.9] max-w-[14ch] tracking-tight">
+            Find your <span className="text-[var(--brand)] italic pr-4">life&apos;s work.</span>
+          </h1>
+          <p className="mt-6 text-g5 text-lg md:text-xl max-w-[40ch] leading-relaxed">
+            The premium network for builders, hackers, and creators. Discover opportunities, join spaces, and launch your next project.
+          </p>
+
+          {/* Unstop-style Category Row (but editorial) */}
+          <div className="flex gap-3 mt-12 overflow-x-auto pb-4 -mx-5 sm:mx-0 px-5 sm:px-0" style={{ scrollbarWidth: 'none' }}>
+            <Link href="/explore?f=Internships" className="stamp">Internships</Link>
+            <Link href="/explore?f=Jobs" className="stamp">Jobs</Link>
+            <Link href="/explore?f=Hackathons" className="stamp">Hackathons</Link>
+            <Link href="/explore?f=MockTests" className="stamp">Mock Tests</Link>
+            <Link href="/explore?f=Mentorships" className="stamp">Mentorships</Link>
+            <Link href="/explore?f=Courses" className="stamp">Courses</Link>
+          </div>
+        </div>
+        
+        {/* Editorial masthead — a single line of typography */}
+        <div className="flex items-baseline justify-between flex-wrap gap-y-3 hairline-b pb-6 mt-8">
           <div className="eyebrow">Friday, June 19 · 2026 · Issue 1,284</div>
           <div className="eyebrow">Today on Convoke</div>
         </div>
@@ -127,34 +147,38 @@ export default async function Landing() {
         </div>
       </section>
 
-      {/* Two-up: Hackathon + Open role */}
+      {/* Two-up: Hackathon + Open role (Poster Cards) */}
       <section className="mx-auto max-w-[1440px] px-5 sm:px-8 mt-20 grid grid-cols-1 md:grid-cols-2 gap-10">
-        <article className="hairline p-7">
-          <div className="eyebrow">Event · {hack?.location || "TBA"}</div>
-          <h3 className="serif text-3xl md:text-4xl mt-3 leading-[1.05]">{hack?.title || "Upcoming Event"}</h3>
-          <p className="text-g5 mt-3 text-[15px]">{hack ? new Date(hack.startTime).toLocaleDateString() : "TBA"} · Builders going</p>
-          <div className="mt-6 flex -space-x-2">
+        <Link href="/opportunities" className="brutalist-card p-8 md:p-10 group block">
+          <div className="flex items-start justify-between">
+            <div className="eyebrow">Event · {hack?.location || "TBA"}</div>
+            <div className="w-8 h-8 rounded-full bg-[var(--brand)] text-paper flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <span className="mono text-[14px]">→</span>
+            </div>
+          </div>
+          <h3 className="serif text-4xl md:text-5xl mt-6 leading-[1.05] group-hover:italic transition-all duration-300">{hack?.title || "Upcoming Event"}</h3>
+          <p className="text-g5 mt-4 text-[16px]">{hack ? new Date(hack.startTime).toLocaleDateString() : "TBA"} · Builders going</p>
+          <div className="mt-10 flex -space-x-2">
             {dbPeople.map((p, i) => (
-              <Avatar key={p.id} src={p.avatarUrl || ""} name={p.name || "User"} size={28} />
+              <Avatar key={p.id} src={p.avatarUrl || ""} name={p.name || "User"} size={32} />
             ))}
-            <span className="ml-4 text-g5 text-[13px] self-center">+ 10 others</span>
+            <span className="ml-4 text-ink font-medium text-[14px] self-center">+ 10 others</span>
           </div>
-          <Link href="/opportunities" className="mt-7 inline-block eyebrow text-ink underline-link">
-            RSVP →
-          </Link>
-        </article>
-        <article className="hairline p-7">
-          <div className="eyebrow">{role?.type || "Role"} · {role?.location || "Remote"}</div>
-          <h3 className="serif text-3xl md:text-4xl mt-3 leading-[1.05]">{role?.title || "Open Position"}</h3>
-          <p className="text-g5 mt-3 text-[15px]">{role?.organization?.name || "Organization"} · {role?.compensation || "Negotiable"}</p>
-          <div className="mt-6 flex flex-wrap gap-2">
-            <span className="mono text-[11px] hairline px-2 py-1 text-g6">Full-time</span>
-            <span className="mono text-[11px] hairline px-2 py-1 text-g6">Remote</span>
+        </Link>
+        <Link href="/opportunities" className="brutalist-card p-8 md:p-10 group block">
+          <div className="flex items-start justify-between">
+            <div className="eyebrow">{role?.type || "Role"} · {role?.location || "Remote"}</div>
+            <div className="w-8 h-8 rounded-full bg-[var(--brand)] text-paper flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <span className="mono text-[14px]">→</span>
+            </div>
           </div>
-          <Link href="/opportunities" className="mt-7 inline-block eyebrow text-ink underline-link">
-            Read brief →
-          </Link>
-        </article>
+          <h3 className="serif text-4xl md:text-5xl mt-6 leading-[1.05] group-hover:italic transition-all duration-300">{role?.title || "Open Position"}</h3>
+          <p className="text-g5 mt-4 text-[16px]">{role?.organization?.name || "Organization"} · {role?.compensation || "Negotiable"}</p>
+          <div className="mt-10 flex flex-wrap gap-2">
+            <span className="stamp">Full-time</span>
+            <span className="stamp">Remote</span>
+          </div>
+        </Link>
       </section>
 
       {/* Closing line */}
