@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Shell } from "@/components/Shell";
 import { Avatar } from "@/components/Avatar";
-import { FloatingArt } from "@/components/FloatingArt";
+import { AmbientGlow } from "@/components/AmbientGlow";
 import { prisma } from "@/lib/prisma";
 
 const filters = ["All", "Events", "Roles", "Hackathons", "Projects", "Drops", "Vouches", "Office hours"] as const;
@@ -66,10 +66,9 @@ export default async function Explore(props: { searchParams?: Promise<{ f?: stri
     <Shell>
       <div className="mx-auto max-w-[840px] px-5 sm:px-8 py-12 relative">
         
-        {/* Background Arts */}
-        <FloatingArt shape="squiggle" className="absolute top-10 -left-20 w-48 h-20 opacity-20 pointer-events-none -rotate-12" color="var(--brand)" />
-        <FloatingArt shape="circle" className="absolute top-40 -right-20 w-64 h-64 opacity-10 pointer-events-none" />
-        <FloatingArt shape="dots" className="absolute bottom-40 -left-10 w-24 h-24 opacity-30 pointer-events-none" color="var(--brand)" />
+        {/* Background Ambient Glows */}
+        <AmbientGlow className="top-10 -left-20 w-[600px] h-[600px] opacity-[0.03] dark:opacity-[0.08]" color="var(--brand)" />
+        <AmbientGlow className="bottom-40 -right-20 w-[800px] h-[800px] opacity-[0.02] dark:opacity-[0.05]" />
 
         <div className="flex items-baseline justify-between hairline-b pb-5 relative z-10">
           <h1 className="serif text-4xl">Explore</h1>
@@ -96,7 +95,7 @@ export default async function Explore(props: { searchParams?: Promise<{ f?: stri
             <div className="py-20 text-center text-g5 eyebrow">No items found. Try adjusting your filters.</div>
           )}
           {items.map((it) => (
-            <li key={it.id} className="bg-paper border border-g3 rounded-2xl p-6 md:p-8 hover:border-[var(--brand)] hover:shadow-[6px_6px_0_0_var(--brand)] transition-all duration-300">
+            <li key={it.id} className="premium-card p-6 md:p-8">
               <div className="flex items-center gap-3 mb-4">
                 <Link href={`/profile/${it.who.handle}`}>
                   <Avatar src={it.who.avatar} name={it.who.name} size={32} />
@@ -114,7 +113,7 @@ export default async function Explore(props: { searchParams?: Promise<{ f?: stri
               {it.body && <p className="text-g5 text-[16px] mt-3 max-w-[65ch] leading-relaxed">{it.body}</p>}
               {it.cover && (
                 <div className="mt-5 overflow-hidden rounded-xl border border-g3">
-                  <img src={it.cover} alt="" loading="lazy" className="w-full max-h-[420px] object-cover grayscale hover:grayscale-0 transition-all duration-500" />
+                  <img src={it.cover} alt="" loading="lazy" className="w-full max-h-[420px] object-cover hover:scale-[1.02] transition-transform duration-700" />
                 </div>
               )}
               {it.meta && <div className="mt-5 mono text-[13px] text-g5 font-medium">{it.meta}</div>}

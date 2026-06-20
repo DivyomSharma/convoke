@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Shell } from "@/components/Shell";
 import { Avatar } from "@/components/Avatar";
-import { FloatingArt } from "@/components/FloatingArt";
+import { AmbientGlow } from "@/components/AmbientGlow";
 import { Briefcase, BriefcaseBusiness, Code, ClipboardList, Users, GraduationCap } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
@@ -29,60 +29,58 @@ export default async function Landing() {
   return (
     <Shell wide>
       <section className="mx-auto max-w-[1440px] px-5 sm:px-8 pt-10 pb-16 relative overflow-hidden">
-        {/* Floating Arts */}
-        <FloatingArt shape="circle" className="absolute top-0 right-0 w-64 h-64 opacity-10 pointer-events-none translate-x-1/3 -translate-y-1/3" />
-        <FloatingArt shape="star" className="absolute top-20 left-10 w-12 h-12 opacity-20 pointer-events-none -rotate-12" color="var(--brand)" />
-        <FloatingArt shape="dots" className="absolute bottom-20 right-20 w-24 h-24 opacity-30 pointer-events-none" />
+        {/* Ambient Glows */}
+        <AmbientGlow className="top-[-20%] right-[-10%] w-[800px] h-[800px] opacity-[0.08] dark:opacity-[0.15]" color="var(--brand)" />
+        <AmbientGlow className="top-[20%] left-[-10%] w-[600px] h-[600px] opacity-[0.05] dark:opacity-[0.1]" color="var(--brand)" />
 
         {/* Hero Section */}
-        <div className="pt-10 pb-8 relative z-10">
-          <h1 className="serif text-6xl md:text-8xl lg:text-9xl leading-[0.9] max-w-[14ch] tracking-tight">
+        <div className="pt-20 pb-12 relative z-10">
+          <h1 className="serif text-7xl md:text-8xl lg:text-9xl leading-[0.95] max-w-[12ch] tracking-tight">
             Find your <span className="text-[var(--brand)] italic pr-4 relative">
               life&apos;s work.
-              <FloatingArt shape="squiggle" className="absolute -bottom-6 left-0 w-full h-8 opacity-40 pointer-events-none" color="var(--brand)" />
             </span>
           </h1>
-          <p className="mt-6 text-g5 text-lg md:text-xl max-w-[40ch] leading-relaxed">
+          <p className="mt-8 text-g5 text-lg md:text-xl max-w-[40ch] leading-relaxed">
             The premium network for builders, hackers, and creators. Discover opportunities, join spaces, and launch your next project.
           </p>
 
-          {/* Unstop-style Category Cards */}
-          <div className="flex gap-4 mt-16 overflow-x-auto pb-6 -mx-5 sm:mx-0 px-5 sm:px-0" style={{ scrollbarWidth: 'none' }}>
-            <Link href="/explore?f=Internships" className="group flex-shrink-0 w-40 h-40 bg-paper border border-g3 rounded-2xl p-5 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-[4px_4px_0_0_var(--brand)] transition-all duration-300">
-              <div className="w-12 h-12 rounded-full bg-[var(--brand)]/10 text-[var(--brand)] flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Briefcase size={24} strokeWidth={1.5} />
+          {/* Premium Category Cards */}
+          <div className="flex gap-4 mt-20 overflow-x-auto pb-8 -mx-5 sm:mx-0 px-5 sm:px-0" style={{ scrollbarWidth: 'none' }}>
+            <Link href="/explore?f=Internships" className="group flex-shrink-0 w-44 h-44 bg-paper/60 backdrop-blur-xl border border-g3 rounded-2xl p-6 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-2xl transition-all duration-300">
+              <div className="w-12 h-12 rounded-xl bg-g1 group-hover:bg-[var(--brand)] text-[var(--brand)] group-hover:text-white flex items-center justify-center transition-all duration-300 shadow-sm border border-g2">
+                <Briefcase size={22} strokeWidth={1.5} />
               </div>
-              <span className="font-medium text-ink">Internships</span>
+              <span className="font-medium text-ink text-lg">Internships</span>
             </Link>
-            <Link href="/explore?f=Jobs" className="group flex-shrink-0 w-40 h-40 bg-paper border border-g3 rounded-2xl p-5 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-[4px_4px_0_0_var(--brand)] transition-all duration-300">
-              <div className="w-12 h-12 rounded-full bg-[var(--brand)]/10 text-[var(--brand)] flex items-center justify-center group-hover:scale-110 transition-transform">
-                <BriefcaseBusiness size={24} strokeWidth={1.5} />
+            <Link href="/explore?f=Jobs" className="group flex-shrink-0 w-44 h-44 bg-paper/60 backdrop-blur-xl border border-g3 rounded-2xl p-6 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-2xl transition-all duration-300">
+              <div className="w-12 h-12 rounded-xl bg-g1 group-hover:bg-[var(--brand)] text-[var(--brand)] group-hover:text-white flex items-center justify-center transition-all duration-300 shadow-sm border border-g2">
+                <BriefcaseBusiness size={22} strokeWidth={1.5} />
               </div>
-              <span className="font-medium text-ink">Jobs</span>
+              <span className="font-medium text-ink text-lg">Jobs</span>
             </Link>
-            <Link href="/explore?f=Hackathons" className="group flex-shrink-0 w-40 h-40 bg-paper border border-g3 rounded-2xl p-5 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-[4px_4px_0_0_var(--brand)] transition-all duration-300">
-              <div className="w-12 h-12 rounded-full bg-[var(--brand)]/10 text-[var(--brand)] flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Code size={24} strokeWidth={1.5} />
+            <Link href="/explore?f=Hackathons" className="group flex-shrink-0 w-44 h-44 bg-paper/60 backdrop-blur-xl border border-g3 rounded-2xl p-6 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-2xl transition-all duration-300">
+              <div className="w-12 h-12 rounded-xl bg-g1 group-hover:bg-[var(--brand)] text-[var(--brand)] group-hover:text-white flex items-center justify-center transition-all duration-300 shadow-sm border border-g2">
+                <Code size={22} strokeWidth={1.5} />
               </div>
-              <span className="font-medium text-ink">Hackathons</span>
+              <span className="font-medium text-ink text-lg">Hackathons</span>
             </Link>
-            <Link href="/explore?f=MockTests" className="group flex-shrink-0 w-40 h-40 bg-paper border border-g3 rounded-2xl p-5 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-[4px_4px_0_0_var(--brand)] transition-all duration-300">
-              <div className="w-12 h-12 rounded-full bg-[var(--brand)]/10 text-[var(--brand)] flex items-center justify-center group-hover:scale-110 transition-transform">
-                <ClipboardList size={24} strokeWidth={1.5} />
+            <Link href="/explore?f=MockTests" className="group flex-shrink-0 w-44 h-44 bg-paper/60 backdrop-blur-xl border border-g3 rounded-2xl p-6 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-2xl transition-all duration-300">
+              <div className="w-12 h-12 rounded-xl bg-g1 group-hover:bg-[var(--brand)] text-[var(--brand)] group-hover:text-white flex items-center justify-center transition-all duration-300 shadow-sm border border-g2">
+                <ClipboardList size={22} strokeWidth={1.5} />
               </div>
-              <span className="font-medium text-ink">Mock Tests</span>
+              <span className="font-medium text-ink text-lg">Mock Tests</span>
             </Link>
-            <Link href="/explore?f=Mentorships" className="group flex-shrink-0 w-40 h-40 bg-paper border border-g3 rounded-2xl p-5 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-[4px_4px_0_0_var(--brand)] transition-all duration-300">
-              <div className="w-12 h-12 rounded-full bg-[var(--brand)]/10 text-[var(--brand)] flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Users size={24} strokeWidth={1.5} />
+            <Link href="/explore?f=Mentorships" className="group flex-shrink-0 w-44 h-44 bg-paper/60 backdrop-blur-xl border border-g3 rounded-2xl p-6 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-2xl transition-all duration-300">
+              <div className="w-12 h-12 rounded-xl bg-g1 group-hover:bg-[var(--brand)] text-[var(--brand)] group-hover:text-white flex items-center justify-center transition-all duration-300 shadow-sm border border-g2">
+                <Users size={22} strokeWidth={1.5} />
               </div>
-              <span className="font-medium text-ink">Mentorships</span>
+              <span className="font-medium text-ink text-lg">Mentorships</span>
             </Link>
-            <Link href="/explore?f=Courses" className="group flex-shrink-0 w-40 h-40 bg-paper border border-g3 rounded-2xl p-5 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-[4px_4px_0_0_var(--brand)] transition-all duration-300">
-              <div className="w-12 h-12 rounded-full bg-[var(--brand)]/10 text-[var(--brand)] flex items-center justify-center group-hover:scale-110 transition-transform">
-                <GraduationCap size={24} strokeWidth={1.5} />
+            <Link href="/explore?f=Courses" className="group flex-shrink-0 w-44 h-44 bg-paper/60 backdrop-blur-xl border border-g3 rounded-2xl p-6 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-2xl transition-all duration-300">
+              <div className="w-12 h-12 rounded-xl bg-g1 group-hover:bg-[var(--brand)] text-[var(--brand)] group-hover:text-white flex items-center justify-center transition-all duration-300 shadow-sm border border-g2">
+                <GraduationCap size={22} strokeWidth={1.5} />
               </div>
-              <span className="font-medium text-ink">Courses</span>
+              <span className="font-medium text-ink text-lg">Courses</span>
             </Link>
           </div>
         </div>
@@ -188,35 +186,45 @@ export default async function Landing() {
       </section>
 
       {/* Two-up: Hackathon + Open role (Poster Cards) */}
-      <section className="mx-auto max-w-[1440px] px-5 sm:px-8 mt-20 grid grid-cols-1 md:grid-cols-2 gap-10">
-        <Link href="/opportunities" className="brutalist-card bg-paper p-8 md:p-10 group block">
-          <div className="flex items-start justify-between">
+      <section className="mx-auto max-w-[1440px] px-5 sm:px-8 mt-24 mb-16 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <Link href="/opportunities" className="premium-card p-10 flex flex-col justify-between min-h-[360px] group block relative overflow-hidden">
+          <AmbientGlow className="-bottom-20 -right-20 w-[400px] h-[400px] opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-500" color="var(--brand)" />
+          <div className="relative z-10 flex items-start justify-between">
             <div className="eyebrow">Event · {hack?.location || "TBA"}</div>
-            <div className="w-8 h-8 rounded-full bg-[var(--brand)] text-paper flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <span className="mono text-[14px]">→</span>
+            <div className="w-10 h-10 rounded-full border border-g3 flex items-center justify-center text-ink group-hover:bg-ink group-hover:text-paper group-hover:border-ink transition-all">
+              <span className="mono text-[16px]">→</span>
             </div>
           </div>
-          <h3 className="serif text-4xl md:text-5xl mt-6 leading-[1.05] group-hover:italic transition-all duration-300">{hack?.title || "Upcoming Event"}</h3>
-          <p className="text-g5 mt-4 text-[16px]">{hack ? new Date(hack.startTime).toLocaleDateString() : "TBA"} · Builders going</p>
-          <div className="mt-10 flex -space-x-2">
-            {dbPeople.map((p, i) => (
-              <Avatar key={p.id} src={p.avatarUrl || ""} name={p.name || "User"} size={32} />
-            ))}
-            <span className="ml-4 text-ink font-medium text-[14px] self-center">+ 10 others</span>
+          <div className="relative z-10 mt-auto">
+            <h3 className="serif text-5xl md:text-6xl leading-[1.05] tracking-tight">{hack?.title || "Upcoming Event"}</h3>
+            <div className="mt-8 flex items-center justify-between">
+              <p className="text-g5 text-[15px]">{hack ? new Date(hack.startTime).toLocaleDateString() : "TBA"} · Builders going</p>
+              <div className="flex -space-x-3">
+                {dbPeople.map((p, i) => (
+                  <Avatar key={p.id} src={p.avatarUrl || ""} name={p.name || "User"} size={36} />
+                ))}
+              </div>
+            </div>
           </div>
         </Link>
-        <Link href="/opportunities" className="brutalist-card bg-paper p-8 md:p-10 group block">
-          <div className="flex items-start justify-between">
+        
+        <Link href="/opportunities" className="premium-card p-10 flex flex-col justify-between min-h-[360px] group block relative overflow-hidden">
+          <AmbientGlow className="-top-20 -left-20 w-[400px] h-[400px] opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-500" color="var(--brand)" />
+          <div className="relative z-10 flex items-start justify-between">
             <div className="eyebrow">{role?.type || "Role"} · {role?.location || "Remote"}</div>
-            <div className="w-8 h-8 rounded-full bg-[var(--brand)] text-paper flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <span className="mono text-[14px]">→</span>
+            <div className="w-10 h-10 rounded-full border border-g3 flex items-center justify-center text-ink group-hover:bg-ink group-hover:text-paper group-hover:border-ink transition-all">
+              <span className="mono text-[16px]">→</span>
             </div>
           </div>
-          <h3 className="serif text-4xl md:text-5xl mt-6 leading-[1.05] group-hover:italic transition-all duration-300">{role?.title || "Open Position"}</h3>
-          <p className="text-g5 mt-4 text-[16px]">{role?.organization?.name || "Organization"} · {role?.compensation || "Negotiable"}</p>
-          <div className="mt-10 flex flex-wrap gap-2">
-            <span className="stamp">Full-time</span>
-            <span className="stamp">Remote</span>
+          <div className="relative z-10 mt-auto">
+            <h3 className="serif text-5xl md:text-6xl leading-[1.05] tracking-tight">{role?.title || "Open Position"}</h3>
+            <div className="mt-8 flex items-center justify-between">
+              <p className="text-g5 text-[15px]">{role?.organization?.name || "Organization"} · {role?.compensation || "Negotiable"}</p>
+              <div className="flex gap-2">
+                <span className="stamp !py-1 !px-3 text-[10px]">Full-time</span>
+                <span className="stamp !py-1 !px-3 text-[10px]">Remote</span>
+              </div>
+            </div>
           </div>
         </Link>
       </section>
