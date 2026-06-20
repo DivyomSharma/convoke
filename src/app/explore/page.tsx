@@ -1,62 +1,79 @@
+"use client";
+
 import Link from "next/link";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Shell } from "@/components/Shell";
+import { Avatar } from "@/components/Avatar";
+import { feed } from "@/lib/data";
+import { useState } from "react";
 
-export default function ExplorePage() {
+const filters = ["All", "Events", "Roles", "Hackathons", "Projects", "Drops", "Vouches", "Office hours"] as const;
+
+export default function Explore() {
+  const [f, setF] = useState<(typeof filters)[number]>("All");
+  const items = f === "All" ? feed : feed.filter((it) => {
+    const map: Record<string, string> = { Events: "event", Roles: "role", Hackathons: "hackathon", Projects: "project", Drops: "drop", Vouches: "vouch", "Office hours": "office-hours" };
+    return it.kind === map[f];
+  });
+
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl py-12">
-      <div className="flex flex-col space-y-12">
-        <header className="flex items-end justify-between border-b pb-8">
-          <h1 className="text-5xl font-serif tracking-tight">Explore</h1>
-          <span className="text-xs uppercase tracking-widest text-muted-foreground font-mono">9 Items</span>
-        </header>
-
-        <div className="flex items-center gap-6 overflow-x-auto pb-4 scrollbar-hide text-xs uppercase tracking-widest font-medium border-b border-border/50">
-          <button className="bg-foreground text-background px-3 py-1.5 rounded-sm">ALL</button>
-          <button className="text-muted-foreground hover:text-foreground transition-colors">EVENTS</button>
-          <button className="text-muted-foreground hover:text-foreground transition-colors">ROLES</button>
-          <button className="text-muted-foreground hover:text-foreground transition-colors">HACKATHONS</button>
-          <button className="text-muted-foreground hover:text-foreground transition-colors">PROJECTS</button>
-          <button className="text-muted-foreground hover:text-foreground transition-colors">DROPS</button>
-          <button className="text-muted-foreground hover:text-foreground transition-colors">VOUCHES</button>
-          <button className="text-muted-foreground hover:text-foreground transition-colors">OFFICE HOURS</button>
+    <Shell>
+      <div className="mx-auto max-w-[760px] px-5 sm:px-8 py-12">
+        <div className="flex items-baseline justify-between hairline-b pb-5">
+          <h1 className="serif text-4xl">Explore</h1>
+          <span className="eyebrow">{items.length} items</span>
         </div>
 
-        <div className="flex flex-col space-y-24 pt-4">
-          {/* Feed Item 1 */}
-          <article className="flex flex-col space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src="https://github.com/shadcn.png" />
-                  <AvatarFallback>AR</AvatarFallback>
-                </Avatar>
-                <div className="flex items-center space-x-2 text-sm">
-                  <span className="font-medium">Ananya Rao</span>
-                  <span className="text-muted-foreground">&middot;</span>
-                  <span className="text-muted-foreground">Founder, Lumen Labs</span>
-                  <span className="text-muted-foreground">&middot;</span>
-                  <span className="text-muted-foreground">12m</span>
-                </div>
+        <div className="sticky top-14 z-20 bg-paper hairline-b py-3 -mx-5 sm:-mx-8 px-5 sm:px-8 mt-4 flex gap-2 overflow-x-auto">
+          {filters.map((n) => (
+            <button
+              key={n}
+              onClick={() => setF(n)}
+              className={
+                "px-3 py-1.5 text-[12px] mono tracking-wide uppercase shrink-0 rounded-sm transition-colors " +
+                (f === n ? "bg-ink text-paper" : "text-g5 hover:text-ink")
+              }
+            >
+              {n}
+            </button>
+          ))}
+        </div>
+
+        <ul className="divide-y divide-g3">
+          {items.map((it) => (
+            <li key={it.id} className="py-7">
+              <div className="flex items-center gap-3 mb-3">
+                <Link href={`/profile/${it.who.handle}`}>
+                  <Avatar src={it.who.avatar} name={it.who.name} size={28} />
+                </Link>
+                <Link href={`/profile/${it.who.handle}`} className="text-[14px] text-ink hover:underline">
+                  {it.who.name}
+                </Link>
+                <span className="text-g4 text-[12px]">·</span>
+                <span className="text-[12px] text-g5">{it.who.role}</span>
+                <span className="text-g4 text-[12px]">·</span>
+                <span className="text-[12px] text-g4 mono">{it.at}</span>
+                <span className="ml-auto mono text-[10px] uppercase tracking-wider text-g4">{labelFor(it.kind)}</span>
               </div>
-              <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-mono">LAUNCH</span>
-            </div>
-            
-            <div className="space-y-3">
-              <h2 className="text-3xl font-serif tracking-tight leading-snug">
-                Launched Lumen &mdash; calm tools for solo founders.
-              </h2>
-              <p className="text-lg text-muted-foreground">
-                Eight months of nights and weekends. First 100 users get free lifetime.
-              </p>
-            </div>
-
-            <div className="w-full aspect-[16/9] bg-muted overflow-hidden relative border border-border">
-              {/* Image Placeholder */}
-              <div className="absolute inset-0 bg-neutral-200 dark:bg-neutral-800" />
-            </div>
-          </article>
-        </div>
+              <h3 className="serif text-[26px] md:text-[30px] leading-[1.1]">{it.title}</h3>
+              {it.body && <p className="text-g5 text-[15px] mt-2 max-w-[60ch]">{it.body}</p>}
+              {it.cover && (
+                <div className="mt-4 overflow-hidden">
+                  <img src={it.cover} alt="" loading="lazy" className="w-full max-h-[420px] object-cover grayscale-[15%]" />
+                </div>
+              )}
+              {it.meta && <div className="mt-4 mono text-[12px] text-g5">{it.meta}</div>}
+            </li>
+          ))}
+        </ul>
       </div>
-    </div>
+    </Shell>
   );
+}
+
+function labelFor(k: string) {
+  const m: Record<string, string> = {
+    launch: "Launch", event: "Event", role: "Role", project: "Project",
+    drop: "Drop", vouch: "Vouch", space: "Space", hackathon: "Hackathon", "office-hours": "Office hours",
+  };
+  return m[k] ?? k;
 }

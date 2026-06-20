@@ -1,54 +1,58 @@
-export default function OpportunitiesPage() {
-  const roles = [
-    { title: "Founding engineer", type: "ROLE", company: "LUMEN LABS", meta: "SF · onsite · $160–200k + 1.5%", deadline: "Rolling", tags: ["TypeScript", "Postgres", "0→1"] },
-    { title: "Design engineer, web", type: "ROLE", company: "ARC", meta: "Remote · $140–180k", deadline: "Mar 14", tags: ["React", "Motion", "Craft"] },
-    { title: "Winter research fellowship", type: "FELLOWSHIP", company: "SEQUOIA LAB", meta: "Remote · 12 weeks · $15k stipend", deadline: "Feb 28", tags: ["LLMs", "Eval"] },
-  ];
+"use client";
+
+import Link from "next/link";
+import { Shell } from "@/components/Shell";
+import { opportunities } from "@/lib/data";
+import { useState } from "react";
+
+const types = ["All", "Role", "Fellowship", "Grant", "Hackathon"] as const;
+
+export default function Opportunities() {
+  const [t, setT] = useState<(typeof types)[number]>("All");
+  const items = t === "All" ? opportunities : opportunities.filter((o) => o.type === t);
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl py-12">
-      <div className="flex flex-col space-y-12">
-        <header className="flex items-end justify-between border-b pb-8">
-          <div className="flex flex-col space-y-4">
-            <span className="text-xs uppercase tracking-widest text-muted-foreground font-mono">OPEN RIGHT NOW</span>
-            <h1 className="text-5xl font-serif tracking-tight">Opportunities.</h1>
+    <Shell>
+      <div className="mx-auto max-w-[1080px] px-5 sm:px-8 py-12">
+        <div className="hairline-b pb-6 flex items-end justify-between gap-6 flex-wrap">
+          <div>
+            <div className="eyebrow">Open right now</div>
+            <h1 className="serif text-5xl md:text-7xl mt-2 leading-[0.95]">Opportunities.</h1>
           </div>
-          <div className="flex items-center gap-2 mb-2">
-            <button className="bg-foreground text-background px-4 py-2 text-xs uppercase tracking-widest font-mono border border-foreground">ALL</button>
-            <button className="bg-background text-foreground hover:bg-muted transition-colors px-4 py-2 text-xs uppercase tracking-widest font-mono border border-border">ROLE</button>
-            <button className="bg-background text-foreground hover:bg-muted transition-colors px-4 py-2 text-xs uppercase tracking-widest font-mono border border-border">FELLOWSHIP</button>
-            <button className="bg-background text-foreground hover:bg-muted transition-colors px-4 py-2 text-xs uppercase tracking-widest font-mono border border-border">GRANT</button>
-            <button className="bg-background text-foreground hover:bg-muted transition-colors px-4 py-2 text-xs uppercase tracking-widest font-mono border border-border">HACKATHON</button>
+          <div className="flex gap-2 flex-wrap">
+            {types.map((x) => (
+              <button
+                key={x}
+                onClick={() => setT(x)}
+                className={"px-3 py-1.5 text-[12px] mono uppercase tracking-wide " + (t === x ? "bg-ink text-paper" : "text-g5 hover:text-ink hairline")}
+              >
+                {x}
+              </button>
+            ))}
           </div>
-        </header>
+        </div>
 
-        <div className="flex flex-col">
-          {roles.map((role, idx) => (
-            <div key={idx} className="flex items-start justify-between py-10 border-b border-border last:border-0 group cursor-pointer">
-              <div className="flex flex-col space-y-4">
-                <div className="flex items-center space-x-2 text-[10px] uppercase tracking-widest text-muted-foreground font-mono">
-                  <span>{role.type}</span>
-                  <span>&middot;</span>
-                  <span>{role.company}</span>
-                </div>
-                <h2 className="text-3xl font-serif tracking-tight group-hover:text-primary transition-colors">{role.title}</h2>
-                <p className="text-sm text-muted-foreground">{role.meta}</p>
-                <div className="flex gap-2 pt-2">
-                  {role.tags.map(tag => (
-                    <span key={tag} className="border border-border px-2 py-1 text-xs font-mono text-muted-foreground bg-muted/50 rounded-sm">
-                      {tag}
-                    </span>
+        <ul className="divide-y divide-g3">
+          {items.map((o) => (
+            <li key={o.id} className="grid grid-cols-[1fr_auto] gap-6 py-7 group hover:bg-g1 -mx-4 px-4 transition-colors">
+              <div className="min-w-0">
+                <div className="mono text-[11px] uppercase tracking-wider text-g5">{o.type} · {o.org}</div>
+                <h2 className="serif text-3xl md:text-4xl leading-[1.05] mt-1">{o.title}</h2>
+                <div className="mt-2 text-g5 text-[14px]">{o.location} · {o.comp}</div>
+                <div className="mt-3 flex gap-2 flex-wrap">
+                  {o.tags.map((tg) => (
+                     <span key={tg} className="mono text-[11px] hairline px-2 py-0.5 text-g6">{tg}</span>
                   ))}
                 </div>
               </div>
-              <div className="flex flex-col items-end space-y-2">
-                <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-mono">DEADLINE</span>
-                <span className="text-xl font-serif">{role.deadline}</span>
+              <div className="text-right shrink-0 self-start">
+                <div className="eyebrow">Deadline</div>
+                <div className="serif text-2xl mt-1">{o.deadline}</div>
               </div>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
-    </div>
+    </Shell>
   );
 }

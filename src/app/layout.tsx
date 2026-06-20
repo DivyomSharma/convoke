@@ -1,22 +1,28 @@
 import type { Metadata } from "next";
-import { Inter, Newsreader } from "next/font/google";
+import { Inter_Tight, Instrument_Serif, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
-import { NavBar } from "@/components/nav-bar";
 import "./globals.css";
 
-const fontSans = Inter({
+const fontSans = Inter_Tight({
   variable: "--font-sans",
   subsets: ["latin"],
 });
 
-const fontSerif = Newsreader({
+const fontSerif = Instrument_Serif({
   variable: "--font-serif",
+  weight: ["400"],
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+});
+
+const fontMono = JetBrains_Mono({
+  variable: "--font-mono",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Convoke",
-  description: "Build your future together.",
+  title: "Convoke — Where ambitious people gather",
+  description: "Events, communities, opportunities and projects in one editorial feed.",
 };
 
 export default function RootLayout({
@@ -25,7 +31,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${fontSans.variable} ${fontSerif.variable} antialiased h-full`}>
+    <html lang="en" suppressHydrationWarning className={`${fontSans.variable} ${fontSerif.variable} ${fontMono.variable} antialiased h-full`}>
       <body className="min-h-full flex flex-col font-sans">
         <ThemeProvider
           attribute="class"
@@ -33,10 +39,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <NavBar />
-          <main className="flex-1 flex flex-col">
-            {children}
-          </main>
+          {children}
         </ThemeProvider>
       </body>
     </html>
