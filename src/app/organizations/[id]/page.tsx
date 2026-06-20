@@ -67,12 +67,12 @@ Our research focuses on deep learning, reinforcement learning, and large-scale l
             
             {/* Identity */}
             <div className="flex items-end gap-5">
-              <div className="w-32 h-32 md:w-40 md:h-40 rounded-3xl bg-paper p-2 shadow-2xl border border-g3 relative">
+              <div className="w-32 h-32 md:w-40 md:h-40 rounded-3xl glass-panel p-2 shadow-2xl relative">
                 <div className="w-full h-full rounded-2xl bg-g1 overflow-hidden">
                   {org.logoUrl && <img src={org.logoUrl} alt={org.name} className="w-full h-full object-cover" />}
                 </div>
                 {org.verified && (
-                  <div className="absolute -bottom-2 -right-2 bg-paper p-1 rounded-full shadow-sm">
+                  <div className="absolute -bottom-2 -right-2 glass-panel p-1 rounded-full shadow-sm">
                     <CheckCircle2 size={28} className="text-[var(--brand)] fill-[var(--brand)]/10" />
                   </div>
                 )}

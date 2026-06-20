@@ -42,7 +42,7 @@ export default async function Org(props: { params?: Promise<{ slug: string }> })
         <div className="text-g5">Cover Image</div>
       </div>
       <div className="mx-auto max-w-[1080px] px-5 sm:px-8 -mt-12">
-        <div className="bg-paper hairline p-8 md:p-10 relative z-10">
+        <div className="glass-panel rounded-2xl p-8 md:p-10 relative z-10">
           <div className="eyebrow">Organization · since {o.createdAt.getFullYear()}</div>
           <h1 className="serif text-5xl md:text-7xl leading-[0.95] mt-2">{o.name}</h1>
           <p className="text-g5 text-[15px] mt-3 max-w-[56ch]">{o.description || "No description provided."}</p>

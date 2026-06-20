@@ -75,7 +75,7 @@ export default async function Explore(props: { searchParams?: Promise<{ f?: stri
           <span className="eyebrow">{items.length} items</span>
         </div>
 
-        <div className="sticky top-14 z-20 bg-paper hairline-b py-3 -mx-5 sm:-mx-8 px-5 sm:px-8 mt-4 flex gap-2 overflow-x-auto">
+        <div className="sticky top-14 z-20 bg-paper/80 backdrop-blur-md hairline-b py-3 -mx-5 sm:-mx-8 px-5 sm:px-8 mt-4 flex gap-2 overflow-x-auto">
           {filters.map((n) => (
             <Link
               key={n}

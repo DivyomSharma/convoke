@@ -82,9 +82,9 @@ This year features hands-on workshops, deep technical dives into the new App Rou
               </div>
 
               {/* Host Strip */}
-              <div className="flex items-center justify-between p-4 rounded-2xl border border-g3 bg-g1/50">
+              <div className="flex items-center justify-between p-4 rounded-2xl glass-panel">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-paper border border-g3 flex items-center justify-center text-ink"><Building2 size={16} /></div>
+                  <div className="w-10 h-10 rounded-xl glass-panel flex items-center justify-center text-ink"><Building2 size={16} /></div>
                   <div>
                     <div className="text-[12px] text-g5 uppercase tracking-wider font-medium">Hosted By</div>
                     <div className="text-[15px] font-medium text-ink">{event.host}</div>
@@ -104,7 +104,7 @@ This year features hands-on workshops, deep technical dives into the new App Rou
               {/* Schedule */}
               <section>
                 <h2 className="serif text-2xl mb-4">Schedule</h2>
-                <div className="border border-g3 rounded-2xl overflow-hidden bg-paper">
+                <div className="rounded-2xl overflow-hidden glass-panel">
                   {event.schedule.map((item, i) => (
                     <div key={i} className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 md:p-5 border-b border-g3 last:border-0 hover:bg-g1/50 transition-colors">
                       <div className="w-24 mono text-[13px] font-medium text-g5 shrink-0">{item.time}</div>
@@ -125,7 +125,7 @@ This year features hands-on workshops, deep technical dives into the new App Rou
                 <h2 className="serif text-2xl mb-4">Frequently Asked</h2>
                 <div className="space-y-3">
                   {event.faqs.map((faq, i) => (
-                    <details key={i} className="group border border-g3 rounded-xl p-4 [&_summary::-webkit-details-marker]:hidden cursor-pointer bg-paper">
+                    <details key={i} className="group rounded-xl p-4 [&_summary::-webkit-details-marker]:hidden cursor-pointer glass-panel">
                       <summary className="flex items-center justify-between font-medium text-ink outline-none">
                         {faq.q}
                         <ChevronDown size={18} className="text-g4 group-open:rotate-180 transition-transform" />

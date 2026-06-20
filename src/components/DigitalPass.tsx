@@ -42,7 +42,7 @@ export function DigitalPass({
   
   // Status Colors
   const stateConfig = {
-    REGISTERED: { color: "text-blue-500", bg: "bg-blue-500/10", icon: CircleDashed, label: "Registered" },
+    REGISTERED: { color: "text-[var(--brand)]", bg: "bg-[var(--brand)]/10", icon: CircleDashed, label: "Registered" },
     CONFIRMED: { color: "text-green-500", bg: "bg-green-500/10", icon: CheckCircle2, label: "Confirmed" },
     WAITLISTED: { color: "text-orange-500", bg: "bg-orange-500/10", icon: CircleDashed, label: "Waitlisted" },
     CHECKED_IN: { color: "text-g5", bg: "bg-g2", icon: CheckCircle2, label: "Checked In" },
@@ -56,7 +56,7 @@ export function DigitalPass({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      className="w-full max-w-[400px] mx-auto bg-paper rounded-[24px] shadow-2xl border border-g3 overflow-hidden flex flex-col"
+      className="w-full max-w-[400px] mx-auto glass-panel rounded-[24px] shadow-2xl overflow-hidden flex flex-col"
       style={{ boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.15)' }}
     >
       {/* Top Banner Section */}
@@ -121,7 +121,7 @@ export function DigitalPass({
       </div>
 
       {/* Ticket Meta & QR */}
-      <div className="px-6 pt-4 pb-8 bg-paper flex-shrink-0 flex items-center justify-between">
+      <div className="px-6 pt-4 pb-8 bg-transparent flex-shrink-0 flex items-center justify-between">
         <div className="flex flex-col gap-4">
           <div>
             <div className="text-[10px] mono text-g5 uppercase tracking-widest mb-1">Attendee</div>

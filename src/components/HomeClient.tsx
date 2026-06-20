@@ -193,7 +193,7 @@ export function HomeClient({ stats, feedItems, featured }: HomeClientProps) {
                       className="group block py-6 border-b border-g3 first:pt-0 last:border-b-0 transition-all duration-300 hover:translate-y-[-1px] hover:bg-ink/[0.01] px-4 -mx-4"
                     >
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="text-[11px] mono tracking-wider text-[#315CFF] font-semibold uppercase">
+                        <span className="text-[11px] mono tracking-wider text-[var(--brand)] font-semibold uppercase">
                           {getIndicator(item.tag)}
                         </span>
                         <span className="text-g4 text-[10px] mono">/</span>
@@ -233,7 +233,7 @@ export function HomeClient({ stats, feedItems, featured }: HomeClientProps) {
                       className="group block py-5 border-b border-g3 first:pt-0 last:border-b-0 transition-all duration-300 hover:translate-y-[-1px] hover:bg-ink/[0.01] px-4 -mx-4"
                     >
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="text-[11px] mono tracking-wider text-[#315CFF] font-semibold uppercase">
+                        <span className="text-[11px] mono tracking-wider text-[var(--brand)] font-semibold uppercase">
                           {getIndicator(item.tag)}
                         </span>
                         <span className="text-g4 text-[10px] mono">/</span>
@@ -273,7 +273,7 @@ export function HomeClient({ stats, feedItems, featured }: HomeClientProps) {
                       className="group block py-5 border-b border-g3 first:pt-0 last:border-b-0 transition-all duration-300 hover:translate-y-[-1px] hover:bg-ink/[0.01] px-4 -mx-4"
                     >
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="text-[11px] mono tracking-wider text-[#315CFF] font-semibold uppercase">
+                        <span className="text-[11px] mono tracking-wider text-[var(--brand)] font-semibold uppercase">
                           {getIndicator(item.tag)}
                         </span>
                         <span className="text-g4 text-[10px] mono">/</span>
