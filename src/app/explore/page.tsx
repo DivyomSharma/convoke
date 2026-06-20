@@ -20,7 +20,7 @@ export default async function Explore(props: { searchParams?: Promise<{ f?: stri
   // Normalize into a common feed format
   const normalizedItems: any[] = [];
 
-  if (f === "All" || f === "Events" || f === "Hackathons") {
+  if (f === "All" || f === "Events" || f === "Challenges") {
     events.forEach(e => normalizedItems.push({
       id: e.id,
       kind: "Event",
