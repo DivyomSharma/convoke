@@ -20,6 +20,13 @@
 # production
 /build
 
+# PWA files
+**/public/sw.js
+**/public/workbox-*.js
+**/public/worker-*.js
+**/public/fallback-*.js
+theconvoke-main/
+
 # misc
 .DS_Store
 *.pem
