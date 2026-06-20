@@ -14,7 +14,7 @@ const mainNav = [
   { href: "/explore", label: "Explore" },
   { href: "/spaces", label: "Spaces" },
   { href: "/events", label: "Events" },
-  { href: "/hackathons", label: "Hackathons" },
+  { href: "/challenges", label: "Challenges" },
   { href: "/opportunities", label: "Opportunities" },
 ] as const;
 

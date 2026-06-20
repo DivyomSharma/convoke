@@ -7,7 +7,7 @@ const mockSpaces = [
   { id: 1, name: "Web Startups", description: "Founders building the next generation of SaaS and consumer web apps.", members: 1240, threads: 342, category: "Startups" },
   { id: 2, title: "AI & Machine Learning", description: "Discussions on LLMs, generative AI, research papers, and models.", members: 4500, threads: 1205, category: "AI" },
   { id: 3, title: "UI/UX Design", description: "Share portfolios, critique designs, and discuss the latest trends.", members: 890, threads: 156, category: "Design" },
-  { id: 4, title: "Hackathon Teambuilding", description: "Find teammates for upcoming global and local hackathons.", members: 3200, threads: 890, category: "Collaboration" },
+  { id: 4, title: "Challenge Teambuilding", description: "Find teammates for upcoming global and local challenges.", members: 3200, threads: 890, category: "Collaboration" },
 ];
 
 export default function SpacesPage() {

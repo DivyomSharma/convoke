@@ -4,7 +4,7 @@ import { Avatar } from "@/components/Avatar";
 import { AmbientGlow } from "@/components/AmbientGlow";
 import { prisma } from "@/lib/prisma";
 
-const filters = ["All", "Events", "Roles", "Hackathons", "Projects", "Drops", "Vouches", "Office hours"] as const;
+const filters = ["All", "Events", "Roles", "Challenges", "Projects", "Drops", "Vouches", "Office hours"] as const;
 
 export default async function Explore(props: { searchParams?: Promise<{ f?: string }> }) {
   const searchParams = await props.searchParams;

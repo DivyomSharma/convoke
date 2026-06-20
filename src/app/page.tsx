@@ -58,11 +58,11 @@ export default async function Landing() {
               </div>
               <span className="font-medium text-ink text-lg">Jobs</span>
             </Link>
-            <Link href="/explore?f=Hackathons" className="group flex-shrink-0 w-44 h-44 bg-paper/60 backdrop-blur-xl border border-g3 rounded-2xl p-6 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-2xl transition-all duration-300">
+            <Link href="/explore?f=Challenges" className="group flex-shrink-0 w-44 h-44 bg-paper/60 backdrop-blur-xl border border-g3 rounded-2xl p-6 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-2xl transition-all duration-300">
               <div className="w-12 h-12 rounded-xl bg-g1 group-hover:bg-[var(--brand)] text-[var(--brand)] group-hover:text-white flex items-center justify-center transition-all duration-300 shadow-sm border border-g2">
                 <Code size={22} strokeWidth={1.5} />
               </div>
-              <span className="font-medium text-ink text-lg">Hackathons</span>
+              <span className="font-medium text-ink text-lg">Challenges</span>
             </Link>
             <Link href="/explore?f=MockTests" className="group flex-shrink-0 w-44 h-44 bg-paper/60 backdrop-blur-xl border border-g3 rounded-2xl p-6 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-2xl transition-all duration-300">
               <div className="w-12 h-12 rounded-xl bg-g1 group-hover:bg-[var(--brand)] text-[var(--brand)] group-hover:text-white flex items-center justify-center transition-all duration-300 shadow-sm border border-g2">
