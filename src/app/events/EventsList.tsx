@@ -114,10 +114,10 @@ export function EventsList({
           <div className="max-w-3xl">
             <div className="eyebrow">Live calendar</div>
             <h1 className="mt-3 serif text-5xl tracking-tight md:text-7xl">
-              Events built for momentum, not optics.
+              Rooms worth entering.
             </h1>
             <p className="mt-5 max-w-2xl text-[15px] leading-7 text-g5 md:text-[17px]">
-              Workshops, campus mixers, founder circles, demo nights, and technical gatherings that actually connect people to rooms, roles, and collaborators.
+              Workshops, dinners, and quiet places to build. A live registry of tech events, founder circles, and hacker houses that actually connect people.
             </p>
           </div>
           <button 
@@ -135,9 +135,9 @@ export function EventsList({
           <div className="mono text-[11px] tracking-[0.2em] uppercase text-g5">
             (04) Calendar
           </div>
-          <h1 className="serif text-5xl md:text-7xl mt-4 tracking-tight">Events</h1>
+          <h1 className="serif text-5xl md:text-7xl mt-4 tracking-tight">Gatherings</h1>
           <p className="text-g5 mt-4 text-[16px] max-w-[50ch] leading-relaxed">
-            Gatherings built for momentum, not optics. Paper reviews, circles, and demo nights.
+            Rooms worth entering. Workshops, dinners, and quiet places to build.
           </p>
         </div>
         <button 

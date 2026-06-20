@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, CalendarDays, FolderKanban, Sparkles, UsersRound } from "lucide-react";
 import { Shell } from "@/components/Shell";
 import { Avatar } from "@/components/Avatar";
+import { VerticalMarquee } from "@/components/VerticalMarquee";
 import { prisma } from "@/lib/prisma";
 import { getFallbackPhoto } from "@/lib/photos";
 
@@ -145,23 +146,31 @@ export default async function Explore(props: { searchParams?: Promise<{ f?: stri
 
   return (
     <Shell>
-      <main className="relative mx-auto max-w-[1040px] px-5 py-16 sm:px-8">
-        <section className="border-b border-g3 pb-8">
-          <div className="mono text-[11px] tracking-[0.2em] uppercase text-g5">
-            Ecosystem Dispatch
+      <div className="relative min-h-screen bg-paper flex">
+        {/* Subtle left border with vertical marquee */}
+        <aside className="hidden lg:block w-12 border-r border-g3/60 relative bg-g1/20 shrink-0">
+          <div className="sticky top-0 h-screen overflow-hidden opacity-30 mix-blend-screen py-10">
+            <VerticalMarquee duration={120} />
           </div>
-          <div className="mt-4 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <h1 className="serif text-6xl leading-[0.9] tracking-tight text-ink">Explore</h1>
-              <p className="mt-4 max-w-[54ch] text-[16px] leading-[1.6] text-g5">
-                A live stream of events, roles, challenges, and builder projects from the Convoke ecosystem.
-              </p>
+        </aside>
+
+        <main className="relative mx-auto w-full max-w-[1040px] px-5 py-16 sm:px-8">
+          <section className="border-b border-g3 pb-8">
+            <div className="mono text-[11px] tracking-[0.2em] uppercase text-g5">
+              Campus Feed
             </div>
-            <span className="inline-flex rounded-sm border border-g3 bg-g1 px-3 py-1.5 mono text-[10px] uppercase tracking-wider text-g5">
-              {sortedItems.length} active item{sortedItems.length === 1 ? "" : "s"}
-            </span>
-          </div>
-        </section>
+            <div className="mt-4 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h1 className="serif text-6xl leading-[0.9] tracking-tight text-ink">Explore</h1>
+                <p className="mt-4 max-w-[54ch] text-[16px] leading-[1.6] text-g5">
+                  A quiet, continuous record of people and their work across the Convoke network.
+                </p>
+              </div>
+              <span className="inline-flex rounded-sm border border-g3 bg-g1 px-3 py-1.5 mono text-[10px] uppercase tracking-wider text-g5">
+                {sortedItems.length} active item{sortedItems.length === 1 ? "" : "s"}
+              </span>
+            </div>
+          </section>
 
         <nav className="sticky top-14 z-20 -mx-5 mt-6 flex gap-3 overflow-x-auto border-b border-g3/60 bg-paper/90 px-5 py-4 backdrop-blur-md sm:-mx-8 sm:px-8">
           {filters.map((filter) => (
@@ -268,7 +277,8 @@ export default async function Explore(props: { searchParams?: Promise<{ f?: stri
             })}
           </ul>
         )}
-      </main>
+        </main>
+      </div>
     </Shell>
   );
 }

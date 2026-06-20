@@ -133,12 +133,12 @@ export function OpportunitiesList({
       <section className="premium-card p-6 md:p-8 relative z-10">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-3xl">
-            <div className="eyebrow">Opportunity board</div>
+            <div className="eyebrow">Collaborations & Roles</div>
             <h1 className="mt-2 serif text-4xl tracking-tight md:text-5xl">
-              Roles, fellowships, grants, and builder asks.
+              Where the next great teams are formed.
             </h1>
             <p className="mt-3 max-w-2xl text-[14px] leading-6 text-g5">
-              Apply faster, discover sharper roles, and connect with organizations that are actively building.
+              Roles, fellowships, grants, and deep-tech collaborations. Discover and connect with organizations that are actively building.
             </p>
           </div>
           <button 

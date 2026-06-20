@@ -25,12 +25,9 @@ const mainNav = [
   { href: "/events", label: "Events" },
   { href: "/challenges", label: "Challenges" },
   { href: "/opportunities", label: "Opportunities" },
-] as const;
-
-const moreNav = [
-  { href: "/projects", label: "Projects", icon: LayoutGrid },
-  { href: "/organizations", label: "Organizations", icon: Building2 },
-  { href: "/research", label: "Research", icon: FlaskConical },
+  { href: "/projects", label: "Projects" },
+  { href: "/organizations", label: "Organizations" },
+  { href: "/research", label: "Research" },
 ] as const;
 
 export function Shell({ children, wide = false }: { children: ReactNode; wide?: boolean }) {
@@ -59,12 +56,12 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
   return (
     <div className="min-h-screen bg-paper text-ink">
       <header className="sticky top-0 z-30 border-b border-g3/80 bg-paper/75 backdrop-blur-2xl">
-        <div className={`mx-auto flex h-16 items-center gap-5 px-5 sm:px-8 ${widthClass}`}>
+        <div className="mx-auto flex h-16 w-full items-center gap-5 px-5 sm:px-8">
           <Link href="/" className="serif text-[22px] leading-none tracking-tight text-ink">
             Convoke.
           </Link>
 
-          <nav className="hidden items-center gap-6 mono text-[11px] uppercase tracking-[0.14em] text-g5 md:flex">
+          <nav className="hidden items-center gap-6 mono text-[11px] uppercase tracking-[0.14em] text-g5 xl:flex">
             {mainNav.map((item) => (
               <Link
                 key={item.href}
@@ -77,28 +74,6 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
                 {item.label}
               </Link>
             ))}
-
-            <div className="relative group">
-              <button className="flex items-center gap-1 hover:text-ink cursor-pointer">
-                <span>More</span>
-                <ChevronDown size={11} className="text-g4" />
-              </button>
-              <div className="absolute left-0 mt-2 w-44 origin-top-left rounded-sm border border-g3 bg-paper-card p-1 opacity-0 scale-95 pointer-events-none group-hover:opacity-100 group-hover:scale-100 group-hover:pointer-events-auto transition-all duration-200">
-                {moreNav.map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className="flex items-center gap-2 rounded-sm px-2.5 py-1.5 text-left text-[10px] text-g5 hover:bg-g1 hover:text-ink transition-colors"
-                    >
-                      <Icon size={12} className="text-g4" />
-                      <span>{item.label}</span>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
           </nav>
 
           <button

@@ -69,7 +69,7 @@ export default async function Workspace() {
         {/* Left Column: Sidebar Profile & Spaces */}
         <aside className="col-span-12 lg:col-span-3 space-y-10">
           <div className="hairline-b pb-6">
-            <div className="eyebrow">Builder Workspace</div>
+            <div className="eyebrow">Your Desk</div>
             <h1 className="serif text-4xl mt-2 font-light text-ink">{dbUser?.name || "Workspace"}</h1>
             {dbUser?.role && (
               <p className="text-g5 text-[13px] mt-1.5 font-medium uppercase tracking-wider mono">
@@ -186,8 +186,8 @@ export default async function Workspace() {
           {/* Applications in Flight */}
           <div>
             <div className="hairline-b pb-4">
-              <div className="eyebrow">Outbound applications</div>
-              <h2 className="serif text-3xl mt-1">Applications In Flight</h2>
+              <div className="eyebrow">Ongoing Collaborations</div>
+              <h2 className="serif text-3xl mt-1">Open Conversations</h2>
             </div>
 
             {myApps.length > 0 ? (
@@ -223,7 +223,7 @@ export default async function Workspace() {
           <div>
             <div className="hairline-b pb-4">
               <div className="eyebrow">Discover campus</div>
-              <h2 className="serif text-3xl mt-1">Recommended for you</h2>
+              <h2 className="serif text-3xl mt-1">Upcoming Gatherings</h2>
             </div>
 
             {upcomingEvents.length > 0 ? (
@@ -349,7 +349,7 @@ function Momentum({ activities }: { activities: { createdAt: Date }[] }) {
   return (
     <div>
       <div className="flex items-baseline justify-between">
-        <div className="eyebrow">16-Week Momentum</div>
+        <div className="eyebrow">Recent Momentum</div>
         <span className="mono text-[11px] text-[var(--brand)] font-semibold">{percentText}</span>
       </div>
       <div className="mt-3.5 flex items-end gap-[3px] h-12">

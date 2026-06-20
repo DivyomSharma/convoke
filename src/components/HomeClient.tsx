@@ -95,8 +95,8 @@ export function HomeClient({ stats, feedItems, featured }: HomeClientProps) {
         {/* Subtle Vignette Background */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0)_60%,rgba(0,0,0,0.85)_100%)] pointer-events-none z-10" />
         
-        {/* Slow Marquee Ribbon (5% opacity) */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-5 pointer-events-none">
+        {/* Slow Marquee Ribbon */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.15] pointer-events-none mix-blend-screen">
           <div style={{ perspective: "1000px" }}>
             <div style={{ transform: "rotateX(72deg) rotateY(-8deg) scale(1.4)" }}>
               <CircularMarquee size={840} duration={85} />
@@ -113,18 +113,18 @@ export function HomeClient({ stats, feedItems, featured }: HomeClientProps) {
           >
             {/* Tagline */}
             <div className="mono text-[11px] tracking-[0.24em] uppercase text-g4 font-medium mb-8">
-              The internet home for builders
+              A quiet place to build
             </div>
             
             {/* Editorial Heading */}
             <h1 className="serif text-5xl leading-[1.0] tracking-tight md:text-8xl xl:text-[8rem] max-w-4xl text-ink font-light">
-              Find your next<br />
-              <span className="italic-accent text-brand">breakthrough.</span>
+              Work in good<br />
+              <span className="italic-accent text-[var(--brand)]">company.</span>
             </h1>
             
             {/* Description */}
             <p className="mt-8 max-w-2xl text-[16px] leading-[1.6] text-g5 md:text-[18px]">
-              A quiet, high-signal ecosystem where ambitious people meet, collaborate, launch startups, and grow together.
+              A continuous, high-signal ecosystem where ambitious people meet, collaborate, launch startups, and grow together.
             </p>
             
             {/* Buttons */}
@@ -161,11 +161,11 @@ export function HomeClient({ stats, feedItems, featured }: HomeClientProps) {
       <section className="relative z-10 mx-auto mt-14 max-w-[1240px] px-5 sm:px-8">
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <div className="eyebrow">Today on Convoke</div>
-            <h2 className="mt-3 serif text-4xl tracking-tight md:text-6xl">A live surface, not a gallery wall.</h2>
+            <div className="eyebrow">Campus Feed</div>
+            <h2 className="mt-3 serif text-4xl tracking-tight md:text-6xl">What's happening.</h2>
           </div>
           <div className="mono text-[11px] uppercase tracking-[0.18em] text-g4">
-            Daily discovery across rooms, work, and people
+            A live record of work and people
           </div>
         </div>
 
@@ -185,10 +185,10 @@ export function HomeClient({ stats, feedItems, featured }: HomeClientProps) {
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <div className="eyebrow">Curated signal</div>
-            <h2 className="mt-3 serif text-4xl tracking-tight md:text-6xl">Featured across the network.</h2>
+            <h2 className="mt-3 serif text-4xl tracking-tight md:text-6xl">Featured this week.</h2>
           </div>
           <Link href="/explore" className="mono text-[12px] uppercase tracking-[0.18em] text-[var(--brand)] hover:text-ink">
-            Open full feed
+            Open full registry
           </Link>
         </div>
 

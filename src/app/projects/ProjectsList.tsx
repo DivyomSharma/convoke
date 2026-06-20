@@ -91,9 +91,9 @@ export function ProjectsList({ initialProjects }: { initialProjects: ProjectWith
     <>
       <div className="flex flex-col md:flex-row md:items-end md:justify-between hairline-b pb-8 relative z-10 gap-6">
         <div>
-          <div className="eyebrow">Proof of work</div>
-          <h1 className="serif text-5xl md:text-6xl tracking-tight mt-2">Projects Gallery</h1>
-          <p className="text-g5 mt-2 text-md">Discover the products, designs, and protocols ambitious people are launching.</p>
+          <div className="eyebrow">Recent Work</div>
+          <h1 className="serif text-5xl md:text-6xl tracking-tight mt-2">Case studies.</h1>
+          <p className="text-g5 mt-2 text-md">A quiet gallery of products, designs, and technical shipments from the community.</p>
         </div>
         <button 
           onClick={() => setDrawerOpen(true)}

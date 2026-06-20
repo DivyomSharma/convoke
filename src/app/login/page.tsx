@@ -32,7 +32,10 @@ export default function LoginPage() {
       });
 
       if (result.error) {
-        setError(result.error.message || "Failed to sign in. Please verify your credentials.");
+        const message = result.error.longMessage 
+          || result.error.message 
+          || "Failed to sign in. Please check your credentials.";
+        setError(message);
       } else if (signIn.status === "complete") {
         const finalizeRes = await signIn.finalize();
         if (finalizeRes.error) {
@@ -41,12 +44,17 @@ export default function LoginPage() {
           router.push("/workspace");
         }
       } else {
-        console.log("Incomplete status:", signIn.status);
-        setError("Sign in incomplete. Additional verification steps are required.");
+        // Needs additional verification (e.g. 2FA)
+        console.log("Sign-in status:", signIn.status);
+        setError("Additional verification required. Please check your email or authenticator app.");
       }
     } catch (err: any) {
-      console.error(err);
-      setError("An unexpected error occurred during sign in.");
+      console.error("Sign-in error:", err);
+      const message = err?.errors?.[0]?.longMessage 
+        || err?.errors?.[0]?.message 
+        || err?.message 
+        || "Failed to sign in. Please check your credentials.";
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -68,7 +76,10 @@ export default function LoginPage() {
       });
 
       if (result.error) {
-        setError(result.error.message || "Failed to create account. Try a different email.");
+        const message = result.error.longMessage 
+          || result.error.message 
+          || "Failed to create account. Try a different email or stronger password.";
+        setError(message);
       } else if (signUp.status === "complete") {
         const finalizeRes = await signUp.finalize();
         if (finalizeRes.error) {
@@ -77,12 +88,17 @@ export default function LoginPage() {
           router.push("/workspace");
         }
       } else {
-        console.log("Incomplete signup status:", signUp.status);
-        setError("Account creation requires email verification. Check your inbox.");
+        // Needs email verification or additional steps
+        console.log("Sign-up status:", signUp.status);
+        setError("Account created. Please check your inbox to verify your email address.");
       }
     } catch (err: any) {
-      console.error(err);
-      setError("An unexpected error occurred during account creation.");
+      console.error("Sign-up error:", err);
+      const message = err?.errors?.[0]?.longMessage 
+        || err?.errors?.[0]?.message 
+        || err?.message 
+        || "Failed to create account. Try a different email or stronger password.";
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -90,18 +106,27 @@ export default function LoginPage() {
 
   const handleSocialAuth = async (strategy: "oauth_google" | "oauth_apple" | "oauth_discord") => {
     if (!signIn) return;
+
     try {
       const result = await signIn.sso({
         strategy,
         redirectUrl: "/sso-callback",
         redirectCallbackUrl: "/workspace",
       });
+
       if (result.error) {
-        setError(result.error.message || "Social authentication failed.");
+        const message = result.error.longMessage 
+          || result.error.message 
+          || "Social authentication failed to initialize.";
+        setError(message);
       }
     } catch (err: any) {
-      console.error(err);
-      alert("Social auth failed to initialize.");
+      console.error("Social auth error:", err);
+      const message = err?.errors?.[0]?.longMessage 
+        || err?.errors?.[0]?.message 
+        || err?.message 
+        || "Social authentication failed to initialize.";
+      setError(message);
     }
   };
 
@@ -109,8 +134,7 @@ export default function LoginPage() {
     <div className="grid min-h-screen bg-paper lg:grid-cols-[1.1fr_0.9fr]">
       {/* Editorial side */}
       <section className="relative hidden overflow-hidden border-r border-g3 lg:flex">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(201,161,109,0.18),transparent_34%),radial-gradient(circle_at_80%_22%,rgba(117,184,203,0.08),transparent_26%),linear-gradient(180deg,#0c0c0c_0%,#111111_100%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.03),transparent_55%)]" />
+        <div className="absolute inset-0 bg-[#0c0c0c]" />
 
         <div className="relative z-10 flex h-full flex-col justify-between p-12 text-[#f4ede4]">
           <div className="inline-flex w-fit items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 mono text-[11px] uppercase tracking-[0.18em] text-white/72">
@@ -132,7 +156,7 @@ export default function LoginPage() {
               ["Opportunities", "Roles, grants, internships, collabs"],
               ["Identity", "Profiles built on work and reputation"],
             ].map(([title, copy]) => (
-              <div key={title} className="rounded-[24px] border border-white/10 bg-white/5 p-4 backdrop-blur-xl">
+              <div key={title} className="rounded-md border border-white/10 bg-white/5 p-4 backdrop-blur-xl">
                 <div className="mono text-[11px] uppercase tracking-[0.18em] text-[var(--brand)]">{title}</div>
                 <div className="mt-3 text-[13px] leading-6 text-white/68">{copy}</div>
               </div>
@@ -143,7 +167,6 @@ export default function LoginPage() {
 
       {/* Custom Auth Form side */}
       <section className="relative flex items-center justify-center px-6 py-12">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(201,161,109,0.12),transparent_34%)]" />
         <div className="premium-card relative z-10 w-full max-w-[420px] p-8 md:p-10">
           <div className="text-center">
             <span className="serif text-4xl tracking-tight text-ink">Convoke.</span>
@@ -155,7 +178,7 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <div className="mt-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-[13px] text-center">
+            <div className="mt-6 p-4 rounded-md bg-red-500/10 border border-red-500/20 text-red-500 text-[13px] text-center">
               {error}
             </div>
           )}
@@ -164,7 +187,8 @@ export default function LoginPage() {
           <div className="mt-8 space-y-3">
             <button 
               onClick={() => handleSocialAuth("oauth_google")}
-              className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-full border border-g3 bg-g1/50 hover:bg-g2 text-ink text-[14px] font-medium transition-all shadow-sm active:scale-98"
+              disabled={!signIn}
+              className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-full border border-g3 bg-g1/50 hover:bg-g2 text-ink text-[14px] font-medium transition-all active:scale-98 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -177,7 +201,8 @@ export default function LoginPage() {
 
             <button 
               onClick={() => handleSocialAuth("oauth_discord")}
-              className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-full border border-g3 bg-g1/50 hover:bg-g2 text-ink text-[14px] font-medium transition-all shadow-sm active:scale-98"
+              disabled={!signIn}
+              className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-full border border-g3 bg-g1/50 hover:bg-g2 text-ink text-[14px] font-medium transition-all active:scale-98 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <svg className="w-4 h-4 shrink-0 fill-current text-[#5865F2]" viewBox="0 0 127.14 96.36">
                 <path d="M107.7,8.07A105.15,105.15,0,0,0,77.26,0a77.19,77.19,0,0,0-3.3,6.83A96.67,96.67,0,0,0,53.22,6.83,77.19,77.19,0,0,0,49.88,0,105.15,105.15,0,0,0,19.44,8.07C3.66,31.58-1.86,54.65,1,77.53A105.73,105.73,0,0,0,32,96.36a77.7,77.7,0,0,0,6.63-10.85,68.43,68.43,0,0,1-10.5-5c.9-.65,1.76-1.34,2.58-2.06a75.48,75.48,0,0,0,72.84,0c.82.72,1.68,1.41,2.58,2.06a68.43,68.43,0,0,1-10.5,5,77.7,77.7,0,0,0,6.63,10.85,105.73,105.73,0,0,0,31-18.83C129,54.65,123.48,31.58,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53S36.18,40.36,42.45,40.36,53.83,46,53.83,53,48.72,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.24,60,73.24,53S78.41,40.36,84.69,40.36,96.07,46,96.07,53,91,65.69,84.69,65.69Z" />
@@ -204,7 +229,7 @@ export default function LoginPage() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Ananya Rao"
-                    className="w-full h-12 pl-11 pr-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                    className="w-full h-12 pl-11 pr-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
                   />
                 </div>
               </div>
@@ -220,7 +245,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@university.edu"
-                  className="w-full h-12 pl-11 pr-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                  className="w-full h-12 pl-11 pr-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
                 />
               </div>
             </div>
@@ -235,7 +260,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full h-12 pl-11 pr-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                  className="w-full h-12 pl-11 pr-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
                 />
               </div>
             </div>
@@ -243,7 +268,7 @@ export default function LoginPage() {
             <button 
               type="submit"
               disabled={loading}
-              className="w-full h-12 rounded-full bg-ink hover:opacity-95 text-paper font-medium transition-all shadow-md active:scale-98 flex items-center justify-center gap-2 border border-[var(--brand)]/20 mt-6"
+              className="w-full h-12 rounded-full bg-ink hover:opacity-95 text-paper font-medium transition-all active:scale-98 flex items-center justify-center gap-2 border border-[var(--brand)]/20 mt-6 cursor-pointer"
             >
               {loading && <Loader2 size={16} className="animate-spin" />}
               <span>{mode === "signin" ? "Sign In" : "Create Passport"}</span>
@@ -256,14 +281,14 @@ export default function LoginPage() {
             {mode === "signin" ? (
               <span>
                 New to Convoke?{" "}
-                <button onClick={() => setMode("signup")} className="font-semibold text-ink hover:text-[var(--brand)] hover:underline">
+                <button onClick={() => { setMode("signup"); setError(""); }} className="font-semibold text-ink hover:text-[var(--brand)] hover:underline cursor-pointer">
                   Create a passport
                 </button>
               </span>
             ) : (
               <span>
                 Already have a passport?{" "}
-                <button onClick={() => setMode("signin")} className="font-semibold text-ink hover:text-[var(--brand)] hover:underline">
+                <button onClick={() => { setMode("signin"); setError(""); }} className="font-semibold text-ink hover:text-[var(--brand)] hover:underline cursor-pointer">
                   Sign in here
                 </button>
               </span>
