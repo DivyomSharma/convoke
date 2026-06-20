@@ -40,7 +40,7 @@ export default function ProfilePage() {
               {/* GitHub style contribution graph placeholder */}
               <div className="flex flex-wrap gap-1">
                 {[...Array(168)].map((_, i) => (
-                  <div key={i} className={`w-3 h-3 rounded-sm ${((i * 13) % 10) > 7 ? 'bg-foreground' : ((i * 7) % 10) > 5 ? 'bg-muted-foreground/50' : 'bg-muted'}`} />
+                  <div key={i} className={`w-3 h-3 rounded-sm ${Math.random() > 0.7 ? 'bg-foreground' : Math.random() > 0.5 ? 'bg-muted-foreground/50' : 'bg-muted'}`} />
                 ))}
               </div>
             </section>

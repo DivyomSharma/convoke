@@ -20,7 +20,7 @@ export default function WorkspacePage() {
             {/* Momentum Bar Chart Placeholder */}
             <div className="flex items-end gap-1 h-20 w-full">
               {[...Array(16)].map((_, i) => (
-                <div key={i} className="flex-1 bg-foreground" style={{ height: `${Math.max(10, ((i * 27) % 100))}%` }} />
+                <div key={i} className="flex-1 bg-foreground" style={{ height: `${Math.max(10, Math.random() * 100)}%` }} />
               ))}
             </div>
           </div>
@@ -43,7 +43,7 @@ export default function WorkspacePage() {
           <section className="flex flex-col space-y-8">
             <div className="flex flex-col space-y-2 border-b pb-4">
               <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-mono">TODAY &middot; FRIDAY, JUNE 19</span>
-              <h1 className="text-3xl font-serif tracking-tight">What you&apos;re showing up to.</h1>
+              <h1 className="text-3xl font-serif tracking-tight">What you're showing up to.</h1>
             </div>
 
             <div className="flex items-start gap-6 py-4 border-b">
