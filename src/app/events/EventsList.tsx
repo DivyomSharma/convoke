@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { CalendarDays, Clock3, MapPin, Plus, Users, X, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createEvent } from "@/app/actions/workspace";
+import { getFallbackPhoto } from "@/lib/photos";
 
 interface EventWithDetails {
   id: string;
@@ -129,91 +130,154 @@ export function EventsList({
         </div>
       </section>
 
-      {events.length === 0 ? (
-        <section className="mt-8 premium-card p-12 text-center relative z-10">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-g3 bg-g1 text-[var(--brand)]">
-            <CalendarDays size={26} />
+      <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between border-b border-g3 pb-8 z-10 relative">
+        <div>
+          <div className="mono text-[11px] tracking-[0.2em] uppercase text-g5">
+            (04) Calendar
           </div>
-          <h2 className="mt-6 serif text-3xl">No events are live yet</h2>
-          <p className="mx-auto mt-3 max-w-[42ch] text-[15px] leading-7 text-g5">
-            Launch the first gathering for your community, startup, or college chapter. This directory only fills with real events.
+          <h1 className="serif text-5xl md:text-7xl mt-4 tracking-tight">Events</h1>
+          <p className="text-g5 mt-4 text-[16px] max-w-[50ch] leading-relaxed">
+            Gatherings built for momentum, not optics. Paper reviews, circles, and demo nights.
           </p>
-          <div className="mt-8">
-            <button 
-              onClick={() => setDrawerOpen(true)}
-              className="ink-button px-5 text-[14px] font-medium cursor-pointer"
-            >
-              <Plus size={16} />
-              <span>Create the first event</span>
-            </button>
-          </div>
+        </div>
+        <button 
+          onClick={() => setDrawerOpen(true)}
+          className="ink-button px-5 text-[14px] font-medium flex items-center justify-center gap-2 cursor-pointer shrink-0"
+        >
+          <Plus size={15} />
+          <span>Host Event</span>
+        </button>
+      </div>
+
+      {events.length === 0 ? (
+        <section className="mt-16 text-center py-20 relative z-10">
+          <h2 className="serif text-4xl text-ink font-light">No gatherings scheduled</h2>
+          <p className="mx-auto mt-4 max-w-[36ch] text-[15px] leading-relaxed text-g5">
+            Launch the first mixer, circle, or code sprint.
+          </p>
+          <button 
+            onClick={() => setDrawerOpen(true)}
+            className="ink-button px-5 mt-8 text-[14px] font-medium cursor-pointer"
+          >
+            Create the first event
+          </button>
         </section>
       ) : (
-        <section className="mt-8 grid gap-5 relative z-10">
-          {events.map((event) => {
-            const startsOn = new Date(event.startTime);
-            const endsOn = new Date(event.endTime);
-            const isLive = new Date() >= startsOn && new Date() <= endsOn;
+        <div className="mt-12 space-y-16 relative z-10">
+          {(() => {
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+            const dayAfterTomorrow = new Date(tomorrow.getTime() + 24 * 60 * 60 * 1000);
+            const endOfWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-            return (
-              <Link key={event.id} href={`/events/${event.id}`} className="premium-card campus-frame block p-6 md:p-8">
-                <div className="grid gap-6 lg:grid-cols-[1.35fr_0.65fr] lg:items-center">
-                  <div>
-                    <div className="flex flex-wrap items-center gap-3">
-                      <span className="rounded-full border border-[color:var(--brand)]/25 bg-[color:var(--brand)]/10 px-3 py-1 mono text-[11px] uppercase tracking-[0.18em] text-[var(--brand)]">
-                        {isLive ? "Live now" : "Upcoming"}
-                      </span>
-                      <span className="mono text-[11px] uppercase tracking-[0.18em] text-g4">
-                        {event.space.organization.name}
-                      </span>
-                    </div>
-                    <h2 className="mt-5 serif text-3xl tracking-tight md:text-5xl">{event.title}</h2>
-                    <p className="mt-4 max-w-3xl text-[15px] leading-7 text-g5 line-clamp-2">
-                      {event.description || "No event brief published yet."}
-                    </p>
-                    <div className="mt-6 flex flex-wrap gap-3 text-[13px] text-g5">
-                      <span className="inline-flex items-center gap-2 rounded-full border border-g3 bg-g1/60 px-3 py-2">
-                        <CalendarDays size={14} className="text-[var(--brand)]" />
-                        {startsOn.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                      </span>
-                      <span className="inline-flex items-center gap-2 rounded-full border border-g3 bg-g1/60 px-3 py-2">
-                        <Clock3 size={14} className="text-[var(--brand)]" />
-                        {startsOn.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                      </span>
-                      <span className="inline-flex items-center gap-2 rounded-full border border-g3 bg-g1/60 px-3 py-2">
-                        <MapPin size={14} className="text-[var(--brand)]" />
-                        {event.location || "Online"}
-                      </span>
-                    </div>
-                  </div>
+            const todayEvents = events.filter(e => {
+              const d = new Date(e.startTime);
+              return d >= today && d < tomorrow;
+            });
+            const tomorrowEvents = events.filter(e => {
+              const d = new Date(e.startTime);
+              return d >= tomorrow && d < dayAfterTomorrow;
+            });
+            const thisWeekEvents = events.filter(e => {
+              const d = new Date(e.startTime);
+              return d >= dayAfterTomorrow && d <= endOfWeek;
+            });
+            const upcomingEvents = events.filter(e => {
+              const d = new Date(e.startTime);
+              return d > endOfWeek;
+            });
+            const pastEvents = events.filter(e => {
+              const d = new Date(e.startTime);
+              return d < today;
+            });
 
-                  <div className="glass-panel rounded-[26px] p-5 md:p-6">
-                    <div className="eyebrow">Attendance</div>
-                    <div className="mt-3 serif text-4xl">{String(event._count.attendance).padStart(2, "0")}</div>
-                    <div className="mt-2 text-[14px] leading-6 text-g5">
-                      {event.capacity ? `${event.capacity} seats available in total.` : "Open capacity for all interested members."}
-                    </div>
+            const renderSection = (title: string, list: EventWithDetails[]) => {
+              if (list.length === 0) return null;
+              return (
+                <div className="border-b border-g3/60 pb-12 last:border-0 last:pb-0">
+                  <h2 className="serif text-3xl italic text-ink border-b border-g3/40 pb-2 mb-8 font-light">
+                    {title}
+                  </h2>
+                  <div className="flex flex-col gap-12">
+                    {list.map((event) => {
+                      const startsOn = new Date(event.startTime);
+                      const endsOn = new Date(event.endTime);
+                      const isLive = new Date() >= startsOn && new Date() <= endsOn;
+                      const banner = event.bannerUrl || getFallbackPhoto(event.id, 'event');
 
-                    <div className="mt-6 space-y-3 border-t border-g3 pt-5 text-[13px] text-g5">
-                      <div className="flex items-center justify-between">
-                        <span>Space</span>
-                        <span className="text-ink">{event.space.name}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span>Waitlist</span>
-                        <span className="text-ink">{event.waitlistCount}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span>Venue</span>
-                        <span className="text-ink">{event.venue || "TBA"}</span>
-                      </div>
-                    </div>
+                      return (
+                        <div key={event.id} className="group grid gap-8 lg:grid-cols-12 lg:items-center">
+                          {/* Event B/W Photography Banner */}
+                          <div className="lg:col-span-5">
+                            <Link href={`/events/${event.id}`} className="block overflow-hidden rounded-sm bg-g1 aspect-[16/10] relative">
+                              <img 
+                                src={banner} 
+                                alt={event.title} 
+                                className="w-full h-full object-cover" 
+                              />
+                            </Link>
+                          </div>
+
+                          {/* Event details */}
+                          <div className="lg:col-span-7 flex flex-col justify-between">
+                            <div>
+                              <div className="flex flex-wrap items-center gap-3 text-[11px] mono uppercase tracking-wider text-g5 mb-4">
+                                <span className={isLive ? "text-brand" : ""}>
+                                  {isLive ? "Live now" : startsOn.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                                </span>
+                                <span>•</span>
+                                <span>{startsOn.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+                                <span>•</span>
+                                <span>{event.space.organization.name}</span>
+                              </div>
+
+                              <Link href={`/events/${event.id}`} className="block mt-2">
+                                <h3 className="serif text-3xl leading-tight text-ink md:text-4xl group-hover:underline decoration-1 decoration-g4 underline-offset-4 font-light">
+                                  {event.title}
+                                </h3>
+                              </Link>
+
+                              <p className="mt-4 max-w-[62ch] text-[15px] leading-[1.6] text-g5">
+                                {event.description || "Gathering details are forming. Stay tuned for details."}
+                              </p>
+
+                              <div className="mt-6 flex flex-wrap gap-4 text-[11px] mono uppercase tracking-wider text-g4">
+                                <span>Location: {event.location || "Online"}</span>
+                                <span>•</span>
+                                <span>Attendance: {event._count.attendance} / {event.capacity || "Open"}</span>
+                              </div>
+                            </div>
+
+                            <div className="mt-8">
+                              <Link 
+                                href={`/events/${event.id}`}
+                                className="text-[13px] font-medium text-ink hover:underline underline-offset-4 inline-flex items-center gap-2"
+                              >
+                                <span>View Gathering</span>
+                                <span className="text-[11px] opacity-70">→</span>
+                              </Link>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
-              </Link>
+              );
+            };
+
+            return (
+              <>
+                {renderSection("Today", todayEvents)}
+                {renderSection("Tomorrow", tomorrowEvents)}
+                {renderSection("This Week", thisWeekEvents)}
+                {renderSection("Upcoming", upcomingEvents)}
+                {renderSection("Archive", pastEvents)}
+              </>
             );
-          })}
-        </section>
+          })()}
+        </div>
       )}
 
       {/* Creation Drawer Overlay */}

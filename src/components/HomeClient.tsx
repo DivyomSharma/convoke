@@ -91,62 +91,70 @@ export function HomeClient({ stats, feedItems, featured }: HomeClientProps) {
 
   return (
     <div className="relative overflow-hidden">
-      <section className="relative px-5 pt-16 sm:px-8 sm:pt-20">
-        <div className="absolute inset-x-0 top-0 h-[42rem] bg-[radial-gradient(circle_at_top,rgba(201,161,109,0.16),transparent_54%)]" />
-        <div className="absolute left-1/2 top-[10rem] -translate-x-1/2 opacity-25 dark:opacity-35">
+      <section className="relative px-5 pt-20 pb-16 sm:px-8 sm:pt-28 sm:pb-24">
+        {/* Subtle Vignette Background */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0)_60%,rgba(0,0,0,0.85)_100%)] pointer-events-none z-10" />
+        
+        {/* Slow Marquee Ribbon (5% opacity) */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-5 pointer-events-none">
           <div style={{ perspective: "1000px" }}>
-            <div style={{ transform: "rotateX(74deg) rotateY(-9deg) scale(1.32)" }}>
-              <CircularMarquee size={760} duration={42} />
+            <div style={{ transform: "rotateX(72deg) rotateY(-8deg) scale(1.4)" }}>
+              <CircularMarquee size={840} duration={85} />
             </div>
           </div>
         </div>
 
-        <div className="relative z-10 mx-auto max-w-[1240px]">
+        <div className="relative z-20 mx-auto max-w-[1240px]">
           <motion.div
-            initial={{ opacity: 0, y: 18 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
-            className="premium-card campus-frame px-6 py-8 md:px-10 md:py-12"
+            transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-col items-start text-left"
           >
-            <div className="max-w-4xl">
-              <div className="inline-flex items-center gap-2 rounded-full border border-[color:var(--brand)]/25 bg-[color:var(--brand)]/10 px-3 py-2 mono text-[11px] uppercase tracking-[0.18em] text-[var(--brand)]">
-                <Sparkles size={12} />
-                India-first ambition network
+            {/* Tagline */}
+            <div className="mono text-[11px] tracking-[0.24em] uppercase text-g4 font-medium mb-8">
+              The internet home for builders
+            </div>
+            
+            {/* Editorial Heading */}
+            <h1 className="serif text-5xl leading-[1.0] tracking-tight md:text-8xl xl:text-[8rem] max-w-4xl text-ink font-light">
+              Find your next<br />
+              <span className="italic-accent text-brand">breakthrough.</span>
+            </h1>
+            
+            {/* Description */}
+            <p className="mt-8 max-w-2xl text-[16px] leading-[1.6] text-g5 md:text-[18px]">
+              A quiet, high-signal ecosystem where ambitious people meet, collaborate, launch startups, and grow together.
+            </p>
+            
+            {/* Buttons */}
+            <div className="mt-10 flex flex-wrap items-center gap-6">
+              <Link 
+                href="/login" 
+                className="bg-ink text-paper dark:bg-white dark:text-black rounded-full px-6 py-3 transition hover:opacity-80 font-sans font-medium text-[14px] inline-flex items-center gap-2"
+              >
+                <span>Step Inside</span>
+                <span className="text-[12px] opacity-70">→</span>
+              </Link>
+              <Link 
+                href="/events" 
+                className="text-ink hover:underline underline-offset-4 font-sans font-medium text-[14px] transition inline-flex items-center gap-2"
+              >
+                <span>Explore Events</span>
+                <span className="text-[12px] opacity-70">→</span>
+              </Link>
+            </div>
+            
+            {/* Established Footer */}
+            <div className="mt-20 w-full flex items-center justify-between border-t border-g3/60 pt-6">
+              <div className="mono text-[11px] tracking-[0.16em] uppercase text-g4 font-medium">
+                (01) ESTABLISHED MMXXVI
               </div>
-              <h1 className="mt-6 max-w-5xl serif text-6xl leading-[0.9] tracking-tight md:text-8xl xl:text-[7.5rem]">
-                Where ambitious people open daily to find momentum.
-              </h1>
-              <p className="mt-6 max-w-2xl text-[16px] leading-8 text-g5 md:text-[18px]">
-                Convoke connects communities, opportunities, projects, events, and identity into one calm operating surface for builders, founders, creators, and students.
-              </p>
-              <div className="mt-8 flex flex-wrap items-center gap-3">
-                <Link href="/explore" className="ink-button px-5 text-[14px] font-medium">
-                  Explore the ecosystem
-                  <ArrowRight size={15} />
-                </Link>
-                <Link href="/workspace" className="ghost-button px-5 text-[14px] font-medium">
-                  Open workspace
-                </Link>
+              <div className="mono text-[11px] tracking-[0.16em] uppercase text-g4 font-medium">
+                GLOBAL BUILDER NETWORK
               </div>
             </div>
           </motion.div>
-
-          <div className="mt-6 border-y border-g3 px-1 py-5">
-            {stats.length > 0 ? (
-              <div className="flex flex-wrap gap-x-8 gap-y-3 text-[13px] text-g5 md:text-[14px]">
-                {stats.map((stat) => (
-                  <div key={stat.label} className="flex items-center gap-2">
-                    <span className="serif text-2xl text-ink">{stat.count}</span>
-                    <span>{stat.label}</span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-[14px] italic text-g5">
-                No platform activity yet. The first event, role, space, or project will define the tone.
-              </div>
-            )}
-          </div>
         </div>
       </section>
 

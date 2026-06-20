@@ -63,7 +63,7 @@ export default async function ProjectDetailPage(props: { params?: Promise<{ id: 
           {proj.bannerUrl ? (
             <img src={proj.bannerUrl} alt="Banner" className="w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-g2 to-g1 flex items-center justify-center text-g3">
+            <div className="w-full h-full bg-g1 flex items-center justify-center text-g3">
               <Layers size={64} className="text-g3/80" />
             </div>
           )}
@@ -76,7 +76,7 @@ export default async function ProjectDetailPage(props: { params?: Promise<{ id: 
             {/* Identity */}
             <div className="flex items-end gap-5">
               <div className="w-32 h-32 md:w-40 md:h-40 rounded-3xl glass-panel p-2 shadow-2xl relative">
-                <div className="w-full h-full rounded-2xl bg-g1 overflow-hidden flex items-center justify-center text-[var(--brand)] font-semibold text-2xl uppercase">
+                <div className="w-full h-full rounded-md bg-g1 overflow-hidden flex items-center justify-center text-[var(--brand)] font-semibold text-2xl uppercase">
                   {proj.title.slice(0, 2)}
                 </div>
               </div>
@@ -103,7 +103,7 @@ export default async function ProjectDetailPage(props: { params?: Promise<{ id: 
                   href={proj.url} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="bg-ink text-paper px-8 py-2.5 rounded-full text-[14px] font-medium hover:bg-ink-2 transition-all active:scale-95 shadow-lg border border-[var(--brand)]/20 flex items-center gap-1.5"
+                  className="bg-ink text-paper px-8 py-2.5 rounded-full text-[14px] font-medium hover:bg-ink-2 transition-all active:scale-95 border border-[var(--brand)]/20 flex items-center gap-1.5"
                 >
                   <Globe size={14} />
                   <span>Live Demo</span>
@@ -165,7 +165,7 @@ export default async function ProjectDetailPage(props: { params?: Promise<{ id: 
                   <h2 className="serif text-3xl mb-6 text-ink">Gallery</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {proj.gallery.map((img) => (
-                      <div key={img.id} className="aspect-video rounded-2xl overflow-hidden border border-g3 bg-g1 group">
+                      <div key={img.id} className="aspect-video rounded-md overflow-hidden border border-g3 bg-g1 group">
                         <img src={img.url} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt={img.caption || ""} />
                       </div>
                     ))}

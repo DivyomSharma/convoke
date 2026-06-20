@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Building2, Users, MapPin, Plus, X, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createOrganization } from "@/app/actions/workspace";
+import { getFallbackPhoto } from "@/lib/photos";
 
 interface OrganizationWithMembers {
   id: string;
@@ -92,65 +93,91 @@ export function OrganizationsList({ initialOrgs }: { initialOrgs: OrganizationWi
 
   return (
     <>
-      <div className="flex items-end justify-between hairline-b pb-6 relative z-10">
+      <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between border-b border-g3 pb-8 relative z-10">
         <div>
-          <h1 className="serif text-5xl md:text-6xl tracking-tight">Organizations</h1>
-          <p className="text-g5 mt-3 text-lg">Discover communities, startups, and college clubs.</p>
+          <div className="mono text-[11px] tracking-[0.2em] uppercase text-g5">
+            (03) Collectives
+          </div>
+          <h1 className="serif text-5xl md:text-7xl mt-4 tracking-tight">Organizations</h1>
+          <p className="text-g5 mt-4 text-[16px] max-w-[50ch] leading-relaxed">
+            Startup hubs, hacker syndicates, university chapters, and creator rooms defining the future.
+          </p>
         </div>
         <button 
           onClick={() => setDrawerOpen(true)}
-          className="flex items-center justify-center gap-2 bg-ink text-paper px-6 py-2.5 rounded-full text-[14px] font-medium hover:bg-ink-2 transition-all active:scale-95 border border-[var(--brand)]/25 shadow-md cursor-pointer"
+          className="ink-button px-5 text-[14px] font-medium flex items-center justify-center gap-2 cursor-pointer shrink-0"
         >
-          <Plus size={16} />
+          <Plus size={15} />
           <span>Create Organization</span>
         </button>
       </div>
 
       {orgs.length === 0 ? (
-        <div className="py-32 text-center relative z-10 flex flex-col items-center justify-center">
-          <div className="w-16 h-16 rounded-full glass-panel flex items-center justify-center text-g5 mb-6">
-            <Building2 size={28} />
-          </div>
-          <h3 className="serif text-3xl text-ink mb-2">No organizations yet</h3>
-          <p className="text-g5 text-[15px] max-w-[40ch] leading-relaxed mb-8">
-            Start a builder community, startup hub, or university club to bring people together.
+        <div className="py-24 text-center relative z-10 flex flex-col items-center justify-center">
+          <h3 className="serif text-4xl text-ink font-light">No organizations established</h3>
+          <p className="text-g5 text-[15px] max-w-[36ch] leading-relaxed mt-4 mb-8">
+            Create the first builder workspace presence for your team or syndicate.
           </p>
           <button 
             onClick={() => setDrawerOpen(true)}
-            className="bg-ink text-paper px-6 py-2.5 rounded-full text-[14px] font-medium hover:bg-ink-2 transition-all active:scale-95 border border-[var(--brand)]/20 shadow-md cursor-pointer"
+            className="ink-button px-5 text-[14px] font-medium cursor-pointer"
           >
-            Start a builder community
+            Create Organization
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10 relative z-10">
-          {orgs.map((org) => (
-            <Link key={org.id} href={`/org/${org.slug}`} className="premium-card p-6 flex flex-col group">
-              <div className="flex items-start gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-g1 border border-g3 overflow-hidden flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
-                  {org.logoUrl ? (
-                    <img src={org.logoUrl} alt={org.name} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-g4 bg-g2">
-                      <Building2 size={24} />
-                    </div>
-                  )}
+        <div className="mt-12 flex flex-col gap-20 relative z-10">
+          {orgs.map((org, index) => {
+            const banner = org.logoUrl || getFallbackPhoto(org.id, 'space');
+            return (
+              <div key={org.id} className="group grid gap-8 lg:grid-cols-12 lg:items-center">
+                {/* Large Photography */}
+                <div className="lg:col-span-6">
+                  <Link href={`/org/${org.slug}`} className="block overflow-hidden rounded-sm bg-g1 aspect-[16/10] relative">
+                    <img 
+                      src={banner} 
+                      alt={org.name} 
+                      className="w-full h-full object-cover" 
+                    />
+                  </Link>
                 </div>
-                <div>
-                  <h3 className="serif text-2xl group-hover:text-[var(--brand)] transition-colors">{org.name}</h3>
-                  <span className="mono text-[11px] text-g5 uppercase tracking-wider">{org.industry || "Ecosystem Hub"}</span>
+
+                {/* Feature Content */}
+                <div className="lg:col-span-6 flex flex-col justify-center">
+                  <div className="flex items-center gap-2 mono text-[10px] uppercase tracking-widest text-g5 mb-4">
+                    <span>(0{index + 1})</span>
+                    <span>•</span>
+                    <span>{org.industry || "Ecosystem Hub"}</span>
+                  </div>
+
+                  <Link href={`/org/${org.slug}`} className="block">
+                    <h3 className="serif text-4xl md:text-5xl leading-tight text-ink group-hover:italic transition-all duration-300">
+                      {org.name}
+                    </h3>
+                  </Link>
+
+                  <p className="text-g5 text-[15px] mt-4 leading-relaxed max-w-[48ch]">
+                    {org.description || "A collective group of makers and builders shaping technology on campus."}
+                  </p>
+
+                  <div className="mt-6 flex items-center gap-6 text-[11px] mono uppercase tracking-wider text-g4">
+                    <span>{org.members.length} Members</span>
+                    <span>{org.location || "Remote"}</span>
+                  </div>
+
+                  <div className="mt-8">
+                    <Link 
+                      href={`/org/${org.slug}`}
+                      className="text-[13px] font-medium text-ink hover:underline underline-offset-4 inline-flex items-center gap-2"
+                    >
+                      <span>Enter Workspace</span>
+                      <span className="text-[11px] opacity-70">→</span>
+                    </Link>
+                  </div>
                 </div>
               </div>
-              <div className="mt-8 flex items-center justify-between text-g5 text-[13px]">
-                <div className="flex items-center gap-1.5">
-                  <Users size={14} /> {org.members.length} members
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <MapPin size={14} /> {org.location || "Remote"}
-                </div>
-              </div>
-            </Link>
-          ))}
+            );
+          })}
         </div>
       )}
 

@@ -68,7 +68,7 @@ export default async function OrgDetailPage(props: { params?: Promise<{ slug: st
           {org.bannerUrl ? (
             <img src={org.bannerUrl} alt="Banner" className="w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-g2 to-g1 flex items-center justify-center text-g3">
+            <div className="w-full h-full bg-g1 flex items-center justify-center text-g3">
               <Building2 size={64} />
             </div>
           )}
@@ -81,7 +81,7 @@ export default async function OrgDetailPage(props: { params?: Promise<{ slug: st
             {/* Identity */}
             <div className="flex items-end gap-5">
               <div className="w-32 h-32 md:w-40 md:h-40 rounded-3xl glass-panel p-2 shadow-2xl relative">
-                <div className="w-full h-full rounded-2xl bg-g1 overflow-hidden flex items-center justify-center">
+                <div className="w-full h-full rounded-md bg-g1 overflow-hidden flex items-center justify-center">
                   {org.logoUrl ? (
                     <img src={org.logoUrl} alt={org.name} className="w-full h-full object-cover" />
                   ) : (
@@ -115,7 +115,7 @@ export default async function OrgDetailPage(props: { params?: Promise<{ slug: st
               <button className="w-10 h-10 flex items-center justify-center rounded-full border border-g3 text-g5 hover:text-ink hover:bg-g1 transition-colors shadow-sm">
                 <Bookmark size={16} />
               </button>
-              <button className="bg-ink text-paper px-8 py-2.5 rounded-full text-[14px] font-medium hover:bg-ink-2 transition-all active:scale-95 shadow-lg border border-[var(--brand)]/20">
+              <button className="bg-ink text-paper px-8 py-2.5 rounded-full text-[14px] font-medium hover:bg-ink-2 transition-all active:scale-95 border border-[var(--brand)]/20">
                 Join Space
               </button>
             </div>
@@ -159,13 +159,13 @@ export default async function OrgDetailPage(props: { params?: Promise<{ slug: st
                   <h2 className="serif text-3xl text-ink">Gallery</h2>
                 </div>
                 {org.gallery.length === 0 ? (
-                  <div className="py-12 text-center text-g5 italic rounded-2xl glass-panel text-[14px]">
+                  <div className="py-12 text-center text-g5 italic rounded-md glass-panel text-[14px]">
                     No images posted yet.
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     {org.gallery.map((img) => (
-                      <div key={img.id} className="aspect-square rounded-2xl overflow-hidden border border-g3 bg-g1 group">
+                      <div key={img.id} className="aspect-square rounded-md overflow-hidden border border-g3 bg-g1 group">
                         <img src={img.url} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt={img.caption || ""} />
                       </div>
                     ))}
@@ -177,7 +177,7 @@ export default async function OrgDetailPage(props: { params?: Promise<{ slug: st
               <section>
                 <h2 className="serif text-3xl mb-6 text-ink">Timeline</h2>
                 {org.timeline.length === 0 ? (
-                  <div className="py-12 text-center text-g5 italic rounded-2xl glass-panel text-[14px]">
+                  <div className="py-12 text-center text-g5 italic rounded-md glass-panel text-[14px]">
                     No milestones recorded yet.
                   </div>
                 ) : (
@@ -202,7 +202,7 @@ export default async function OrgDetailPage(props: { params?: Promise<{ slug: st
               <section>
                 <h2 className="serif text-3xl mb-6 text-ink">Frequently Asked</h2>
                 {org.faqs.length === 0 ? (
-                  <div className="py-12 text-center text-g5 italic rounded-2xl glass-panel text-[14px]">
+                  <div className="py-12 text-center text-g5 italic rounded-md glass-panel text-[14px]">
                     No questions answered yet.
                   </div>
                 ) : (

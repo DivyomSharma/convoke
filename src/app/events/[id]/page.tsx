@@ -43,6 +43,8 @@ export async function generateMetadata(props: { params?: Promise<{ id: string }>
   };
 }
 
+import { OrganizerDashboard } from "./OrganizerDashboard";
+
 export default async function EventDetailPage(props: { params?: Promise<{ id: string }> }) {
   const params = await props.params;
   const id = params?.id;
@@ -59,13 +61,16 @@ export default async function EventDetailPage(props: { params?: Promise<{ id: st
                 include: {
                   user: true,
                 },
-                take: 4,
               },
             },
           },
         },
       },
-      attendance: true,
+      attendance: {
+        include: {
+          user: true
+        }
+      },
       faqs: true,
       sponsors: true,
       resources: true,
@@ -75,194 +80,224 @@ export default async function EventDetailPage(props: { params?: Promise<{ id: st
   if (!event) return notFound();
 
   const viewer = await requireUser().catch(() => null);
-  const initialRegistered = viewer ? event.attendance.some((entry) => entry.userId === viewer.id && entry.status === "GOING") : false;
-  const isFull = Boolean(event.capacity && event.attendance.length >= event.capacity);
+  const myAttendance = viewer ? event.attendance.find((entry) => entry.userId === viewer.id) : null;
+  const initialStatus = myAttendance ? myAttendance.status : null;
+  
+  const isOrganizer = viewer ? event.space.organization.members.some(
+    (m) => m.userId === viewer.id && (m.role === "ADMIN" || m.role === "FOUNDER")
+  ) : false;
+
+  const isFull = Boolean(event.capacity && event.attendance.filter(a => a.status === "GOING" || a.status === "CHECKED_IN").length >= event.capacity);
   const price = "Free";
+
+  const attendeesCount = event.attendance.filter(a => a.status === "GOING" || a.status === "CHECKED_IN").length;
 
   return (
     <Shell wide>
-      <div className="relative min-h-screen pb-20">
-        <div className="relative h-[240px] w-full overflow-hidden border-b border-g3 bg-g1 md:h-[340px]">
+      <div className="relative min-h-screen pb-20 text-ink">
+        {/* Banner area */}
+        <div className="relative h-[220px] w-full overflow-hidden border-b border-g3 bg-g1 md:h-[300px]">
           {event.bannerUrl ? (
-            <img src={event.bannerUrl} alt={event.title} className="h-full w-full object-cover opacity-75" />
+            <img src={event.bannerUrl} alt={event.title} className="h-full w-full object-cover opacity-80" />
           ) : (
-            <div className="h-full w-full bg-[radial-gradient(circle_at_top,rgba(201,161,109,0.18),transparent_52%)]">
-              <AmbientGlow className="left-1/2 top-1/2 h-[22rem] w-[22rem] -translate-x-1/2 -translate-y-1/2 opacity-[0.16]" color="var(--brand)" />
+            <div className="h-full w-full bg-[#0A0A0A] border-b border-g3 flex items-center justify-center">
+              <span className="serif text-8xl text-g2 select-none">C.</span>
             </div>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-paper via-paper/40 to-transparent" />
         </div>
 
-        <div className="relative z-10 mx-auto -mt-20 max-w-[1080px] px-5 sm:px-8">
-          <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="space-y-10">
-              <section className="premium-card campus-frame p-7 md:p-9">
-                <div className="inline-flex items-center gap-2 rounded-full border border-[color:var(--brand)]/25 bg-[color:var(--brand)]/10 px-3 py-1 mono text-[11px] uppercase tracking-[0.18em] text-[var(--brand)]">
-                  Live ecosystem event
+        <div className="relative z-20 mx-auto -mt-16 max-w-[1080px] px-5 sm:px-8">
+          <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+            <div className="space-y-8">
+              {/* Event briefing */}
+              <section className="border border-g3 rounded-sm p-6 md:p-8 bg-paper-card">
+                <div className="mono text-[10px] uppercase tracking-wider text-brand mb-4">
+                  (Gathering)
                 </div>
-                <h1 className="mt-5 serif text-4xl tracking-tight md:text-6xl">{event.title}</h1>
-                <p className="mt-4 max-w-3xl text-[16px] leading-8 text-g5">
-                  {event.description || "No public event overview has been published yet."}
+                <h1 className="serif text-4xl leading-tight md:text-5xl font-light">{event.title}</h1>
+                <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-g5">
+                  {event.description || "No public overview has been published yet."}
                 </p>
 
-                <div className="mt-7 grid gap-3 text-[13px] text-g5 sm:grid-cols-2 xl:grid-cols-4">
-                  <div className="glass-panel rounded-[22px] p-4">
+                <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                  <div className="border border-g3 rounded-sm p-4">
                     <div className="eyebrow">Date</div>
-                    <div className="mt-2 inline-flex items-center gap-2 text-ink">
-                      <Calendar size={15} className="text-[var(--brand)]" />
+                    <div className="mt-2 text-[14px] text-ink font-medium">
                       {new Date(event.startTime).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
                     </div>
                   </div>
-                  <div className="glass-panel rounded-[22px] p-4">
+                  <div className="border border-g3 rounded-sm p-4">
                     <div className="eyebrow">Time</div>
-                    <div className="mt-2 inline-flex items-center gap-2 text-ink">
-                      <Clock3 size={15} className="text-[var(--brand)]" />
+                    <div className="mt-2 text-[14px] text-ink font-medium">
                       {new Date(event.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                     </div>
                   </div>
-                  <div className="glass-panel rounded-[22px] p-4">
+                  <div className="border border-g3 rounded-sm p-4">
                     <div className="eyebrow">Location</div>
-                    <div className="mt-2 inline-flex items-center gap-2 text-ink">
-                      <MapPin size={15} className="text-[var(--brand)]" />
+                    <div className="mt-2 text-[14px] text-ink font-medium">
                       {event.location || "Online"}
                     </div>
                   </div>
-                  <div className="glass-panel rounded-[22px] p-4">
+                  <div className="border border-g3 rounded-sm p-4">
                     <div className="eyebrow">Capacity</div>
-                    <div className="mt-2 text-ink">{event.capacity ? `${event.capacity} seats` : "Open"}</div>
+                    <div className="mt-2 text-[14px] text-ink font-medium">
+                      {event.capacity ? `${event.capacity} seats` : "Open RSVP"}
+                    </div>
                   </div>
                 </div>
               </section>
 
+              {/* Host & Venue */}
               <section className="grid gap-6 md:grid-cols-2">
-                <div className="glass-panel rounded-[26px] p-6">
-                  <div className="eyebrow">Hosted by</div>
-                  <Link href={`/org/${event.space.organization.slug}`} className="mt-3 flex items-center gap-4">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-g3 bg-g1">
+                <div className="border border-g3 rounded-sm p-6 bg-paper-card">
+                  <div className="eyebrow">Host</div>
+                  <Link href={`/org/${event.space.organization.slug}`} className="mt-4 flex items-center gap-4 group">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-sm border border-g3 bg-g1 overflow-hidden">
                       {event.space.organization.logoUrl ? (
-                        <img src={event.space.organization.logoUrl} alt={event.space.organization.name} className="h-full w-full rounded-2xl object-cover" />
+                        <img src={event.space.organization.logoUrl} alt="" className="h-full w-full object-cover" />
                       ) : (
-                        <Building2 size={20} className="text-[var(--brand)]" />
+                        <Building2 size={16} className="text-brand" />
                       )}
                     </div>
                     <div>
-                      <div className="serif text-2xl">{event.space.organization.name}</div>
-                      <div className="text-[14px] text-g5">{event.space.name}</div>
+                      <div className="serif text-xl group-hover:underline">{event.space.organization.name}</div>
+                      <div className="text-[11px] mono uppercase text-g4">{event.space.name}</div>
                     </div>
                   </Link>
-                  <p className="mt-4 text-[14px] leading-7 text-g5">
-                    {event.space.organization.description || "This organizer has not added a public introduction yet."}
+                  <p className="mt-4 text-[13px] leading-relaxed text-g5">
+                    {event.space.organization.description || "Collective space updates are synced here."}
                   </p>
                 </div>
 
-                <div className="glass-panel rounded-[26px] p-6">
-                  <div className="eyebrow">Venue notes</div>
-                  <div className="mt-4 space-y-3 text-[14px] text-g5">
-                    <div className="flex items-start gap-3">
-                      <MapPin size={16} className="mt-0.5 text-[var(--brand)]" />
-                      <div>
-                        <div className="text-ink">{event.venue || "Venue to be announced"}</div>
-                        <div>{event.location || "Online event details will be shared after RSVP."}</div>
-                      </div>
-                    </div>
-                    {event.requirements ? (
-                      <div className="flex items-start gap-3">
-                        <FileText size={16} className="mt-0.5 text-[var(--brand)]" />
-                        <div>{event.requirements}</div>
-                      </div>
-                    ) : null}
-                    <div className="flex items-center gap-2 text-[var(--brand)]">
-                      <Navigation size={14} />
-                      Follow organizer updates for the final logistics drop.
-                    </div>
+                <div className="border border-g3 rounded-sm p-6 bg-paper-card">
+                  <div className="eyebrow">Venue Notes</div>
+                  <div className="mt-4 space-y-2 text-[13px] text-g5">
+                    <div className="text-ink font-medium">{event.venue || "TBA"}</div>
+                    <div>{event.location || "Details drop before start."}</div>
+                    {event.requirements && <div className="mt-2 pt-2 border-t border-g1">{event.requirements}</div>}
                   </div>
                 </div>
               </section>
 
-              {event.faqs.length > 0 ? (
-                <section>
-                  <div className="eyebrow mb-4">Common questions</div>
+              {/* SVG Attendance Certificate for Checked-In Users */}
+              {initialStatus === "CHECKED_IN" && (
+                <div className="border border-g3 rounded-sm p-6 bg-paper-card text-ink">
+                  <div className="mono text-[10px] uppercase tracking-[0.2em] text-brand mb-4">Credentials Verification</div>
+                  <div className="border border-ink/15 p-6 rounded-sm bg-black text-[#EAEAEA] relative overflow-hidden flex flex-col justify-between aspect-[1.6/1]">
+                    <div className="absolute inset-0 opacity-5 pointer-events-none flex items-center justify-center">
+                      <span className="serif text-[120px] font-bold">C.</span>
+                    </div>
+                    <div>
+                      <div className="mono text-[9px] tracking-widest text-g4 uppercase">Convoke Digital Campus Passport</div>
+                      <h4 className="serif text-2xl mt-4 font-light tracking-tight text-brand">Certificate of Attendance</h4>
+                    </div>
+                    <div className="mt-4 space-y-1">
+                      <p className="text-[13px] text-g5 font-light">
+                        This certifies that <span className="text-[#EAEAEA] font-medium">{viewer?.name || "Builder"}</span> checked in and participated in
+                      </p>
+                      <p className="serif text-xl italic text-white leading-tight">{event.title}</p>
+                    </div>
+                    <div className="mt-6 flex items-center justify-between text-[9px] mono uppercase tracking-wider text-g4 border-t border-g4/20 pt-4">
+                      <span>Verified MMXXVI</span>
+                      <span>ID: {myAttendance?.id.slice(0, 8)}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Organizer Dashboard Panel */}
+              {isOrganizer && (
+                <OrganizerDashboard
+                  eventId={event.id}
+                  eventTitle={event.title}
+                  initialAttendance={event.attendance as any}
+                />
+              )}
+
+              {/* FAQs */}
+              {event.faqs.length > 0 && (
+                <section className="space-y-4">
+                  <div className="eyebrow">FAQs</div>
                   <div className="space-y-3">
                     {event.faqs.map((faq) => (
-                      <details key={faq.id} className="glass-panel group rounded-[22px] p-5">
-                        <summary className="flex cursor-pointer items-center justify-between text-[15px] font-medium text-ink outline-none [&::-webkit-details-marker]:hidden">
-                          {faq.question}
-                          <ChevronDown size={18} className="text-g4 transition-transform group-open:rotate-180" />
+                      <details key={faq.id} className="border border-g3 rounded-sm p-4 bg-paper-card group">
+                        <summary className="flex cursor-pointer items-center justify-between text-[14px] font-medium text-ink outline-none list-none">
+                          <span>{faq.question}</span>
+                          <ChevronDown size={14} className="text-g4 transition-transform group-open:rotate-180" />
                         </summary>
-                        <p className="mt-4 border-t border-g3 pt-4 text-[14px] leading-7 text-g5">
+                        <p className="mt-3 border-t border-g1 pt-3 text-[13px] leading-relaxed text-g5">
                           {faq.answer}
                         </p>
                       </details>
                     ))}
                   </div>
                 </section>
-              ) : null}
+              )}
             </div>
 
-            <div className="space-y-6 lg:pt-4">
-              <div className="sticky top-24 space-y-6">
+            {/* Sidebar RSVP widget */}
+            <div className="space-y-6">
+              <div className="sticky top-20 space-y-6">
                 <RsvpClient
                   eventId={event.id}
-                  initialRegistered={initialRegistered}
+                  initialStatus={initialStatus}
                   isFull={isFull}
                   price={price}
-                  attendeesCount={event.attendance.length}
+                  attendeesCount={attendeesCount}
                   capacity={event.capacity}
+                  userId={viewer?.id}
                 />
 
-                <div className="glass-panel rounded-[26px] p-6">
-                  <div className="eyebrow">People in the room</div>
-                  <div className="mt-4 flex flex-wrap gap-3">
-                    {event.space.organization.members.length > 0 ? (
-                      event.space.organization.members.map((member) => (
-                        <div key={member.id} className="flex items-center gap-3 rounded-full border border-g3 bg-g1/70 px-3 py-2">
-                          <Avatar src={member.user.avatarUrl || ""} name={member.user.name || "Member"} size={28} />
-                          <div className="text-[13px]">
-                            <div className="text-ink">{member.user.name || "Member"}</div>
-                            <div className="text-g5">{member.role}</div>
-                          </div>
+                <div className="border border-g3 rounded-sm p-6 bg-paper-card">
+                  <div className="eyebrow mb-4">Attendees</div>
+                  <div className="flex flex-wrap gap-2">
+                    {event.attendance.filter(a => a.status === "GOING" || a.status === "CHECKED_IN").length > 0 ? (
+                      event.attendance.filter(a => a.status === "GOING" || a.status === "CHECKED_IN").map((entry) => (
+                        <div key={entry.id} className="flex items-center gap-2 rounded-sm border border-g3 bg-g1 px-2.5 py-1 text-[12px]">
+                          <Avatar src={entry.user.avatarUrl || ""} name={entry.user.name || "Member"} size={20} />
+                          <span className="text-ink font-medium">{entry.user.name || "Member"}</span>
                         </div>
                       ))
                     ) : (
-                      <p className="text-[14px] leading-7 text-g5">
-                        Organizer team members will appear here once the community profile is completed.
+                      <p className="text-[13px] leading-relaxed text-g5">
+                        First builders to RSVP will appear here.
                       </p>
                     )}
                   </div>
                 </div>
 
-                {event.sponsors.length > 0 ? (
-                  <div className="glass-panel rounded-[26px] p-6">
+                {event.sponsors.length > 0 && (
+                  <div className="border border-g3 rounded-sm p-6 bg-paper-card">
                     <div className="eyebrow">Sponsors</div>
                     <div className="mt-4 flex flex-wrap gap-2">
                       {event.sponsors.map((sponsor) => (
-                        <span key={sponsor.id} className="rounded-full border border-g3 bg-g1/70 px-3 py-2 text-[13px] text-ink">
+                        <span key={sponsor.id} className="rounded-sm border border-g3 bg-g1 px-2.5 py-1 text-[12px] text-ink">
                           {sponsor.name}
                         </span>
                       ))}
                     </div>
                   </div>
-                ) : null}
+                )}
 
-                {event.resources.length > 0 ? (
-                  <div className="glass-panel rounded-[26px] p-6">
+                {event.resources.length > 0 && (
+                  <div className="border border-g3 rounded-sm p-6 bg-paper-card">
                     <div className="eyebrow">Resources</div>
-                    <div className="mt-4 space-y-3">
+                    <div className="mt-4 space-y-2">
                       {event.resources.map((resource) => (
                         <a
                           key={resource.id}
                           href={resource.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-3 rounded-[18px] border border-g3 bg-g1/65 px-4 py-3 text-[14px] text-g5 transition hover:text-ink"
+                          className="flex items-center justify-between rounded-sm border border-g3 bg-g1 px-3 py-2 text-[13px] text-g5 hover:text-ink hover:border-g4 transition-all"
                         >
-                          <FileText size={15} className="text-[var(--brand)]" />
-                          <span>{resource.name}</span>
+                          <span className="truncate">{resource.name}</span>
+                          <span className="text-[11px] opacity-70">→</span>
                         </a>
                       ))}
                     </div>
                   </div>
-                ) : null}
+                )}
               </div>
             </div>
           </div>

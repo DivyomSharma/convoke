@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Hash, MessageCircle, Users, Plus, X, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createSpace } from "@/app/actions/workspace";
+import { getFallbackPhoto } from "@/lib/photos";
 
 interface SpaceWithDetails {
   id: string;
@@ -82,57 +83,91 @@ export function SpacesList({
 
   return (
     <>
-      <div className="flex items-end justify-between hairline-b pb-6 relative z-10">
+      <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between border-b border-g3 pb-8 relative z-10">
         <div>
-          <h1 className="serif text-5xl md:text-6xl tracking-tight">Spaces</h1>
-          <p className="text-g5 mt-3 text-lg">Gather with your tribe. Discussion, voice, and collaboration.</p>
+          <div className="mono text-[11px] tracking-[0.2em] uppercase text-g5">
+            (02) Spaces & Circles
+          </div>
+          <h1 className="serif text-5xl md:text-7xl mt-4 tracking-tight">Communities</h1>
+          <p className="text-g5 mt-4 text-[16px] max-w-[50ch] leading-relaxed">
+            The rooms you didn't know you were missing. Weekly conversations and quarterly meetups.
+          </p>
         </div>
         <button 
           onClick={() => setDrawerOpen(true)}
-          className="flex items-center justify-center gap-2 bg-ink text-paper px-6 py-2.5 rounded-full text-[14px] font-medium hover:bg-ink-2 transition-all active:scale-95 border border-[var(--brand)]/25 shadow-md cursor-pointer"
+          className="ink-button px-5 text-[14px] font-medium flex items-center justify-center gap-2 cursor-pointer shrink-0"
         >
-          <Plus size={16} />
+          <Plus size={15} />
           <span>Create Space</span>
         </button>
       </div>
 
       {spaces.length === 0 ? (
-        <div className="py-32 text-center relative z-10 flex flex-col items-center justify-center">
-          <div className="w-16 h-16 rounded-full glass-panel flex items-center justify-center text-g5 mb-6">
-            <Hash size={28} className="text-[var(--brand)]" />
-          </div>
-          <h3 className="serif text-3xl text-ink mb-2">No spaces yet</h3>
-          <p className="text-g5 text-[15px] max-w-[40ch] leading-relaxed mb-8">
-            Start a builder space.
+        <div className="py-24 text-center relative z-10 flex flex-col items-center justify-center">
+          <h3 className="serif text-4xl text-ink font-light">No communities active</h3>
+          <p className="text-g5 text-[15px] max-w-[36ch] leading-relaxed mt-4 mb-8">
+            Define the rhythm. Establish the first community space.
           </p>
           <button 
             onClick={() => setDrawerOpen(true)}
-            className="bg-ink text-paper px-6 py-2.5 rounded-full text-[14px] font-medium hover:bg-ink-2 transition-all active:scale-95 border border-[var(--brand)]/20 shadow-md cursor-pointer"
+            className="ink-button px-5 text-[14px] font-medium cursor-pointer"
           >
             Create Space
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10 relative z-10">
-          {spaces.map((space) => (
-            <Link key={space.id} href={`/spaces/${space.id}`} className="premium-card p-8 flex flex-col group">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-g1 flex items-center justify-center text-g5 group-hover:bg-[var(--brand)] group-hover:text-white transition-colors duration-300">
-                  <Hash size={24} />
+        <div className="mt-12 flex flex-col gap-20 relative z-10">
+          {spaces.map((space, index) => {
+            const banner = space.bannerUrl || getFallbackPhoto(space.id, 'space');
+            return (
+              <div key={space.id} className="group grid gap-8 lg:grid-cols-12 lg:items-center">
+                {/* Large Photography */}
+                <div className="lg:col-span-6">
+                  <Link href={`/spaces/${space.id}`} className="block overflow-hidden rounded-sm bg-g1 aspect-[16/10] relative">
+                    <img 
+                      src={banner} 
+                      alt={space.name} 
+                      className="w-full h-full object-cover" 
+                    />
+                  </Link>
                 </div>
-                <div>
-                  <h3 className="serif text-3xl group-hover:italic transition-all duration-300">{space.name}</h3>
-                  <span className="mono text-[11px] text-[var(--brand)] uppercase tracking-wider">{space.organization.name}</span>
+
+                {/* Feature Content */}
+                <div className="lg:col-span-6 flex flex-col justify-center">
+                  <div className="flex items-center gap-2 mono text-[10px] uppercase tracking-widest text-g5 mb-4">
+                    <span>(0{index + 1})</span>
+                    <span>•</span>
+                    <span>{space.organization.name}</span>
+                  </div>
+
+                  <Link href={`/spaces/${space.id}`} className="block">
+                    <h3 className="serif text-4xl md:text-5xl leading-tight text-ink group-hover:italic transition-all duration-300">
+                      {space.name}
+                    </h3>
+                  </Link>
+
+                  <p className="text-g5 text-[15px] mt-4 leading-relaxed max-w-[48ch]">
+                    {space.description || "A collaborative circle gathered on the Convoke digital campus."}
+                  </p>
+
+                  <div className="mt-6 flex items-center gap-6 text-[11px] mono uppercase tracking-wider text-g4">
+                    <span>{space.organization.members.length} Builders</span>
+                    <span>{space._count.messages} Dispatches</span>
+                  </div>
+
+                  <div className="mt-8">
+                    <Link 
+                      href={`/spaces/${space.id}`}
+                      className="text-[13px] font-medium text-ink hover:underline underline-offset-4 inline-flex items-center gap-2"
+                    >
+                      <span>Build With Them</span>
+                      <span className="text-[11px] opacity-70">→</span>
+                    </Link>
+                  </div>
                 </div>
               </div>
-              <p className="text-g5 text-[15px] mt-4 leading-relaxed max-w-[50ch] flex-1">{space.description || "No description provided."}</p>
-              
-              <div className="mt-8 flex items-center gap-6 text-[13px] text-g6 border-t border-g3 pt-4">
-                <div className="flex items-center gap-1.5"><Users size={16} className="text-g4" /> {space.organization.members.length} members</div>
-                <div className="flex items-center gap-1.5"><MessageCircle size={16} className="text-g4" /> {space._count.messages} messages</div>
-              </div>
-            </Link>
-          ))}
+            );
+          })}
         </div>
       )}
 

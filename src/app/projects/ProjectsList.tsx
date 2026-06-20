@@ -3,10 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Eye, Download, Share2, Plus, X, Loader2 } from "lucide-react";
+import { Eye, Download, Share2, Plus, X, Loader2, ArrowRight } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
 import { motion, AnimatePresence } from "framer-motion";
 import { createProject } from "@/app/actions/workspace";
+import { getFallbackPhoto } from "@/lib/photos";
 
 interface ProjectWithDetails {
   id: string;
@@ -88,14 +89,15 @@ export function ProjectsList({ initialProjects }: { initialProjects: ProjectWith
 
   return (
     <>
-      <div className="flex items-end justify-between hairline-b pb-6 relative z-10">
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between hairline-b pb-8 relative z-10 gap-6">
         <div>
-          <h1 className="serif text-5xl md:text-6xl tracking-tight">Projects Gallery</h1>
-          <p className="text-g5 mt-3 text-lg">Proof of work. Discover what ambitious people are building.</p>
+          <div className="eyebrow">Proof of work</div>
+          <h1 className="serif text-5xl md:text-6xl tracking-tight mt-2">Projects Gallery</h1>
+          <p className="text-g5 mt-2 text-md">Discover the products, designs, and protocols ambitious people are launching.</p>
         </div>
         <button 
           onClick={() => setDrawerOpen(true)}
-          className="flex items-center justify-center gap-2 bg-ink text-paper px-6 py-2.5 rounded-full text-[14px] font-medium hover:bg-ink-2 transition-all active:scale-95 border border-[var(--brand)]/25 shadow-md cursor-pointer"
+          className="ink-button px-6 text-[13px] font-medium flex items-center justify-center gap-2 cursor-pointer self-start md:self-auto"
         >
           <Plus size={16} />
           <span>Launch Project</span>
@@ -103,62 +105,82 @@ export function ProjectsList({ initialProjects }: { initialProjects: ProjectWith
       </div>
 
       {projects.length === 0 ? (
-        <div className="py-32 text-center relative z-10 flex flex-col items-center justify-center">
-          <div className="w-16 h-16 rounded-full glass-panel flex items-center justify-center text-g5 mb-6">
-            <Eye size={28} className="text-[var(--brand)]" />
+        <div className="py-24 text-center relative z-10 flex flex-col items-center justify-center border border-dashed border-g3 rounded-md mt-10">
+          <div className="w-14 h-14 rounded-full border border-g3 bg-g1 flex items-center justify-center text-[var(--brand)] mb-4">
+            <Eye size={24} />
           </div>
-          <h3 className="serif text-3xl text-ink mb-2">No projects shipped yet</h3>
-          <p className="text-g5 text-[15px] max-w-[40ch] leading-relaxed mb-8">
-            Share what you are building.
+          <h3 className="serif text-2xl text-ink mb-1">No projects shipped yet</h3>
+          <p className="text-g5 text-[14px] max-w-[36ch] leading-relaxed mb-6">
+            Be the first to share your breakthrough with the community.
           </p>
           <button 
             onClick={() => setDrawerOpen(true)}
-            className="bg-ink text-paper px-6 py-2.5 rounded-full text-[14px] font-medium hover:bg-ink-2 transition-all active:scale-95 border border-[var(--brand)]/20 shadow-md cursor-pointer"
+            className="ink-button px-6 text-[13px] font-medium cursor-pointer"
           >
             Launch Project
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-10 relative z-10">
-          {projects.map((proj) => (
-            <div key={proj.id} className="premium-card overflow-hidden flex flex-col group">
-              <Link href={`/projects/${proj.id}`} className="block relative h-48 overflow-hidden bg-gradient-to-br from-g2 to-g1 flex items-center justify-center border-b border-g3">
-                {proj.bannerUrl ? (
-                  <img src={proj.bannerUrl} alt={proj.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-                ) : (
-                  <div className="w-16 h-16 rounded-full overflow-hidden border border-g3/80 bg-paper flex items-center justify-center shadow-md">
-                    {proj.user.avatarUrl ? (
-                      <img src={proj.user.avatarUrl} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      <span className="serif text-xl text-g5 font-bold uppercase">
-                        {(proj.user.name || "B").slice(0, 1)}
-                      </span>
-                    )}
-                  </div>
-                )}
-              </Link>
-              <div className="p-5 flex-1 flex flex-col">
-                <div className="flex items-center gap-3 mb-3">
-                  <Avatar src={proj.user.avatarUrl || ""} name={proj.user.name || "Builder"} size={24} />
-                  <Link href={`/profile/${proj.user.handle || proj.user.id}`} className="text-[13px] font-medium text-ink hover:underline">
-                    {proj.user.name || "Builder"}
-                  </Link>
-                </div>
-                <Link href={`/projects/${proj.id}`} className="block flex-1">
-                  <h3 className="serif text-2xl group-hover:text-[var(--brand)] transition-colors">{proj.title}</h3>
-                  <p className="text-g5 text-[14px] mt-2 line-clamp-2">{proj.description}</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16 mt-12 relative z-10">
+          {projects.map((proj) => {
+            const banner = proj.bannerUrl || getFallbackPhoto(proj.id, "project");
+            return (
+              <div key={proj.id} className="group flex flex-col">
+                <Link 
+                  href={`/projects/${proj.id}`} 
+                  className="relative aspect-[16/10] w-full overflow-hidden rounded-md border border-g3 bg-g1 block"
+                >
+                  <img 
+                    src={banner} 
+                    alt={proj.title} 
+                    className="w-full h-full object-cover transition-all duration-700" 
+                  />
                 </Link>
-                
-                <div className="mt-6 flex items-center justify-between text-g5 text-[13px] hairline-t pt-4">
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-1.5"><Eye size={16} /> {proj.views}</div>
-                    <div className="flex items-center gap-1.5"><Download size={16} /> {proj.downloads}</div>
+
+                <div className="mt-5 flex-1 flex flex-col">
+                  {/* Builder details */}
+                  <div className="flex items-center gap-2.5 mb-3.5">
+                    <Avatar src={proj.user.avatarUrl || ""} name={proj.user.name || "Builder"} size={22} />
+                    <Link href={`/profile/${proj.user.handle || proj.user.id}`} className="text-[12px] font-medium text-g6 hover:text-ink hover:underline">
+                      {proj.user.name || "Builder"}
+                    </Link>
+                    <span className="text-g3">•</span>
+                    <span className="mono text-[10px] text-g5 uppercase tracking-wider">
+                      {proj.stack ? proj.stack.split(",")[0] : "Product"}
+                    </span>
                   </div>
-                  <button className="hover:text-ink transition-colors"><Share2 size={16} /></button>
+
+                  {/* Title & Description */}
+                  <Link href={`/projects/${proj.id}`} className="block group-hover:opacity-90 transition-opacity">
+                    <h3 className="serif text-3xl tracking-tight text-ink group-hover:text-[var(--brand)] transition-colors">
+                      {proj.title}
+                    </h3>
+                    <p className="text-g5 text-[14px] leading-relaxed mt-2.5 line-clamp-2">
+                      {proj.description || "A showcase of custom building and engineering craftsmanship."}
+                    </p>
+                  </Link>
+
+                  {/* Actions & Metrics */}
+                  <div className="mt-5 flex items-center justify-between text-g5 text-[12px] pt-4 hairline-t">
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-1.5">
+                        <Eye size={14} className="text-g4" /> 
+                        <span>{proj.views}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <Download size={14} className="text-g4" /> 
+                        <span>{proj.downloads}</span>
+                      </div>
+                    </div>
+                    <Link href={`/projects/${proj.id}`} className="inline-flex items-center gap-1 text-[11px] uppercase tracking-wider text-[var(--brand)] font-semibold hover:text-ink transition-colors">
+                      <span>Case Study</span>
+                      <ArrowRight size={12} />
+                    </Link>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -213,7 +235,7 @@ export function ProjectsList({ initialProjects }: { initialProjects: ProjectWith
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="E.g. Convoke Search v2"
-                    className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                    className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
                   />
                 </div>
 
@@ -224,7 +246,7 @@ export function ProjectsList({ initialProjects }: { initialProjects: ProjectWith
                     value={stack}
                     onChange={(e) => setStack(e.target.value)}
                     placeholder="E.g. Next.js, Prisma, Framer Motion"
-                    className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                    className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
                   />
                 </div>
 
@@ -236,7 +258,7 @@ export function ProjectsList({ initialProjects }: { initialProjects: ProjectWith
                       value={githubUrl}
                       onChange={(e) => setGithubUrl(e.target.value)}
                       placeholder="https://github.com/username/repo"
-                      className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                      className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
                     />
                   </div>
                   <div>
@@ -246,7 +268,7 @@ export function ProjectsList({ initialProjects }: { initialProjects: ProjectWith
                       value={figmaUrl}
                       onChange={(e) => setFigmaUrl(e.target.value)}
                       placeholder="https://figma.com/file/..."
-                      className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                      className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
                     />
                   </div>
                 </div>
@@ -259,7 +281,7 @@ export function ProjectsList({ initialProjects }: { initialProjects: ProjectWith
                       value={demoUrl}
                       onChange={(e) => setDemoUrl(e.target.value)}
                       placeholder="https://myproject.com"
-                      className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                      className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
                     />
                   </div>
                   <div>
@@ -269,7 +291,7 @@ export function ProjectsList({ initialProjects }: { initialProjects: ProjectWith
                       value={url}
                       onChange={(e) => setUrl(e.target.value)}
                       placeholder="https://landingpage.com"
-                      className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                      className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
                     />
                   </div>
                 </div>
@@ -281,7 +303,7 @@ export function ProjectsList({ initialProjects }: { initialProjects: ProjectWith
                     value={bannerUrl}
                     onChange={(e) => setBannerUrl(e.target.value)}
                     placeholder="https://unsplash.com/... or direct image link"
-                    className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                    className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
                   />
                 </div>
 
@@ -292,7 +314,7 @@ export function ProjectsList({ initialProjects }: { initialProjects: ProjectWith
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Describe what your project does, how you built it, the problem it solves, and its features..."
-                    className="w-full p-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all resize-none"
+                    className="w-full p-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all resize-none"
                   />
                 </div>
               </form>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter_Tight, Newsreader, JetBrains_Mono } from "next/font/google";
+import { Inter_Tight, Newsreader, JetBrains_Mono, Instrument_Serif } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
@@ -18,6 +18,13 @@ const fontSerif = Newsreader({
 const fontMono = JetBrains_Mono({
   variable: "--font-mono",
   subsets: ["latin"],
+});
+
+const fontAccent = Instrument_Serif({
+  variable: "--font-accent",
+  subsets: ["latin"],
+  style: ["italic"],
+  weight: "400",
 });
 
 export const metadata: Metadata = {
@@ -59,7 +66,7 @@ export default function RootLayout({
           borderRadius: '4px',
         },
         elements: {
-          card: "bg-paper border border-g3 shadow-none rounded-2xl",
+          card: "bg-paper border border-g3 shadow-none rounded-md",
           headerTitle: "font-serif text-3xl text-ink",
           headerSubtitle: "text-g5 font-sans text-base",
           formButtonPrimary: "bg-ink text-paper hover:bg-ink/90 shadow-none transition-all border-none font-medium text-sm rounded-md",
@@ -70,7 +77,7 @@ export default function RootLayout({
           dividerLine: "bg-g3",
           dividerText: "text-g5 font-mono text-[11px] uppercase tracking-wider",
           footerActionLink: "text-ink font-medium hover:underline",
-          userButtonPopoverCard: "bg-paper border border-g3 shadow-xl rounded-xl overflow-hidden",
+          userButtonPopoverCard: "bg-paper border border-g3 shadow-none rounded-md overflow-hidden",
           userButtonPopoverActionButton: "hover:bg-g1 transition-colors",
           userButtonPopoverActionButtonText: "text-ink font-sans font-medium",
           userButtonPopoverActionButtonIcon: "text-ink",
@@ -83,11 +90,11 @@ export default function RootLayout({
           navbarButtonActive: "text-ink bg-g1 font-sans rounded-md",
           breadcrumbsItem: "text-ink font-sans",
           breadcrumbsItemDivider: "text-g5",
-          scrollBox: "bg-paper rounded-xl",
+          scrollBox: "bg-paper rounded-md",
         }
       }}
     >
-      <html lang="en" suppressHydrationWarning className={`${fontSans.variable} ${fontSerif.variable} ${fontMono.variable} antialiased h-full`}>
+      <html lang="en" suppressHydrationWarning className={`${fontSans.variable} ${fontSerif.variable} ${fontMono.variable} ${fontAccent.variable} antialiased h-full`}>
         <body className="min-h-full flex flex-col font-sans">
           <ThemeProvider
             attribute="class"

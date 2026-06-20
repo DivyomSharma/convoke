@@ -5,6 +5,7 @@
   --font-sans: var(--font-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-serif: var(--font-serif), ui-serif, Georgia, serif;
   --font-mono: var(--font-mono), ui-monospace, "SFMono-Regular", monospace;
+  --font-accent: var(--font-accent), ui-serif, Georgia, serif;
 
   --color-paper: var(--paper);
   --color-paper-elevated: var(--paper-elevated);
@@ -30,51 +31,51 @@
 :root {
   color-scheme: light;
 
-  --paper: #f6f2ea;
-  --paper-elevated: rgba(255, 252, 247, 0.92);
-  --paper-card: rgba(255, 252, 247, 0.76);
+  --paper: #f7f6f3;
+  --paper-elevated: #ffffff;
+  --paper-card: #ffffff;
 
-  --ink: #17120d;
-  --ink-muted: #55463b;
+  --ink: #111111;
+  --ink-muted: #666666;
 
-  --g1: rgba(47, 34, 24, 0.045);
-  --g2: rgba(47, 34, 24, 0.08);
-  --g3: rgba(47, 34, 24, 0.12);
-  --g4: rgba(47, 34, 24, 0.24);
-  --g5: rgba(47, 34, 24, 0.58);
-  --g6: rgba(20, 15, 11, 0.78);
+  --g1: rgba(17, 17, 17, 0.025);
+  --g2: rgba(17, 17, 17, 0.05);
+  --g3: rgba(17, 17, 17, 0.09);
+  --g4: rgba(17, 17, 17, 0.18);
+  --g5: rgba(17, 17, 17, 0.54);
+  --g6: rgba(17, 17, 17, 0.76);
 
-  --brand: #b98f59;
-  --brand-2: #845d33;
-  --accent: #183a46;
+  --brand: #00b2ff; /* Signature Blue */
+  --brand-2: #00b2ff;
+  --accent: #c6a36b; /* Ceremonial Bronze */
 
-  --shadow-soft: 0 24px 80px -32px rgba(25, 18, 11, 0.18);
-  --shadow-card: 0 16px 40px -18px rgba(25, 18, 11, 0.12);
+  --shadow-soft: none;
+  --shadow-card: none;
 }
 
 .dark {
   color-scheme: dark;
 
-  --paper: #090909;
-  --paper-elevated: rgba(14, 14, 14, 0.92);
-  --paper-card: rgba(17, 17, 17, 0.76);
+  --paper: #000000;
+  --paper-elevated: #0a0a0a;
+  --paper-card: #121212;
 
-  --ink: #f4ede4;
-  --ink-muted: #d0c0ad;
+  --ink: #eaeaea;
+  --ink-muted: #8a8a8a;
 
-  --g1: rgba(255, 255, 255, 0.028);
-  --g2: rgba(255, 255, 255, 0.05);
-  --g3: rgba(255, 255, 255, 0.09);
-  --g4: rgba(255, 255, 255, 0.18);
-  --g5: rgba(244, 237, 228, 0.58);
-  --g6: rgba(244, 237, 228, 0.84);
+  --g1: rgba(234, 234, 234, 0.015);
+  --g2: rgba(234, 234, 234, 0.03);
+  --g3: rgba(234, 234, 234, 0.06);
+  --g4: rgba(234, 234, 234, 0.12);
+  --g5: rgba(234, 234, 234, 0.54);
+  --g6: rgba(234, 234, 234, 0.76);
 
-  --brand: #c8a16d;
-  --brand-2: #f0c892;
-  --accent: #75b8cb;
+  --brand: #00b2ff; /* Signature Blue */
+  --brand-2: #00b2ff;
+  --accent: #c6a36b; /* Ceremonial Bronze */
 
-  --shadow-soft: 0 36px 120px -44px rgba(0, 0, 0, 0.72);
-  --shadow-card: 0 22px 54px -28px rgba(0, 0, 0, 0.65);
+  --shadow-soft: none;
+  --shadow-card: none;
 }
 
 @layer base {
@@ -88,10 +89,7 @@
 
   body {
     min-height: 100vh;
-    background:
-      radial-gradient(circle at top, color-mix(in srgb, var(--brand) 15%, transparent) 0%, transparent 42%),
-      radial-gradient(circle at 85% 18%, color-mix(in srgb, var(--accent) 10%, transparent) 0%, transparent 28%),
-      linear-gradient(180deg, var(--paper-elevated) 0%, var(--paper) 100%);
+    background: var(--paper);
     color: var(--ink);
     font-family: var(--font-sans);
     font-feature-settings: "ss01", "cv11";
@@ -105,7 +103,7 @@
 
   ::selection {
     background: var(--brand);
-    color: #0f0a06;
+    color: #ffffff;
   }
 
   h1,
@@ -113,6 +111,16 @@
   h3,
   .logo {
     font-family: var(--font-serif);
+  }
+
+  /* Image defaults: grayscale with 110% contrast, transition back on hover */
+  img {
+    filter: grayscale(100%) contrast(110%);
+    transition: filter 700ms ease;
+  }
+
+  img:hover {
+    filter: grayscale(0%) contrast(100%);
   }
 }
 
@@ -131,6 +139,11 @@
   font-family: var(--font-serif);
   font-weight: 400;
   letter-spacing: -0.03em;
+}
+
+@utility italic-accent {
+  font-family: var(--font-accent);
+  font-style: italic;
 }
 
 @utility mono {
@@ -158,120 +171,77 @@
   color: var(--g5);
 }
 
+/* Editorial Reboot Card Layout: Whitespace over borders, border on hover only, rounded-sm/md */
 @utility premium-card {
   position: relative;
   overflow: hidden;
-  border: 1px solid var(--g3);
-  border-radius: 28px;
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--paper-card) 88%, transparent), color-mix(in srgb, var(--paper-card) 100%, transparent)),
-    linear-gradient(135deg, color-mix(in srgb, var(--brand) 8%, transparent), transparent 55%);
-  backdrop-filter: blur(24px) saturate(112%);
-  -webkit-backdrop-filter: blur(24px) saturate(112%);
-  box-shadow: var(--shadow-card);
-  transition:
-    transform 420ms cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 320ms ease,
-    box-shadow 420ms cubic-bezier(0.16, 1, 0.3, 1),
-    background 420ms ease;
-}
-
-.premium-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--brand) 12%, transparent), transparent 42%);
-  opacity: 0;
-  transition: opacity 360ms ease;
-  pointer-events: none;
+  border: 1px solid transparent;
+  border-radius: 4px; /* rounded-sm */
+  background: var(--paper-card);
+  transition: border-color 320ms ease;
 }
 
 .premium-card:hover {
-  transform: translateY(-6px);
-  border-color: color-mix(in srgb, var(--brand) 38%, var(--g3));
-  box-shadow: var(--shadow-soft);
-}
-
-.premium-card:hover::before {
-  opacity: 1;
+  border-color: var(--g3);
 }
 
 @utility glass-panel {
   border: 1px solid var(--g3);
-  border-radius: 24px;
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--paper-card) 86%, transparent), color-mix(in srgb, var(--paper-card) 100%, transparent)),
-    linear-gradient(145deg, color-mix(in srgb, var(--brand) 7%, transparent), transparent 65%);
-  backdrop-filter: blur(20px) saturate(110%);
-  -webkit-backdrop-filter: blur(20px) saturate(110%);
+  border-radius: 6px; /* rounded-md */
+  background: var(--paper-elevated);
 }
 
 @utility campus-frame {
   position: relative;
 }
 
-.campus-frame::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  border: 1px solid color-mix(in srgb, var(--brand) 18%, transparent);
-  mask: linear-gradient(180deg, rgba(0, 0, 0, 0.7), transparent 46%);
-  pointer-events: none;
-}
-
+/* Primary Button: White background, black text, rounded-full, no shadows. Hover slight opacity. */
 @utility ink-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.6rem;
-  min-height: 2.9rem;
-  border-radius: 999px;
-  padding-inline: 1.15rem;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--brand) 18%, var(--ink)), var(--ink));
+  min-height: 2.5rem;
+  border-radius: 9999px; /* rounded-full */
+  padding-inline: 1.25rem;
+  background: var(--ink);
   color: var(--paper);
-  box-shadow: 0 18px 34px -22px color-mix(in srgb, var(--brand) 45%, black);
-  transition:
-    transform 240ms ease,
-    box-shadow 240ms ease,
-    opacity 240ms ease;
+  transition: opacity 240ms ease;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  border: none;
+  box-shadow: none;
 }
 
 .ink-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 24px 40px -24px color-mix(in srgb, var(--brand) 55%, black);
+  opacity: 0.85;
 }
 
 .ink-button:active {
-  transform: translateY(0);
+  opacity: 0.95;
 }
 
+/* Secondary Button: Text only, underline on hover. No filled dark buttons. */
 @utility ghost-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.55rem;
-  min-height: 2.75rem;
-  border-radius: 999px;
-  padding-inline: 1rem;
-  border: 1px solid var(--g3);
-  background: color-mix(in srgb, var(--paper-card) 86%, transparent);
+  min-height: 2.5rem;
+  background: transparent;
   color: var(--ink);
-  transition:
-    border-color 240ms ease,
-    background 240ms ease,
-    transform 240ms ease;
+  transition: text-decoration 240ms ease, opacity 240ms ease;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  border: none;
 }
 
 .ghost-button:hover {
-  transform: translateY(-1px);
-  border-color: color-mix(in srgb, var(--brand) 34%, var(--g3));
-  background: color-mix(in srgb, var(--brand) 8%, var(--paper-card));
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 
 @utility focus-ring {
   outline: none;
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--brand) 70%, transparent),
-    0 0 0 4px color-mix(in srgb, var(--brand) 18%, transparent);
+  box-shadow: 0 0 0 2px var(--brand);
 }

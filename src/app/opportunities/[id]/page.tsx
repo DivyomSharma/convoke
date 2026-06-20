@@ -79,7 +79,7 @@ export default async function OpportunityDetailPage(props: { params?: Promise<{ 
           {opp.bannerUrl ? (
             <img src={opp.bannerUrl} alt="Banner" className="w-full h-full object-cover opacity-80" />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-g2 to-g1 flex items-center justify-center">
+            <div className="w-full h-full bg-g1 flex items-center justify-center">
               <AmbientGlow className="top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full opacity-10" color="var(--brand)" />
               <Building2 size={64} className="text-g3" />
             </div>
@@ -121,9 +121,9 @@ export default async function OpportunityDetailPage(props: { params?: Promise<{ 
               </div>
 
               {/* Company manifesto block */}
-              <div className="flex items-center justify-between p-5 rounded-2xl glass-panel">
+              <div className="flex items-center justify-between p-5 rounded-md glass-panel">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-g1 flex-shrink-0 flex items-center justify-center border border-g3 overflow-hidden">
+                  <div className="w-12 h-12 rounded-sm bg-g1 flex-shrink-0 flex items-center justify-center border border-g3 overflow-hidden">
                     {opp.organization.logoUrl ? (
                       <img src={opp.organization.logoUrl} alt="" className="w-full h-full object-cover" />
                     ) : (
@@ -149,7 +149,7 @@ export default async function OpportunityDetailPage(props: { params?: Promise<{ 
               {logistics.length > 0 && (
                 <section>
                   <h2 className="serif text-2xl mb-4">Job Specifications</h2>
-                  <div className="rounded-2xl overflow-hidden glass-panel divide-y divide-g3">
+                  <div className="rounded-md overflow-hidden glass-panel divide-y divide-g3">
                     {logistics.map((item, i) => (
                       <div key={i} className="flex items-center justify-between p-4 md:p-5 hover:bg-g1/50 transition-colors">
                         <div className="mono text-[13px] font-medium text-g5 uppercase">{item.label}</div>
@@ -164,7 +164,7 @@ export default async function OpportunityDetailPage(props: { params?: Promise<{ 
               {opp.benefits && (
                 <section>
                   <h2 className="serif text-2xl mb-4">Perks & Benefits</h2>
-                  <div className="text-g6 text-[15px] leading-relaxed whitespace-pre-line p-5 rounded-2xl glass-panel">
+                  <div className="text-g6 text-[15px] leading-relaxed whitespace-pre-line p-5 rounded-md glass-panel">
                     {opp.benefits}
                   </div>
                 </section>
@@ -176,7 +176,7 @@ export default async function OpportunityDetailPage(props: { params?: Promise<{ 
                   <h2 className="serif text-2xl mb-4">Frequently Asked</h2>
                   <div className="space-y-3">
                     {opp.faqs.map((faq) => (
-                      <details key={faq.id} className="group rounded-xl p-4 [&_summary::-webkit-details-marker]:hidden cursor-pointer glass-panel">
+                      <details key={faq.id} className="group rounded-sm p-4 [&_summary::-webkit-details-marker]:hidden cursor-pointer glass-panel">
                         <summary className="flex items-center justify-between font-medium text-ink outline-none">
                           {faq.question}
                           <ChevronDown size={18} className="text-g4 group-open:rotate-180 transition-transform" />

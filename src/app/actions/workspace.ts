@@ -7,6 +7,39 @@ import { requireUser } from "@/lib/auth";
 export async function rsvpToEvent(eventId: string, status: "GOING" | "INTERESTED") {
   const user = await requireUser();
 
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+    select: { capacity: true }
+  });
+
+  if (!event) {
+    throw new Error("Event not found.");
+  }
+
+  const existingAttendance = await prisma.eventAttendance.findUnique({
+    where: {
+      eventId_userId: {
+        eventId,
+        userId: user.id,
+      },
+    },
+  });
+
+  let finalStatus: string = status;
+  if (status === "GOING" && existingAttendance?.status !== "GOING") {
+    // Check current GOING count
+    const goingCount = await prisma.eventAttendance.count({
+      where: {
+        eventId,
+        status: "GOING",
+      },
+    });
+
+    if (event.capacity && goingCount >= event.capacity) {
+      finalStatus = "WAITLISTED";
+    }
+  }
+
   await prisma.eventAttendance.upsert({
     where: {
       eventId_userId: {
@@ -15,20 +48,33 @@ export async function rsvpToEvent(eventId: string, status: "GOING" | "INTERESTED
       },
     },
     update: {
-      status,
+      status: finalStatus,
     },
     create: {
       eventId,
       userId: user.id,
-      status,
+      status: finalStatus,
     },
+  });
+
+  // Re-calculate waitlist count for the event
+  const waitlistCount = await prisma.eventAttendance.count({
+    where: {
+      eventId,
+      status: "WAITLISTED",
+    },
+  });
+
+  await prisma.event.update({
+    where: { id: eventId },
+    data: { waitlistCount },
   });
 
   revalidatePath("/workspace");
   revalidatePath("/workspace/tickets");
   revalidatePath("/events");
   revalidatePath(`/events/${eventId}`);
-  return { success: true };
+  return { success: true, status: finalStatus };
 }
 
 export async function applyToOpportunity(opportunityId: string) {
@@ -348,3 +394,109 @@ export async function createResearch(data: {
   revalidatePath("/workspace");
   return { success: true, research };
 }
+
+export async function promoteAttendee(eventId: string, userId: string, status: string) {
+  const viewer = await requireUser();
+
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+    include: {
+      space: {
+        include: {
+          organization: {
+            include: {
+              members: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!event) throw new Error("Event not found.");
+
+  const isOrganizer = event.space.organization.members.some(
+    (m) => m.userId === viewer.id && (m.role === "ADMIN" || m.role === "FOUNDER")
+  );
+
+  if (!isOrganizer) throw new Error("Unauthorized.");
+
+  if (status === "REJECTED") {
+    await prisma.eventAttendance.delete({
+      where: {
+        eventId_userId: { eventId, userId },
+      },
+    }).catch(() => {});
+  } else {
+    await prisma.eventAttendance.update({
+      where: {
+        eventId_userId: { eventId, userId },
+      },
+      data: {
+        status,
+      },
+    });
+  }
+
+  const waitlistCount = await prisma.eventAttendance.count({
+    where: {
+      eventId,
+      status: "WAITLISTED",
+    },
+  });
+
+  await prisma.event.update({
+    where: { id: eventId },
+    data: { waitlistCount },
+  });
+
+  revalidatePath(`/events/${eventId}`);
+  revalidatePath("/workspace");
+  return { success: true };
+}
+
+export async function checkInAttendee(eventId: string, userId: string) {
+  const viewer = await requireUser();
+
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+    include: {
+      space: {
+        include: {
+          organization: {
+            include: {
+              members: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!event) throw new Error("Event not found.");
+
+  const isOrganizer = event.space.organization.members.some(
+    (m) => m.userId === viewer.id && (m.role === "ADMIN" || m.role === "FOUNDER")
+  );
+
+  if (!isOrganizer) throw new Error("Unauthorized.");
+
+  await prisma.eventAttendance.upsert({
+    where: {
+      eventId_userId: { eventId, userId },
+    },
+    update: {
+      status: "CHECKED_IN",
+    },
+    create: {
+      eventId,
+      userId,
+      status: "CHECKED_IN",
+    },
+  });
+
+  revalidatePath(`/events/${eventId}`);
+  revalidatePath("/workspace");
+  return { success: true };
+}
+

@@ -15,3 +15,20 @@ export const portraits = [
   "/assets/ph-portrait-3.jpg",
   "/assets/ph-portrait-4.jpg",
 ];
+
+export function getFallbackPhoto(id: string, type: 'event' | 'project' | 'space' | 'opportunity'): string {
+  const hash = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  if (type === 'event') {
+    const options = [photos.meetup, photos.demoday, photos.coffee];
+    return options[hash % options.length];
+  } else if (type === 'project') {
+    const options = [photos.code, photos.whiteboard, photos.hackathon];
+    return options[hash % options.length];
+  } else if (type === 'space') {
+    const options = [photos.coworking, photos.meetup, photos.coffee];
+    return options[hash % options.length];
+  } else {
+    const options = [photos.pitch, photos.code, photos.coworking];
+    return options[hash % options.length];
+  }
+}

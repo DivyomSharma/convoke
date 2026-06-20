@@ -3,9 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Building2, CircleDollarSign, MapPin, Plus, X, Loader2 } from "lucide-react";
+import { ArrowRight, Building2, CircleDollarSign, MapPin, Plus, X, Loader2, Search } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createOpportunity } from "@/app/actions/workspace";
+import { getFallbackPhoto } from "@/lib/photos";
 
 interface OpportunityWithDetails {
   id: string;
@@ -18,6 +19,7 @@ interface OpportunityWithDetails {
   openings: number | null;
   experience: string | null;
   deadline: Date | null;
+  bannerUrl: string | null;
   organization: {
     name: string;
   };
@@ -43,6 +45,10 @@ export function OpportunitiesList({
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Search & filter states
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedType, setSelectedType] = useState("ALL");
 
   // Form states
   const [title, setTitle] = useState("");
@@ -109,110 +115,159 @@ export function OpportunitiesList({
     }
   };
 
+  const filteredOpportunities = opportunities.filter((opp) => {
+    const matchesSearch = 
+      opp.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      opp.organization.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (opp.description && opp.description.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    const matchesType = selectedType === "ALL" || opp.type === selectedType;
+    
+    return matchesSearch && matchesType;
+  });
+
+  const types = ["ALL", "ROLE", "FELLOWSHIP", "GRANT", "HACKATHON", "CHALLENGE"];
+
   return (
     <>
-      <section className="campus-frame premium-card p-7 md:p-10 z-10 relative">
+      <section className="premium-card p-6 md:p-8 relative z-10">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-3xl">
             <div className="eyebrow">Opportunity board</div>
-            <h1 className="mt-3 serif text-5xl tracking-tight md:text-7xl">
+            <h1 className="mt-2 serif text-4xl tracking-tight md:text-5xl">
               Roles, fellowships, grants, and builder asks.
             </h1>
-            <p className="mt-5 max-w-2xl text-[15px] leading-7 text-g5 md:text-[17px]">
-              This surface should help ambitious people move: apply faster, discover sharper roles, and connect with organizations that are actively building.
+            <p className="mt-3 max-w-2xl text-[14px] leading-6 text-g5">
+              Apply faster, discover sharper roles, and connect with organizations that are actively building.
             </p>
           </div>
           <button 
             onClick={() => setDrawerOpen(true)}
-            className="ink-button px-5 text-[14px] font-medium flex items-center justify-center gap-2 cursor-pointer shrink-0"
+            className="ink-button px-5 text-[13px] font-medium flex items-center justify-center gap-2 cursor-pointer shrink-0"
           >
-            <Plus size={16} />
+            <Plus size={15} />
             <span>Post Opportunity</span>
           </button>
         </div>
       </section>
 
-      {opportunities.length === 0 ? (
-        <section className="mt-8 premium-card p-12 text-center relative z-10">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-g3 bg-g1 text-[var(--brand)]">
-            <Building2 size={26} />
+      {/* Filter & Search Bar */}
+      <div className="mt-8 flex flex-col md:flex-row gap-4 items-center justify-between relative z-10 hairline-b pb-5">
+        <div className="relative w-full md:w-80">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-g5" size={15} />
+          <input
+            type="text"
+            placeholder="Search opportunities..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full h-10 pl-10 pr-4 rounded-md border border-g3 bg-paper text-[13px] text-ink outline-none focus:border-[var(--brand)] transition-all placeholder:text-g5"
+          />
+        </div>
+
+        <div className="flex flex-wrap gap-1.5 w-full md:w-auto">
+          {types.map((t) => (
+            <button
+              key={t}
+              onClick={() => setSelectedType(t)}
+              className={`px-3 py-1.5 rounded-md mono text-[10px] uppercase tracking-wider transition-colors cursor-pointer border ${
+                selectedType === t 
+                  ? "border-[var(--brand)] text-[var(--brand)] bg-[var(--brand)]/5 font-semibold" 
+                  : "border-g3 text-g5 hover:text-ink hover:border-g4 bg-transparent"
+              }`}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {filteredOpportunities.length === 0 ? (
+        <section className="mt-8 p-12 text-center relative z-10 border border-dashed border-g3 rounded-md">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-g3 bg-g1 text-[var(--brand)]">
+            <Building2 size={22} />
           </div>
-          <h2 className="mt-6 serif text-3xl">No opportunities are live yet</h2>
-          <p className="mx-auto mt-3 max-w-[42ch] text-[15px] leading-7 text-g5">
-            Post the first internship, volunteer role, ambassador program, or fellowship. This directory stays honest until the ecosystem is real.
+          <h2 className="mt-5 serif text-2xl">No opportunities found</h2>
+          <p className="mx-auto mt-2 max-w-[38ch] text-[13px] leading-relaxed text-g5">
+            Adjust your search filter or publish the first opportunity to seed the platform.
           </p>
-          <div className="mt-8">
+          <div className="mt-6">
             <button 
               onClick={() => setDrawerOpen(true)}
-              className="ink-button px-5 text-[14px] font-medium cursor-pointer"
+              className="ink-button px-5 text-[13px] font-medium cursor-pointer"
             >
-              <Plus size={16} />
+              <Plus size={15} />
               <span>Publish first role</span>
             </button>
           </div>
         </section>
       ) : (
-        <section className="mt-8 grid gap-5 relative z-10">
-          {opportunities.map((opportunity) => (
-            <Link key={opportunity.id} href={`/opportunities/${opportunity.id}`} className="premium-card campus-frame block p-6 md:p-8">
-              <div className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr] lg:items-start">
-                <div>
-                  <div className="flex flex-wrap items-center gap-3">
-                    <span className="rounded-full border border-[color:var(--brand)]/25 bg-[color:var(--brand)]/10 px-3 py-1 mono text-[11px] uppercase tracking-[0.18em] text-[var(--brand)]">
-                      {opportunity.type}
-                    </span>
-                    <span className="mono text-[11px] uppercase tracking-[0.18em] text-g4">
-                      {opportunity.organization.name}
-                    </span>
+        <section className="mt-6 relative z-10 divide-y divide-g3/80">
+          {filteredOpportunities.map((opportunity) => {
+            const banner = opportunity.bannerUrl || getFallbackPhoto(opportunity.id, "opportunity");
+            return (
+              <div key={opportunity.id} className="group transition-colors duration-200">
+                <Link 
+                  href={`/opportunities/${opportunity.id}`} 
+                  className="grid grid-cols-12 gap-4 py-4 md:py-5 items-center hover:bg-g1/30 px-3 -mx-3 rounded-md"
+                >
+                  {/* Left Column: Image Banner */}
+                  <div className="col-span-12 sm:col-span-2 md:col-span-1">
+                    <div className="relative aspect-[16/10] sm:aspect-square md:aspect-[16/10] w-full bg-g2 rounded-md overflow-hidden border border-g3">
+                      <img 
+                        src={banner} 
+                        alt={opportunity.title} 
+                        className="w-full h-full object-cover transition-all duration-700" 
+                      />
+                    </div>
                   </div>
-                  <h2 className="mt-5 serif text-3xl tracking-tight md:text-5xl">{opportunity.title}</h2>
-                  <p className="mt-4 max-w-3xl text-[15px] leading-7 text-g5 line-clamp-2">
-                    {opportunity.description || "No public description has been published yet."}
-                  </p>
 
-                  <div className="mt-6 flex flex-wrap gap-3 text-[13px] text-g5">
-                    <span className="inline-flex items-center gap-2 rounded-full border border-g3 bg-g1/60 px-3 py-2">
-                      <Building2 size={14} className="text-[var(--brand)]" />
-                      {opportunity.organization.name}
-                    </span>
-                    <span className="inline-flex items-center gap-2 rounded-full border border-g3 bg-g1/60 px-3 py-2">
-                      <MapPin size={14} className="text-[var(--brand)]" />
+                  {/* Title & Organization Info */}
+                  <div className="col-span-12 sm:col-span-6 md:col-span-5 flex flex-col justify-center">
+                    <div className="flex items-center gap-2">
+                      <span className="mono text-[9px] uppercase tracking-widest text-[var(--brand)] px-1.5 py-0.5 rounded border border-[var(--brand)]/20 bg-[var(--brand)]/5 font-semibold">
+                        {opportunity.type}
+                      </span>
+                      <span className="mono text-[10px] uppercase tracking-wider text-g5">
+                        {opportunity.organization.name}
+                      </span>
+                    </div>
+                    <h2 className="mt-1.5 text-lg font-medium text-ink group-hover:text-[var(--brand)] transition-colors line-clamp-1">
+                      {opportunity.title}
+                    </h2>
+                    {opportunity.description && (
+                      <p className="mt-1 text-[13px] text-g5 line-clamp-1 leading-normal">
+                        {opportunity.description}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Location & Compensation */}
+                  <div className="col-span-6 sm:col-span-2 md:col-span-3 text-left sm:text-right md:text-left flex flex-col sm:justify-center">
+                    <span className="text-[13px] text-ink font-medium truncate flex items-center gap-1.5 sm:justify-end md:justify-start">
+                      <MapPin size={13} className="text-g5 shrink-0" />
                       {opportunity.location || "Remote"}
                     </span>
-                    <span className="inline-flex items-center gap-2 rounded-full border border-g3 bg-g1/60 px-3 py-2">
-                      <CircleDollarSign size={14} className="text-[var(--brand)]" />
+                    <span className="mt-1 text-[12px] text-g5 truncate flex items-center gap-1.5 sm:justify-end md:justify-start">
+                      <CircleDollarSign size={13} className="text-g5 shrink-0" />
                       {opportunity.compensation || "Competitive"}
                     </span>
                   </div>
-                </div>
 
-                <div className="glass-panel rounded-[26px] p-5 md:p-6">
-                  <div className="eyebrow">Application pulse</div>
-                  <div className="mt-3 serif text-4xl">{String(opportunity._count.applications).padStart(2, "0")}</div>
-                  <div className="mt-2 text-[14px] leading-6 text-g5">
-                    {opportunity.deadline
-                      ? `Applications open until ${new Date(opportunity.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric" })}.`
-                      : "Rolling applications with no fixed deadline published yet."}
+                  {/* Deadline & Applications count */}
+                  <div className="col-span-6 sm:col-span-2 md:col-span-3 text-right flex flex-col justify-center">
+                    <span className="text-[13px] text-ink font-medium">
+                      {String(opportunity._count.applications).padStart(2, "0")} applications
+                    </span>
+                    <span className="mt-1 text-[11px] text-g5">
+                      {opportunity.deadline
+                        ? `Due ${new Date(opportunity.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
+                        : "Rolling basis"}
+                    </span>
                   </div>
-
-                  <div className="mt-6 space-y-3 border-t border-g3 pt-5 text-[13px] text-g5">
-                    <div className="flex items-center justify-between">
-                      <span>Work style</span>
-                      <span className="text-ink">{opportunity.remoteHybrid || "Flexible"}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span>Openings</span>
-                      <span className="text-ink">{opportunity.openings || "Not stated"}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span>Experience</span>
-                      <span className="text-ink">{opportunity.experience || "Open to builders"}</span>
-                    </div>
-                  </div>
-                </div>
+                </Link>
               </div>
-            </Link>
-          ))}
+            );
+          })}
         </section>
       )}
 
@@ -267,7 +322,7 @@ export function OpportunitiesList({
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="E.g. Lead Frontend Architect"
-                    className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                    className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
                   />
                 </div>
 
@@ -277,7 +332,7 @@ export function OpportunitiesList({
                     <select 
                       value={type}
                       onChange={(e) => setType(e.target.value)}
-                      className="w-full h-11 px-4 rounded-xl border border-g3 bg-paper text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                      className="w-full h-11 px-4 rounded-md border border-g3 bg-paper text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
                     >
                       <option value="ROLE">Role / Job</option>
                       <option value="FELLOWSHIP">Fellowship</option>
@@ -296,7 +351,7 @@ export function OpportunitiesList({
                       <select 
                         value={organizationId}
                         onChange={(e) => setOrganizationId(e.target.value)}
-                        className="w-full h-11 px-4 rounded-xl border border-g3 bg-paper text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                        className="w-full h-11 px-4 rounded-md border border-g3 bg-paper text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
                       >
                         {organizations.map((org) => (
                           <option key={org.id} value={org.id}>{org.name}</option>
@@ -314,7 +369,7 @@ export function OpportunitiesList({
                       value={department}
                       onChange={(e) => setDepartment(e.target.value)}
                       placeholder="E.g. Engineering, Design"
-                      className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                      className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
                     />
                   </div>
                   <div>
@@ -324,7 +379,7 @@ export function OpportunitiesList({
                       value={employmentType}
                       onChange={(e) => setEmploymentType(e.target.value)}
                       placeholder="E.g. Full-time, Internship"
-                      className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                      className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
                     />
                   </div>
                 </div>
@@ -337,7 +392,7 @@ export function OpportunitiesList({
                       value={openings}
                       onChange={(e) => setOpenings(e.target.value)}
                       placeholder="E.g. 2"
-                      className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                      className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
                     />
                   </div>
                   <div>
@@ -347,7 +402,7 @@ export function OpportunitiesList({
                       value={experience}
                       onChange={(e) => setExperience(e.target.value)}
                       placeholder="E.g. Open to all, 1+ years"
-                      className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                      className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
                     />
                   </div>
                 </div>
@@ -360,7 +415,7 @@ export function OpportunitiesList({
                       value={location}
                       onChange={(e) => setLocation(e.target.value)}
                       placeholder="E.g. Remote, Bangalore"
-                      className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                      className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
                     />
                   </div>
                   <div>
@@ -370,7 +425,7 @@ export function OpportunitiesList({
                       value={compensation}
                       onChange={(e) => setCompensation(e.target.value)}
                       placeholder="E.g. ₹50k/mo, Equity"
-                      className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                      className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
                     />
                   </div>
                 </div>
@@ -382,7 +437,7 @@ export function OpportunitiesList({
                       type="date"
                       value={deadline}
                       onChange={(e) => setDeadline(e.target.value)}
-                      className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                      className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
                     />
                   </div>
                   <div>
@@ -392,7 +447,7 @@ export function OpportunitiesList({
                       value={stipend}
                       onChange={(e) => setStipend(e.target.value)}
                       placeholder="E.g. Funded travel, $5k award"
-                      className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                      className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
                     />
                   </div>
                 </div>
@@ -404,7 +459,7 @@ export function OpportunitiesList({
                     value={bannerUrl}
                     onChange={(e) => setBannerUrl(e.target.value)}
                     placeholder="https://unsplash.com/... or direct image link"
-                    className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                    className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
                   />
                 </div>
 
@@ -415,7 +470,7 @@ export function OpportunitiesList({
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Detail the role responsibilities, key projects, and ideal candidate profile..."
-                    className="w-full p-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all resize-none"
+                    className="w-full p-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all resize-none"
                   />
                 </div>
               </form>

@@ -58,21 +58,20 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
 
   return (
     <div className="min-h-screen bg-paper text-ink">
-      <div className="fixed inset-x-0 top-0 z-0 h-[28rem] bg-[radial-gradient(circle_at_top,rgba(201,161,109,0.14),transparent_58%)]" />
       <header className="sticky top-0 z-30 border-b border-g3/80 bg-paper/75 backdrop-blur-2xl">
         <div className={`mx-auto flex h-16 items-center gap-5 px-5 sm:px-8 ${widthClass}`}>
-          <Link href="/" className="serif text-[24px] tracking-tight text-ink">
+          <Link href="/" className="serif text-[22px] leading-none tracking-tight text-ink">
             Convoke.
           </Link>
 
-          <nav className="hidden items-center gap-6 text-[13px] font-medium tracking-wide text-g5 md:flex uppercase">
+          <nav className="hidden items-center gap-6 mono text-[11px] uppercase tracking-[0.14em] text-g5 md:flex">
             {mainNav.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 className={
-                  "transition hover:text-ink " +
-                  (pathname.startsWith(item.href) ? "text-ink font-semibold" : "")
+                  "transition-colors " +
+                  (pathname.startsWith(item.href) ? "text-brand" : "hover:text-ink")
                 }
               >
                 {item.label}
@@ -80,20 +79,20 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
             ))}
 
             <div className="relative group">
-              <button className="flex items-center gap-1 transition hover:text-ink cursor-pointer">
+              <button className="flex items-center gap-1 hover:text-ink cursor-pointer">
                 <span>More</span>
-                <ChevronDown size={14} className="text-g4" />
+                <ChevronDown size={11} className="text-g4" />
               </button>
-              <div className="absolute left-0 mt-2 w-48 origin-top-left rounded-xl border border-g3 bg-paper-card backdrop-blur-2xl p-1.5 opacity-0 scale-95 pointer-events-none group-hover:opacity-100 group-hover:scale-100 group-hover:pointer-events-auto transition-all duration-200 shadow-xl">
+              <div className="absolute left-0 mt-2 w-44 origin-top-left rounded-sm border border-g3 bg-paper-card p-1 opacity-0 scale-95 pointer-events-none group-hover:opacity-100 group-hover:scale-100 group-hover:pointer-events-auto transition-all duration-200">
                 {moreNav.map((item) => {
                   const Icon = item.icon;
                   return (
                     <Link
                       key={item.href}
                       href={item.href}
-                      className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm text-g5 hover:bg-g1/50 hover:text-ink transition-colors"
+                      className="flex items-center gap-2 rounded-sm px-2.5 py-1.5 text-left text-[10px] text-g5 hover:bg-g1 hover:text-ink transition-colors"
                     >
-                      <Icon size={15} className="text-g4" />
+                      <Icon size={12} className="text-g4" />
                       <span>{item.label}</span>
                     </Link>
                   );
@@ -104,11 +103,11 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
 
           <button
             onClick={() => setCommandOpen(true)}
-            className="hidden items-center gap-2 border border-g3 bg-g1/35 px-4 h-10 rounded-full text-left text-[13px] text-g5 transition hover:border-g4 hover:bg-g1/60 md:flex md:w-64 lg:w-80 cursor-pointer shadow-inner"
+            className="hidden items-center gap-2 border border-g3 bg-g1/35 px-3 h-8 rounded-sm text-left mono text-[10px] uppercase tracking-wider text-g5 transition hover:border-g4 hover:bg-g1/60 md:flex md:w-48 cursor-pointer"
           >
-            <Search size={14} className="text-[var(--brand)]" />
-            <span>Search people, spaces, roles, events</span>
-            <span className="ml-auto mono text-[11px] text-g4">Cmd K</span>
+            <Search size={11} className="text-brand" />
+            <span>Search</span>
+            <span className="ml-auto text-[9px] text-g4">⌘K</span>
           </button>
 
           <div className="ml-auto flex items-center gap-2 md:ml-0">
@@ -117,24 +116,24 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
               <>
                 <Link
                   href="/workspace"
-                  className="hidden h-10 w-10 items-center justify-center rounded-full border border-g3 bg-paper-card text-g5 transition hover:border-g4 hover:text-ink sm:inline-flex"
+                  className="hidden h-8 w-8 items-center justify-center rounded-sm border border-g3 bg-paper-card text-g5 transition hover:border-g4 hover:text-ink sm:inline-flex"
                   aria-label="Workspace"
                 >
-                  <LayoutTemplate size={18} strokeWidth={1.6} />
+                  <LayoutTemplate size={14} strokeWidth={1.5} />
                 </Link>
                 <Link
                   href="/notifications"
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-g3 bg-paper-card text-g5 transition hover:border-g4 hover:text-ink"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-sm border border-g3 bg-paper-card text-g5 transition hover:border-g4 hover:text-ink"
                   aria-label="Notifications"
                 >
-                  <Bell size={17} strokeWidth={1.7} />
+                  <Bell size={14} strokeWidth={1.5} />
                 </Link>
                 <Link
                   href="/messages"
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-g3 bg-paper-card text-g5 transition hover:border-g4 hover:text-ink"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-sm border border-g3 bg-paper-card text-g5 transition hover:border-g4 hover:text-ink"
                   aria-label="Messages"
                 >
-                  <Mail size={17} strokeWidth={1.7} />
+                  <Mail size={14} strokeWidth={1.5} />
                 </Link>
                 
                 {/* Custom User Dropdown Profile Menu */}
@@ -155,7 +154,7 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
                   {profileOpen && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setProfileOpen(false)} />
-                      <div className="absolute right-0 mt-2.5 w-56 rounded-2xl border border-g3 bg-paper-card backdrop-blur-2xl shadow-[0_32px_80px_-40px_rgba(0,0,0,0.65)] py-2 z-50 animate-in fade-in-50 slide-in-from-top-3 duration-200">
+                      <div className="absolute right-0 mt-2.5 w-56 rounded-sm border border-g3 bg-paper-card py-2 z-50 animate-in fade-in-50 slide-in-from-top-3 duration-200">
                         <div className="px-4 py-3 border-b border-g3/60">
                           <div className="text-sm font-semibold text-ink truncate">{user?.fullName || "Builder"}</div>
                           <div className="text-xs text-g5 truncate">@{user?.username || user?.id.slice(0, 8)}</div>
@@ -165,21 +164,21 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
                           <Link 
                             href={`/profile/${user?.username || user?.id}`}
                             onClick={() => setProfileOpen(false)}
-                            className="flex w-full items-center px-3 py-2 rounded-lg text-sm text-g6 hover:bg-g1/50 hover:text-ink transition-colors"
+                            className="flex w-full items-center px-3 py-2 rounded-sm text-sm text-g6 hover:bg-g1/50 hover:text-ink transition-colors"
                           >
                             Passport
                           </Link>
                           <Link 
                             href="/workspace"
                             onClick={() => setProfileOpen(false)}
-                            className="flex w-full items-center px-3 py-2 rounded-lg text-sm text-g6 hover:bg-g1/50 hover:text-ink transition-colors"
+                            className="flex w-full items-center px-3 py-2 rounded-sm text-sm text-g6 hover:bg-g1/50 hover:text-ink transition-colors"
                           >
                             Workspace
                           </Link>
                           <Link 
                             href="/settings"
                             onClick={() => setProfileOpen(false)}
-                            className="flex w-full items-center px-3 py-2 rounded-lg text-sm text-g6 hover:bg-g1/50 hover:text-ink transition-colors"
+                            className="flex w-full items-center px-3 py-2 rounded-sm text-sm text-g6 hover:bg-g1/50 hover:text-ink transition-colors"
                           >
                             Settings
                           </Link>
@@ -189,7 +188,7 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
                               await signOut();
                               router.push("/");
                             }}
-                            className="flex w-full items-center px-3 py-2 rounded-lg text-sm text-red-500 hover:bg-red-500/10 transition-colors text-left cursor-pointer"
+                            className="flex w-full items-center px-3 py-2 rounded-sm text-sm text-red-500 hover:bg-red-500/10 transition-colors text-left cursor-pointer"
                           >
                             Log Out
                           </button>
@@ -214,7 +213,7 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
         <div className={`mx-auto px-5 sm:px-8 py-16 ${widthClass}`}>
           <div className="grid gap-10 md:grid-cols-4 lg:grid-cols-5">
             <div className="md:col-span-2 lg:col-span-2">
-              <Link href="/" className="serif text-2xl tracking-tight text-ink">
+              <Link href="/" className="serif text-[22px] leading-none tracking-tight text-ink">
                 Convoke.
               </Link>
               <p className="mt-4 max-w-[34ch] text-[14px] leading-relaxed text-g5">

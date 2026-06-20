@@ -74,8 +74,8 @@ export default function ContactPage() {
               ].map((item) => {
                 const Icon = item.icon;
                 return (
-                  <div key={item.title} className="flex gap-4 p-5 rounded-2xl border border-g3 bg-g1/30 backdrop-blur-md">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-ink/10 border border-g3 text-[var(--brand)]">
+                  <div key={item.title} className="flex gap-4 p-5 rounded-md border border-g3 bg-g1/30 backdrop-blur-md">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm bg-ink/10 border border-g3 text-[var(--brand)]">
                       <Icon size={18} />
                     </div>
                     <div>
@@ -97,7 +97,7 @@ export default function ContactPage() {
             <p className="mt-2 text-sm text-g5">Our operations team typically responds within a business day.</p>
 
             {success ? (
-              <div className="mt-8 flex flex-col items-center justify-center p-8 rounded-2xl border border-green-500/20 bg-green-500/5 text-center">
+              <div className="mt-8 flex flex-col items-center justify-center p-8 rounded-md border border-green-500/20 bg-green-500/5 text-center">
                 <CheckCircle size={44} className="text-green-500 mb-4" />
                 <h3 className="text-base font-semibold text-ink">Message Sent</h3>
                 <p className="mt-2 text-xs text-g5 max-w-[280px]">
@@ -113,7 +113,7 @@ export default function ContactPage() {
             ) : (
               <form onSubmit={handleSubmit} className="mt-8 space-y-5">
                 {error && (
-                  <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-xs text-center">
+                  <div className="p-4 rounded-sm bg-red-500/10 border border-red-500/20 text-red-500 text-xs text-center">
                     {error}
                   </div>
                 )}
@@ -126,7 +126,7 @@ export default function ContactPage() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Ananya Rao"
-                    className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                    className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
                   />
                 </div>
 
@@ -138,7 +138,7 @@ export default function ContactPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="name@university.edu"
-                    className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                    className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
                   />
                 </div>
 
@@ -150,7 +150,7 @@ export default function ContactPage() {
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
                     placeholder="Inquiry about organizing a hackathon"
-                    className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                    className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
                   />
                 </div>
 
@@ -162,14 +162,14 @@ export default function ContactPage() {
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="How can we support your vision?"
-                    className="w-full p-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all resize-none"
+                    className="w-full p-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all resize-none"
                   />
                 </div>
 
                 <button 
                   type="submit"
                   disabled={loading}
-                  className="w-full h-11 rounded-full bg-ink hover:opacity-95 text-paper font-semibold text-sm transition-all shadow-md active:scale-98 flex items-center justify-center gap-2 border border-[var(--brand)]/20 mt-6"
+                  className="w-full h-11 rounded-full bg-ink hover:opacity-95 text-paper font-semibold text-sm transition-all active:scale-98 flex items-center justify-center gap-2 border border-[var(--brand)]/20 mt-6"
                 >
                   {loading && <Loader2 size={16} className="animate-spin" />}
                   <span>Send Message</span>

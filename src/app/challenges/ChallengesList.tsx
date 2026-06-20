@@ -100,7 +100,7 @@ export function ChallengesList({
         </div>
         <button 
           onClick={() => setDrawerOpen(true)}
-          className="flex items-center justify-center gap-2 bg-ink text-paper px-6 py-2.5 rounded-full text-[14px] font-medium hover:bg-ink-2 transition-all active:scale-95 border border-[var(--brand)]/25 shadow-md cursor-pointer"
+          className="flex items-center justify-center gap-2 bg-ink text-paper px-6 py-2.5 rounded-full text-[14px] font-medium hover:bg-ink-2 transition-all active:scale-95 border border-[var(--brand)]/25 cursor-pointer"
         >
           <Plus size={16} />
           <span>Host a Challenge</span>
@@ -118,7 +118,7 @@ export function ChallengesList({
           </p>
           <button 
             onClick={() => setDrawerOpen(true)}
-            className="bg-ink text-paper px-6 py-2.5 rounded-full text-[14px] font-medium hover:bg-ink-2 transition-all active:scale-95 border border-[var(--brand)]/20 shadow-md cursor-pointer"
+            className="bg-ink text-paper px-6 py-2.5 rounded-full text-[14px] font-medium hover:bg-ink-2 transition-all active:scale-95 border border-[var(--brand)]/20 cursor-pointer"
           >
             Host Challenge
           </button>
@@ -127,11 +127,11 @@ export function ChallengesList({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10 relative z-10">
           {challenges.map((challenge) => (
             <Link key={challenge.id} href={`/challenges/${challenge.id}`} className="premium-card overflow-hidden group flex flex-col">
-              <div className="h-32 relative overflow-hidden bg-gradient-to-br from-g2 to-g1 flex items-center justify-center border-b border-g3">
+              <div className="h-32 relative overflow-hidden bg-g1 flex items-center justify-center border-b border-g3">
                 {challenge.bannerUrl ? (
                   <img src={challenge.bannerUrl} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                 ) : challenge.organization.logoUrl ? (
-                  <div className="w-16 h-16 rounded-2xl overflow-hidden border border-g3/80 shadow-md">
+                  <div className="w-16 h-16 rounded-md overflow-hidden border border-g3/80">
                     <img src={challenge.organization.logoUrl} alt="" className="w-full h-full object-cover" />
                   </div>
                 ) : (
@@ -216,7 +216,7 @@ export function ChallengesList({
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="E.g. India Web3 Buildathon 2026"
-                    className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                    className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
                   />
                 </div>
 
@@ -226,7 +226,7 @@ export function ChallengesList({
                     <select 
                       value={type}
                       onChange={(e) => setType(e.target.value)}
-                      className="w-full h-11 px-4 rounded-xl border border-g3 bg-paper text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                      className="w-full h-11 px-4 rounded-md border border-g3 bg-paper text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
                     >
                       <option value="HACKATHON">Hackathon</option>
                       <option value="CHALLENGE">Technical Challenge</option>
@@ -242,7 +242,7 @@ export function ChallengesList({
                       <select 
                         value={organizationId}
                         onChange={(e) => setOrganizationId(e.target.value)}
-                        className="w-full h-11 px-4 rounded-xl border border-g3 bg-paper text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                        className="w-full h-11 px-4 rounded-md border border-g3 bg-paper text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
                       >
                         {organizations.map((org) => (
                           <option key={org.id} value={org.id}>{org.name}</option>
@@ -260,7 +260,7 @@ export function ChallengesList({
                       value={compensation}
                       onChange={(e) => setCompensation(e.target.value)}
                       placeholder="E.g. $10,000 in grants"
-                      className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                      className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
                     />
                   </div>
                   <div>
@@ -269,7 +269,7 @@ export function ChallengesList({
                       type="date"
                       value={deadline}
                       onChange={(e) => setDeadline(e.target.value)}
-                      className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                      className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
                     />
                   </div>
                 </div>
@@ -282,7 +282,7 @@ export function ChallengesList({
                       value={location}
                       onChange={(e) => setLocation(e.target.value)}
                       placeholder="E.g. Online, IIT Delhi"
-                      className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                      className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
                     />
                   </div>
                   <div>
@@ -292,7 +292,7 @@ export function ChallengesList({
                       value={bannerUrl}
                       onChange={(e) => setBannerUrl(e.target.value)}
                       placeholder="https://unsplash.com/... or direct image link"
-                      className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                      className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
                     />
                   </div>
                 </div>
@@ -304,7 +304,7 @@ export function ChallengesList({
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Provide a detailed brief, track details, rules, judging criteria, and schedules..."
-                    className="w-full p-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all resize-none"
+                    className="w-full p-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all resize-none"
                   />
                 </div>
               </form>
@@ -322,7 +322,7 @@ export function ChallengesList({
                   type="button"
                   onClick={handleSubmit}
                   disabled={loading || organizations.length === 0}
-                  className="flex-1 h-11 rounded-full bg-ink hover:opacity-95 text-paper text-xs font-semibold transition-all shadow-md active:scale-98 flex items-center justify-center gap-2 border border-[var(--brand)]/20 cursor-pointer"
+                  className="flex-1 h-11 rounded-full bg-ink hover:opacity-95 text-paper text-xs font-semibold transition-all active:scale-98 flex items-center justify-center gap-2 border border-[var(--brand)]/20 cursor-pointer"
                 >
                   {loading && <Loader2 size={14} className="animate-spin" />}
                   <span>Publish Challenge</span>

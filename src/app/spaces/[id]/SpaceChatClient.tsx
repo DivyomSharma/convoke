@@ -54,7 +54,7 @@ export function SpaceChatClient({
   };
 
   return (
-    <div className="flex flex-col h-[60vh] md:h-[70vh] rounded-2xl border border-g3 glass-panel overflow-hidden">
+    <div className="flex flex-col h-[60vh] md:h-[70vh] rounded-md border border-g3 glass-panel overflow-hidden">
       {/* Messages list */}
       <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin">
         {initialMessages.length === 0 ? (
@@ -91,12 +91,12 @@ export function SpaceChatClient({
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="Message this space..."
-          className="flex-1 bg-g1 border border-g3 rounded-xl px-4 py-3 text-[14px] text-ink placeholder:text-g4 outline-none focus:border-[var(--brand)]/50 focus:ring-1 focus:ring-[var(--brand)]/30 transition-all"
+          className="flex-1 bg-g1 border border-g3 rounded-sm px-4 py-3 text-[14px] text-ink placeholder:text-g4 outline-none focus:border-[var(--brand)]/50 focus:ring-1 focus:ring-[var(--brand)]/30 transition-all"
         />
         <button
           type="submit"
           disabled={loading || !content.trim()}
-          className="w-10 h-10 rounded-xl bg-ink text-paper hover:bg-ink-2 active:scale-95 disabled:opacity-40 disabled:pointer-events-none transition-all flex items-center justify-center shrink-0 border border-[var(--brand)]/20 shadow"
+          className="w-10 h-10 rounded-sm bg-ink text-paper hover:bg-ink-2 active:scale-95 disabled:opacity-40 disabled:pointer-events-none transition-all flex items-center justify-center shrink-0 border border-[var(--brand)]/20 shadow"
         >
           {loading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
         </button>
