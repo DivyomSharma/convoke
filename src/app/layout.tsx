@@ -55,10 +55,7 @@ export default function RootLayout({
       appearance={{
         variables: {
           colorBackground: 'var(--paper)',
-          colorText: 'var(--ink)',
-          colorTextSecondary: 'var(--g5)',
-          colorInputBackground: 'transparent',
-          colorInputText: 'var(--ink)',
+          colorPrimary: 'var(--brand)',
           fontFamily: 'var(--font-sans)',
           borderRadius: '4px',
         },
