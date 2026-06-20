@@ -6,6 +6,7 @@ import { type ReactNode, useEffect, useState } from "react";
 import { Avatar } from "./Avatar";
 import { portraits } from "@/lib/photos";
 import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
+import { ThemeToggle } from "./ThemeToggle";
 
 const nav = [
   { href: "/explore", label: "Explore" },
@@ -60,6 +61,7 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
             <span className="ml-auto mono text-[11px] text-g4">⌘K</span>
           </button>
           <div className="flex items-center gap-4 ml-auto md:ml-0">
+            <ThemeToggle />
             {isSignedIn ? (
               <>
                 <Link href="/notifications" className="text-g5 hover:text-ink text-[14px]" aria-label="Notifications">
