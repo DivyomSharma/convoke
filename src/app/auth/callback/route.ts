@@ -10,6 +10,8 @@ export async function GET(request: Request) {
 
   if (code) {
     const cookieStore = await cookies()
+    const response = NextResponse.redirect(`${origin}${next}`)
+    
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -20,9 +22,12 @@ export async function GET(request: Request) {
           },
           setAll(cookiesToSet) {
             try {
-              cookiesToSet.forEach(({ name, value, options }) =>
+              cookiesToSet.forEach(({ name, value, options }) => {
+                // Set on the request cookie store so it's immediately available
                 cookieStore.set(name, value, options)
-              )
+                // Set on the response so the browser saves it
+                response.cookies.set(name, value, options)
+              })
             } catch {
               // The `setAll` method was called from a Server Component.
               // This can be ignored if you have middleware refreshing
@@ -35,7 +40,7 @@ export async function GET(request: Request) {
     
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`)
+      return response
     }
   }
 

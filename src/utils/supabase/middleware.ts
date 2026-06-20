@@ -39,6 +39,11 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname.startsWith('/login') ||
     request.nextUrl.pathname.startsWith('/api/seed') ||
     request.nextUrl.pathname.startsWith('/auth/callback') ||
+    request.nextUrl.pathname.startsWith('/explore') ||
+    request.nextUrl.pathname.startsWith('/spaces') ||
+    request.nextUrl.pathname.startsWith('/opportunities') ||
+    request.nextUrl.pathname.startsWith('/profile') ||
+    request.nextUrl.pathname.startsWith('/org') ||
     request.nextUrl.pathname === '/'
 
   if (!user && !isPublicRoute) {
