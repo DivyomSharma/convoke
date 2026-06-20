@@ -26,11 +26,11 @@ export const metadata: Metadata = {
     default: "Convoke | Where ambitious people gather.",
   },
   description: "A calm, editorial operating system for builders, researchers, and creators. Join spaces, find opportunities, and build momentum.",
-  metadataBase: new URL("https://convoke.com"),
+  metadataBase: new URL("https://www.theconvoke.xyz"),
   openGraph: {
     title: "Convoke",
     description: "Where ambitious people gather.",
-    url: "https://convoke.com",
+    url: "https://www.theconvoke.xyz",
     siteName: "Convoke",
     images: [
       {

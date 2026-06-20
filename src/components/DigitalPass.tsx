@@ -40,7 +40,6 @@ export function DigitalPass({
   orgLogo
 }: DigitalPassProps) {
   
-  // Status Colors
   const stateConfig = {
     REGISTERED: { color: "text-[var(--brand)]", bg: "bg-[var(--brand)]/10", icon: CircleDashed, label: "Registered" },
     CONFIRMED: { color: "text-green-500", bg: "bg-green-500/10", icon: CheckCircle2, label: "Confirmed" },
@@ -59,7 +58,6 @@ export function DigitalPass({
       className="w-full max-w-[400px] mx-auto glass-panel rounded-[24px] shadow-2xl overflow-hidden flex flex-col"
       style={{ boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.15)' }}
     >
-      {/* Top Banner Section */}
       <div className="relative h-32 w-full bg-g1 flex-shrink-0">
         {bannerUrl ? (
           <img src={bannerUrl} alt="Banner" className="w-full h-full object-cover opacity-90" />
@@ -74,7 +72,6 @@ export function DigitalPass({
         </div>
       </div>
 
-      {/* Identity Overlap */}
       <div className="px-6 relative -mt-6 flex justify-between items-end z-10 flex-shrink-0">
         <div className="w-14 h-14 rounded-xl bg-paper p-1 shadow-sm border border-g3">
           <div className="w-full h-full rounded-lg bg-g1 overflow-hidden">
@@ -87,7 +84,6 @@ export function DigitalPass({
         </div>
       </div>
 
-      {/* Main Info */}
       <div className="px-6 pt-5 pb-6 flex-shrink-0">
         <h2 className="serif text-2xl leading-tight text-ink tracking-tight line-clamp-2">{eventName}</h2>
         
@@ -113,14 +109,12 @@ export function DigitalPass({
         </div>
       </div>
 
-      {/* Tear Line */}
       <div className="relative w-full h-8 flex items-center flex-shrink-0">
-        <div className="absolute -left-4 w-8 h-8 rounded-full bg-g1 border-r border-g3" style={{ background: 'var(--background)' }} />
+        <div className="absolute -left-4 w-8 h-8 rounded-full bg-g1 border-r border-g3" style={{ background: "var(--paper)" }} />
         <div className="w-full border-t-2 border-dashed border-g2 mx-4" />
-        <div className="absolute -right-4 w-8 h-8 rounded-full bg-g1 border-l border-g3" style={{ background: 'var(--background)' }} />
+        <div className="absolute -right-4 w-8 h-8 rounded-full bg-g1 border-l border-g3" style={{ background: "var(--paper)" }} />
       </div>
 
-      {/* Ticket Meta & QR */}
       <div className="px-6 pt-4 pb-8 bg-transparent flex-shrink-0 flex items-center justify-between">
         <div className="flex flex-col gap-4">
           <div>
@@ -143,7 +137,6 @@ export function DigitalPass({
           </div>
         </div>
 
-        {/* QR Code */}
         <div className="p-2 bg-white rounded-xl border border-g2 shadow-sm shrink-0">
           <QRCodeSVG 
             value={qrPayload} 

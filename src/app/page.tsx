@@ -2,15 +2,23 @@ import { Shell } from "@/components/Shell";
 import { prisma } from "@/lib/prisma";
 import { HomeClient } from "@/components/HomeClient";
 
-export const revalidate = 60; // Revalidate every minute
+export const revalidate = 60;
+
+type HomeFeedItem = {
+  id: string;
+  tag: string;
+  title: string;
+  meta: string;
+  link: string;
+  actionText: string;
+  timestamp: number;
+};
 
 export default async function HomePage() {
-  // Get today's bounds in local/UTC time
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
 
-  // 1. Fetch statistics counts from the database
   const [
     eventsTodayCount,
     hackathonsCount,
@@ -61,7 +69,6 @@ export default async function HomePage() {
     prisma.space.count().catch(() => 0),
   ]);
 
-  // Filter out statistics that have a count of 0 to avoid clutter
   const stats = [
     { count: eventsTodayCount, label: "Events Today" },
     { count: hackathonsCount, label: "Hackathons Open" },
@@ -73,7 +80,6 @@ export default async function HomePage() {
     { count: communitiesCount, label: "Communities Growing" },
   ].filter((s) => s.count > 0);
 
-  // 2. Fetch live feed items from the database
   const [todayEvents, recentProjects, recentOpportunities, recentSpaces] = await Promise.all([
     prisma.event.findMany({
       where: {
@@ -126,10 +132,9 @@ export default async function HomePage() {
     }).catch(() => []),
   ]);
 
-  // Construct final feed items from DB queries
-  const feedItems: any[] = [];
+  const feedItems: HomeFeedItem[] = [];
 
-  todayEvents.forEach((e: any) => {
+  todayEvents.forEach((e) => {
     const isLive = new Date() >= e.startTime && new Date() <= e.endTime;
     const timeStr = e.startTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     feedItems.push({
@@ -143,7 +148,7 @@ export default async function HomePage() {
     });
   });
 
-  recentProjects.forEach((p: any) => {
+  recentProjects.forEach((p) => {
     const hoursAgo = Math.max(1, Math.round((Date.now() - p.createdAt.getTime()) / (1000 * 60 * 60)));
     const timeStr = hoursAgo < 24 ? `${hoursAgo} hours ago` : p.createdAt.toLocaleDateString();
     feedItems.push({
@@ -151,91 +156,44 @@ export default async function HomePage() {
       tag: "NEW PROJECT",
       title: p.title,
       meta: `Shipped ${timeStr} by ${p.user?.name || "Builder"}`,
-      link: `/projects`,
+      link: `/projects/${p.id}`,
       actionText: "View",
       timestamp: p.createdAt.getTime(),
     });
   });
 
-  recentOpportunities.forEach((o: any) => {
+  recentOpportunities.forEach((o) => {
     feedItems.push({
       id: `opp-${o.id}`,
       tag: "NOW HIRING",
       title: o.title,
       meta: `${o.organization?.name || "Organization"} · ${o.location || "Remote"}`,
-      link: `/opportunities`,
+      link: `/opportunities/${o.id}`,
       actionText: "Apply",
       timestamp: o.createdAt.getTime(),
     });
   });
 
-  recentSpaces.forEach((s: any) => {
+  recentSpaces.forEach((s) => {
     feedItems.push({
       id: `space-${s.id}`,
       tag: "NEW COMMUNITY",
       title: s.name,
       meta: s.description || "A new space on Convoke",
-      link: `/spaces`,
+      link: `/spaces/${s.id}`,
       actionText: "Join",
       timestamp: s.createdAt.getTime(),
     });
   });
 
-  // Sort and select prominent items
   const liveAndTonight = feedItems.filter((item) => item.tag === "LIVE NOW" || item.tag === "TONIGHT");
   const otherFeed = feedItems
     .filter((item) => item.tag !== "LIVE NOW" && item.tag !== "TONIGHT")
     .sort((a, b) => b.timestamp - a.timestamp);
 
   const finalFeed = [...liveAndTonight, ...otherFeed].slice(0, 10);
+  const displayFeed = finalFeed;
 
-  // Example fallbacks for clean database states
-  const fallbackFeed = [
-    {
-      id: "feed-1",
-      tag: "LIVE NOW",
-      title: "OpenAI Student Chapter",
-      meta: "218 builders online",
-      link: "/spaces",
-      actionText: "Join",
-    },
-    {
-      id: "feed-2",
-      tag: "TONIGHT",
-      title: "Founders Before Product",
-      meta: "IIT Delhi · 7:00 PM",
-      link: "/events",
-      actionText: "RSVP",
-    },
-    {
-      id: "feed-3",
-      tag: "NEW PROJECT",
-      title: "PlotArmour",
-      meta: "Launched 2 hours ago",
-      link: "/projects",
-      actionText: "View",
-    },
-    {
-      id: "feed-4",
-      tag: "NOW HIRING",
-      title: "Backend Engineer",
-      meta: "Remote · Full-time",
-      link: "/opportunities",
-      actionText: "Apply",
-    },
-    {
-      id: "feed-5",
-      tag: "NEW COMMUNITY",
-      title: "AI Research Collective",
-      meta: "42 members joined today",
-      link: "/spaces",
-      actionText: "Join",
-    },
-  ];
-
-  const displayFeed = finalFeed.length > 0 ? finalFeed : fallbackFeed;
-
-  // 3. Fetch Featured entities from DB
   const [dbFeaturedEvent, dbFeaturedOrg, dbFeaturedProject, dbFeaturedOpp, dbFeaturedUser, dbFeaturedResearch] =
     await Promise.all([
       prisma.event.findFirst({
@@ -262,7 +220,6 @@ export default async function HomePage() {
       }).catch(() => null),
     ]);
 
-  // Construct final featured contents using fallbacks where missing (e.g. unseeded entities)
   const featured = {
     event: dbFeaturedEvent
       ? {
@@ -273,11 +230,11 @@ export default async function HomePage() {
           actionText: "RSVP Today",
         }
       : {
-          title: "Founders Before Product",
-          description: "A weekly gathering of early stage founders and builders sharing raw demos and feedback.",
-          meta: "IIT Delhi · 7:00 PM Tonight",
+          title: "No upcoming events",
+          description: "Bring builders together for a technical paper review, workshop, or community mixer.",
+          meta: "Create the first event on campus",
           link: "/events",
-          actionText: "RSVP Today",
+          actionText: "Host Event",
         },
     org: dbFeaturedOrg
       ? {
@@ -288,41 +245,43 @@ export default async function HomePage() {
           actionText: "Enter Hub",
         }
       : {
-          title: "Lumen Labs",
-          description: "Building next-generation developer tooling and compiler designs for modern software teams.",
-          meta: "Startup Hub · 11 members active",
+          title: "No collectives registered",
+          description: "Start a builder organization for your startup hub, college club, or hacking team.",
+          meta: "Launch a builder community",
           link: "/organizations",
-          actionText: "Enter Hub",
+          actionText: "Create Org",
         },
     project: dbFeaturedProject
       ? {
           title: dbFeaturedProject.title,
           description: dbFeaturedProject.description || "Shaping the frontier of technology.",
           meta: `Shipped by ${dbFeaturedProject.user?.name || "Builder"}`,
-          link: `/projects`,
+          link: `/projects/${dbFeaturedProject.id}`,
           actionText: "Explore Work",
         }
       : {
-          title: "PlotArmour",
-          description: "A real-time security scanning tool and vulnerability analyzer for AI-generated code snippets.",
-          meta: "Shipped by Kenji Watanabe (@kenji)",
+          title: "No projects shipped yet",
+          description: "Launch what you're working on to gather feedback, downloads, and builder momentum.",
+          meta: "Share your latest build with campus",
           link: "/projects",
-          actionText: "Explore Work",
+          actionText: "Launch Project",
         },
     opportunity: dbFeaturedOpp
       ? {
           title: dbFeaturedOpp.title,
           description: dbFeaturedOpp.description || "Open application for ambitious builders.",
           meta: `Hiring at ${dbFeaturedOpp.organization?.name} · ${dbFeaturedOpp.location || "Remote"}`,
-          link: `/opportunities`,
+          link: dbFeaturedOpp.type === "HACKATHON" || dbFeaturedOpp.type === "CHALLENGE" 
+            ? `/challenges/${dbFeaturedOpp.id}` 
+            : `/opportunities/${dbFeaturedOpp.id}`,
           actionText: "Apply Now",
         }
       : {
-          title: "Backend Systems Engineer",
-          description: "Open roles at high-growth organizations within the campus ecosystem. Looking for 0→1 builders.",
-          meta: "Hiring at Lumen Labs · Remote",
+          title: "No active opportunities",
+          description: "Hire founding developers, post roles, or offer research fellowships to campus builders.",
+          meta: "Post a role to source builder talent",
           link: "/opportunities",
-          actionText: "Apply Now",
+          actionText: "Post Role",
         },
     builder: dbFeaturedUser
       ? {
@@ -333,26 +292,26 @@ export default async function HomePage() {
           actionText: "View Passport",
         }
       : {
-          title: "Ananya Rao",
-          description: "Tinkering with Rust compilers, distributed key-value databases, and early-stage network routing protocols.",
-          meta: "@ananya · Founder, Lumen Labs",
+          title: "Setup your passport",
+          description: "Passports verify builder identity, contribution history, memberships, and community vouches.",
+          meta: "Verify your developer passport today",
           link: "/explore",
-          actionText: "View Passport",
+          actionText: "Explore Passports",
         },
     research: dbFeaturedResearch
       ? {
           title: dbFeaturedResearch.title,
           description: dbFeaturedResearch.abstract || "A scientific paper published on campus.",
           meta: `Published by ${dbFeaturedResearch.user?.name || "Researcher"}`,
-          link: `/explore`,
+          link: "/research",
           actionText: "Read Paper",
         }
       : {
-          title: "Latency-Aware Mixture of Experts Routing",
-          description: "A novel routing algorithm for sparse MoEs that optimizes for inference latency alongside training efficiency.",
-          meta: "Published by Marcus Hill (@marcus)",
-          link: "/explore",
-          actionText: "Read Paper",
+          title: "No research publications",
+          description: "Drop academic papers, system architectures, white papers, or tech notes for peer review.",
+          meta: "Drop the first technical paper",
+          link: "/research",
+          actionText: "Publish Paper",
         },
   };
 

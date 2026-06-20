@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { CircularMarquee } from "@/components/CircularMarquee";
 
 interface FeedItem {
@@ -40,449 +40,216 @@ interface HomeClientProps {
   };
 }
 
+const containerVariants = {
+  animate: {
+    transition: {
+      staggerChildren: 0.08,
+    },
+  },
+};
+
+const itemVariants = {
+  initial: { opacity: 0, y: 16 },
+  animate: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.64,
+      ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
+    },
+  },
+};
+
 export function HomeClient({ stats, feedItems, featured }: HomeClientProps) {
-  // Stagger configurations for Framer Motion (without spring or bounce, calm ease)
-  const containerVariants = {
-    animate: {
-      transition: {
-        staggerChildren: 0.08,
-      },
-    },
-  };
-
-  const itemVariants = {
-    initial: { opacity: 0, y: 15 },
-    animate: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.6,
-        ease: [0.16, 1, 0.3, 1] as [number, number, number, number], // Calm, editorial ease
-      },
-    },
-  };
-
-  // Split feed items by category for the editorial columns
   const eventsFeed = feedItems.filter((item) => item.tag === "LIVE NOW" || item.tag === "TONIGHT");
   const workFeed = feedItems.filter((item) => item.tag === "NEW PROJECT" || item.tag === "NOW HIRING");
   const communityFeed = feedItems.filter((item) => item.tag === "NEW COMMUNITY");
 
-  // Get indicator dot color / tag mapping
   const getIndicator = (tag: string) => {
     switch (tag) {
       case "LIVE NOW":
-        return "• LIVE";
+        return "Live";
       case "TONIGHT":
-        return "• TODAY";
+        return "Today";
       case "NOW HIRING":
-        return "• OPEN";
+        return "Open";
       case "NEW COMMUNITY":
-        return "• TRENDING";
+        return "New";
       default:
-        return "• NEW";
+        return "Update";
     }
   };
 
+  const featuredCards = [
+    { label: "Featured Event", value: featured.event },
+    { label: "Featured Organization", value: featured.org },
+    { label: "Featured Project", value: featured.project },
+    { label: "Featured Opportunity", value: featured.opportunity },
+    { label: "Featured Builder", value: featured.builder },
+    { label: "Featured Research", value: featured.research },
+  ];
+
   return (
-    <div className="relative min-h-screen overflow-hidden bg-paper flex flex-col animate-fade-in">
-      {/* HERO SECTION */}
-      <div className="relative flex-1 flex flex-col items-center justify-center pt-20 pb-32 z-10 px-5 sm:px-8">
-        {/* 3D Tilted Marquee Background */}
-        <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-20 dark:opacity-30 pointer-events-none"
-          style={{ perspective: "1000px" }}
-        >
-          <div style={{ transform: "rotateX(75deg) rotateY(-10deg) scale(1.5)" }}>
-            <CircularMarquee size={800} duration={40} />
+    <div className="relative overflow-hidden">
+      <section className="relative px-5 pt-16 sm:px-8 sm:pt-20">
+        <div className="absolute inset-x-0 top-0 h-[42rem] bg-[radial-gradient(circle_at_top,rgba(201,161,109,0.16),transparent_54%)]" />
+        <div className="absolute left-1/2 top-[10rem] -translate-x-1/2 opacity-25 dark:opacity-35">
+          <div style={{ perspective: "1000px" }}>
+            <div style={{ transform: "rotateX(74deg) rotateY(-9deg) scale(1.32)" }}>
+              <CircularMarquee size={760} duration={42} />
+            </div>
           </div>
         </div>
 
-        <div className="max-w-[800px] mx-auto text-center relative z-20">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="serif text-7xl md:text-9xl text-ink leading-[1] tracking-tighter mb-4"
-          >
-            Convoke.
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="text-xl md:text-2xl text-g5 max-w-[500px] mx-auto mb-12 font-light tracking-wide"
-          >
-            For people building the future.
-          </motion.p>
-
+        <div className="relative z-10 mx-auto max-w-[1240px]">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="flex items-center justify-center"
+            transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+            className="premium-card campus-frame px-6 py-8 md:px-10 md:py-12"
           >
-            <Link
-              href="/explore"
-              className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 bg-ink text-paper rounded-full text-[15px] font-medium overflow-hidden transition-all hover:bg-ink-muted active:scale-95 shadow-2xl shadow-[var(--brand)]/10 border border-[var(--brand)]/20"
-            >
-              <span>Enter Campus</span>
-              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-            </Link>
+            <div className="max-w-4xl">
+              <div className="inline-flex items-center gap-2 rounded-full border border-[color:var(--brand)]/25 bg-[color:var(--brand)]/10 px-3 py-2 mono text-[11px] uppercase tracking-[0.18em] text-[var(--brand)]">
+                <Sparkles size={12} />
+                India-first ambition network
+              </div>
+              <h1 className="mt-6 max-w-5xl serif text-6xl leading-[0.9] tracking-tight md:text-8xl xl:text-[7.5rem]">
+                Where ambitious people open daily to find momentum.
+              </h1>
+              <p className="mt-6 max-w-2xl text-[16px] leading-8 text-g5 md:text-[18px]">
+                Convoke connects communities, opportunities, projects, events, and identity into one calm operating surface for builders, founders, creators, and students.
+              </p>
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                <Link href="/explore" className="ink-button px-5 text-[14px] font-medium">
+                  Explore the ecosystem
+                  <ArrowRight size={15} />
+                </Link>
+                <Link href="/workspace" className="ghost-button px-5 text-[14px] font-medium">
+                  Open workspace
+                </Link>
+              </div>
+            </div>
           </motion.div>
-        </div>
-      </div>
 
-      {/* LIVE ECOSYSTEM SECTION */}
-      <div className="mx-auto max-w-[1200px] px-5 sm:px-8 pb-32 relative z-20 w-full">
-        {/* Newspaper Section Title */}
-        <div className="border-t border-g3 pt-12 mt-12">
-          <div className="flex flex-col md:flex-row md:items-baseline justify-between gap-4 mb-8">
-            <h2 className="serif text-4xl md:text-5xl tracking-tight text-ink uppercase">
-              Today on Convoke
-            </h2>
-            <span className="text-[11px] mono tracking-widest text-g5 uppercase">
-              CAMPUS CHRONICLE • VOLUME IV •{" "}
-              {new Date().toLocaleDateString("en-US", {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </span>
-          </div>
-
-          {/* Statistics Bar */}
-          <div className="py-6 border-y border-g3 mb-16">
+          <div className="mt-6 border-y border-g3 px-1 py-5">
             {stats.length > 0 ? (
-              <div className="flex flex-wrap items-center gap-x-8 gap-y-4 text-sm md:text-base font-light text-g5">
-                {stats.map((stat, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <span className="text-ink font-semibold">{stat.count}</span>
+              <div className="flex flex-wrap gap-x-8 gap-y-3 text-[13px] text-g5 md:text-[14px]">
+                {stats.map((stat) => (
+                  <div key={stat.label} className="flex items-center gap-2">
+                    <span className="serif text-2xl text-ink">{stat.count}</span>
                     <span>{stat.label}</span>
-                    {i < stats.length - 1 && <span className="text-g3 font-sans ml-6">|</span>}
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-g5 italic py-2">
-                No activity yet. Be the first to build something.
+              <div className="text-[14px] italic text-g5">
+                No platform activity yet. The first event, role, space, or project will define the tone.
               </div>
             )}
           </div>
         </div>
+      </section>
 
-        {/* Live Feed - Magazine Grid Layout */}
+      <section className="relative z-10 mx-auto mt-14 max-w-[1240px] px-5 sm:px-8">
+        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <div className="eyebrow">Today on Convoke</div>
+            <h2 className="mt-3 serif text-4xl tracking-tight md:text-6xl">A live surface, not a gallery wall.</h2>
+          </div>
+          <div className="mono text-[11px] uppercase tracking-[0.18em] text-g4">
+            Daily discovery across rooms, work, and people
+          </div>
+        </div>
+
         <motion.div
           variants={containerVariants}
           initial="initial"
           animate="animate"
-          className="grid grid-cols-1 lg:grid-cols-[2fr_1fr_1fr] gap-x-12 gap-y-12"
+          className="grid gap-5 lg:grid-cols-[1.3fr_1fr_0.9fr]"
         >
-          {/* Column 1: Live & Today Events (Large Left Column) */}
-          <div className="lg:border-r lg:border-g3 lg:pr-12">
-            <h3 className="text-[11px] mono tracking-widest text-g5 uppercase mb-6 pb-2 border-b border-g3">
-              Campus Events & Interactive
-            </h3>
-            <div className="flex flex-col">
-              {eventsFeed.length > 0 ? (
-                eventsFeed.map((item, index) => (
-                  <motion.div key={item.id} variants={itemVariants}>
-                    <Link
-                      href={item.link}
-                      className="group block py-6 border-b border-g3 first:pt-0 last:border-b-0 transition-all duration-300 hover:translate-y-[-1px] hover:bg-ink/[0.01] px-4 -mx-4"
-                    >
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-[11px] mono tracking-wider text-[var(--brand)] font-semibold uppercase">
-                          {getIndicator(item.tag)}
-                        </span>
-                        <span className="text-g4 text-[10px] mono">/</span>
-                        <span className="text-g5 text-[11px] mono uppercase tracking-wider">
-                          {item.tag}
-                        </span>
-                      </div>
-                      <h4 className="serif text-3xl md:text-4xl text-ink group-hover:underline decoration-1 underline-offset-4 decoration-ink/40 transition-all">
-                        {item.title}
-                      </h4>
-                      <div className="flex items-center justify-between mt-4 text-g5 text-[14px]">
-                        <span>{item.meta}</span>
-                        <span className="font-medium text-ink group-hover:translate-x-0.5 transition-transform flex items-center gap-1">
-                          {item.actionText} <span className="serif">→</span>
-                        </span>
-                      </div>
-                    </Link>
-                  </motion.div>
-                ))
-              ) : (
-                <div className="text-g5 text-[14px] italic py-4">No events scheduled.</div>
-              )}
-            </div>
-          </div>
-
-          {/* Column 2: Building & Hiring */}
-          <div className="lg:border-r lg:border-g3 lg:pr-12">
-            <h3 className="text-[11px] mono tracking-widest text-g5 uppercase mb-6 pb-2 border-b border-g3">
-              Building & Hiring
-            </h3>
-            <div className="flex flex-col">
-              {workFeed.length > 0 ? (
-                workFeed.map((item, index) => (
-                  <motion.div key={item.id} variants={itemVariants}>
-                    <Link
-                      href={item.link}
-                      className="group block py-5 border-b border-g3 first:pt-0 last:border-b-0 transition-all duration-300 hover:translate-y-[-1px] hover:bg-ink/[0.01] px-4 -mx-4"
-                    >
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-[11px] mono tracking-wider text-[var(--brand)] font-semibold uppercase">
-                          {getIndicator(item.tag)}
-                        </span>
-                        <span className="text-g4 text-[10px] mono">/</span>
-                        <span className="text-g5 text-[11px] mono uppercase tracking-wider">
-                          {item.tag}
-                        </span>
-                      </div>
-                      <h4 className="serif text-2xl text-ink group-hover:underline decoration-1 underline-offset-4 decoration-ink/40 transition-all">
-                        {item.title}
-                      </h4>
-                      <div className="flex items-center justify-between mt-3 text-g5 text-[13px]">
-                        <span className="truncate max-w-[15ch] sm:max-w-[20ch]">{item.meta}</span>
-                        <span className="font-medium text-ink group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5 shrink-0">
-                          {item.actionText} <span className="serif">→</span>
-                        </span>
-                      </div>
-                    </Link>
-                  </motion.div>
-                ))
-              ) : (
-                <div className="text-g5 text-[14px] italic py-4">No projects launched recently.</div>
-              )}
-            </div>
-          </div>
-
-          {/* Column 3: New Communities */}
-          <div>
-            <h3 className="text-[11px] mono tracking-widest text-g5 uppercase mb-6 pb-2 border-b border-g3">
-              New Collectives
-            </h3>
-            <div className="flex flex-col">
-              {communityFeed.length > 0 ? (
-                communityFeed.map((item, index) => (
-                  <motion.div key={item.id} variants={itemVariants}>
-                    <Link
-                      href={item.link}
-                      className="group block py-5 border-b border-g3 first:pt-0 last:border-b-0 transition-all duration-300 hover:translate-y-[-1px] hover:bg-ink/[0.01] px-4 -mx-4"
-                    >
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-[11px] mono tracking-wider text-[var(--brand)] font-semibold uppercase">
-                          {getIndicator(item.tag)}
-                        </span>
-                        <span className="text-g4 text-[10px] mono">/</span>
-                        <span className="text-g5 text-[11px] mono uppercase tracking-wider">
-                          {item.tag}
-                        </span>
-                      </div>
-                      <h4 className="serif text-2xl text-ink group-hover:underline decoration-1 underline-offset-4 decoration-ink/40 transition-all">
-                        {item.title}
-                      </h4>
-                      <div className="flex items-center justify-between mt-3 text-g5 text-[13px]">
-                        <span className="truncate max-w-[15ch] sm:max-w-[20ch]">{item.meta}</span>
-                        <span className="font-medium text-ink group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5 shrink-0">
-                          {item.actionText} <span className="serif">→</span>
-                        </span>
-                      </div>
-                    </Link>
-                  </motion.div>
-                ))
-              ) : (
-                <div className="text-g5 text-[14px] italic py-4">No new communities.</div>
-              )}
-            </div>
-          </div>
+          <FeedColumn title="Events and gatherings" items={eventsFeed} getIndicator={getIndicator} />
+          <FeedColumn title="Projects and roles" items={workFeed} getIndicator={getIndicator} />
+          <FeedColumn title="Communities and rooms" items={communityFeed} getIndicator={getIndicator} />
         </motion.div>
+      </section>
 
-        {/* FEATURED SECTIONS */}
-        <div className="border-t border-g3 pt-16 mt-24">
-          <div className="flex items-baseline justify-between mb-10">
-            <h2 className="serif text-3xl tracking-tight text-ink uppercase">
-              Featured on Campus
-            </h2>
-            <span className="text-[11px] mono tracking-widest text-g5 uppercase">
-              EDITORIAL RECOMMENDATIONS
-            </span>
+      <section className="relative z-10 mx-auto mt-20 max-w-[1240px] px-5 pb-24 sm:px-8">
+        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <div className="eyebrow">Curated signal</div>
+            <h2 className="mt-3 serif text-4xl tracking-tight md:text-6xl">Featured across the network.</h2>
           </div>
-
-          <motion.div
-            variants={containerVariants}
-            initial="initial"
-            animate="animate"
-            className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4"
-          >
-            {/* Featured Event */}
-            <motion.div
-              variants={itemVariants}
-              className="py-10 border-b border-g3 group md:border-r md:border-g3 md:pr-12"
-            >
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-[11px] mono tracking-widest text-[var(--brand)] font-semibold uppercase">
-                  Featured Event
-                </span>
-              </div>
-              <Link href={featured.event.link} className="block">
-                <h3 className="serif text-3xl md:text-4xl text-ink mb-3 group-hover:underline decoration-1 underline-offset-4 decoration-ink/40 transition-all">
-                  {featured.event.title}
-                </h3>
-              </Link>
-              <p className="text-g5 text-[15px] leading-relaxed mb-4 max-w-[65ch] line-clamp-2">
-                {featured.event.description}
-              </p>
-              <div className="flex items-center justify-between text-g5 text-[13px] mono">
-                <span className="truncate max-w-[25ch]">{featured.event.meta}</span>
-                <Link
-                  href={featured.event.link}
-                  className="font-semibold text-ink group-hover:translate-x-0.5 transition-transform flex items-center gap-1 shrink-0"
-                >
-                  {featured.event.actionText} <span className="serif">→</span>
-                </Link>
-              </div>
-            </motion.div>
-
-            {/* Featured Organization */}
-            <motion.div variants={itemVariants} className="py-10 border-b border-g3 group md:pl-12">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-[11px] mono tracking-widest text-[var(--brand)] font-semibold uppercase">
-                  Featured Organization
-                </span>
-              </div>
-              <Link href={featured.org.link} className="block">
-                <h3 className="serif text-3xl md:text-4xl text-ink mb-3 group-hover:underline decoration-1 underline-offset-4 decoration-ink/40 transition-all">
-                  {featured.org.title}
-                </h3>
-              </Link>
-              <p className="text-g5 text-[15px] leading-relaxed mb-4 max-w-[65ch] line-clamp-2">
-                {featured.org.description}
-              </p>
-              <div className="flex items-center justify-between text-g5 text-[13px] mono">
-                <span className="truncate max-w-[25ch]">{featured.org.meta}</span>
-                <Link
-                  href={featured.org.link}
-                  className="font-semibold text-ink group-hover:translate-x-0.5 transition-transform flex items-center gap-1 shrink-0"
-                >
-                  {featured.org.actionText} <span className="serif">→</span>
-                </Link>
-              </div>
-            </motion.div>
-
-            {/* Featured Project */}
-            <motion.div
-              variants={itemVariants}
-              className="py-10 border-b border-g3 group md:border-r md:border-g3 md:pr-12"
-            >
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-[11px] mono tracking-widest text-[var(--brand)] font-semibold uppercase">
-                  Featured Project
-                </span>
-              </div>
-              <Link href={featured.project.link} className="block">
-                <h3 className="serif text-3xl md:text-4xl text-ink mb-3 group-hover:underline decoration-1 underline-offset-4 decoration-ink/40 transition-all">
-                  {featured.project.title}
-                </h3>
-              </Link>
-              <p className="text-g5 text-[15px] leading-relaxed mb-4 max-w-[65ch] line-clamp-2">
-                {featured.project.description}
-              </p>
-              <div className="flex items-center justify-between text-g5 text-[13px] mono">
-                <span className="truncate max-w-[25ch]">{featured.project.meta}</span>
-                <Link
-                  href={featured.project.link}
-                  className="font-semibold text-ink group-hover:translate-x-0.5 transition-transform flex items-center gap-1 shrink-0"
-                >
-                  {featured.project.actionText} <span className="serif">→</span>
-                </Link>
-              </div>
-            </motion.div>
-
-            {/* Featured Opportunity */}
-            <motion.div variants={itemVariants} className="py-10 border-b border-g3 group md:pl-12">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-[11px] mono tracking-widest text-[var(--brand)] font-semibold uppercase">
-                  Featured Opportunity
-                </span>
-              </div>
-              <Link href={featured.opportunity.link} className="block">
-                <h3 className="serif text-3xl md:text-4xl text-ink mb-3 group-hover:underline decoration-1 underline-offset-4 decoration-ink/40 transition-all">
-                  {featured.opportunity.title}
-                </h3>
-              </Link>
-              <p className="text-g5 text-[15px] leading-relaxed mb-4 max-w-[65ch] line-clamp-2">
-                {featured.opportunity.description}
-              </p>
-              <div className="flex items-center justify-between text-g5 text-[13px] mono">
-                <span className="truncate max-w-[25ch]">{featured.opportunity.meta}</span>
-                <Link
-                  href={featured.opportunity.link}
-                  className="font-semibold text-ink group-hover:translate-x-0.5 transition-transform flex items-center gap-1 shrink-0"
-                >
-                  {featured.opportunity.actionText} <span className="serif">→</span>
-                </Link>
-              </div>
-            </motion.div>
-
-            {/* Featured Builder */}
-            <motion.div
-              variants={itemVariants}
-              className="py-10 md:border-b-0 border-b border-g3 group md:border-r md:border-g3 md:pr-12"
-            >
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-[11px] mono tracking-widest text-[var(--brand)] font-semibold uppercase">
-                  Featured Builder
-                </span>
-              </div>
-              <Link href={featured.builder.link} className="block">
-                <h3 className="serif text-3xl md:text-4xl text-ink mb-3 group-hover:underline decoration-1 underline-offset-4 decoration-ink/40 transition-all">
-                  {featured.builder.title}
-                </h3>
-              </Link>
-              <p className="text-g5 text-[15px] leading-relaxed mb-4 max-w-[65ch] line-clamp-2">
-                {featured.builder.description}
-              </p>
-              <div className="flex items-center justify-between text-g5 text-[13px] mono">
-                <span className="truncate max-w-[25ch]">{featured.builder.meta}</span>
-                <Link
-                  href={featured.builder.link}
-                  className="font-semibold text-ink group-hover:translate-x-0.5 transition-transform flex items-center gap-1 shrink-0"
-                >
-                  {featured.builder.actionText} <span className="serif">→</span>
-                </Link>
-              </div>
-            </motion.div>
-
-            {/* Featured Research */}
-            <motion.div variants={itemVariants} className="py-10 group md:pl-12">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-[11px] mono tracking-widest text-[var(--brand)] font-semibold uppercase">
-                  Featured Research
-                </span>
-              </div>
-              <Link href={featured.research.link} className="block">
-                <h3 className="serif text-3xl md:text-4xl text-ink mb-3 group-hover:underline decoration-1 underline-offset-4 decoration-ink/40 transition-all">
-                  {featured.research.title}
-                </h3>
-              </Link>
-              <p className="text-g5 text-[15px] leading-relaxed mb-4 max-w-[65ch] line-clamp-2">
-                {featured.research.description}
-              </p>
-              <div className="flex items-center justify-between text-g5 text-[13px] mono">
-                <span className="truncate max-w-[25ch]">{featured.research.meta}</span>
-                <Link
-                  href={featured.research.link}
-                  className="font-semibold text-ink group-hover:translate-x-0.5 transition-transform flex items-center gap-1 shrink-0"
-                >
-                  {featured.research.actionText} <span className="serif">→</span>
-                </Link>
-              </div>
-            </motion.div>
-          </motion.div>
+          <Link href="/explore" className="mono text-[12px] uppercase tracking-[0.18em] text-[var(--brand)] hover:text-ink">
+            Open full feed
+          </Link>
         </div>
+
+        <motion.div
+          variants={containerVariants}
+          initial="initial"
+          animate="animate"
+          className="grid gap-5 md:grid-cols-2"
+        >
+          {featuredCards.map((card) => (
+            <motion.div key={card.label} variants={itemVariants} className="premium-card campus-frame p-6 md:p-7">
+              <div className="eyebrow text-[var(--brand)]">{card.label}</div>
+              <Link href={card.value.link} className="mt-4 block">
+                <h3 className="serif text-3xl tracking-tight md:text-4xl">{card.value.title}</h3>
+              </Link>
+              <p className="mt-4 max-w-[60ch] text-[15px] leading-7 text-g5">{card.value.description}</p>
+              <div className="mt-6 flex items-center justify-between gap-4 border-t border-g3 pt-4 text-[13px]">
+                <span className="text-g5">{card.value.meta}</span>
+                <Link href={card.value.link} className="font-medium text-[var(--brand)] hover:text-ink">
+                  {card.value.actionText}
+                </Link>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      </section>
+    </div>
+  );
+}
+
+function FeedColumn({
+  title,
+  items,
+  getIndicator,
+}: {
+  title: string;
+  items: FeedItem[];
+  getIndicator: (tag: string) => string;
+}) {
+  return (
+    <div className="premium-card campus-frame p-5 md:p-6">
+      <div className="eyebrow">{title}</div>
+      <div className="mt-5 flex flex-col">
+        {items.length > 0 ? (
+          items.map((item, index) => (
+            <motion.div key={item.id} variants={itemVariants}>
+              <Link
+                href={item.link}
+                className={`block rounded-[20px] px-3 py-4 transition hover:bg-g1 ${index > 0 ? "border-t border-g3" : ""}`}
+              >
+                <div className="flex items-center gap-2">
+                  <span className="mono text-[11px] uppercase tracking-[0.18em] text-[var(--brand)]">
+                    {getIndicator(item.tag)}
+                  </span>
+                  <span className="mono text-[10px] uppercase tracking-[0.18em] text-g4">/ {item.tag}</span>
+                </div>
+                <h3 className="mt-3 serif text-2xl tracking-tight md:text-3xl">{item.title}</h3>
+                <div className="mt-4 flex items-center justify-between gap-4 text-[13px] text-g5">
+                  <span>{item.meta}</span>
+                  <span className="font-medium text-ink">{item.actionText}</span>
+                </div>
+              </Link>
+            </motion.div>
+          ))
+        ) : (
+          <div className="px-3 py-6 text-[14px] italic text-g5">
+            Nothing here yet. The next real record will light up this column.
+          </div>
+        )}
       </div>
     </div>
   );

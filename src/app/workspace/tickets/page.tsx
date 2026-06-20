@@ -1,78 +1,151 @@
-import { Shell } from "@/components/Shell";
+import Link from "next/link";
+import { CalendarCheck, Ticket } from "lucide-react";
 import { AmbientGlow } from "@/components/AmbientGlow";
 import { DigitalPass, TicketState } from "@/components/DigitalPass";
+import { Shell } from "@/components/Shell";
+import { prisma } from "@/lib/prisma";
+import { requireUser } from "@/lib/auth";
 
-export default function MyTicketsPage() {
-  
-  // Mock Tickets Data for the Wallet
-  const myTickets = [
-    {
-      ticketId: "TKT-A9X72K",
-      eventName: "Next.js Conf 2026: The Future of the Web",
-      orgName: "Vercel",
-      date: "Oct 24, 2026",
-      time: "9:00 AM PST",
-      venue: "Moscone Center, SF",
-      userName: "Divyom Sharma",
-      userAvatar: "",
-      seat: "VIP-12",
-      type: "Early Bird",
-      state: "CONFIRMED" as TicketState,
-      bannerUrl: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=600&auto=format&fit=crop",
-      orgLogo: "https://api.dicebear.com/9.x/shapes/svg?seed=v"
-    },
-    {
-      ticketId: "TKT-B4M91P",
-      eventName: "Global AI Challenge Finale",
-      orgName: "OpenAI Labs",
-      date: "Nov 10, 2026",
-      time: "10:00 AM EST",
-      venue: "Online",
-      userName: "Divyom Sharma",
-      userAvatar: "",
-      seat: "HACK-4A",
-      type: "Participant",
-      state: "REGISTERED" as TicketState,
-      orgLogo: "https://api.dicebear.com/9.x/shapes/svg?seed=o"
-    },
-    {
-      ticketId: "TKT-C7V22L",
-      eventName: "Founder Mixer & Pitch",
-      orgName: "YC Startup Hub",
-      date: "Nov 12, 2026",
-      time: "6:00 PM EST",
-      venue: "New York, NY",
-      userName: "Divyom Sharma",
-      userAvatar: "",
-      seat: "GEN-01",
-      type: "General Admission",
-      state: "WAITLISTED" as TicketState,
-      orgLogo: "https://api.dicebear.com/9.x/shapes/svg?seed=y"
-    }
-  ];
+function passState(status: string): TicketState {
+  if (status === "GOING" || status === "ACCEPTED") return "CONFIRMED";
+  if (status === "WAITLISTED") return "WAITLISTED";
+  if (status === "CHECKED_IN") return "CHECKED_IN";
+  return "REGISTERED";
+}
+
+function passId(prefix: string, value: string) {
+  return `${prefix}-${value.replace(/-/g, "").slice(0, 8).toUpperCase()}`;
+}
+
+export default async function MyTicketsPage() {
+  const user = await requireUser();
+
+  const [registrations, challengeApplications] = await Promise.all([
+    prisma.eventAttendance.findMany({
+      where: { userId: user.id },
+      include: {
+        event: {
+          include: {
+            space: {
+              include: {
+                organization: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.application.findMany({
+      where: {
+        userId: user.id,
+        opportunity: {
+          type: {
+            in: ["HACKATHON", "CHALLENGE"],
+          },
+        },
+      },
+      include: {
+        opportunity: {
+          include: {
+            organization: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    }),
+  ]);
+
+  const eventPasses = registrations.map((registration, index) => {
+    const event = registration.event;
+
+    return {
+      ticketId: passId("EVT", registration.id),
+      eventName: event.title,
+      orgName: event.space.organization.name,
+      date: new Date(event.startTime).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+      time: new Date(event.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      venue: event.venue || event.location || "Online",
+      userName: user.name || "Convoke member",
+      userAvatar: user.avatarUrl || "",
+      seat: event.capacity ? `GEN-${String(index + 1).padStart(2, "0")}` : "OPEN",
+      type: registration.status === "INTERESTED" ? "Interested" : "Event pass",
+      state: passState(registration.status),
+      bannerUrl: event.bannerUrl || undefined,
+      orgLogo: event.space.organization.logoUrl || undefined,
+    };
+  });
+
+  const challengePasses = challengeApplications.map((application, index) => {
+    const opportunity = application.opportunity;
+
+    return {
+      ticketId: passId("CHL", application.id),
+      eventName: opportunity.title,
+      orgName: opportunity.organization.name,
+      date: opportunity.deadline
+        ? new Date(opportunity.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+        : "Rolling",
+      time: "Submission window",
+      venue: opportunity.location || "Online",
+      userName: user.name || "Convoke member",
+      userAvatar: user.avatarUrl || "",
+      seat: `TEAM-${String(index + 1).padStart(2, "0")}`,
+      type: opportunity.type === "HACKATHON" ? "Hackathon" : "Challenge",
+      state: passState(application.status),
+      bannerUrl: opportunity.bannerUrl || undefined,
+      orgLogo: opportunity.organization.logoUrl || undefined,
+    };
+  });
+
+  const passes = [...eventPasses, ...challengePasses];
 
   return (
     <Shell>
-      <div className="mx-auto max-w-[1240px] px-5 sm:px-8 py-12 relative min-h-screen">
-        <AmbientGlow className="top-20 right-20 w-[800px] h-[800px] opacity-[0.03] dark:opacity-[0.05]" color="var(--brand)" />
-        
-        <div className="flex items-end justify-between hairline-b pb-6 relative z-10">
-          <div>
-            <h1 className="serif text-5xl md:text-6xl tracking-tight">My Wallet</h1>
-            <p className="text-g5 mt-3 text-lg">Your digital passports for upcoming events and challenges.</p>
-          </div>
-          <div className="text-[13px] font-medium text-g5 uppercase tracking-wider mono bg-g1 px-4 py-2 rounded-full">
-            {myTickets.length} Passes
-          </div>
-        </div>
+      <div className="relative mx-auto min-h-screen max-w-[1240px] px-5 py-12 sm:px-8">
+        <AmbientGlow className="right-20 top-20 h-[34rem] w-[34rem] opacity-[0.05]" color="var(--brand)" />
 
-        <div className="mt-12 relative z-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {myTickets.map((ticket, idx) => (
-              <DigitalPass key={ticket.ticketId} {...ticket} />
-            ))}
+        <section className="campus-frame premium-card p-7 md:p-10">
+          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <div>
+              <div className="eyebrow">Workspace wallet</div>
+              <h1 className="mt-3 serif text-5xl tracking-tight md:text-7xl">My Passes</h1>
+              <p className="mt-4 max-w-2xl text-[15px] leading-7 text-g5">
+                Event RSVPs and challenge registrations become scannable passes tied to your Convoke identity.
+              </p>
+            </div>
+            <div className="inline-flex w-fit items-center gap-2 rounded-full border border-g3 bg-g1/70 px-4 py-2 mono text-[12px] uppercase tracking-[0.16em] text-g5">
+              <Ticket size={14} className="text-[var(--brand)]" />
+              {passes.length} Pass{passes.length === 1 ? "" : "es"}
+            </div>
           </div>
-        </div>
+        </section>
+
+        {passes.length === 0 ? (
+          <section className="mt-8 premium-card p-12 text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-g3 bg-g1 text-[var(--brand)]">
+              <CalendarCheck size={26} />
+            </div>
+            <h2 className="mt-6 serif text-3xl">No passes yet</h2>
+            <p className="mx-auto mt-3 max-w-[42ch] text-[15px] leading-7 text-g5">
+              Register for an event or join a challenge to generate your first Convoke pass.
+            </p>
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <Link href="/events" className="ink-button px-5 text-[14px] font-medium">
+                Browse events
+              </Link>
+              <Link href="/challenges" className="ghost-button px-5 text-[14px] font-medium">
+                Browse challenges
+              </Link>
+            </div>
+          </section>
+        ) : (
+          <section className="relative z-10 mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {passes.map((pass) => (
+              <DigitalPass key={pass.ticketId} {...pass} />
+            ))}
+          </section>
+        )}
       </div>
     </Shell>
   );

@@ -2,8 +2,6 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { auth, currentUser } from "@clerk/nextjs/server";
-
 import { requireUser } from "@/lib/auth";
 
 export async function rsvpToEvent(eventId: string, status: "GOING" | "INTERESTED") {
@@ -27,12 +25,22 @@ export async function rsvpToEvent(eventId: string, status: "GOING" | "INTERESTED
   });
 
   revalidatePath("/workspace");
-  revalidatePath("/explore");
+  revalidatePath("/workspace/tickets");
+  revalidatePath("/events");
+  revalidatePath(`/events/${eventId}`);
   return { success: true };
 }
 
 export async function applyToOpportunity(opportunityId: string) {
   const user = await requireUser();
+  const opportunity = await prisma.opportunity.findUnique({
+    where: { id: opportunityId },
+    select: { type: true },
+  });
+
+  if (!opportunity) {
+    throw new Error("Opportunity not found.");
+  }
 
   const existing = await prisma.application.findFirst({
     where: { opportunityId, userId: user.id },
@@ -51,7 +59,13 @@ export async function applyToOpportunity(opportunityId: string) {
   });
 
   revalidatePath("/workspace");
+  revalidatePath("/workspace/tickets");
   revalidatePath("/opportunities");
+  revalidatePath(`/opportunities/${opportunityId}`);
+  if (opportunity.type === "HACKATHON" || opportunity.type === "CHALLENGE") {
+    revalidatePath("/challenges");
+    revalidatePath(`/challenges/${opportunityId}`);
+  }
   return { success: true };
 }
 
@@ -79,7 +93,33 @@ export async function joinSpace(organizationId: string) {
     },
   });
 
+  const org = await prisma.organization.findUnique({
+    where: { id: organizationId },
+    select: { slug: true },
+  });
+
   revalidatePath("/workspace");
   revalidatePath("/spaces");
+  if (org) {
+    revalidatePath("/org/" + org.slug);
+  }
+  return { success: true };
+}
+
+export async function postMessage(spaceId: string, content: string) {
+  const user = await requireUser();
+  if (!content || !content.trim()) {
+    throw new Error("Message content cannot be empty.");
+  }
+
+  await prisma.message.create({
+    data: {
+      content: content.trim(),
+      spaceId,
+      userId: user.id,
+    },
+  });
+
+  revalidatePath(`/spaces/${spaceId}`);
   return { success: true };
 }

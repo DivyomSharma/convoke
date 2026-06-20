@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/workspace', '/messages', '/notifications', '/settings', '/api/'],
     },
-    sitemap: 'https://convoke.com/sitemap.xml',
+    sitemap: 'https://www.theconvoke.xyz/sitemap.xml',
   };
 }

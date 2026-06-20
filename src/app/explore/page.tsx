@@ -1,126 +1,237 @@
 import Link from "next/link";
+import { ArrowRight, CalendarDays, FolderKanban, Sparkles, UsersRound } from "lucide-react";
 import { Shell } from "@/components/Shell";
 import { Avatar } from "@/components/Avatar";
 import { AmbientGlow } from "@/components/AmbientGlow";
 import { prisma } from "@/lib/prisma";
 
-const filters = ["All", "Events", "Roles", "Challenges", "Projects", "Drops", "Vouches", "Office hours"] as const;
+const filters = ["All", "Events", "Opportunities", "Challenges", "Projects"] as const;
+type Filter = (typeof filters)[number];
+
+type FeedItem = {
+  id: string;
+  kind: string;
+  title: string;
+  body: string | null;
+  meta: string | null;
+  at: Date;
+  href: string;
+  icon: typeof CalendarDays;
+  who: {
+    name: string;
+    role: string;
+    avatar: string;
+    href: string;
+  };
+};
+
+function formatDate(date: Date) {
+  return new Intl.DateTimeFormat("en-IN", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(date);
+}
+
+function isChallenge(type: string) {
+  return type === "HACKATHON" || type === "CHALLENGE";
+}
 
 export default async function Explore(props: { searchParams?: Promise<{ f?: string }> }) {
   const searchParams = await props.searchParams;
-  const f = searchParams?.f || "All";
+  const selected = filters.includes(searchParams?.f as Filter) ? (searchParams?.f as Filter) : "All";
 
-  // Fetch real data from Prisma
   const [events, opportunities, projects] = await Promise.all([
-    prisma.event.findMany({ include: { space: { include: { organization: true } } }, orderBy: { createdAt: "desc" } }),
-    prisma.opportunity.findMany({ include: { organization: true }, orderBy: { createdAt: "desc" } }),
-    prisma.project.findMany({ include: { user: true }, orderBy: { createdAt: "desc" } }),
+    prisma.event
+      .findMany({
+        include: { space: { include: { organization: true } } },
+        orderBy: { createdAt: "desc" },
+        take: 20,
+      })
+      .catch(() => []),
+    prisma.opportunity
+      .findMany({
+        include: { organization: true },
+        orderBy: { createdAt: "desc" },
+        take: 24,
+      })
+      .catch(() => []),
+    prisma.project
+      .findMany({
+        include: { user: true },
+        orderBy: { createdAt: "desc" },
+        take: 20,
+      })
+      .catch(() => []),
   ]);
 
-  // Normalize into a common feed format
-  const normalizedItems: any[] = [];
+  const items: FeedItem[] = [];
 
-  if (f === "All" || f === "Events" || f === "Challenges") {
-    events.forEach(e => normalizedItems.push({
-      id: e.id,
-      kind: "Event",
-      title: e.title,
-      body: e.description,
-      cover: null,
-      meta: e.location,
-      at: e.createdAt.toLocaleDateString(),
-      who: { handle: "event", name: e.space.name, role: "Space", avatar: "" }
-    }));
+  if (selected === "All" || selected === "Events") {
+    events.forEach((event) => {
+      items.push({
+        id: `event-${event.id}`,
+        kind: "Event",
+        title: event.title,
+        body: event.description,
+        meta: `${event.location || event.venue || "Online"} · ${formatDate(event.startTime)}`,
+        at: event.createdAt,
+        href: `/events/${event.id}`,
+        icon: CalendarDays,
+        who: {
+          name: event.space.name,
+          role: event.space.organization.name,
+          avatar: event.space.organization.logoUrl || "",
+          href: `/spaces/${event.space.id}`,
+        },
+      });
+    });
   }
 
-  if (f === "All" || f === "Roles") {
-    opportunities.forEach(o => normalizedItems.push({
-      id: o.id,
-      kind: "Role",
-      title: o.title,
-      body: o.description,
-      cover: null,
-      meta: o.location,
-      at: o.createdAt.toLocaleDateString(),
-      who: { handle: o.organization.slug, name: o.organization.name, role: "Organization", avatar: o.organization.logoUrl || "" }
-    }));
+  if (selected === "All" || selected === "Opportunities" || selected === "Challenges") {
+    opportunities
+      .filter((opportunity) => {
+        if (selected === "Challenges") return isChallenge(opportunity.type);
+        if (selected === "Opportunities") return !isChallenge(opportunity.type);
+        return true;
+      })
+      .forEach((opportunity) => {
+        const challenge = isChallenge(opportunity.type);
+        items.push({
+          id: `opportunity-${opportunity.id}`,
+          kind: challenge ? "Challenge" : "Opportunity",
+          title: opportunity.title,
+          body: opportunity.description,
+          meta: `${opportunity.organization.name} · ${opportunity.location || "Remote"}`,
+          at: opportunity.createdAt,
+          href: challenge ? `/challenges/${opportunity.id}` : `/opportunities/${opportunity.id}`,
+          icon: challenge ? Sparkles : UsersRound,
+          who: {
+            name: opportunity.organization.name,
+            role: opportunity.organization.industry || "Organization",
+            avatar: opportunity.organization.logoUrl || "",
+            href: `/org/${opportunity.organization.slug}`,
+          },
+        });
+      });
   }
 
-  if (f === "All" || f === "Projects") {
-    projects.forEach(p => normalizedItems.push({
-      id: p.id,
-      kind: "Project",
-      title: p.title,
-      body: p.description,
-      cover: p.url,
-      meta: p.url,
-      at: p.createdAt.toLocaleDateString(),
-      who: { handle: p.user.handle || p.user.id, name: p.user.name || "Builder", role: p.user.role || "User", avatar: p.user.avatarUrl || "" }
-    }));
+  if (selected === "All" || selected === "Projects") {
+    projects.forEach((project) => {
+      items.push({
+        id: `project-${project.id}`,
+        kind: "Project",
+        title: project.title,
+        body: project.description,
+        meta: project.url || "Builder project",
+        at: project.createdAt,
+        href: `/projects/${project.id}`,
+        icon: FolderKanban,
+        who: {
+          name: project.user.name || "Builder",
+          role: project.user.role || "Member",
+          avatar: project.user.avatarUrl || "",
+          href: `/profile/${project.user.handle || project.user.id}`,
+        },
+      });
+    });
   }
 
-  // Sort by date descending (using string sort for now, would be better to keep Date objects)
-  const items = normalizedItems;
+  const sortedItems = items.sort((a, b) => b.at.getTime() - a.at.getTime()).slice(0, 40);
 
   return (
     <Shell>
-      <div className="mx-auto max-w-[840px] px-5 sm:px-8 py-12 relative">
-        
-        {/* Background Ambient Glows */}
-        <AmbientGlow className="top-10 -left-20 w-[600px] h-[600px] opacity-[0.03] dark:opacity-[0.08]" color="var(--brand)" />
-        <AmbientGlow className="bottom-40 -right-20 w-[800px] h-[800px] opacity-[0.02] dark:opacity-[0.05]" />
+      <main className="relative mx-auto max-w-[920px] px-5 py-12 sm:px-8">
+        <AmbientGlow className="-left-24 top-10 h-[560px] w-[560px] opacity-[0.05]" color="var(--brand)" />
+        <AmbientGlow className="-right-24 bottom-40 h-[720px] w-[720px] opacity-[0.035]" />
 
-        <div className="flex items-baseline justify-between hairline-b pb-5 relative z-10">
-          <h1 className="serif text-4xl">Explore</h1>
-          <span className="eyebrow">{items.length} items</span>
-        </div>
+        <section className="relative z-10 border-b border-g2 pb-7">
+          <div className="eyebrow">Live discovery</div>
+          <div className="mt-4 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h1 className="serif text-5xl leading-none tracking-[-0.045em] text-ink sm:text-6xl">Explore</h1>
+              <p className="mt-4 max-w-[58ch] text-[15px] leading-7 text-g5">
+                A live stream of events, roles, challenges, and builder projects from the Convoke ecosystem.
+              </p>
+            </div>
+            <span className="inline-flex w-fit rounded-full border border-g3 bg-g1/70 px-4 py-2 mono text-[11px] uppercase tracking-[0.18em] text-g5">
+              {sortedItems.length} live item{sortedItems.length === 1 ? "" : "s"}
+            </span>
+          </div>
+        </section>
 
-        <div className="sticky top-14 z-20 bg-paper/80 backdrop-blur-md hairline-b py-3 -mx-5 sm:-mx-8 px-5 sm:px-8 mt-4 flex gap-2 overflow-x-auto">
-          {filters.map((n) => (
+        <nav className="sticky top-14 z-20 -mx-5 mt-4 flex gap-2 overflow-x-auto border-b border-g2 bg-paper/85 px-5 py-3 backdrop-blur-md sm:-mx-8 sm:px-8">
+          {filters.map((filter) => (
             <Link
-              key={n}
-              href={`/explore?f=${n}`}
+              key={filter}
+              href={`/explore?f=${filter}`}
               className={
-                "px-3 py-1.5 text-[12px] mono tracking-wide uppercase shrink-0 rounded-sm transition-colors " +
-                (f === n ? "bg-ink text-paper" : "text-g5 hover:text-ink")
+                "shrink-0 rounded-full px-4 py-2 mono text-[11px] uppercase tracking-[0.16em] transition-colors " +
+                (selected === filter ? "bg-ink text-paper" : "border border-transparent text-g5 hover:border-g3 hover:text-ink")
               }
             >
-              {n}
+              {filter}
             </Link>
           ))}
-        </div>
+        </nav>
 
-        <ul className="flex flex-col gap-6 mt-8 relative z-10">
-          {items.length === 0 && (
-            <div className="py-20 text-center text-g5 eyebrow">No items found. Try adjusting your filters.</div>
-          )}
-          {items.map((it) => (
-            <li key={it.id} className="premium-card p-6 md:p-8">
-              <div className="flex items-center gap-3 mb-4">
-                <Link href={`/profile/${it.who.handle}`}>
-                  <Avatar src={it.who.avatar} name={it.who.name} size={32} />
-                </Link>
-                <Link href={`/profile/${it.who.handle}`} className="text-[15px] font-medium text-ink hover:underline">
-                  {it.who.name}
-                </Link>
-                <span className="text-g4 text-[12px]">·</span>
-                <span className="text-[13px] text-g5">{it.who.role}</span>
-                <span className="text-g4 text-[12px]">·</span>
-                <span className="text-[13px] text-g4 mono">{it.at}</span>
-                <span className="ml-auto mono text-[11px] font-medium bg-[var(--brand)]/10 text-[var(--brand)] px-3 py-1 rounded-full uppercase tracking-wider">{it.kind}</span>
-              </div>
-              <h3 className="serif text-[28px] md:text-[34px] leading-[1.1]">{it.title}</h3>
-              {it.body && <p className="text-g5 text-[16px] mt-3 max-w-[65ch] leading-relaxed">{it.body}</p>}
-              {it.cover && (
-                <div className="mt-5 overflow-hidden rounded-xl border border-g3">
-                  <img src={it.cover} alt="" loading="lazy" className="w-full max-h-[420px] object-cover hover:scale-[1.02] transition-transform duration-700" />
-                </div>
-              )}
-              {it.meta && <div className="mt-5 mono text-[13px] text-g5 font-medium">{it.meta}</div>}
-            </li>
-          ))}
-        </ul>
-      </div>
+        {sortedItems.length === 0 ? (
+          <section className="mt-8 premium-card p-10 text-center">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-g3 bg-g1 text-brand">
+              <Sparkles size={22} />
+            </div>
+            <h2 className="mt-5 serif text-3xl text-ink">No live items yet</h2>
+            <p className="mx-auto mt-3 max-w-[46ch] text-[15px] leading-7 text-g5">
+              Convoke will fill this feed from real events, applications, communities, and projects as they are created.
+            </p>
+          </section>
+        ) : (
+          <ul className="relative z-10 mt-8 flex flex-col gap-5">
+            {sortedItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <li key={item.id} className="premium-card group p-6 transition-transform duration-300 hover:-translate-y-1 md:p-8">
+                  <div className="flex items-start gap-4">
+                    <Link href={item.who.href} className="mt-1 shrink-0">
+                      <Avatar src={item.who.avatar} name={item.who.name} size={38} />
+                    </Link>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-g5">
+                        <Link href={item.who.href} className="font-medium text-ink hover:text-brand">
+                          {item.who.name}
+                        </Link>
+                        <span>·</span>
+                        <span>{item.who.role}</span>
+                        <span>·</span>
+                        <time className="mono text-[12px] text-g4">{formatDate(item.at)}</time>
+                      </div>
+                      <Link href={item.href} className="mt-4 block">
+                        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-g3 bg-g1/70 px-3 py-1 mono text-[10px] uppercase tracking-[0.18em] text-brand">
+                          <Icon size={13} />
+                          {item.kind}
+                        </div>
+                        <h3 className="serif text-[30px] leading-[1.05] tracking-[-0.035em] text-ink md:text-[38px]">
+                          {item.title}
+                        </h3>
+                        {item.body && <p className="mt-3 max-w-[66ch] text-[15px] leading-7 text-g5">{item.body}</p>}
+                        {item.meta && <p className="mt-5 mono text-[12px] uppercase tracking-[0.14em] text-g4">{item.meta}</p>}
+                      </Link>
+                    </div>
+                    <Link
+                      href={item.href}
+                      aria-label={`Open ${item.title}`}
+                      className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border border-g3 text-g5 transition-colors group-hover:border-brand/40 group-hover:text-brand sm:flex"
+                    >
+                      <ArrowRight size={16} />
+                    </Link>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </main>
     </Shell>
   );
 }
