@@ -1,16 +1,25 @@
-"use client";
-
 import Link from "next/link";
 import { Shell } from "@/components/Shell";
 import { Avatar } from "@/components/Avatar";
-import { events, feed, people, spaces, opportunities } from "@/lib/data";
+import { feed } from "@/lib/data";
+import { prisma } from "@/lib/prisma";
 
-export default function Landing() {
-  const tonight = events.slice(0, 3);
+export default async function Landing() {
+  const dbEvents = await prisma.event.findMany({ 
+    take: 3,
+    orderBy: { startTime: 'asc' },
+  });
+  
+  const dbSpaces = await prisma.space.findMany({ take: 3 });
+  
+  const dbOpportunities = await prisma.opportunity.findMany({ take: 1, include: { organization: true } });
+  
+  const dbPeople = await prisma.user.findMany({ take: 5 });
+
   const launch = feed.find((f) => f.kind === "launch")!;
-  const hack = events[2];
-  const role = opportunities[0];
-  const featuredSpaces = spaces.slice(0, 3);
+  const hack = dbEvents[2] || dbEvents[0]; // fallback if <3 events
+  const role = dbOpportunities[0];
+  const featuredSpaces = dbSpaces;
 
   return (
     <Shell wide>
@@ -57,18 +66,20 @@ export default function Landing() {
           <aside className="col-span-12 lg:col-span-5 lg:pl-8 lg:hairline-l hairline-t lg:border-t-0 pt-8 lg:pt-0" style={{ borderLeft: "1px solid var(--g3)" }}>
             <div className="eyebrow mb-5">Tonight & this week</div>
             <ul className="divide-y divide-g3">
-              {tonight.map((e) => (
+              {dbEvents.map((e, idx) => (
                 <li key={e.id}>
                   <Link href="/explore" className="grid grid-cols-[1fr_auto] gap-4 py-5 group">
                     <div className="min-w-0">
-                      <div className="mono text-[11px] text-g5 uppercase tracking-wider">{e.kind} · {e.city}</div>
+                      <div className="mono text-[11px] text-g5 uppercase tracking-wider">Event · {e.location || "Online"}</div>
                       <h3 className="serif text-2xl md:text-[28px] leading-[1.05] mt-1 group-hover:italic transition-all">
                         {e.title}
                       </h3>
-                      <div className="mt-2 text-[13px] text-g5">{e.when} · {e.host} · {e.going} going</div>
+                      <div className="mt-2 text-[13px] text-g5">
+                        {new Date(e.startTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} · {e.location || "TBA"} · 10+ going
+                      </div>
                     </div>
-                    <div className="w-20 h-20 shrink-0 overflow-hidden">
-                      <img src={e.cover} alt="" className="w-full h-full object-cover grayscale" />
+                    <div className="w-20 h-20 shrink-0 overflow-hidden bg-g2">
+                      <img src={`/assets/ph-meetup.jpg`} alt="" className="w-full h-full object-cover grayscale" />
                     </div>
                   </Link>
                 </li>
@@ -88,16 +99,16 @@ export default function Landing() {
           <Link href="/spaces" className="eyebrow underline-link text-ink">All spaces →</Link>
         </div>
         <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-8">
-          {featuredSpaces.map((s) => (
-            <Link key={s.slug} href="/spaces" className="group block">
-              <div className="aspect-[4/5] overflow-hidden">
-                <img src={s.cover} alt="" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
+          {featuredSpaces.map((s, idx) => (
+            <Link key={s.id} href="/spaces" className="group block">
+              <div className="aspect-[4/5] overflow-hidden bg-g2">
+                <img src={`/assets/ph-coworking.jpg`} alt="" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
               </div>
               <div className="mt-4 flex items-baseline justify-between">
                 <h3 className="serif text-2xl">{s.name}</h3>
-                <span className="mono text-[11px] text-g5">{s.members.toLocaleString()} members</span>
+                <span className="mono text-[11px] text-g5">Public Space</span>
               </div>
-              <p className="text-g5 text-[14px] mt-1">{s.tagline}</p>
+              <p className="text-g5 text-[14px] mt-1">{s.description}</p>
             </Link>
           ))}
         </div>
@@ -106,27 +117,26 @@ export default function Landing() {
       {/* Two-up: Hackathon + Open role */}
       <section className="mx-auto max-w-[1440px] px-5 sm:px-8 mt-20 grid grid-cols-1 md:grid-cols-2 gap-10">
         <article className="hairline p-7">
-          <div className="eyebrow">Hackathon · {hack.city}</div>
-          <h3 className="serif text-3xl md:text-4xl mt-3 leading-[1.05]">{hack.title}</h3>
-          <p className="text-g5 mt-3 text-[15px]">{hack.when} · {hack.going} builders going · $10k prize pool</p>
+          <div className="eyebrow">Event · {hack?.location || "TBA"}</div>
+          <h3 className="serif text-3xl md:text-4xl mt-3 leading-[1.05]">{hack?.title || "Upcoming Event"}</h3>
+          <p className="text-g5 mt-3 text-[15px]">{hack ? new Date(hack.startTime).toLocaleDateString() : "TBA"} · Builders going</p>
           <div className="mt-6 flex -space-x-2">
-            {people.map((p, i) => (
-              <Avatar key={i} src={p.avatar} name={p.name} size={28} />
+            {dbPeople.map((p, i) => (
+              <Avatar key={p.id} src={p.avatarUrl || ""} name={p.name || "User"} size={28} />
             ))}
-            <span className="ml-4 text-g5 text-[13px] self-center">+ 307 others</span>
+            <span className="ml-4 text-g5 text-[13px] self-center">+ 10 others</span>
           </div>
           <Link href="/opportunities" className="mt-7 inline-block eyebrow text-ink underline-link">
             RSVP →
           </Link>
         </article>
         <article className="hairline p-7">
-          <div className="eyebrow">Open role · {role.location}</div>
-          <h3 className="serif text-3xl md:text-4xl mt-3 leading-[1.05]">{role.title}</h3>
-          <p className="text-g5 mt-3 text-[15px]">{role.org} · {role.comp}</p>
+          <div className="eyebrow">{role?.type || "Role"} · {role?.location || "Remote"}</div>
+          <h3 className="serif text-3xl md:text-4xl mt-3 leading-[1.05]">{role?.title || "Open Position"}</h3>
+          <p className="text-g5 mt-3 text-[15px]">{role?.organization?.name || "Organization"} · {role?.compensation || "Negotiable"}</p>
           <div className="mt-6 flex flex-wrap gap-2">
-            {role.tags.map((t) => (
-              <span key={t} className="mono text-[11px] hairline px-2 py-1 text-g6">{t}</span>
-            ))}
+            <span className="mono text-[11px] hairline px-2 py-1 text-g6">Full-time</span>
+            <span className="mono text-[11px] hairline px-2 py-1 text-g6">Remote</span>
           </div>
           <Link href="/opportunities" className="mt-7 inline-block eyebrow text-ink underline-link">
             Read brief →
