@@ -73,15 +73,54 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
 
       <main className="flex-1">{children}</main>
 
-      <footer className="hairline-t mt-24">
-        <div className={"mx-auto px-5 sm:px-8 py-10 flex flex-wrap items-baseline gap-x-8 gap-y-3 text-[13px] text-g5 " + (wide ? "max-w-[1440px]" : "max-w-[1240px]")}>
-          <span className="serif text-ink text-lg">Convoke</span>
-          <span>Where ambitious people gather.</span>
-          <Link href="/spaces" className="hover:text-ink">Spaces</Link>
-          <Link href="/opportunities" className="hover:text-ink">Opportunities</Link>
-          <Link href="/explore" className="hover:text-ink">Explore</Link>
-          <Link href="/settings" className="hover:text-ink">Settings</Link>
-          <span className="ml-auto mono text-[11px] text-g4">© {new Date().getFullYear()}</span>
+      <footer className="hairline-t mt-24 bg-paper">
+        <div className={"mx-auto px-5 sm:px-8 py-16 " + (wide ? "max-w-[1440px]" : "max-w-[1240px]")}>
+          <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-10">
+            <div className="col-span-1 md:col-span-2 lg:col-span-2">
+              <Link href="/" className="serif text-2xl text-ink tracking-tight">Convoke.</Link>
+              <p className="mt-4 text-[14px] text-g5 max-w-[30ch] leading-relaxed">
+                The network for ambitious builders. A quiet place to gather, build, and invent the future together.
+              </p>
+            </div>
+            
+            <div>
+              <h4 className="eyebrow mb-4 text-ink">Platform</h4>
+              <ul className="space-y-3 text-[14px] text-g5">
+                <li><Link href="/explore" className="hover:text-ink transition-colors">Explore Feed</Link></li>
+                <li><Link href="/spaces" className="hover:text-ink transition-colors">Spaces Directory</Link></li>
+                <li><Link href="/opportunities" className="hover:text-ink transition-colors">Opportunities</Link></li>
+                <li><Link href="/workspace" className="hover:text-ink transition-colors">Workspace</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="eyebrow mb-4 text-ink">Company</h4>
+              <ul className="space-y-3 text-[14px] text-g5">
+                <li><Link href="/about" className="hover:text-ink transition-colors">About Us</Link></li>
+                <li><Link href="/changelog" className="hover:text-ink transition-colors">Changelog</Link></li>
+                <li><Link href="/guidelines" className="hover:text-ink transition-colors">Community Guidelines</Link></li>
+                <li><Link href="https://twitter.com/convoke" className="hover:text-ink transition-colors">Twitter (X)</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="eyebrow mb-4 text-ink">Legal</h4>
+              <ul className="space-y-3 text-[14px] text-g5">
+                <li><Link href="/privacy" className="hover:text-ink transition-colors">Privacy Policy</Link></li>
+                <li><Link href="/terms" className="hover:text-ink transition-colors">Terms of Service</Link></li>
+                <li><a href="mailto:hello@convoke.com" className="hover:text-ink transition-colors">Contact Support</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="mt-16 pt-8 hairline-t flex flex-col md:flex-row items-center justify-between gap-4 text-[13px] text-g4 mono">
+            <span>© {new Date().getFullYear()} Convoke, Inc. All rights reserved.</span>
+            <div className="flex gap-4">
+              <span>Designed in California.</span>
+              <span className="hidden sm:inline">·</span>
+              <span>Built on the Internet.</span>
+            </div>
+          </div>
         </div>
       </footer>
 
