@@ -71,19 +71,19 @@
 :root {
   --radius: 4px;
 
-  /* Monochrome scale, calibrated by eye */
-  --paper:  oklch(0.985 0.002 95);       /* warm off-white */
-  --ink:    oklch(0.16 0 0);             /* near-black */
-  --ink-2:  oklch(0.28 0 0);             /* secondary ink */
+  /* Theme: British Racing Green & Sage */
+  --paper:  #F7F7F7;                     /* Crisp, Clean Off-White */
+  --ink:    #1E2229;                     /* Slate Black */
+  --ink-2:  #2d333d;                     /* Slightly lighter slate */
 
   --g1:     oklch(0.965 0.002 95);       /* faintest gray, hover bg */
   --g2:     oklch(0.93 0.002 95);        /* subtle surface */
   --g3:     oklch(0.88 0.002 95);        /* hairline border */
-  --g4:     oklch(0.72 0.002 95);        /* tertiary text */
-  --g5:     oklch(0.50 0.002 95);        /* secondary text */
-  --g6:     oklch(0.32 0.002 95);        /* dark gray */
+  --g4:     #a3b19f;                     /* lighter sage */
+  --g5:     #8A9A86;                     /* Muted Sage (Secondary Text) */
+  --g6:     #6b7868;                     /* darker sage */
 
-  --brand:  #800E13;                     /* OU Crimson Red */
+  --brand:  #1C4431;                     /* Deep British Racing Green */
 }
 
 .dark {
