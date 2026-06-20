@@ -68,7 +68,21 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
                 <Link href="/messages" className="text-g5 hover:text-ink text-[14px]" aria-label="Messages">
                   <MailGlyph />
                 </Link>
-                <UserButton appearance={{ elements: { userButtonAvatarBox: "w-7 h-7" } }} />
+                <UserButton 
+                  appearance={{ 
+                    elements: { 
+                      userButtonAvatarBox: "w-7 h-7",
+                      userButtonPopoverCard: "shadow-lg bg-paper border border-g3 rounded-lg overflow-hidden",
+                      userButtonPopoverActionButton: "hover:bg-g1 text-ink font-sans text-sm px-4 py-2",
+                      userButtonPopoverActionButtonIcon: "text-ink",
+                      userButtonPopoverActionButtonText: "text-ink font-medium",
+                      userButtonPopoverFooter: "hidden",
+                      userPreviewMainIdentifier: "text-ink font-medium",
+                      userPreviewSecondaryIdentifier: "text-g5 text-xs",
+                      userButtonPopoverMain: "bg-paper",
+                    } 
+                  }} 
+                />
               </>
             ) : (
               <SignInButton mode="modal">
