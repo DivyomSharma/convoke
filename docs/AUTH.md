@@ -1,22 +1,41 @@
 # Authentication Architecture
 
-## Overview
-Convoke uses **Clerk** for seamless, secure edge-authentication, bypassing the need to manage passwords or complex session token cycling manually.
+**Source of Truth Version:** 1.0.0
 
-## Core Flow
-1. **Middleware**: `src/middleware.ts` intercepts all requests.
-   - Public routes (`/`, `/explore`, `/login`, `/api/webhooks/clerk`) are bypassed.
-   - Protected routes (`/workspace`, `/settings`) enforce authentication, redirecting unauthenticated users to `/login`.
-2. **Provider**: The entire app is wrapped in `<ClerkProvider>` within `src/app/layout.tsx`.
-3. **Components**: Clerk's drop-in `<SignIn />` component handles OAuth and Email Magic Links natively.
+## 1. Provider System
+Convoke utilizes **Supabase Auth** as the sole identity provider. Previously, the application relied on Clerk, but has fully migrated to a Supabase-native SSR flow to ensure users exist within the same unified PostgreSQL database ecosystem.
 
-## Database Synchronization
-Because Clerk stores user identities on their servers, Convoke must synchronize this data with its own Supabase PostgreSQL database to maintain referential integrity (so Users can own Projects, attend Events, etc).
+### Supported Methods
+1. **OAuth2**: Google, Apple, Discord, LinkedIn.
+2. **Passwordless**: Email OTP (Magic Links).
 
-- **Webhook Endpoint**: `/api/webhooks/clerk/route.ts`
-- **Trigger**: Listens for `user.created` and `user.updated` events from Clerk.
-- **Action**: Uses the Prisma client to `upsert` the user into the Supabase database.
-- **Security**: The webhook verifies the `svix-id`, `svix-timestamp`, and `svix-signature` headers against the `WEBHOOK_SECRET` environment variable to ensure requests actually originated from Clerk.
+## 2. Component Flow
+- **Login UI (`src/app/login/page.tsx`)**: 
+  - A fully custom Client Component utilizing `@supabase/ssr` `createBrowserClient`.
+  - OAuth login calls `supabase.auth.signInWithOAuth()`.
+  - Email login calls `supabase.auth.signInWithOtp()`.
+- **OAuth Callback (`src/app/auth/callback/route.ts`)**:
+  - Intercepts redirects from Supabase after successful provider authentication.
+  - Exchanges the ephemeral auth code for a secure Next.js server session via `supabase.auth.exchangeCodeForSession()`.
 
-## Role System
-Currently, roles are defined via a string column (`role`) on the User table and via the `Membership` join table for Organizational roles (`ADMIN`, `MEMBER`). Deep RBAC (Role-Based Access Control) has not yet been implemented at the middleware level.
+## 3. Session Management & Middleware
+Authentication protection is handled at the edge via Next.js Middleware.
+
+- **Middleware File**: `src/middleware.ts` delegates logic to `src/utils/supabase/middleware.ts`.
+- **Session Refresh**: On every non-static request, the middleware invokes `supabase.auth.getUser()`. If the internal session is expired, Supabase automatically attempts to refresh it using the refresh token cookie, writing new cookies back to the response.
+- **Route Protection**:
+  - The middleware acts as a strict gatekeeper. 
+  - Unauthenticated requests are immediately redirected to `/login`, unless the requested path matches an explicit public whitelist (`/`, `/login`, `/auth/callback`, `/api/seed`).
+  - Authenticated users attempting to access `/login` are automatically redirected to the root workspace (`/`).
+
+## 4. Server Actions & SSR
+- To access the current user securely inside React Server Components (RSC) or Server Actions, developers must use the dedicated server utility:
+  ```typescript
+  import { createClient } from '@/utils/supabase/server'
+  
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  ```
+
+## 5. Deprecation Notice
+- **Clerk Removal**: All Clerk components (`<ClerkProvider>`, `@clerk/nextjs`) have been removed. Any lingering webhooks in `/api/webhooks/clerk` are obsolete and should be scheduled for deletion.

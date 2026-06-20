@@ -1,57 +1,37 @@
-# Convoke AI Context & Architecture Summary
+# Convoke: AI Context & System Prompt
 
-**Purpose**: This document serves as the master context file for LLMs to instantly understand the Convoke codebase, architecture, and design constraints.
+**Source of Truth Version:** 1.0.0
+**Last Updated:** June 20, 2026
 
-## 1. Product Vision & Aesthetic
-- **Mission**: A highly curated, signal-rich digital campus for students, founders, creators, developers, researchers, and communities to build their future together.
-- **Aesthetic**: "Timely & Timeless". Apple-level craftsmanship, Discord-level belonging, Linear-level polish.
-- **UI Constraints**: Strict monochrome palette (Black/White). Typography is heavily enforced: `Inter` for standard UI, `Newsreader` (Serif) for editorial headers/numbers. Large touch targets, subtle glassmorphism, no heavy drop-shadows, sharp geometry (`rounded-sm`).
+## 1. Project Identity
+Convoke is a professional networking and community platform designed as an "editorial feed" for ambitious people. It aggregates events, communities (Spaces), opportunities (Roles, Grants, Fellowships), and projects into a highly curated, immersive experience.
 
-## 2. Tech Stack
-- **Framework**: Next.js 16 (App Router, React Server Components).
-- **Styling**: Tailwind CSS v4, `shadcn/ui` (Radix UI primitives), Framer Motion.
-- **Database**: PostgreSQL hosted on Supabase.
-- **ORM**: Prisma (`@prisma/client` v5.22.0).
-- **Auth**: Clerk (`@clerk/nextjs`).
-- **PWA**: Serwist (`@serwist/next`).
-- **Deployment**: Vercel (Edge network).
+The core aesthetic is strict **Monochrome Editorial**: Pure ink, paper backgrounds, and calibrated grays. No gradients, no glows, no vibrant brand colors outside of absolute necessity (e.g., standard provider logos).
 
-## 3. Core Architecture
-- **Rendering**: Default to React Server Components (RSCs) for everything. Use `"use client"` strictly at leaf nodes for interactivity.
-- **Data Mutations**: Handled exclusively via Next.js Server Actions. No internal REST API routes unless necessary for webhooks.
-- **Auth Sync**: Clerk handles edge auth. A webhook at `/api/webhooks/clerk` securely syncs `user.created` events into the Supabase Postgres `User` table to maintain referential integrity.
-- **State Management**: Zustand (if needed for client), but heavily rely on URL state and Server State (Next.js Cache).
+## 2. Technical Stack
+- **Framework:** Next.js (App Router, v16.2.9)
+- **Language:** TypeScript 5 (Strict Mode)
+- **Database:** PostgreSQL via Prisma ORM (v5.22.0)
+- **Authentication:** Supabase Auth (SSR via `@supabase/ssr`)
+- **Styling:** Tailwind CSS v4 (Inline `@theme` configuration)
+- **UI Library:** `@base-ui/react` (Headless) + Custom internal components
+- **PWA:** Serwist
+- **Animations:** Framer Motion
 
-## 4. Database Schema (Prisma)
-- **User**: The core identity (synced with Clerk).
-- **Organization & Membership**: Organizations (clubs/startups) that Users join.
-- **Space & Message**: Communities belonging to Organizations where Users can chat.
-- **Event & EventAttendance**: Time-bound gatherings inside Spaces.
-- **Opportunity & Application**: Roles, grants, or hackathons posted by Organizations.
-- **Vouch, Project, Research**: Portfolio items attached to Users.
-- **Activity & Notification**: System logs and user alerts.
-- **Bookmark**: Polymorphic saves.
+## 3. Core Directives for AI Agents
+When modifying or adding to the Convoke codebase, adhere strictly to these rules:
 
-## 5. Directory Structure
-```text
-/
-├── prisma/schema.prisma      # Source of truth for DB
-├── src/app/                  # Next.js Routes
-│   ├── api/webhooks/clerk/   # DB Sync
-│   ├── explore/              # Global feed
-│   ├── opportunities/        # Job/Grant board
-│   ├── profile/[handle]/     # Public portfolio
-│   ├── spaces/               # Communities
-│   ├── workspace/            # Authenticated dashboard
-│   ├── layout.tsx            # ClerkProvider & Root
-│   └── page.tsx              # Minimal Landing Page
-├── src/components/ui/        # shadcn components
-└── src/lib/utils.ts          # Tailwind cn() merger
-```
+1. **Monochrome Adherence:** Do not introduce new colors. Utilize `--paper`, `--ink`, and the `--g1` through `--g6` gray scale.
+2. **Server-First Data Fetching:** Utilize React Server Components (RSC) by default. Fetch data directly via Prisma in the server component. Only use `"use client"` when state, effects, or browser APIs are required (e.g., filtering, auth flows).
+3. **No Standalone API Routes for Data:** Do not build `/api/v1/...` routes just for fetching data for a page. Fetch directly in the RSC. API routes are strictly for external webhooks (e.g., Clerk sync) or specific remote actions (e.g., `/api/seed`).
+4. **Auth Abstraction:** Authentication relies entirely on Supabase. Use `@/utils/supabase/server` for RSC/Server Actions and `@/utils/supabase/client` for Client Components.
+5. **Class Management:** Always merge classes using the `cn()` utility (`clsx` + `tailwind-merge`) from `src/lib/utils.ts`.
+6. **No Placeholder Styles:** Designs must be pixel-perfect matching the editorial constraints. Use `hairline` utility classes for 1px borders instead of generic border classes.
 
-## 6. Coding Guidelines for AI
-1. **Never write legacy code**: Use Next.js App Router conventions (RSCs, Server Actions, `next/image`, `next/link`).
-2. **Never hallucinate styles**: Adhere strictly to the monochrome, Inter/Newsreader typographic hierarchy. Use `cn()` for merging classes.
-3. **Database operations**: Always use the Prisma client inside Server Actions or Server Components. Never expose `Convoke_PRISMA_DATABASE_URL` to the client.
-4. **Security**: Validate `session.userId` in all Server Actions before performing `UPDATE` or `DELETE` mutations.
-5. **Performance**: Avoid `useEffect` fetching. Fetch data on the server and pass it as props to client components.
+## 4. Known File Paths
+- **Global CSS & Theme:** `src/app/globals.css`
+- **Database Schema:** `prisma/schema.prisma`
+- **Middleware (Auth):** `src/middleware.ts` & `src/utils/supabase/middleware.ts`
+- **Root Layout:** `src/app/layout.tsx`
+- **Main Shell (Nav/Footer):** `src/components/Shell.tsx`
+- **UI Primitives:** `src/components/ui/`

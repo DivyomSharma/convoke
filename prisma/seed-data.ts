@@ -1,4 +1,4 @@
-import { photos, portraits } from "./photos";
+import { photos, portraits } from "../src/lib/photos";
 
 export type FeedKind =
   | "event"

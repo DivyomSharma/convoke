@@ -1,70 +1,47 @@
-# Database Documentation
+# Database Architecture
 
-## ER Diagram Overview
+**Source of Truth Version:** 1.0.0
 
-Convoke uses a PostgreSQL database hosted on Supabase, managed entirely by Prisma.
+## 1. Technology
+- **Engine:** PostgreSQL
+- **ORM:** Prisma (`v5.22.0`)
+- **Schema Location:** `prisma/schema.prisma`
 
-```mermaid
-erDiagram
-    User ||--o{ Membership : "has"
-    User ||--o{ EventAttendance : "attends"
-    User ||--o{ Application : "submits"
-    User ||--o{ Bookmark : "creates"
-    User ||--o{ Activity : "performs"
-    User ||--o{ Vouch : "gives/receives"
-    
-    Organization ||--o{ Membership : "has"
-    Organization ||--o{ Space : "owns"
-    Organization ||--o{ Opportunity : "posts"
-    
-    Space ||--o{ Event : "hosts"
-    Space ||--o{ Message : "contains"
-    
-    Event ||--o{ EventAttendance : "tracks"
-    Opportunity ||--o{ Application : "receives"
-```
+## 2. Core Models & Relations
 
-## All Tables
+### Users & Identity
+- **`User`**: Primary identity model.
+  - *Key Fields*: `id`, `email`, `name`, `handle`, `role`, `clerkId`.
+  - *Relations*: Linked to `Settings` (1:1), `Membership` (1:M), `EventAttendance` (1:M), `Vouch` (self-referencing 1:M).
+- **`Settings`**: User preferences (theme, notification toggles).
+- **`Session`**: Auth sessions tracking (managed primarily by Supabase now, but historically tracked in Prisma).
 
-### Core Entities
-1. **`User`**: Central entity. Synced with Clerk via `clerkId`. Contains profile data (bio, handle, avatarUrl, university).
-2. **`Organization`**: Represents clubs, startups, or communities. Identified by a unique `slug`.
-3. **`Space`**: A community hub belonging to an Organization. Think of it as a forum or channel.
-4. **`Event`**: A time-bound gathering hosted within a Space.
-5. **`Opportunity`**: Roles, grants, or hackathons posted by an Organization.
+### Organizations & Communities
+- **`Organization`**: Represents companies, DAOs, or clubs.
+  - *Relations*: Hosts multiple `Space` and `Opportunity` entities. 
+- **`Membership`**: Junction table mapping `User` to `Organization` with a `role` (e.g., ADMIN, MEMBER).
+- **`Space`**: A sub-community within an Organization.
+  - *Relations*: Contains `Event` and `Message` entities.
 
-### Relational & Interaction Tables
-6. **`Membership`**: Join table mapping `User` to `Organization` with a specific `role` (e.g., ADMIN, MEMBER).
-7. **`EventAttendance`**: Join table mapping `User` to `Event` with a `status` (e.g., GOING, INTERESTED).
-8. **`Application`**: Join table mapping `User` to `Opportunity`.
-9. **`Vouch`**: A peer-to-peer endorsement. Links `giverId` (User) to `receiverId` (User).
-10. **`Message`**: Chat/forum messages sent by a `User` in a `Space`.
-11. **`Project`**: Portfolio items created by a `User`.
-12. **`Research`**: Academic/research portfolio items created by a `User`.
+### Content & Interaction
+- **`Event`**: A gathering in a `Space` (`startTime`, `endTime`, `location`).
+- **`EventAttendance`**: Junction between `User` and `Event` (`status`: GOING, INTERESTED).
+- **`Opportunity`**: A job, grant, or hackathon.
+- **`Application`**: Junction tracking a `User` applying to an `Opportunity` (`status`: PENDING, ACCEPTED).
+- **`Project` & `Research`**: Portfolio models linked to `User`.
+- **`Message`**: Chat payload linked to a `Space` and `User`.
+- **`Vouch`**: A peer endorsement (`giverId`, `receiverId`).
 
-### Metadata & System Tables
-13. **`Notification`**: In-app alerts for users.
-14. **`Bookmark`**: Polymorphic table (`itemId`, `itemType`) allowing users to save events or opportunities.
-15. **`Settings`**: User preferences (theme, email notifications).
-16. **`Session`**: Used if NextAuth is employed, though currently superseded by Clerk.
-17. **`Activity`**: Audit log of user actions.
+### Utility Models
+- **`Notification`**: System alerts generated for users.
+- **`Bookmark`**: A polymorphic table (`itemId`, `itemType`) allowing users to save events or opportunities.
+- **`Activity`**: Audit log for user actions (`metadata` stored as JSON).
 
-## Key Relations & Constraints
-- **Cascade Deletes**: Almost all foreign keys implement `ON DELETE CASCADE` (e.g., deleting a User deletes their Memberships, Applications, and Activity).
-- **Unique Indexes**:
-  - `User(email)`, `User(handle)`, `User(clerkId)`
-  - `Organization(slug)`
-  - `Membership(userId, organizationId)`
-  - `EventAttendance(eventId, userId)`
+## 3. Sync & Seeding Strategy
+- **Deployment Sync**: The `package.json` contains a `postinstall` script (`prisma db push --accept-data-loss`). This automatically synchronizes the remote database schema with Prisma during Vercel builds. 
+- **Seeding**: 
+  - Executed locally via `tsx prisma/seed.ts`.
+  - Executed remotely via the `/api/seed?secret=convoke123` API route, which mirrors the local seed logic safely.
 
-## Unused/Future Tables
-- **`Session`**: Defined in schema but currently unused since Clerk handles session tokens. Safe to remove.
-- **`Activity`**: Defined but no logging mechanism currently writes to it. 
-
-## Optimization Suggestions
-1. **Indexing**: Add indexes on frequently queried fields that aren't primary/unique keys. 
-   - `Event(startTime)`
-   - `Message(spaceId, createdAt)`
-   - `Notification(userId, read)`
-2. **Polymorphic Relations**: The `Bookmark` table uses a soft polymorphic relation (`itemId`, `itemType`). While flexible, this prevents Prisma from enforcing referential integrity.
-3. **Enum Refactoring**: Fields like `Opportunity.type` and `Application.status` are defined as `String`. These should be migrated to PostgreSQL `ENUM` types to guarantee data integrity.
+## 4. Known Issues / Tech Debt
+- **Supabase vs Clerk Legacy**: The `User` model still contains a `clerkId` field and there is a `webhooks/clerk` endpoint, despite the recent migration to Supabase Auth. This field should be repurposed or removed in a future database migration.

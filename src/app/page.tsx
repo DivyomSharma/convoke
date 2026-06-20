@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Shell } from "@/components/Shell";
 import { Avatar } from "@/components/Avatar";
-import { feed } from "@/lib/data";
 import { prisma } from "@/lib/prisma";
 
 export default async function Landing() {
@@ -16,7 +15,11 @@ export default async function Landing() {
   
   const dbPeople = await prisma.user.findMany({ take: 5 });
 
-  const launch = feed.find((f) => f.kind === "launch")!;
+  const latestProject = await prisma.project.findFirst({
+    include: { user: true },
+    orderBy: { createdAt: "desc" },
+  });
+
   const hack = dbEvents[2] || dbEvents[0]; // fallback if <3 events
   const role = dbOpportunities[0];
   const featuredSpaces = dbSpaces;
@@ -34,32 +37,42 @@ export default async function Landing() {
         <div className="grid grid-cols-12 gap-6 lg:gap-8 mt-10">
           {/* Lead — Launch */}
           <article className="col-span-12 lg:col-span-7 group">
-            <Link href={`/profile/${launch.who.handle}`} className="block">
-              <div className="relative overflow-hidden">
-                <img
-                  src={launch.cover}
-                  alt=""
-                  width={1280}
-                  height={880}
-                  className="w-full h-[460px] md:h-[560px] object-cover grayscale-[10%]"
-                />
+            {latestProject ? (
+              <Link href={`/profile/${latestProject.user.handle || latestProject.user.id}`} className="block">
+                <div className="relative overflow-hidden bg-g2 aspect-[4/3] w-full h-[460px] md:h-[560px]">
+                  {latestProject.url ? (
+                    <img
+                      src={latestProject.url}
+                      alt=""
+                      width={1280}
+                      height={880}
+                      className="w-full h-full object-cover grayscale-[10%]"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-g4">No cover image</div>
+                  )}
+                </div>
+                <div className="mt-5 flex items-baseline gap-3 eyebrow">
+                  <span>Project · Recently Launched</span>
+                </div>
+                <h1 className="serif text-4xl md:text-6xl lg:text-7xl leading-[0.95] mt-3 max-w-[14ch]">
+                  {latestProject.title}
+                </h1>
+                <p className="mt-5 text-g5 max-w-[52ch] text-[15px] leading-relaxed">
+                  {latestProject.description}
+                </p>
+                <div className="mt-5 flex items-center gap-3 text-[13px] text-g6">
+                  <Avatar src={latestProject.user.avatarUrl || ""} name={latestProject.user.name || "User"} size={24} />
+                  <span className="text-ink">{latestProject.user.name || "Unknown Builder"}</span>
+                  <span className="text-g4">·</span>
+                  <span>{latestProject.user.role || "Builder"}</span>
+                </div>
+              </Link>
+            ) : (
+              <div className="w-full h-full min-h-[460px] flex items-center justify-center border border-g3 text-g5 eyebrow">
+                No projects launched yet.
               </div>
-              <div className="mt-5 flex items-baseline gap-3 eyebrow">
-                <span>Launch · {launch.at} ago</span>
-              </div>
-              <h1 className="serif text-4xl md:text-6xl lg:text-7xl leading-[0.95] mt-3 max-w-[14ch]">
-                {launch.title}
-              </h1>
-              <p className="mt-5 text-g5 max-w-[52ch] text-[15px] leading-relaxed">
-                {launch.body}
-              </p>
-              <div className="mt-5 flex items-center gap-3 text-[13px] text-g6">
-                <Avatar src={launch.who.avatar} name={launch.who.name} size={24} />
-                <span className="text-ink">{launch.who.name}</span>
-                <span className="text-g4">·</span>
-                <span>{launch.who.role}</span>
-              </div>
-            </Link>
+            )}
           </article>
 
           {/* Right rail — tonight */}

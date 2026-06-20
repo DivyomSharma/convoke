@@ -90,17 +90,43 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
   );
 }
 
+import { globalSearch, type SearchResult } from "@/app/actions/search";
+
 function CommandK({ onClose }: { onClose: () => void }) {
-  const items = [
-    { kind: "Page", label: "Explore feed", href: "/explore" },
-    { kind: "Page", label: "Spaces directory", href: "/spaces" },
-    { kind: "Page", label: "Opportunities", href: "/opportunities" },
-    { kind: "Page", label: "Workspace", href: "/workspace" },
-    { kind: "Person", label: "Ananya Rao", href: "/profile/ananya" },
-    { kind: "Person", label: "Leo Carrillo", href: "/profile/leo" },
-    { kind: "Space", label: "Early Builders", href: "/spaces" },
-    { kind: "Org", label: "Lumen Labs", href: "/org/lumen-labs" },
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const staticItems = [
+    { type: "Page", title: "Explore feed", subtitle: "", href: "/explore", id: "p1" },
+    { type: "Page", title: "Spaces directory", subtitle: "", href: "/spaces", id: "p2" },
+    { type: "Page", title: "Opportunities", subtitle: "", href: "/opportunities", id: "p3" },
+    { type: "Page", title: "Workspace", subtitle: "", href: "/workspace", id: "p4" },
   ];
+
+  useEffect(() => {
+    if (query.length < 2) {
+      setResults([]);
+      return;
+    }
+    let active = true;
+    setLoading(true);
+    const timeoutId = setTimeout(() => {
+      globalSearch(query).then((res) => {
+        if (active) {
+          setResults(res);
+          setLoading(false);
+        }
+      });
+    }, 250);
+    return () => {
+      active = false;
+      clearTimeout(timeoutId);
+    };
+  }, [query]);
+
+  const displayItems = query.length < 2 ? staticItems : results;
+
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-[12vh] px-4" onClick={onClose}>
       <div className="absolute inset-0 bg-ink/40" />
@@ -110,19 +136,30 @@ function CommandK({ onClose }: { onClose: () => void }) {
       >
         <input
           autoFocus
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
           placeholder="Jump to anything…"
           className="w-full px-5 h-14 bg-transparent text-[15px] outline-none placeholder:text-g4 hairline-b"
         />
         <ul className="max-h-[60vh] overflow-auto py-2">
-          {items.map((it, i) => (
-            <li key={i}>
+          {loading && query.length >= 2 && results.length === 0 && (
+            <li className="px-5 py-4 text-[13px] text-g5">Searching...</li>
+          )}
+          {!loading && query.length >= 2 && results.length === 0 && (
+             <li className="px-5 py-4 text-[13px] text-g5">No results found for "{query}"</li>
+          )}
+          {displayItems.map((it) => (
+            <li key={it.id}>
               <Link
                 href={it.href}
                 onClick={onClose}
                 className="flex items-center justify-between px-5 py-2.5 hover:bg-g1 text-[14px]"
               >
-                <span>{it.label}</span>
-                <span className="mono text-[10px] text-g4">{it.kind}</span>
+                <div>
+                  <div>{it.title}</div>
+                  {it.subtitle && <div className="text-[12px] text-g5">{it.subtitle}</div>}
+                </div>
+                <span className="mono text-[10px] text-g4">{it.type}</span>
               </Link>
             </li>
           ))}

@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { events, opportunities, orgs, people, spaces, feed } from "../src/lib/data";
+import { events, opportunities, orgs, people, spaces, feed } from "./seed-data";
 
 const prisma = new PrismaClient();
 

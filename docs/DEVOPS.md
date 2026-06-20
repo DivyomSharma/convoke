@@ -1,27 +1,25 @@
-# DevOps & CI/CD
+# DevOps & Deployment
 
-## Deployment Pipeline
-Convoke is deployed exclusively on **Vercel**, leveraging its tight integration with Next.js for Edge routing, serverless functions, and static caching.
+**Source of Truth Version:** 1.0.0
 
-### Branch Strategy
-- **`main`**: The canonical production branch. Any code merged into `main` triggers a production deployment.
-- **Preview Branches**: Any PR or push to non-main branches triggers a Vercel Preview Deployment, allowing for visual regression testing and staging reviews before merging.
+## 1. Hosting Environment
+Convoke is designed to be hosted entirely on **Vercel**.
+- **Compute**: Next.js Serverless Edge Functions.
+- **Routing**: Handled natively by Vercel's routing infrastructure (Middleware execution at the Edge).
 
-### Build Configuration
-- **Package Manager**: `npm`.
-- **Pre-requisites**: `npm run build` runs `next build`.
-- **Crucial Hook**: A `postinstall` script (`prisma generate`) is strictly required in `package.json` to ensure the Prisma Client is rebuilt in the Vercel environment prior to Next.js compilation, as Vercel aggressively caches `node_modules`.
+## 2. Database Infrastructure
+- **Provider**: PostgreSQL (Typically hosted via Supabase given the auth alignment).
+- **ORM Synchronization**: The `package.json` relies on a critical `postinstall` script:
+  `prisma generate && prisma db push --accept-data-loss`
+- **Implication**: When Vercel clones the repository and runs `npm install`, it automatically generates the Prisma client and forcefully pushes the `schema.prisma` structure to the remote database. This ensures the database is *always* perfectly aligned with the deployed code, but risks dropping tables/columns if they are removed from the schema.
 
-## Database Migrations
-- Prisma acts as the source of truth for the Supabase schema.
-- Migrations are pushed via the CLI (`npx prisma db push` or `npx prisma migrate deploy`).
-- *Warning*: Schema changes must be applied to the database *before* the Vercel deployment completes if the new code relies on those schema changes.
+## 3. Build Tooling
+- **TypeScript**: Strict type checking is enforced. The build will fail if TS errors exist.
+- **Linting**: ESLint checks are integrated into the Next.js build process.
+- **Turbopack**: Enabled locally for fast iterations.
 
-## Environment Variables
-- Handled via Vercel's Environment Variable manager.
-- Segregated by environment: `Production`, `Preview`, and `Development`.
-- Keys include Supabase connections, Clerk API keys, and Webhook secrets.
-
-## Monitoring
-- **Vercel Logs**: Used for runtime execution tracking.
-- **Next Steps**: Integrate Sentry or Datadog for granular exception tracking and performance alerting.
+## 4. Environment Variables
+The following environment variables are strictly required for a successful deployment:
+- `NEXT_PUBLIC_SUPABASE_URL`: The URL of the Supabase instance.
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: The public anonymized key for client-side Auth.
+- `DATABASE_URL`: The direct PostgreSQL connection string for Prisma.

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { events, opportunities, orgs, people, spaces } from "@/lib/data";
+import { events, opportunities, orgs, people, spaces } from "../../../../prisma/seed-data";
 
 export async function GET(request: Request) {
   // Basic security check to prevent accidental re-seeding in production

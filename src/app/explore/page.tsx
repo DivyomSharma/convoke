@@ -1,19 +1,65 @@
-"use client";
-
 import Link from "next/link";
 import { Shell } from "@/components/Shell";
 import { Avatar } from "@/components/Avatar";
-import { feed } from "@/lib/data";
-import { useState } from "react";
+import { prisma } from "@/lib/prisma";
 
 const filters = ["All", "Events", "Roles", "Hackathons", "Projects", "Drops", "Vouches", "Office hours"] as const;
 
-export default function Explore() {
-  const [f, setF] = useState<(typeof filters)[number]>("All");
-  const items = f === "All" ? feed : feed.filter((it) => {
-    const map: Record<string, string> = { Events: "event", Roles: "role", Hackathons: "hackathon", Projects: "project", Drops: "drop", Vouches: "vouch", "Office hours": "office-hours" };
-    return it.kind === map[f];
-  });
+export default async function Explore(props: { searchParams?: Promise<{ f?: string }> }) {
+  const searchParams = await props.searchParams;
+  const f = searchParams?.f || "All";
+
+  // Fetch real data from Prisma
+  const [events, opportunities, projects] = await Promise.all([
+    prisma.event.findMany({ include: { space: { include: { organization: true } } }, orderBy: { createdAt: "desc" } }),
+    prisma.opportunity.findMany({ include: { organization: true }, orderBy: { createdAt: "desc" } }),
+    prisma.project.findMany({ include: { user: true }, orderBy: { createdAt: "desc" } }),
+  ]);
+
+  // Normalize into a common feed format
+  const normalizedItems: any[] = [];
+
+  if (f === "All" || f === "Events" || f === "Hackathons") {
+    events.forEach(e => normalizedItems.push({
+      id: e.id,
+      kind: "Event",
+      title: e.title,
+      body: e.description,
+      cover: null,
+      meta: e.location,
+      at: e.createdAt.toLocaleDateString(),
+      who: { handle: "event", name: e.space.name, role: "Space", avatar: "" }
+    }));
+  }
+
+  if (f === "All" || f === "Roles") {
+    opportunities.forEach(o => normalizedItems.push({
+      id: o.id,
+      kind: "Role",
+      title: o.title,
+      body: o.description,
+      cover: null,
+      meta: o.location,
+      at: o.createdAt.toLocaleDateString(),
+      who: { handle: o.organization.slug, name: o.organization.name, role: "Organization", avatar: o.organization.logoUrl || "" }
+    }));
+  }
+
+  if (f === "All" || f === "Projects") {
+    projects.forEach(p => normalizedItems.push({
+      id: p.id,
+      kind: "Project",
+      title: p.title,
+      body: p.description,
+      cover: p.url,
+      meta: p.url,
+      at: p.createdAt.toLocaleDateString(),
+      who: { handle: p.user.handle || p.user.id, name: p.user.name || "Builder", role: p.user.role || "User", avatar: p.user.avatarUrl || "" }
+    }));
+  }
+
+  // Sort by date descending (using string sort for now, would be better to keep Date objects)
+  const items = normalizedItems;
 
   return (
     <Shell>
@@ -25,20 +71,23 @@ export default function Explore() {
 
         <div className="sticky top-14 z-20 bg-paper hairline-b py-3 -mx-5 sm:-mx-8 px-5 sm:px-8 mt-4 flex gap-2 overflow-x-auto">
           {filters.map((n) => (
-            <button
+            <Link
               key={n}
-              onClick={() => setF(n)}
+              href={`/explore?f=${n}`}
               className={
                 "px-3 py-1.5 text-[12px] mono tracking-wide uppercase shrink-0 rounded-sm transition-colors " +
                 (f === n ? "bg-ink text-paper" : "text-g5 hover:text-ink")
               }
             >
               {n}
-            </button>
+            </Link>
           ))}
         </div>
 
         <ul className="divide-y divide-g3">
+          {items.length === 0 && (
+            <div className="py-20 text-center text-g5 eyebrow">No items found. Try adjusting your filters.</div>
+          )}
           {items.map((it) => (
             <li key={it.id} className="py-7">
               <div className="flex items-center gap-3 mb-3">
@@ -52,7 +101,7 @@ export default function Explore() {
                 <span className="text-[12px] text-g5">{it.who.role}</span>
                 <span className="text-g4 text-[12px]">·</span>
                 <span className="text-[12px] text-g4 mono">{it.at}</span>
-                <span className="ml-auto mono text-[10px] uppercase tracking-wider text-g4">{labelFor(it.kind)}</span>
+                <span className="ml-auto mono text-[10px] uppercase tracking-wider text-g4">{it.kind}</span>
               </div>
               <h3 className="serif text-[26px] md:text-[30px] leading-[1.1]">{it.title}</h3>
               {it.body && <p className="text-g5 text-[15px] mt-2 max-w-[60ch]">{it.body}</p>}
@@ -68,12 +117,4 @@ export default function Explore() {
       </div>
     </Shell>
   );
-}
-
-function labelFor(k: string) {
-  const m: Record<string, string> = {
-    launch: "Launch", event: "Event", role: "Role", project: "Project",
-    drop: "Drop", vouch: "Vouch", space: "Space", hackathon: "Hackathon", "office-hours": "Office hours",
-  };
-  return m[k] ?? k;
 }

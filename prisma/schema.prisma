@@ -17,7 +17,6 @@ model User {
   avatarUrl     String?
   role          String?   // Student, Founder, Creator, Researcher, etc.
   university    String?
-  clerkId       String?   @unique // For OAuth mapping
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 

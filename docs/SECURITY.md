@@ -1,20 +1,25 @@
-# Security Audit
+# Security Architecture
 
-## Authentication & Authorization
-- **Authentication**: Fully managed by Clerk. Passwords, OTPs, and OAuth flows are not processed directly by our servers.
-- **Authorization**: Protected routes (`/workspace`, `/settings`) are secured at the Edge via `src/middleware.ts`, preventing unauthenticated users from ever downloading the code for private pages.
+**Source of Truth Version:** 1.0.0
 
-## Database Security (Prisma + Supabase)
-- **Direct DB Access**: Because we use React Server Components and Server Actions, the database connection (`Convoke_PRISMA_DATABASE_URL`) is never exposed to the client.
-- **SQL Injection**: Prisma ORM inherently prevents SQL injection by utilizing parameterized queries for all data access.
-- **Row Level Security (RLS)**: Currently, RLS on Supabase is not fully utilized because Prisma connects as the authenticated `postgres` role via connection string. Application-level authorization checks inside Server Actions must enforce data ownership (e.g., verifying `session.userId === project.userId` before deletion).
+## 1. Authentication Security
+Convoke relies entirely on **Supabase Auth**.
+- Passwords are never stored or processed directly by the Next.js application.
+- OAuth flows utilize secure server-to-server code exchanges (`/auth/callback/route.ts`).
+- Magic Link OTPs prevent credential stuffing attacks.
 
-## Cross-Site Scripting (XSS)
-- React inherently escapes all string variables in JSX, neutralizing standard XSS vectors. 
-- *Risk*: Usage of `dangerouslySetInnerHTML` is strictly prohibited unless parsing sanitized Markdown.
+## 2. Route Protection & Authorization
+- **Edge Middleware (`src/middleware.ts`)**: Acts as a blanket security layer. It operates on an "allow-list" principle. If a route is not explicitly marked public (e.g., `/`, `/login`, `/api/seed`), the middleware blocks access and redirects to `/login`.
+- **Session Refresh**: The middleware guarantees that expired sessions are automatically refreshed. If a user's token is revoked in the database, the middleware will immediately detect the invalid token on the next page navigation and log them out.
 
-## Webhooks
-- The `/api/webhooks/clerk` endpoint uses `svix` to cryptographically verify incoming requests. This ensures malicious actors cannot spoof Clerk lifecycle events to elevate privileges or create phantom users.
+## 3. Database Security
+- **Prisma**: Usage of the Prisma ORM inherently protects against SQL Injection attacks. All dynamic parameters are parameterized before execution against PostgreSQL.
+- **Logging**: Production Prisma logging is strictly limited to `["error"]` to prevent sensitive user data or API keys from leaking into the Vercel server logs.
 
-## Secrets Management
-- All secrets are injected securely via Vercel Environment Variables. Local dev relies on a non-committed `.env` file.
+## 4. API Security
+- **Seeding Endpoint (`/api/seed`)**: The database seeding route is protected by a static URL secret (`?secret=convoke123`). While this is functional for early stages, it is a known vulnerability if the URL is leaked or logged in access proxies.
+- **Webhooks (`/api/webhooks/*`)**: Incoming webhooks (e.g., from Svix) must be cryptographically verified using `Webhook.verify()` to ensure the payload actually originated from the trusted provider.
+
+## 5. Client-Side Security
+- **Strict TypeScript**: The project runs TypeScript 5 in strict mode (`"strict": true`), severely reducing the surface area for runtime null-reference vulnerabilities and logic bypasses.
+- **Environment Variables**: Sensitive keys (like `SUPABASE_SERVICE_ROLE_KEY` or database URLs) are strictly omitted from the `NEXT_PUBLIC_` prefix, guaranteeing they are never bundled into the client-side JavaScript.

@@ -21,8 +21,27 @@ const fontMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Convoke — Where ambitious people gather",
-  description: "Events, communities, opportunities and projects in one editorial feed.",
+  title: {
+    template: "%s | Convoke",
+    default: "Convoke | Where ambitious people gather.",
+  },
+  description: "A calm, editorial operating system for builders, researchers, and creators. Join spaces, find opportunities, and build momentum.",
+  metadataBase: new URL("https://convoke.com"),
+  openGraph: {
+    title: "Convoke",
+    description: "Where ambitious people gather.",
+    url: "https://convoke.com",
+    siteName: "Convoke",
+    images: [
+      {
+        url: "/og-default.jpg", // Needs to be added to public
+        width: 1200,
+        height: 630,
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
 };
 
 export default function RootLayout({

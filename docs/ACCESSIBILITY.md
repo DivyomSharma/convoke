@@ -1,18 +1,20 @@
-# Accessibility (a11y) Audit
+# Accessibility Architecture
 
-## Strategy
-Convoke relies heavily on **Radix UI** primitives (via shadcn/ui) to ensure a robust accessibility foundation.
+**Source of Truth Version:** 1.0.0
 
-### Keyboard Navigation & ARIA
-- All Radix primitives (Dialogs, Dropdowns, Accordions) come with full WAI-ARIA compliance, focus management, and keyboard navigation built-in.
-- Focus rings are explicitly styled via Tailwind's `focus-visible:ring` to maintain visual aesthetics without sacrificing navigability for keyboard users.
+## 1. Headless UI Foundation
+The vast majority of Convoke's interactive primitives (Buttons, Avatars, Modals) are built on top of **`@base-ui/react`**.
+- This library handles all complex W3C ARIA specifications out of the box.
+- It automatically manages semantic HTML roles, focus trapping within dialogs, and keyboard event listeners without requiring manual implementation by the product team.
 
-### Contrast
-- The strict monochrome palette (Black/White with subtle grays) naturally lends itself to high contrast ratios. 
-- *Risk*: `text-muted-foreground` (used for secondary tags and dates) must be actively monitored to ensure it meets WCAG 2.1 AA contrast requirements (4.5:1) against both Light and Dark backgrounds.
+## 2. Keyboard Navigation
+- **The Command Palette (`⌘K`)**: The primary navigation paradigm for power users. It is fully accessible via keyboard. Users hit `⌘K` or `Ctrl+K`, type their destination, use the arrow keys to navigate the filtered list, and press `Enter` to route. The `Escape` key natively closes the overlay.
+- **Focus Rings**: Focus states are preserved. The design system explicitly defines `focus-visible:ring` utilities on inputs and buttons to ensure keyboard users have clear visual indicators of their current DOM position.
 
-### Semantic HTML
-- The UI strictly adheres to semantic structure. `main` for primary content, `article` for feed items, `nav` for navigation, and hierarchical heading tags (`h1` through `h6`) without skipping levels.
+## 3. Visual Accessibility
+- **Contrast Ratios**: The strict adherence to the Oklch-based Monochrome Editorial System ensures mathematically perfect contrast. The `--ink` on `--paper` contrast passes WCAG AAA standards. 
+- **Grayscale Dark Mode**: Because dark mode is a literal lightness inversion of the Oklch spectrum, there is zero risk of introducing inaccessible color combinations (such as dark blue text on a black background) commonly found in SaaS applications.
+- **Legibility**: The base CSS applies `text-rendering: optimizeLegibility` and utilizes `Inter Tight`, a font specifically designed for maximum readability at dense UI sizes.
 
-### Reduced Motion
-- Framer Motion animations and Tailwind transitions should respect `prefers-reduced-motion`. This is achievable using Tailwind's `motion-safe:` and `motion-reduce:` modifiers for intense animations.
+## 4. Semantic HTML
+- The application makes proper use of semantic HTML5 tags (`<main>`, `<header>`, `<footer>`, `<nav>`, `<section>`, `<blockquote>`) to ensure screen readers can accurately interpret the layout hierarchy without relying purely on CSS visual cues.

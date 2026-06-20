@@ -1,30 +1,31 @@
 # Design System
 
-## Core Aesthetic
-Convoke's design language is strictly defined as **"Timely & Timeless"**.
-It relies entirely on high-contrast monochrome palettes, rigorous typography, and extreme minimalism. It avoids loud brand colors, relying instead on structure and whitespace to communicate premium quality.
+**Source of Truth Version:** 1.0.0
 
-## Typography
-- **Sans-serif (UI)**: `Inter`. Used for navigation, buttons, small tags, and utility text.
-- **Serif (Editorial)**: `Newsreader`. Used exclusively for large headers, article titles, and prominent numbers to give an editorial, newspaper-like feel.
+## 1. The Monochrome Editorial Philosophy
+Convoke abandons traditional SaaS branding (vibrant primary colors, heavy gradients, drop shadows) in favor of a strictly structured **Monochrome Editorial System**. The UI is designed to mimic high-end physical print media, relying entirely on typography, hairlines, and highly calibrated grayscale steps to establish hierarchy.
 
-*Hierarchy Example*:
-- `text-8xl font-serif tracking-tight`: Hero Headers
-- `text-xs uppercase tracking-widest font-mono`: Eyebrow tags and meta information.
+## 2. Color Palette (Oklch)
+All colors are defined using the modern Oklch color space in `src/app/globals.css`, ensuring perceptually uniform contrast across light and dark modes.
 
-## Color Palette
-Defined entirely in Tailwind v4 CSS variables (`src/app/globals.css`).
-- **Background**: `hsl(0 0% 100%)` (Light) / `hsl(240 10% 3.9%)` (Dark)
-- **Foreground**: `hsl(240 10% 3.9%)` (Light) / `hsl(0 0% 98%)` (Dark)
-- **Muted**: Very subtle grays used for secondary text and disabled states.
-- **Borders**: Sharp, 1px solid lines using `border-border/50` for structure without heaviness.
+- **`--paper`**: The foundation background. (Light: `oklch(0.985 0.002 95)` / Dark: `oklch(0.13 0 0)`).
+- **`--ink`**: The primary foreground/text color. (Light: `oklch(0.16 0 0)` / Dark: `oklch(0.97 0 0)`).
+- **`--ink-2`**: Secondary focus, slightly softer than pure ink.
+- **`--g1` through `--g6`**: A mathematically calibrated 6-step gray scale.
+  - `--g1`: Extremely subtle hover surfaces.
+  - `--g3`: Structural borders and hairlines.
+  - `--g5`: Secondary metadata text.
+  - `--g6`: Tertiary deep text.
 
-## Structural Elements
-- **Spacing**: Generous. Standard paddings are `py-12`, `py-24`, `gap-6`, and `space-y-12`.
-- **Radius**: `rounded-sm`. Avoid heavily rounded corners. The design favors sharp, architectural geometry over soft, bubbly interfaces.
-- **Shadows**: Almost non-existent. Elevation is communicated through borders and background dimming rather than drop shadows.
-- **Glass**: Used sparingly for sticky navbars via `bg-background/80 backdrop-blur-md`.
+## 3. Typography
+Hierarchy is established primarily through strict typographic choices defined via `next/font/google`:
+- **Sans (`--font-sans`)**: *Inter Tight*. Used globally for all standard interface text, buttons, and body copy. Highly legible at small sizes.
+- **Serif (`--font-serif`)**: *Instrument Serif*. Used exclusively for major expressive headers, blockquotes, and the brand logo ("Convoke.").
+- **Mono (`--font-mono`)**: *JetBrains Mono*. Used for metadata labels, keyboard shortcut hints (e.g., `⌘K`), and technical data (e.g., dates).
 
-## Animation Timing
-Animations rely on Framer Motion and Tailwind `transition-all`.
-Standard timing: `duration-200 ease-out`. Focus on micro-interactions (hover states, slight opacity shifts) rather than dramatic sweeping motions.
+## 4. Spacing, Borders, and Radii
+- **Radii Constraints**: The system aggressively limits border-radius. The base `--radius` is `4px`. It scales from `sm` (2px) to a strict maximum of `4xl` (8px). There are no "pill" shaped buttons outside of specific auth components. Elements must feel sharp and structural.
+- **Hairlines**: Traditional borders are replaced by "hairlines". Custom Tailwind v4 utility directives (`@utility hairline`, `@utility hairline-b`, etc.) apply an exact `1px solid var(--g3)` stroke. Layouts are divided by these hairlines rather than varied background surfaces.
+
+## 5. Dark Mode Implementation
+Handled by `next-themes` (`<ThemeProvider>`). The system relies on CSS variable overriding inside the `.dark` class block in `globals.css`. Because the design is entirely grayscale, dark mode is achieved through a near-perfect mathematical inversion of the Oklch lightness values, ensuring absolute consistency in contrast.

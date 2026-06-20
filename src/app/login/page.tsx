@@ -43,7 +43,7 @@ export default function LoginPage() {
       <div className="hidden lg:flex flex-1 relative bg-muted items-end p-12 overflow-hidden">
         {/* Placeholder for realistic photography. In a real app, use an optimized Image component */}
         <div className="absolute inset-0 bg-neutral-200 dark:bg-neutral-800">
-          <div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center mix-blend-overlay" />
+          <div className="absolute inset-0 opacity-20 bg-cover bg-center mix-blend-overlay" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop')" }} />
         </div>
         
         <div className="relative z-10 text-white mix-blend-difference">
