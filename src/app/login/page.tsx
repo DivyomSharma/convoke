@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { SignIn } from "@clerk/nextjs";
 
 export default function LoginPage() {
   return (
@@ -24,67 +24,42 @@ export default function LoginPage() {
       </div>
 
       {/* RIGHT: Auth Card Section */}
-      <div className="flex flex-1 flex-col justify-center items-center p-8 bg-background">
-        <div className="w-full max-w-[380px] space-y-8">
-          <div className="flex flex-col space-y-2 text-center">
-            <span className="font-serif text-4xl tracking-tight mb-2">Convoke.</span>
-            <p className="text-sm text-muted-foreground">
-              Build your future together.
-            </p>
-          </div>
-
-          <div className="space-y-4">
-            {/* OAuth Buttons */}
-            <div className="flex flex-col gap-3">
-              <Button variant="outline" className="w-full rounded-full h-12 shadow-sm font-medium">
-                Continue with Google
-              </Button>
-              <Button variant="outline" className="w-full rounded-full h-12 shadow-sm font-medium">
-                Continue with Apple
-              </Button>
-              <Button variant="outline" className="w-full rounded-full h-12 shadow-sm font-medium text-white bg-[#5865F2] hover:bg-[#4752C4] hover:text-white border-transparent">
-                Continue with Discord
-              </Button>
-            </div>
-
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
-                  Or continue with email
-                </span>
-              </div>
-            </div>
-
-            {/* Email Form Placeholder */}
-            <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-              <div className="space-y-2">
-                <input 
-                  type="email" 
-                  placeholder="name@example.com"
-                  className="flex h-12 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                />
-              </div>
-              <Button className="w-full rounded-full h-12">
-                Continue
-              </Button>
-            </form>
-          </div>
-          
-          <p className="px-8 text-center text-sm text-muted-foreground">
-            By clicking continue, you agree to our{" "}
-            <Link href="/terms" className="underline underline-offset-4 hover:text-primary">
-              Terms of Service
-            </Link>{" "}
-            and{" "}
-            <Link href="/privacy" className="underline underline-offset-4 hover:text-primary">
-              Privacy Policy
-            </Link>
-            .
-          </p>
-        </div>
+      <div className="flex flex-1 flex-col justify-center items-center p-8 bg-background relative">
+        <SignIn 
+          appearance={{
+            elements: {
+              rootBox: "w-full max-w-[380px]",
+              card: "bg-transparent shadow-none border-0 p-0 w-full",
+              headerTitle: "font-serif text-4xl tracking-tight mb-2 text-ink text-center",
+              headerSubtitle: "text-sm text-g5 text-center hidden", // We'll add our own subtitle below if needed, or let clerk use its default
+              socialButtonsBlockButton: "rounded-full h-12 shadow-sm font-medium border border-input text-ink hover:bg-g1 w-full justify-center text-[14px]",
+              socialButtonsProviderIcon: "w-5 h-5",
+              dividerLine: "bg-g3",
+              dividerText: "bg-background px-2 text-g5 uppercase text-xs",
+              formFieldInput: "flex h-12 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring text-ink",
+              formFieldLabel: "text-ink text-[13px] font-medium",
+              formButtonPrimary: "w-full rounded-full h-12 bg-ink text-paper hover:bg-ink-2 shadow-none font-medium mt-2",
+              footerActionText: "text-sm text-g5",
+              footerActionLink: "underline underline-offset-4 hover:text-ink text-g6 font-medium",
+              identityPreviewText: "text-ink",
+              identityPreviewEditButton: "text-g5 hover:text-ink",
+              formFieldSuccessText: "text-ink",
+            }
+          }}
+          routing="hash"
+        />
+        
+        <p className="absolute bottom-8 px-8 text-center text-sm text-muted-foreground max-w-[380px]">
+          By continuing, you agree to our{" "}
+          <Link href="/terms" className="underline underline-offset-4 hover:text-primary">
+            Terms of Service
+          </Link>{" "}
+          and{" "}
+          <Link href="/privacy" className="underline underline-offset-4 hover:text-primary">
+            Privacy Policy
+          </Link>
+          .
+        </p>
       </div>
     </div>
   );
