@@ -1,7 +1,7 @@
 import { Shell } from "@/components/Shell";
 import { AmbientGlow } from "@/components/AmbientGlow";
 import Link from "next/link";
-import { Building2, Calendar, FileText, Link2, MapPin, Twitter, Users, Share, Bookmark, Flag, ChevronDown, CheckCircle2 } from "lucide-react";
+import { Building2, Calendar, FileText, Link2, MapPin, Users, Share, Bookmark, Flag, ChevronDown, CheckCircle2 } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
 
 export default function OrganizationDetailPage({ params }: { params: { id: string } }) {
