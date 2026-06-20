@@ -96,7 +96,7 @@ export default async function Explore(props: { searchParams?: Promise<{ f?: stri
             <div className="py-20 text-center text-g5 eyebrow">No items found. Try adjusting your filters.</div>
           )}
           {items.map((it) => (
-            <li key={it.id} className="bg-white border border-g3 rounded-2xl p-6 md:p-8 hover:border-[var(--brand)] hover:shadow-[6px_6px_0_0_var(--brand)] transition-all duration-300">
+            <li key={it.id} className="bg-paper border border-g3 rounded-2xl p-6 md:p-8 hover:border-[var(--brand)] hover:shadow-[6px_6px_0_0_var(--brand)] transition-all duration-300">
               <div className="flex items-center gap-3 mb-4">
                 <Link href={`/profile/${it.who.handle}`}>
                   <Avatar src={it.who.avatar} name={it.who.name} size={32} />

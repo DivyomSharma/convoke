@@ -48,37 +48,37 @@ export default async function Landing() {
 
           {/* Unstop-style Category Cards */}
           <div className="flex gap-4 mt-16 overflow-x-auto pb-6 -mx-5 sm:mx-0 px-5 sm:px-0" style={{ scrollbarWidth: 'none' }}>
-            <Link href="/explore?f=Internships" className="group flex-shrink-0 w-40 h-40 bg-white border border-g3 rounded-2xl p-5 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-[4px_4px_0_0_var(--brand)] transition-all duration-300">
+            <Link href="/explore?f=Internships" className="group flex-shrink-0 w-40 h-40 bg-paper border border-g3 rounded-2xl p-5 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-[4px_4px_0_0_var(--brand)] transition-all duration-300">
               <div className="w-12 h-12 rounded-full bg-[var(--brand)]/10 text-[var(--brand)] flex items-center justify-center group-hover:scale-110 transition-transform">
                 <Briefcase size={24} strokeWidth={1.5} />
               </div>
               <span className="font-medium text-ink">Internships</span>
             </Link>
-            <Link href="/explore?f=Jobs" className="group flex-shrink-0 w-40 h-40 bg-white border border-g3 rounded-2xl p-5 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-[4px_4px_0_0_var(--brand)] transition-all duration-300">
+            <Link href="/explore?f=Jobs" className="group flex-shrink-0 w-40 h-40 bg-paper border border-g3 rounded-2xl p-5 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-[4px_4px_0_0_var(--brand)] transition-all duration-300">
               <div className="w-12 h-12 rounded-full bg-[var(--brand)]/10 text-[var(--brand)] flex items-center justify-center group-hover:scale-110 transition-transform">
                 <BriefcaseBusiness size={24} strokeWidth={1.5} />
               </div>
               <span className="font-medium text-ink">Jobs</span>
             </Link>
-            <Link href="/explore?f=Hackathons" className="group flex-shrink-0 w-40 h-40 bg-white border border-g3 rounded-2xl p-5 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-[4px_4px_0_0_var(--brand)] transition-all duration-300">
+            <Link href="/explore?f=Hackathons" className="group flex-shrink-0 w-40 h-40 bg-paper border border-g3 rounded-2xl p-5 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-[4px_4px_0_0_var(--brand)] transition-all duration-300">
               <div className="w-12 h-12 rounded-full bg-[var(--brand)]/10 text-[var(--brand)] flex items-center justify-center group-hover:scale-110 transition-transform">
                 <Code size={24} strokeWidth={1.5} />
               </div>
               <span className="font-medium text-ink">Hackathons</span>
             </Link>
-            <Link href="/explore?f=MockTests" className="group flex-shrink-0 w-40 h-40 bg-white border border-g3 rounded-2xl p-5 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-[4px_4px_0_0_var(--brand)] transition-all duration-300">
+            <Link href="/explore?f=MockTests" className="group flex-shrink-0 w-40 h-40 bg-paper border border-g3 rounded-2xl p-5 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-[4px_4px_0_0_var(--brand)] transition-all duration-300">
               <div className="w-12 h-12 rounded-full bg-[var(--brand)]/10 text-[var(--brand)] flex items-center justify-center group-hover:scale-110 transition-transform">
                 <ClipboardList size={24} strokeWidth={1.5} />
               </div>
               <span className="font-medium text-ink">Mock Tests</span>
             </Link>
-            <Link href="/explore?f=Mentorships" className="group flex-shrink-0 w-40 h-40 bg-white border border-g3 rounded-2xl p-5 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-[4px_4px_0_0_var(--brand)] transition-all duration-300">
+            <Link href="/explore?f=Mentorships" className="group flex-shrink-0 w-40 h-40 bg-paper border border-g3 rounded-2xl p-5 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-[4px_4px_0_0_var(--brand)] transition-all duration-300">
               <div className="w-12 h-12 rounded-full bg-[var(--brand)]/10 text-[var(--brand)] flex items-center justify-center group-hover:scale-110 transition-transform">
                 <Users size={24} strokeWidth={1.5} />
               </div>
               <span className="font-medium text-ink">Mentorships</span>
             </Link>
-            <Link href="/explore?f=Courses" className="group flex-shrink-0 w-40 h-40 bg-white border border-g3 rounded-2xl p-5 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-[4px_4px_0_0_var(--brand)] transition-all duration-300">
+            <Link href="/explore?f=Courses" className="group flex-shrink-0 w-40 h-40 bg-paper border border-g3 rounded-2xl p-5 flex flex-col justify-between hover:border-[var(--brand)] hover:shadow-[4px_4px_0_0_var(--brand)] transition-all duration-300">
               <div className="w-12 h-12 rounded-full bg-[var(--brand)]/10 text-[var(--brand)] flex items-center justify-center group-hover:scale-110 transition-transform">
                 <GraduationCap size={24} strokeWidth={1.5} />
               </div>
@@ -189,7 +189,7 @@ export default async function Landing() {
 
       {/* Two-up: Hackathon + Open role (Poster Cards) */}
       <section className="mx-auto max-w-[1440px] px-5 sm:px-8 mt-20 grid grid-cols-1 md:grid-cols-2 gap-10">
-        <Link href="/opportunities" className="brutalist-card p-8 md:p-10 group block">
+        <Link href="/opportunities" className="brutalist-card bg-paper p-8 md:p-10 group block">
           <div className="flex items-start justify-between">
             <div className="eyebrow">Event · {hack?.location || "TBA"}</div>
             <div className="w-8 h-8 rounded-full bg-[var(--brand)] text-paper flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -205,7 +205,7 @@ export default async function Landing() {
             <span className="ml-4 text-ink font-medium text-[14px] self-center">+ 10 others</span>
           </div>
         </Link>
-        <Link href="/opportunities" className="brutalist-card p-8 md:p-10 group block">
+        <Link href="/opportunities" className="brutalist-card bg-paper p-8 md:p-10 group block">
           <div className="flex items-start justify-between">
             <div className="eyebrow">{role?.type || "Role"} · {role?.location || "Remote"}</div>
             <div className="w-8 h-8 rounded-full bg-[var(--brand)] text-paper flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
