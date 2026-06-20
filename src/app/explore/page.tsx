@@ -107,7 +107,7 @@ export default async function Explore(props: { searchParams?: Promise<{ f?: stri
               {it.body && <p className="text-g5 text-[15px] mt-2 max-w-[60ch]">{it.body}</p>}
               {it.cover && (
                 <div className="mt-4 overflow-hidden">
-                  <img src={it.cover} alt="" loading="lazy" className="w-full max-h-[420px] object-cover grayscale-[15%]" />
+                  <img src={it.cover} alt="" loading="lazy" className="w-full max-h-[420px] object-cover grayscale hover:grayscale-0 transition-all duration-500" />
                 </div>
               )}
               {it.meta && <div className="mt-4 mono text-[12px] text-g5">{it.meta}</div>}

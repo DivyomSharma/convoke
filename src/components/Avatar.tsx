@@ -18,7 +18,7 @@ export function Avatar({
       style={{ width: size, height: size, fontSize: size * 0.38 }}
     >
       {src ? (
-        <img src={src} alt={name} className="h-full w-full object-cover" loading="lazy" />
+        <img src={src} alt={name} className="h-full w-full object-cover grayscale hover:grayscale-0 transition-all duration-500" loading="lazy" />
       ) : (
         <span className="font-medium tracking-tight">{initials}</span>
       )}

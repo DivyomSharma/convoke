@@ -46,7 +46,7 @@ export default async function Landing() {
                       alt=""
                       width={1280}
                       height={880}
-                      className="w-full h-full object-cover grayscale-[10%]"
+                      className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-g4">No cover image</div>
@@ -92,7 +92,7 @@ export default async function Landing() {
                       </div>
                     </div>
                     <div className="w-20 h-20 shrink-0 overflow-hidden bg-g2">
-                      <img src={`/assets/ph-meetup.jpg`} alt="" className="w-full h-full object-cover grayscale" />
+                      <img src={`/assets/ph-meetup.jpg`} alt="" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
                     </div>
                   </Link>
                 </li>
