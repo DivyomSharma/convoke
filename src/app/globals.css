@@ -2,8 +2,8 @@
 @source "../";
 
 /*
- * Convoke — Lovable x Editorial System
- * Newsreader meets Apple-tier glassmorphism.
+ * Convoke — Brand Identity System
+ * Newsreader + Inter. Deep darks + Muted Gold.
  */
 
 @theme inline {
@@ -12,8 +12,10 @@
   --font-mono: var(--font-mono), ui-monospace, monospace;
 
   --color-paper: var(--paper);
+  --color-paper-elevated: var(--paper-elevated);
+  --color-paper-card: var(--paper-card);
   --color-ink: var(--ink);
-  --color-ink-2: var(--ink-2);
+  --color-ink-muted: var(--ink-muted);
   --color-brand: var(--brand);
 
   --color-g1: var(--g1);
@@ -30,35 +32,41 @@
 }
 
 :root {
-  /* Theme: Lovable Editorial Light */
+  /* Light Theme (Derived from dark spec) */
   --paper:  #FFFFFF;                     /* Pure White */
+  --paper-elevated: #FAFAFA;             /* Zinc 50 */
+  --paper-card: #F4F4F5;                 /* Zinc 100 */
+  
   --ink:    #000000;                     /* Pure Black */
-  --ink-2:  #27272A;                     /* Zinc 800 */
+  --ink-muted: #52525B;                  /* Zinc 600 */
 
-  --g1:     rgba(0, 0, 0, 0.02);         /* Glass surface 1 */
-  --g2:     rgba(0, 0, 0, 0.04);         /* Glass surface 2 */
-  --g3:     rgba(0, 0, 0, 0.08);         /* Hairline border */
+  --g1:     rgba(0, 0, 0, 0.03);         /* Glass surface 1 */
+  --g2:     rgba(0, 0, 0, 0.06);         /* Glass surface 2 */
+  --g3:     rgba(0, 0, 0, 0.10);         /* Hairline border */
   --g4:     rgba(0, 0, 0, 0.25);         /* Soft dark */
   --g5:     rgba(0, 0, 0, 0.50);         /* Meta text */
   --g6:     rgba(0, 0, 0, 0.70);         /* Secondary text */
 
-  --brand:  #000000;                     /* Stark black accent for editorial */
+  --brand:  #C6A36B;                     /* Muted Gold */
 }
 
 .dark {
-  /* Theme: Lovable Editorial Dark */
-  --paper:  #050505;                     /* Deep Charcoal */
-  --ink:    #FFFFFF;                     /* Pure White */
-  --ink-2:  #E4E4E7;                     /* Zinc 200 */
+  /* Dark Theme (Exact Spec Match) */
+  --paper:  #000000;                     /* Pure Black */
+  --paper-elevated: #0A0A0A;             /* Elevated Black */
+  --paper-card: #121212;                 /* Card Background */
   
-  --g1:     rgba(255, 255, 255, 0.03);   /* Glass surface 1 */
-  --g2:     rgba(255, 255, 255, 0.06);   /* Glass surface 2 */
-  --g3:     rgba(255, 255, 255, 0.10);   /* Hairline border */
-  --g4:     rgba(255, 255, 255, 0.30);   /* Soft light */
-  --g5:     rgba(255, 255, 255, 0.50);   /* Meta text */
-  --g6:     rgba(255, 255, 255, 0.80);   /* Secondary text */
+  --ink:    #EAEAEA;                     /* Primary Text / Off-White */
+  --ink-muted: #8A8A8A;                  /* Muted / Secondary Text */
   
-  --brand:  #FFFFFF;                     /* White accent for editorial */
+  --g1:     #0A0A0A;                     /* Elevated */
+  --g2:     #121212;                     /* Card */
+  --g3:     #1A1A1A;                     /* Subtle Border */
+  --g4:     #2A2A2A;                     /* Stronger Border */
+  --g5:     #8A8A8A;                     /* Muted Text */
+  --g6:     #EAEAEA;                     /* Strong Text */
+  
+  --brand:  #C6A36B;                     /* Muted Gold */
 }
 
 @layer base {
@@ -73,8 +81,8 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
-  ::selection { background: var(--brand); color: var(--paper); }
-  h1, h2, h3 { letter-spacing: -0.04em; } /* Tighter tracking for modern feel */
+  ::selection { background: var(--brand); color: #000000; }
+  h1, h2, h3, .logo { font-family: var(--font-serif); }
 }
 
 @utility serif {
@@ -109,7 +117,7 @@
 }
 
 @utility premium-card {
-  background-color: var(--paper);
+  background-color: var(--paper-card);
   border: 1px solid var(--g3);
   border-radius: 20px;
   transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -120,8 +128,12 @@
   box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.15);
   transform: translateY(-4px) scale(1.01);
 }
+.dark .premium-card {
+  box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.4);
+}
 .dark .premium-card:hover {
-  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.6);
+  border-color: var(--g4);
 }
 
 @utility glass-panel {
