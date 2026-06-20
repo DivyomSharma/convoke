@@ -9,21 +9,28 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(uuid())
-  email         String    @unique
-  name          String?
-  handle        String?   @unique
-  bio           String?
-  avatarUrl     String?
-  role          String?   // Student, Founder, Creator, Researcher, etc.
-  university    String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id         String   @id @default(uuid())
+  email      String   @unique
+  name       String?
+  handle     String?  @unique
+  bio        String?
+  headline   String?
+  avatarUrl  String?
+  bannerUrl  String?
+  role       String? // Student, Founder, Creator, Researcher, etc.
+  university String?
+  company    String?
+  location   String?
+  website    String?
+  github     String?
+  linkedin   String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   memberships   Membership[]
   events        EventAttendance[]
-  vouchesGiven  Vouch[]   @relation("VouchesGiven")
-  vouchesRecv   Vouch[]   @relation("VouchesReceived")
+  vouchesGiven  Vouch[]           @relation("VouchesGiven")
+  vouchesRecv   Vouch[]           @relation("VouchesReceived")
   messages      Message[]
   notifications Notification[]
   applications  Application[]
@@ -39,131 +46,274 @@ model Organization {
   id          String   @id @default(uuid())
   name        String
   slug        String   @unique
-  description String?
+  description String?  @db.Text
+  mission     String?  @db.Text
+  vision      String?  @db.Text
   logoUrl     String?
+  bannerUrl   String?
+  industry    String?
+  location    String?
+  website     String?
+  views       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  members     Membership[]
-  spaces      Space[]
+  members       Membership[]
+  spaces        Space[]
   opportunities Opportunity[]
+  faqs          FAQ[]
+  sponsors      Sponsor[]
+  gallery       GalleryImage[]
+  timeline      TimelineEvent[]
+  resources     Resource[]
+  partners      Partner[]
 }
 
 model Membership {
-  id             String       @id @default(uuid())
+  id             String   @id @default(uuid())
   userId         String
   organizationId String
-  role           String       // ADMIN, MEMBER
-  createdAt      DateTime     @default(now())
+  role           String // ADMIN, FOUNDER, MEMBER
+  createdAt      DateTime @default(now())
 
-  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@unique([userId, organizationId])
 }
 
 model Space {
-  id             String       @id @default(uuid())
+  id             String   @id @default(uuid())
   name           String
-  description    String?
+  description    String?  @db.Text
+  bannerUrl      String?
+  rules          String?  @db.Text
   organizationId String
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  events         Event[]
-  messages       Message[]
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  events       Event[]
+  messages     Message[]
 }
 
 model Event {
-  id          String   @id @default(uuid())
-  title       String
-  description String?
-  spaceId     String
-  startTime   DateTime
-  endTime     DateTime
-  location    String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(uuid())
+  title         String
+  description   String?  @db.Text
+  bannerUrl     String?
+  spaceId       String
+  startTime     DateTime
+  endTime       DateTime
+  timezone      String?
+  duration      Int? // minutes
+  location      String?
+  venue         String?
+  requirements  String?  @db.Text
+  difficulty    String?
+  dressCode     String?
+  parking       String?
+  accessibility String?
+  views         Int      @default(0)
+  capacity      Int?
+  waitlistCount Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  space       Space    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  attendance  EventAttendance[]
+  space      Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  attendance EventAttendance[]
+  faqs       FAQ[]
+  sponsors   Sponsor[]
+  gallery    GalleryImage[]
+  resources  Resource[]
+  partners   Partner[]
 }
 
 model EventAttendance {
   id        String   @id @default(uuid())
   eventId   String
   userId    String
-  status    String   // GOING, INTERESTED
+  status    String // GOING, INTERESTED, WAITLISTED
   createdAt DateTime @default(now())
 
-  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([eventId, userId])
 }
 
 model Opportunity {
-  id             String       @id @default(uuid())
+  id             String    @id @default(uuid())
   title          String
-  type           String       // ROLE, FELLOWSHIP, GRANT, HACKATHON
-  description    String?
+  type           String // ROLE, FELLOWSHIP, GRANT, HACKATHON/CHALLENGE
+  description    String?   @db.Text
+  department     String?
+  employmentType String?
+  jobType        String?
+  remoteHybrid   String?
+  openings       Int?
+  experience     String?
   location       String?
   compensation   String?
+  equity         String?
+  benefits       String?   @db.Text
+  stipend        String?
+  bannerUrl      String?
   deadline       DateTime?
+  views          Int       @default(0)
   organizationId String
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  applications   Application[]
+  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  applications Application[]
+  faqs         FAQ[]
+  resources    Resource[]
 }
 
 model Application {
-  id            String      @id @default(uuid())
+  id            String   @id @default(uuid())
   userId        String
   opportunityId String
-  status        String      // PENDING, ACCEPTED, REJECTED
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  status        String // PENDING, ACCEPTED, REJECTED, INTERVIEW
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  opportunity Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
 }
 
 model Project {
   id          String   @id @default(uuid())
   title       String
-  description String?
+  description String?  @db.Text
+  bannerUrl   String?
   url         String?
+  demoUrl     String?
+  githubUrl   String?
+  figmaUrl    String?
+  stack       String? // comma separated or JSON
+  views       Int      @default(0)
+  downloads   Int      @default(0)
   userId      String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  faqs      FAQ[]
+  gallery   GalleryImage[]
+  timeline  TimelineEvent[]
+  resources Resource[]
 }
 
 model Research {
-  id          String   @id @default(uuid())
-  title       String
-  abstract    String?
-  url         String?
-  userId      String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(uuid())
+  title     String
+  abstract  String?  @db.Text
+  url       String?
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model Vouch {
-  id          String   @id @default(uuid())
-  giverId     String
-  receiverId  String
-  content     String
-  createdAt   DateTime @default(now())
+// ==========================================
+// UNIVERSAL DETAIL COMPONENTS
+// ==========================================
 
-  giver       User     @relation("VouchesGiven", fields: [giverId], references: [id], onDelete: Cascade)
-  receiver    User     @relation("VouchesReceived", fields: [receiverId], references: [id], onDelete: Cascade)
+model FAQ {
+  id             String  @id @default(uuid())
+  question       String
+  answer         String  @db.Text
+  eventId        String?
+  organizationId String?
+  opportunityId  String?
+  projectId      String?
+
+  event        Event?        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  opportunity  Opportunity?  @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  project      Project?      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Sponsor {
+  id             String  @id @default(uuid())
+  name           String
+  logoUrl        String?
+  tier           String?
+  eventId        String?
+  organizationId String?
+
+  event        Event?        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model Partner {
+  id             String  @id @default(uuid())
+  name           String
+  logoUrl        String?
+  eventId        String?
+  organizationId String?
+
+  event        Event?        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model GalleryImage {
+  id             String  @id @default(uuid())
+  url            String
+  caption        String?
+  eventId        String?
+  organizationId String?
+  projectId      String?
+
+  event        Event?        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  project      Project?      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model TimelineEvent {
+  id             String   @id @default(uuid())
+  title          String
+  date           DateTime
+  description    String?  @db.Text
+  organizationId String?
+  projectId      String?
+
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  project      Project?      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Resource {
+  id             String  @id @default(uuid())
+  name           String
+  url            String
+  type           String // PDF, LINK, VIDEO
+  eventId        String?
+  organizationId String?
+  projectId      String?
+  opportunityId  String?
+
+  event        Event?        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  project      Project?      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  opportunity  Opportunity?  @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+}
+
+// ==========================================
+// EXISTING SYSTEM MODELS
+// ==========================================
+
+model Vouch {
+  id         String   @id @default(uuid())
+  giverId    String
+  receiverId String
+  content    String
+  createdAt  DateTime @default(now())
+
+  giver    User @relation("VouchesGiven", fields: [giverId], references: [id], onDelete: Cascade)
+  receiver User @relation("VouchesReceived", fields: [receiverId], references: [id], onDelete: Cascade)
 }
 
 model Message {
@@ -173,8 +323,8 @@ model Message {
   spaceId   String
   createdAt DateTime @default(now())
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  space     Space    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  space Space @relation(fields: [spaceId], references: [id], onDelete: Cascade)
 }
 
 model Notification {
@@ -185,28 +335,28 @@ model Notification {
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Bookmark {
   id        String   @id @default(uuid())
   userId    String
-  itemId    String   // Polymorphic ID
-  itemType  String   // EVENT, OPPORTUNITY, etc.
+  itemId    String // Polymorphic ID
+  itemType  String // EVENT, OPPORTUNITY, etc.
   createdAt DateTime @default(now())
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Settings {
-  id            String   @id @default(uuid())
-  userId        String   @unique
-  theme         String   @default("system")
-  emailNotifs   Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  theme       String   @default("system")
+  emailNotifs Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Session {
@@ -221,8 +371,8 @@ model Activity {
   id        String   @id @default(uuid())
   userId    String
   action    String
-  metadata  String?  // JSON string
+  metadata  String? // JSON string
   createdAt DateTime @default(now())
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
