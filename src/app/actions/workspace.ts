@@ -123,3 +123,228 @@ export async function postMessage(spaceId: string, content: string) {
   revalidatePath(`/spaces/${spaceId}`);
   return { success: true };
 }
+
+export async function createOrganization(data: {
+  name: string;
+  slug: string;
+  description?: string;
+  mission?: string;
+  vision?: string;
+  industry?: string;
+  location?: string;
+  website?: string;
+  logoUrl?: string;
+  bannerUrl?: string;
+}) {
+  const user = await requireUser();
+
+  if (!data.name || !data.slug) {
+    throw new Error("Organization name and slug are required.");
+  }
+
+  // Check if slug is unique
+  const existing = await prisma.organization.findUnique({
+    where: { slug: data.slug },
+  });
+  if (existing) {
+    throw new Error("An organization with this slug already exists.");
+  }
+
+  const organization = await prisma.organization.create({
+    data: {
+      name: data.name,
+      slug: data.slug.toLowerCase().trim(),
+      description: data.description,
+      mission: data.mission,
+      vision: data.vision,
+      industry: data.industry,
+      location: data.location,
+      website: data.website,
+      logoUrl: data.logoUrl || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=256&auto=format&fit=crop",
+      bannerUrl: data.bannerUrl || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop",
+      members: {
+        create: {
+          userId: user.id,
+          role: "FOUNDER",
+        },
+      },
+    },
+  });
+
+  revalidatePath("/organizations");
+  revalidatePath("/workspace");
+  return { success: true, organization };
+}
+
+export async function createSpace(data: {
+  name: string;
+  description?: string;
+  bannerUrl?: string;
+  rules?: string;
+  organizationId: string;
+}) {
+  await requireUser();
+
+  if (!data.name || !data.organizationId) {
+    throw new Error("Space name and organization are required.");
+  }
+
+  const space = await prisma.space.create({
+    data: {
+      name: data.name,
+      description: data.description,
+      bannerUrl: data.bannerUrl || "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?q=80&w=1200&auto=format&fit=crop",
+      rules: data.rules,
+      organizationId: data.organizationId,
+    },
+  });
+
+  revalidatePath("/spaces");
+  revalidatePath("/workspace");
+  return { success: true, space };
+}
+
+export async function createEvent(data: {
+  title: string;
+  description?: string;
+  bannerUrl?: string;
+  spaceId: string;
+  startTime: string | Date;
+  endTime: string | Date;
+  location?: string;
+  venue?: string;
+  capacity?: number;
+  requirements?: string;
+}) {
+  await requireUser();
+
+  if (!data.title || !data.spaceId || !data.startTime || !data.endTime) {
+    throw new Error("Event title, space, start time, and end time are required.");
+  }
+
+  const event = await prisma.event.create({
+    data: {
+      title: data.title,
+      description: data.description,
+      bannerUrl: data.bannerUrl || "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=1200&auto=format&fit=crop",
+      spaceId: data.spaceId,
+      startTime: new Date(data.startTime),
+      endTime: new Date(data.endTime),
+      location: data.location || "ONLINE",
+      venue: data.venue,
+      capacity: data.capacity ? Number(data.capacity) : undefined,
+      requirements: data.requirements,
+    },
+  });
+
+  revalidatePath("/events");
+  revalidatePath("/workspace");
+  return { success: true, event };
+}
+
+export async function createOpportunity(data: {
+  title: string;
+  type: string;
+  description?: string;
+  department?: string;
+  employmentType?: string;
+  openings?: number;
+  experience?: string;
+  location?: string;
+  compensation?: string;
+  stipend?: string;
+  bannerUrl?: string;
+  deadline?: string | Date;
+  organizationId: string;
+}) {
+  await requireUser();
+
+  if (!data.title || !data.type || !data.organizationId) {
+    throw new Error("Opportunity title, type, and organization are required.");
+  }
+
+  const opportunity = await prisma.opportunity.create({
+    data: {
+      title: data.title,
+      type: data.type,
+      description: data.description,
+      department: data.department,
+      employmentType: data.employmentType,
+      openings: data.openings ? Number(data.openings) : undefined,
+      experience: data.experience,
+      location: data.location || "REMOTE",
+      compensation: data.compensation,
+      stipend: data.stipend,
+      bannerUrl: data.bannerUrl || "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1200&auto=format&fit=crop",
+      deadline: data.deadline ? new Date(data.deadline) : undefined,
+      organizationId: data.organizationId,
+    },
+  });
+
+  revalidatePath("/opportunities");
+  if (data.type === "HACKATHON" || data.type === "CHALLENGE") {
+    revalidatePath("/challenges");
+  }
+  revalidatePath("/workspace");
+  return { success: true, opportunity };
+}
+
+export async function createProject(data: {
+  title: string;
+  description?: string;
+  bannerUrl?: string;
+  url?: string;
+  demoUrl?: string;
+  githubUrl?: string;
+  figmaUrl?: string;
+  stack?: string;
+}) {
+  const user = await requireUser();
+
+  if (!data.title) {
+    throw new Error("Project title is required.");
+  }
+
+  const project = await prisma.project.create({
+    data: {
+      title: data.title,
+      description: data.description,
+      bannerUrl: data.bannerUrl || "https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1200&auto=format&fit=crop",
+      url: data.url,
+      demoUrl: data.demoUrl,
+      githubUrl: data.githubUrl,
+      figmaUrl: data.figmaUrl,
+      stack: data.stack,
+      userId: user.id,
+    },
+  });
+
+  revalidatePath("/projects");
+  revalidatePath("/workspace");
+  return { success: true, project };
+}
+
+export async function createResearch(data: {
+  title: string;
+  abstract?: string;
+  url?: string;
+}) {
+  const user = await requireUser();
+
+  if (!data.title) {
+    throw new Error("Research title is required.");
+  }
+
+  const research = await prisma.research.create({
+    data: {
+      title: data.title,
+      abstract: data.abstract,
+      url: data.url,
+      userId: user.id,
+    },
+  });
+
+  revalidatePath("/research");
+  revalidatePath("/workspace");
+  return { success: true, research };
+}

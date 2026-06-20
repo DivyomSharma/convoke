@@ -1,0 +1,7 @@
+Contact: mailto:security@theconvoke.xyz
+Expires: 2027-06-21T00:00:00.000Z
+Encryption: https://theconvoke.xyz/security-key.asc
+Acknowledgments: https://theconvoke.xyz/security/acknowledgments
+Preferred-Languages: en
+Canonical: https://theconvoke.xyz/.well-known/security.txt
+Policy: https://theconvoke.xyz/security/policy

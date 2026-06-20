@@ -1,9 +1,10 @@
+"use"
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { type ReactNode, useEffect, useState } from "react";
-import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
+import { useUser, useClerk } from "@clerk/nextjs";
 import { ThemeToggle } from "./ThemeToggle";
 import { globalSearch, type SearchResult } from "@/app/actions/search";
 import {
@@ -34,8 +35,11 @@ const moreNav = [
 
 export function Shell({ children, wide = false }: { children: ReactNode; wide?: boolean }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [commandOpen, setCommandOpen] = useState(false);
-  const { isSignedIn } = useUser();
+  const [profileOpen, setProfileOpen] = useState(false);
+  const { user, isSignedIn } = useUser();
+  const { signOut } = useClerk();
 
   useEffect(() => {
     const handleKeydown = (event: KeyboardEvent) => {
@@ -58,55 +62,49 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
       <header className="sticky top-0 z-30 border-b border-g3/80 bg-paper/75 backdrop-blur-2xl">
         <div className={`mx-auto flex h-16 items-center gap-5 px-5 sm:px-8 ${widthClass}`}>
           <Link href="/" className="serif text-[24px] tracking-tight text-ink">
-            Convoke<span className="text-[var(--brand)]">.</span>
+            Convoke.
           </Link>
 
-          <nav className="hidden lg:flex items-center gap-2 rounded-full border border-g3/80 bg-g1/70 p-1 text-[13px] text-g5">
-            {mainNav.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`rounded-full px-4 py-2 transition ${
-                    isActive
-                      ? "bg-paper text-ink shadow-[0_10px_24px_-18px_rgba(0,0,0,0.35)]"
-                      : "hover:bg-g2 hover:text-ink"
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
+          <nav className="hidden items-center gap-6 text-[13px] font-medium tracking-wide text-g5 md:flex uppercase">
+            {mainNav.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={
+                  "transition hover:text-ink " +
+                  (pathname.startsWith(item.href) ? "text-ink font-semibold" : "")
+                }
+              >
+                {item.label}
+              </Link>
+            ))}
 
             <div className="relative group">
-              <button className="flex items-center gap-1.5 rounded-full px-4 py-2 transition hover:bg-g2 hover:text-ink">
-                More
-                <ChevronDown size={14} className="transition-transform duration-300 group-hover:rotate-180" />
+              <button className="flex items-center gap-1 transition hover:text-ink cursor-pointer">
+                <span>More</span>
+                <ChevronDown size={14} className="text-g4" />
               </button>
-              <div className="pointer-events-none absolute left-0 top-12 z-50 w-60 translate-y-2 rounded-[22px] border border-g3 bg-paper-card p-2 opacity-0 shadow-[0_28px_64px_-34px_rgba(0,0,0,0.55)] backdrop-blur-2xl transition-all duration-200 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100">
-                <div className="grid gap-1">
-                  {moreNav.map((item) => {
-                    const Icon = item.icon;
-                    return (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        className="flex items-center gap-3 rounded-2xl px-3 py-3 text-[14px] text-ink transition hover:bg-g1"
-                      >
-                        <Icon size={16} className="text-[var(--brand)]" />
-                        <span>{item.label}</span>
-                      </Link>
-                    );
-                  })}
-                </div>
+              <div className="absolute left-0 mt-2 w-48 origin-top-left rounded-xl border border-g3 bg-paper-card backdrop-blur-2xl p-1.5 opacity-0 scale-95 pointer-events-none group-hover:opacity-100 group-hover:scale-100 group-hover:pointer-events-auto transition-all duration-200 shadow-xl">
+                {moreNav.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm text-g5 hover:bg-g1/50 hover:text-ink transition-colors"
+                    >
+                      <Icon size={15} className="text-g4" />
+                      <span>{item.label}</span>
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           </nav>
 
           <button
             onClick={() => setCommandOpen(true)}
-            className="ml-auto hidden min-w-[260px] items-center gap-3 rounded-full border border-g3 bg-paper-card px-4 py-2 text-left text-[13px] text-g5 transition hover:border-g4 hover:text-ink md:flex"
+            className="hidden items-center gap-2 border border-g3 bg-g1/35 px-4 h-10 rounded-full text-left text-[13px] text-g5 transition hover:border-g4 hover:bg-g1/60 md:flex md:w-64 lg:w-80 cursor-pointer shadow-inner"
           >
             <Search size={14} className="text-[var(--brand)]" />
             <span>Search people, spaces, roles, events</span>
@@ -138,26 +136,73 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
                 >
                   <Mail size={17} strokeWidth={1.7} />
                 </Link>
-                <UserButton
-                  appearance={{
-                    elements: {
-                      userButtonAvatarBox: "h-9 w-9",
-                      userButtonPopoverCard: "border border-g3 bg-paper-card shadow-[0_32px_80px_-40px_rgba(0,0,0,0.65)] backdrop-blur-2xl rounded-[22px] overflow-hidden",
-                      userButtonPopoverActionButton: "hover:bg-g1 text-ink font-sans text-sm px-4 py-3",
-                      userButtonPopoverActionButtonIcon: "text-[var(--brand)]",
-                      userButtonPopoverActionButtonText: "text-ink font-medium",
-                      userButtonPopoverFooter: "hidden",
-                      userPreviewMainIdentifier: "text-ink font-medium",
-                      userPreviewSecondaryIdentifier: "text-g5 text-xs",
-                      userButtonPopoverMain: "bg-transparent",
-                    },
-                  }}
-                />
+                
+                {/* Custom User Dropdown Profile Menu */}
+                <div className="relative">
+                  <button 
+                    onClick={() => setProfileOpen(!profileOpen)}
+                    className="h-9 w-9 rounded-full overflow-hidden border border-g3 hover:border-[var(--brand)] transition-colors shrink-0 outline-none cursor-pointer flex items-center justify-center"
+                  >
+                    {user?.imageUrl ? (
+                      <img src={user.imageUrl} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-g1 text-g5 text-[14px] font-semibold">
+                        {(user?.fullName || "U").slice(0, 1)}
+                      </div>
+                    )}
+                  </button>
+                  
+                  {profileOpen && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setProfileOpen(false)} />
+                      <div className="absolute right-0 mt-2.5 w-56 rounded-2xl border border-g3 bg-paper-card backdrop-blur-2xl shadow-[0_32px_80px_-40px_rgba(0,0,0,0.65)] py-2 z-50 animate-in fade-in-50 slide-in-from-top-3 duration-200">
+                        <div className="px-4 py-3 border-b border-g3/60">
+                          <div className="text-sm font-semibold text-ink truncate">{user?.fullName || "Builder"}</div>
+                          <div className="text-xs text-g5 truncate">@{user?.username || user?.id.slice(0, 8)}</div>
+                        </div>
+                        
+                        <div className="p-1.5 space-y-0.5">
+                          <Link 
+                            href={`/profile/${user?.username || user?.id}`}
+                            onClick={() => setProfileOpen(false)}
+                            className="flex w-full items-center px-3 py-2 rounded-lg text-sm text-g6 hover:bg-g1/50 hover:text-ink transition-colors"
+                          >
+                            Passport
+                          </Link>
+                          <Link 
+                            href="/workspace"
+                            onClick={() => setProfileOpen(false)}
+                            className="flex w-full items-center px-3 py-2 rounded-lg text-sm text-g6 hover:bg-g1/50 hover:text-ink transition-colors"
+                          >
+                            Workspace
+                          </Link>
+                          <Link 
+                            href="/settings"
+                            onClick={() => setProfileOpen(false)}
+                            className="flex w-full items-center px-3 py-2 rounded-lg text-sm text-g6 hover:bg-g1/50 hover:text-ink transition-colors"
+                          >
+                            Settings
+                          </Link>
+                          <button 
+                            onClick={async () => {
+                              setProfileOpen(false);
+                              await signOut();
+                              router.push("/");
+                            }}
+                            className="flex w-full items-center px-3 py-2 rounded-lg text-sm text-red-500 hover:bg-red-500/10 transition-colors text-left cursor-pointer"
+                          >
+                            Log Out
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
               </>
             ) : (
-              <SignInButton mode="modal">
-                <button className="ink-button px-5 text-[13px] font-medium">Log in</button>
-              </SignInButton>
+              <Link href="/login" className="ink-button px-5 text-[13px] font-medium flex items-center justify-center">
+                Log in
+              </Link>
             )}
           </div>
         </div>
