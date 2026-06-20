@@ -8,11 +8,20 @@ import { portraits } from "@/lib/photos";
 import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
 import { ThemeToggle } from "./ThemeToggle";
 
-const nav = [
+import { ChevronDown, Briefcase, Calendar, Code, LayoutGrid, Building2, FlaskConical, LayoutTemplate } from "lucide-react";
+
+const mainNav = [
   { href: "/explore", label: "Explore" },
   { href: "/spaces", label: "Spaces" },
+  { href: "/events", label: "Events" },
+  { href: "/hackathons", label: "Hackathons" },
   { href: "/opportunities", label: "Opportunities" },
-  { href: "/workspace", label: "Workspace" },
+] as const;
+
+const moreNav = [
+  { href: "/projects", label: "Projects", icon: LayoutGrid },
+  { href: "/organizations", label: "Organizations", icon: Building2 },
+  { href: "/research", label: "Research", icon: FlaskConical },
 ] as const;
 
 export function Shell({ children, wide = false }: { children: ReactNode; wide?: boolean }) {
@@ -39,19 +48,39 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
           <Link href="/" className="serif text-[22px] leading-none tracking-tight">
             Convoke<span className="text-g4">.</span>
           </Link>
-          <nav className="hidden md:flex items-center gap-6 text-[14px] text-g5">
-            {nav.map((n) => {
+          <nav className="hidden lg:flex items-center gap-6 text-[14px] text-g5">
+            {mainNav.map((n) => {
               const isActive = pathname === n.href;
               return (
                 <Link
                   key={n.href}
                   href={n.href}
-                  className={`transition-colors ${isActive ? "text-ink" : "hover:text-ink"}`}
+                  className={`transition-colors ${isActive ? "text-ink font-medium" : "hover:text-ink"}`}
                 >
                   {n.label}
                 </Link>
               );
             })}
+            
+            {/* More Dropdown */}
+            <div className="relative group">
+              <button className="flex items-center gap-1 hover:text-ink transition-colors h-14">
+                More <ChevronDown size={14} className="group-hover:rotate-180 transition-transform duration-300" />
+              </button>
+              <div className="absolute top-14 left-0 w-56 bg-paper border border-g3 rounded-xl shadow-2xl opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 overflow-hidden">
+                <div className="p-2 flex flex-col gap-1">
+                  {moreNav.map((n) => {
+                    const Icon = n.icon;
+                    return (
+                      <Link key={n.href} href={n.href} className="flex items-center gap-3 px-3 py-2 hover:bg-g1 rounded-lg text-ink transition-colors">
+                        <Icon size={16} className="text-g5" />
+                        <span className="text-[14px]">{n.label}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
           </nav>
           <button
             onClick={() => setK(true)}
@@ -64,6 +93,9 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
             <ThemeToggle />
             {isSignedIn ? (
               <>
+                <Link href="/workspace" className="text-g5 hover:text-ink text-[14px] hidden sm:block" aria-label="Workspace">
+                  <LayoutTemplate size={18} strokeWidth={1.5} />
+                </Link>
                 <Link href="/notifications" className="text-g5 hover:text-ink text-[14px]" aria-label="Notifications">
                   <NotifGlyph />
                 </Link>
