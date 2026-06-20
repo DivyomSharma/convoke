@@ -2,13 +2,10 @@ import Link from "next/link";
 import { Shell } from "@/components/Shell";
 import { Avatar } from "@/components/Avatar";
 import { prisma } from "@/lib/prisma";
-import { createClient } from "@/utils/supabase/server";
+import { requireUser } from "@/lib/auth";
 
 export default async function Workspace() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  const dbUser = user ? await prisma.user.findUnique({ where: { email: user.email! } }) : null;
+  const dbUser = await requireUser();
 
   // Real Queries
   const memberships = dbUser ? await prisma.membership.findMany({

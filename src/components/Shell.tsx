@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { type ReactNode, useEffect, useState } from "react";
 import { Avatar } from "./Avatar";
 import { portraits } from "@/lib/photos";
+import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
 
 const nav = [
   { href: "/explore", label: "Explore" },
@@ -16,6 +17,7 @@ const nav = [
 export function Shell({ children, wide = false }: { children: ReactNode; wide?: boolean }) {
   const pathname = usePathname();
   const [k, setK] = useState(false);
+  const { isSignedIn } = useUser();
 
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
@@ -58,15 +60,23 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
             <span className="ml-auto mono text-[11px] text-g4">⌘K</span>
           </button>
           <div className="flex items-center gap-4 ml-auto md:ml-0">
-            <Link href="/notifications" className="text-g5 hover:text-ink text-[14px]" aria-label="Notifications">
-              <NotifGlyph />
-            </Link>
-            <Link href="/messages" className="text-g5 hover:text-ink text-[14px]" aria-label="Messages">
-              <MailGlyph />
-            </Link>
-            <Link href="/profile/leo">
-              <Avatar src={portraits[0]} name="Leo Carrillo" size={28} />
-            </Link>
+            {isSignedIn ? (
+              <>
+                <Link href="/notifications" className="text-g5 hover:text-ink text-[14px]" aria-label="Notifications">
+                  <NotifGlyph />
+                </Link>
+                <Link href="/messages" className="text-g5 hover:text-ink text-[14px]" aria-label="Messages">
+                  <MailGlyph />
+                </Link>
+                <UserButton appearance={{ elements: { userButtonAvatarBox: "w-7 h-7" } }} />
+              </>
+            ) : (
+              <SignInButton mode="modal">
+                <button className="text-[13px] font-medium bg-ink text-paper px-4 py-1.5 rounded-full hover:bg-ink-2 transition-colors">
+                  Log in
+                </button>
+              </SignInButton>
+            )}
           </div>
         </div>
       </header>

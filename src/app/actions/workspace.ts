@@ -1,30 +1,10 @@
 "use server";
 
-import { createClient } from "@/utils/supabase/server";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { auth, currentUser } from "@clerk/nextjs/server";
 
-/**
- * Ensures the user is authenticated and mapped to a Prisma User.
- */
-async function requireUser() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    throw new Error("Unauthorized: Must be logged in.");
-  }
-
-  const dbUser = await prisma.user.findUnique({
-    where: { email: user.email! },
-  });
-
-  if (!dbUser) {
-    throw new Error("User record not found in database.");
-  }
-
-  return dbUser;
-}
+import { requireUser } from "@/lib/auth";
 
 export async function rsvpToEvent(eventId: string, status: "GOING" | "INTERESTED") {
   const user = await requireUser();
