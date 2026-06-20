@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { type ReactNode, useEffect, useState } from "react";
 import { useUser, useClerk } from "@clerk/nextjs";
 import { ThemeToggle } from "./ThemeToggle";
+import { VerticalMarquee } from "./VerticalMarquee";
 import { globalSearch, type SearchResult } from "@/app/actions/search";
 import {
   Bell,
@@ -76,16 +77,15 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
             ))}
           </nav>
 
-          <button
-            onClick={() => setCommandOpen(true)}
-            className="hidden items-center gap-2 border border-g3 bg-g1/35 px-3 h-8 rounded-sm text-left mono text-[10px] uppercase tracking-wider text-g5 transition hover:border-g4 hover:bg-g1/60 md:flex md:w-48 cursor-pointer"
-          >
-            <Search size={11} className="text-brand" />
-            <span>Search</span>
-            <span className="ml-auto text-[9px] text-g4">⌘K</span>
-          </button>
-
           <div className="ml-auto flex items-center gap-2 md:ml-0">
+            <button
+              onClick={() => setCommandOpen(true)}
+              className="hidden items-center gap-2 border border-g3 bg-g1/35 px-3 h-8 rounded-sm text-left mono text-[10px] uppercase tracking-wider text-g5 transition hover:border-g4 hover:bg-g1/60 md:flex md:w-48 cursor-pointer"
+            >
+              <Search size={11} className="text-brand" />
+              <span>Search</span>
+              <span className="ml-auto text-[9px] text-g4">⌘K</span>
+            </button>
             <ThemeToggle />
             {isSignedIn ? (
               <>
@@ -182,7 +182,21 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
         </div>
       </header>
 
-      <main className="relative z-10">{children}</main>
+      <main className="relative z-10 flex min-h-screen">
+        {/* Left Decorative Column */}
+        <div className="hidden 2xl:flex w-14 fixed left-0 top-16 bottom-0 border-r border-g3/60 bg-paper items-center justify-center pointer-events-none z-0">
+          <VerticalMarquee duration={180} text="CONVOKE • THE INTERNET HOME FOR BUILDERS • " />
+        </div>
+        
+        <div className="flex-1 w-full 2xl:px-14">
+          {children}
+        </div>
+
+        {/* Right Decorative Column */}
+        <div className="hidden 2xl:flex w-14 fixed right-0 top-16 bottom-0 border-l border-g3/60 bg-paper items-center justify-center pointer-events-none z-0">
+          <VerticalMarquee duration={180} text="ESTABLISHED MMXXVI • GLOBAL BUILDER NETWORK • " />
+        </div>
+      </main>
 
       <footer className="relative z-10 mt-24 border-t border-g3 bg-paper/85">
         <div className={`mx-auto px-5 sm:px-8 py-16 ${widthClass}`}>

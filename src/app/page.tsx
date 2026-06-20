@@ -1,6 +1,7 @@
 import { Shell } from "@/components/Shell";
 import { prisma } from "@/lib/prisma";
 import { HomeClient } from "@/components/HomeClient";
+import { getFallbackPhoto } from "@/lib/photos";
 
 export const revalidate = 60;
 
@@ -228,6 +229,7 @@ export default async function HomePage() {
           meta: `Happening at ${dbFeaturedEvent.location || "Online"} · ${dbFeaturedEvent.startTime.toLocaleDateString()}`,
           link: `/events/${dbFeaturedEvent.id}`,
           actionText: "RSVP Today",
+          imageUrl: getFallbackPhoto(dbFeaturedEvent.id, "event"),
         }
       : {
           title: "No upcoming events",
@@ -235,6 +237,7 @@ export default async function HomePage() {
           meta: "Create the first event on campus",
           link: "/events",
           actionText: "Host Event",
+          imageUrl: getFallbackPhoto("empty-event", "event"),
         },
     org: dbFeaturedOrg
       ? {
@@ -243,6 +246,7 @@ export default async function HomePage() {
           meta: `Ecosystem Hub · Since ${dbFeaturedOrg.createdAt.getFullYear()}`,
           link: `/org/${dbFeaturedOrg.slug}`,
           actionText: "Enter Hub",
+          imageUrl: getFallbackPhoto(dbFeaturedOrg.id, "space"),
         }
       : {
           title: "No collectives registered",
@@ -250,6 +254,7 @@ export default async function HomePage() {
           meta: "Launch a builder community",
           link: "/organizations",
           actionText: "Create Org",
+          imageUrl: getFallbackPhoto("empty-org", "space"),
         },
     project: dbFeaturedProject
       ? {
@@ -258,6 +263,7 @@ export default async function HomePage() {
           meta: `Shipped by ${dbFeaturedProject.user?.name || "Builder"}`,
           link: `/projects/${dbFeaturedProject.id}`,
           actionText: "Explore Work",
+          imageUrl: getFallbackPhoto(dbFeaturedProject.id, "project"),
         }
       : {
           title: "No projects shipped yet",
@@ -265,6 +271,7 @@ export default async function HomePage() {
           meta: "Share your latest build with campus",
           link: "/projects",
           actionText: "Launch Project",
+          imageUrl: getFallbackPhoto("empty-project", "project"),
         },
     opportunity: dbFeaturedOpp
       ? {
@@ -275,6 +282,7 @@ export default async function HomePage() {
             ? `/challenges/${dbFeaturedOpp.id}` 
             : `/opportunities/${dbFeaturedOpp.id}`,
           actionText: "Apply Now",
+          imageUrl: getFallbackPhoto(dbFeaturedOpp.id, "opportunity"),
         }
       : {
           title: "No active opportunities",
@@ -282,6 +290,7 @@ export default async function HomePage() {
           meta: "Post a role to source builder talent",
           link: "/opportunities",
           actionText: "Post Role",
+          imageUrl: getFallbackPhoto("empty-opportunity", "opportunity"),
         },
     builder: dbFeaturedUser
       ? {
@@ -290,6 +299,7 @@ export default async function HomePage() {
           meta: `@${dbFeaturedUser.handle || dbFeaturedUser.id.slice(0, 8)} · ${dbFeaturedUser.role || "Builder"}`,
           link: `/profile/${dbFeaturedUser.handle || dbFeaturedUser.id}`,
           actionText: "View Passport",
+          imageUrl: dbFeaturedUser.avatarUrl || getFallbackPhoto(dbFeaturedUser.id, "space"),
         }
       : {
           title: "Setup your passport",
@@ -297,6 +307,7 @@ export default async function HomePage() {
           meta: "Verify your developer passport today",
           link: "/explore",
           actionText: "Explore Passports",
+          imageUrl: getFallbackPhoto("empty-builder", "space"),
         },
     research: dbFeaturedResearch
       ? {
@@ -305,6 +316,7 @@ export default async function HomePage() {
           meta: `Published by ${dbFeaturedResearch.user?.name || "Researcher"}`,
           link: "/research",
           actionText: "Read Paper",
+          imageUrl: getFallbackPhoto(dbFeaturedResearch.id, "project"),
         }
       : {
           title: "No research publications",
@@ -312,6 +324,7 @@ export default async function HomePage() {
           meta: "Drop the first technical paper",
           link: "/research",
           actionText: "Publish Paper",
+          imageUrl: getFallbackPhoto("empty-research", "project"),
         },
   };
 

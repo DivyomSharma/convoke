@@ -7,6 +7,7 @@ import { Building2, Users, MapPin, Plus, X, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createOrganization } from "@/app/actions/workspace";
 import { getFallbackPhoto } from "@/lib/photos";
+import { CardRing } from "@/components/ui/card-ring";
 
 interface OrganizationWithMembers {
   id: string;
@@ -130,10 +131,15 @@ export function OrganizationsList({ initialOrgs }: { initialOrgs: OrganizationWi
           {orgs.map((org, index) => {
             const banner = org.logoUrl || getFallbackPhoto(org.id, 'space');
             return (
-              <div key={org.id} className="group grid gap-8 lg:grid-cols-12 lg:items-center">
+              <div key={org.id} className="group grid gap-0 lg:grid-cols-12 lg:items-stretch premium-card campus-frame overflow-hidden relative border border-[#1a1a1a] hover:border-[#2f2f2f] transition-all duration-700 hover:-translate-y-[2px] ease-[cubic-bezier(0.22,0.61,0.36,1)]">
+                {/* Org Card Ring */}
+                <div className="absolute -right-[15%] top-1/2 -translate-y-1/2 opacity-8 group-hover:opacity-25 transition-opacity duration-700 ease-[cubic-bezier(0.22,0.61,0.36,1)] hidden md:block">
+                  <CardRing size={600} text="ORGANIZATION • COLLECTIVE • ORGANIZATION • " />
+                </div>
+
                 {/* Large Photography */}
-                <div className="lg:col-span-6">
-                  <Link href={`/org/${org.slug}`} className="block overflow-hidden rounded-sm bg-g1 aspect-[16/10] relative">
+                <div className="lg:col-span-5 relative z-10">
+                  <Link href={`/org/${org.slug}`} className="block overflow-hidden bg-g1 aspect-[3/2] h-full relative">
                     <img 
                       src={banner} 
                       alt={org.name} 
@@ -143,25 +149,26 @@ export function OrganizationsList({ initialOrgs }: { initialOrgs: OrganizationWi
                 </div>
 
                 {/* Feature Content */}
-                <div className="lg:col-span-6 flex flex-col justify-center">
-                  <div className="flex items-center gap-2 mono text-[10px] uppercase tracking-widest text-g5 mb-4">
+                <div className="lg:col-span-7 flex flex-col justify-center p-6 md:p-10 relative z-10">
+                  <div className="flex items-center gap-3 mono text-[11px] uppercase tracking-[0.25em] font-medium text-[var(--brand)] mb-4">
                     <span>(0{index + 1})</span>
                     <span>•</span>
                     <span>{org.industry || "Ecosystem Hub"}</span>
                   </div>
 
-                  <Link href={`/org/${org.slug}`} className="block">
-                    <h3 className="serif text-4xl md:text-5xl leading-tight text-ink group-hover:italic transition-all duration-300">
+                  <Link href={`/org/${org.slug}`} className="block mt-2">
+                    <h3 className="serif text-4xl md:text-5xl leading-tight text-ink group-hover:text-g5 transition-colors font-light">
                       {org.name}
                     </h3>
                   </Link>
 
-                  <p className="text-g5 text-[15px] mt-4 leading-relaxed max-w-[48ch]">
+                  <p className="text-g5 text-[15px] mt-5 leading-[1.6] max-w-[48ch] font-sans">
                     {org.description || "A collective group of makers and builders shaping technology on campus."}
                   </p>
 
-                  <div className="mt-6 flex items-center gap-6 text-[11px] mono uppercase tracking-wider text-g4">
+                  <div className="mt-8 flex items-center gap-6 text-[13px] font-sans text-g5">
                     <span>{org.members.length} Members</span>
+                    <span>•</span>
                     <span>{org.location || "Remote"}</span>
                   </div>
 

@@ -1,9 +1,11 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { CircularMarquee } from "@/components/CircularMarquee";
+import { CardRing } from "@/components/ui/card-ring";
 
 interface FeedItem {
   id: string;
@@ -25,6 +27,7 @@ interface FeaturedItem {
   meta: string;
   link: string;
   actionText: string;
+  imageUrl?: string;
 }
 
 interface HomeClientProps {
@@ -61,6 +64,38 @@ const itemVariants = {
 };
 
 export function HomeClient({ stats, feedItems, featured }: HomeClientProps) {
+  const phrases = [
+    "Work among builders.",
+    "Find your people.",
+    "Quiet people build loud things.",
+    "The internet home for builders.",
+    "Find people worth building with.",
+    "Build quietly. Grow together.",
+    "Better work starts with better company."
+  ];
+
+  const [phraseIndex, setPhraseIndex] = useState(0);
+  const [text, setText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    const currentPhrase = phrases[phraseIndex];
+    let timeout: NodeJS.Timeout;
+
+    if (!isDeleting && text === currentPhrase) {
+      timeout = setTimeout(() => setIsDeleting(true), 4000);
+    } else if (isDeleting && text === "") {
+      setIsDeleting(false);
+      setPhraseIndex((prev) => (prev + 1) % phrases.length);
+    } else {
+      const delay = isDeleting ? 30 : 60;
+      timeout = setTimeout(() => {
+        setText(currentPhrase.substring(0, text.length + (isDeleting ? -1 : 1)));
+      }, delay);
+    }
+    return () => clearTimeout(timeout);
+  }, [text, isDeleting, phraseIndex]);
+
   const eventsFeed = feedItems.filter((item) => item.tag === "LIVE NOW" || item.tag === "TONIGHT");
   const workFeed = feedItems.filter((item) => item.tag === "NEW PROJECT" || item.tag === "NOW HIRING");
   const communityFeed = feedItems.filter((item) => item.tag === "NEW COMMUNITY");
@@ -96,12 +131,8 @@ export function HomeClient({ stats, feedItems, featured }: HomeClientProps) {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0)_60%,rgba(0,0,0,0.85)_100%)] pointer-events-none z-10" />
         
         {/* Slow Marquee Ribbon */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.15] pointer-events-none mix-blend-screen">
-          <div style={{ perspective: "1000px" }}>
-            <div style={{ transform: "rotateX(72deg) rotateY(-8deg) scale(1.4)" }}>
-              <CircularMarquee size={840} duration={85} />
-            </div>
-          </div>
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.08] pointer-events-none mix-blend-screen hidden md:block">
+          <CircularMarquee size={1400} duration={85} />
         </div>
 
         <div className="relative z-20 mx-auto max-w-[1240px]">
@@ -109,7 +140,7 @@ export function HomeClient({ stats, feedItems, featured }: HomeClientProps) {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-col items-start text-left"
+            className="flex flex-col items-start text-left pt-12 md:pt-24"
           >
             {/* Tagline */}
             <div className="mono text-[11px] tracking-[0.24em] uppercase text-g4 font-medium mb-8">
@@ -117,9 +148,8 @@ export function HomeClient({ stats, feedItems, featured }: HomeClientProps) {
             </div>
             
             {/* Editorial Heading */}
-            <h1 className="serif text-5xl leading-[1.0] tracking-tight md:text-8xl xl:text-[8rem] max-w-4xl text-ink font-light">
-              Work in good<br />
-              <span className="italic-accent text-[var(--brand)]">company.</span>
+            <h1 className="serif text-5xl leading-[1.0] tracking-tight md:text-8xl xl:text-[8rem] max-w-4xl text-ink font-light min-h-[3em] md:min-h-[2em]">
+              {text}<span className="animate-pulse">|</span>
             </h1>
             
             {/* Description */}
@@ -173,11 +203,11 @@ export function HomeClient({ stats, feedItems, featured }: HomeClientProps) {
           variants={containerVariants}
           initial="initial"
           animate="animate"
-          className="grid gap-5 lg:grid-cols-[1.3fr_1fr_0.9fr]"
+          className="flex overflow-x-auto gap-5 pb-8 snap-x snap-mandatory scrollbar-hide -mx-5 px-5 sm:-mx-8 sm:px-8"
         >
-          <FeedColumn title="Events and gatherings" items={eventsFeed} getIndicator={getIndicator} />
-          <FeedColumn title="Projects and roles" items={workFeed} getIndicator={getIndicator} />
-          <FeedColumn title="Communities and rooms" items={communityFeed} getIndicator={getIndicator} />
+          <FeedColumn title="Events and gatherings" items={eventsFeed} getIndicator={getIndicator} className="min-w-[85vw] md:min-w-[420px] snap-start shrink-0" />
+          <FeedColumn title="Projects and roles" items={workFeed} getIndicator={getIndicator} className="min-w-[85vw] md:min-w-[420px] snap-start shrink-0" />
+          <FeedColumn title="Communities and rooms" items={communityFeed} getIndicator={getIndicator} className="min-w-[85vw] md:min-w-[420px] snap-start shrink-0" />
         </motion.div>
       </section>
 
@@ -199,17 +229,29 @@ export function HomeClient({ stats, feedItems, featured }: HomeClientProps) {
           className="grid gap-5 md:grid-cols-2"
         >
           {featuredCards.map((card) => (
-            <motion.div key={card.label} variants={itemVariants} className="premium-card campus-frame p-6 md:p-7">
-              <div className="eyebrow text-[var(--brand)]">{card.label}</div>
-              <Link href={card.value.link} className="mt-4 block">
-                <h3 className="serif text-3xl tracking-tight md:text-4xl">{card.value.title}</h3>
-              </Link>
-              <p className="mt-4 max-w-[60ch] text-[15px] leading-7 text-g5">{card.value.description}</p>
-              <div className="mt-6 flex items-center justify-between gap-4 border-t border-g3 pt-4 text-[13px]">
-                <span className="text-g5">{card.value.meta}</span>
-                <Link href={card.value.link} className="font-medium text-[var(--brand)] hover:text-ink">
-                  {card.value.actionText}
+            <motion.div key={card.label} variants={itemVariants} className="premium-card group campus-frame p-6 md:p-7 flex flex-col justify-between hover:-translate-y-[2px] transition-transform duration-700 ease-[cubic-bezier(0.22,0.61,0.36,1)] border border-[#1a1a1a] hover:border-[#2f2f2f] overflow-hidden relative">
+              <div className="absolute -right-[20%] top-1/2 -translate-y-1/2 opacity-8 group-hover:opacity-25 transition-opacity duration-700 ease-[cubic-bezier(0.22,0.61,0.36,1)] hidden md:block">
+                <CardRing size={400} text="CONVOKE • FOR PEOPLE BUILDING THE FUTURE • " />
+              </div>
+              <div className="relative z-10">
+                <div className="eyebrow text-[var(--brand)]">{card.label}</div>
+                <Link href={card.value.link} className="mt-4 block">
+                  <h3 className="serif text-3xl tracking-tight md:text-4xl">{card.value.title}</h3>
                 </Link>
+                <p className="mt-4 max-w-[60ch] text-[15px] leading-7 text-g5">{card.value.description}</p>
+              </div>
+              <div className="mt-6 relative z-10">
+                {card.value.imageUrl && (
+                  <Link href={card.value.link} className="block aspect-[16/9] w-full overflow-hidden rounded-md border border-g3 mb-5 bg-g1">
+                     <img src={card.value.imageUrl} alt={card.value.title} className="w-full h-full object-cover" />
+                  </Link>
+                )}
+                <div className="flex items-center justify-between gap-4 border-t border-g3 pt-4 text-[13px]">
+                  <span className="text-g5">{card.value.meta}</span>
+                  <Link href={card.value.link} className="font-medium text-[var(--brand)] hover:text-ink">
+                    {card.value.actionText}
+                  </Link>
+                </div>
               </div>
             </motion.div>
           ))}
@@ -223,13 +265,15 @@ function FeedColumn({
   title,
   items,
   getIndicator,
+  className = "",
 }: {
   title: string;
   items: FeedItem[];
   getIndicator: (tag: string) => string;
+  className?: string;
 }) {
   return (
-    <div className="premium-card campus-frame p-5 md:p-6">
+    <div className={`premium-card campus-frame p-5 md:p-6 flex-1 ${className}`}>
       <div className="eyebrow">{title}</div>
       <div className="mt-5 flex flex-col">
         {items.length > 0 ? (

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Trophy, Code, MapPin, Users, Plus, X, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createOpportunity } from "@/app/actions/workspace";
+import { CardRing } from "@/components/ui/card-ring";
 
 interface ChallengeWithDetails {
   id: string;
@@ -126,36 +127,41 @@ export function ChallengesList({
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10 relative z-10">
           {challenges.map((challenge) => (
-            <Link key={challenge.id} href={`/challenges/${challenge.id}`} className="premium-card overflow-hidden group flex flex-col">
-              <div className="h-32 relative overflow-hidden bg-g1 flex items-center justify-center border-b border-g3">
+            <Link key={challenge.id} href={`/challenges/${challenge.id}`} className="premium-card campus-frame overflow-hidden group flex flex-col relative border border-[#1a1a1a] hover:border-[#2f2f2f] transition-all duration-700 hover:-translate-y-[2px] ease-[cubic-bezier(0.22,0.61,0.36,1)]">
+              {/* Challenge Card Ring */}
+              <div className="absolute -right-[15%] top-1/2 -translate-y-1/2 opacity-8 group-hover:opacity-25 transition-opacity duration-700 ease-[cubic-bezier(0.22,0.61,0.36,1)] hidden md:block z-0 pointer-events-none">
+                <CardRing size={400} text="CHALLENGE • HACKATHON • CHALLENGE • " />
+              </div>
+
+              <div className="h-36 relative overflow-hidden bg-g1 flex items-center justify-center border-b border-g3 z-10">
                 {challenge.bannerUrl ? (
                   <img src={challenge.bannerUrl} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                 ) : challenge.organization.logoUrl ? (
-                  <div className="w-16 h-16 rounded-md overflow-hidden border border-g3/80">
+                  <div className="w-16 h-16 rounded-sm overflow-hidden border border-g3/80">
                     <img src={challenge.organization.logoUrl} alt="" className="w-full h-full object-cover" />
                   </div>
                 ) : (
                   <Code size={40} className="text-g3 group-hover:scale-110 transition-transform duration-500" />
                 )}
-                <div className="absolute top-4 right-4 bg-paper text-[var(--brand)] border border-[var(--brand)]/20 px-3 py-1 rounded-full text-[11px] font-medium uppercase tracking-wide shadow-sm">
+                <div className="absolute top-4 right-4 bg-paper text-[var(--brand)] border border-[var(--brand)]/20 px-3 py-1 rounded-sm text-[10px] font-medium uppercase tracking-widest shadow-sm">
                   {challenge.type}
                 </div>
               </div>
-              <div className="p-6 flex-1 flex flex-col">
-                <h3 className="serif text-2xl group-hover:text-[var(--brand)] transition-colors">{challenge.title}</h3>
-                <p className="text-g5 text-[14px] mt-1">by {challenge.organization.name}</p>
+              <div className="p-6 flex-1 flex flex-col z-10 relative">
+                <h3 className="serif text-2xl group-hover:text-[var(--brand)] transition-colors font-light leading-tight">{challenge.title}</h3>
+                <p className="text-g5 text-[13px] mt-2 font-sans">by {challenge.organization.name}</p>
                 
-                <div className="mt-6 flex-1 flex flex-col justify-end gap-3 text-[13px] text-g6">
-                  <div className="flex items-center gap-2">
+                <div className="mt-8 flex-1 flex flex-col justify-end gap-3.5 text-[13px] text-g6 font-sans">
+                  <div className="flex items-center gap-2.5">
                     <Trophy size={14} className="text-[var(--brand)]" /> 
                     <span className="font-medium text-ink">{challenge.compensation || "Awards & Prizes"}</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Users size={14} className="text-g4" /> 
+                  <div className="flex items-center gap-2.5">
+                    <Users size={14} className="text-g5" /> 
                     {challenge.applications.length} builders registered
                   </div>
-                  <div className="flex items-center gap-2">
-                    <MapPin size={14} className="text-g4" /> 
+                  <div className="flex items-center gap-2.5">
+                    <MapPin size={14} className="text-g5" /> 
                     {challenge.location || "Online"} · {challenge.deadline ? new Date(challenge.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "Ongoing"}
                   </div>
                 </div>

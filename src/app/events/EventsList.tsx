@@ -7,6 +7,7 @@ import { CalendarDays, Clock3, MapPin, Plus, Users, X, Loader2 } from "lucide-re
 import { motion, AnimatePresence } from "framer-motion";
 import { createEvent } from "@/app/actions/workspace";
 import { getFallbackPhoto } from "@/lib/photos";
+import { CardRing } from "@/components/ui/card-ring";
 
 interface EventWithDetails {
   id: string;
@@ -207,10 +208,16 @@ export function EventsList({
                       const banner = event.bannerUrl || getFallbackPhoto(event.id, 'event');
 
                       return (
-                        <div key={event.id} className="group grid gap-8 lg:grid-cols-12 lg:items-center">
+                        <div key={event.id} className="group grid gap-0 lg:grid-cols-12 lg:items-stretch premium-card campus-frame overflow-hidden relative border border-[#1a1a1a] hover:border-[#2f2f2f] transition-all duration-700 hover:-translate-y-[2px] ease-[cubic-bezier(0.22,0.61,0.36,1)]">
+                          
+                          {/* Event Card Ring */}
+                          <div className="absolute -right-[15%] top-1/2 -translate-y-1/2 opacity-8 group-hover:opacity-25 transition-opacity duration-700 ease-[cubic-bezier(0.22,0.61,0.36,1)] hidden md:block">
+                            <CardRing size={600} text="CONVOKE • FOR PEOPLE BUILDING THE FUTURE • " />
+                          </div>
+
                           {/* Event B/W Photography Banner */}
-                          <div className="lg:col-span-5">
-                            <Link href={`/events/${event.id}`} className="block overflow-hidden rounded-sm bg-g1 aspect-[16/10] relative">
+                          <div className="lg:col-span-4 relative z-10">
+                            <Link href={`/events/${event.id}`} className="block overflow-hidden bg-g1 aspect-[3/2] h-full relative">
                               <img 
                                 src={banner} 
                                 alt={event.title} 
@@ -220,43 +227,33 @@ export function EventsList({
                           </div>
 
                           {/* Event details */}
-                          <div className="lg:col-span-7 flex flex-col justify-between">
+                          <div className="lg:col-span-8 flex flex-col justify-between p-6 md:p-8 relative z-10">
                             <div>
-                              <div className="flex flex-wrap items-center gap-3 text-[11px] mono uppercase tracking-wider text-g5 mb-4">
-                                <span className={isLive ? "text-brand" : ""}>
-                                  {isLive ? "Live now" : startsOn.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                                </span>
+                              <div className="flex flex-wrap items-center gap-3 text-[11px] mono uppercase tracking-[0.25em] font-medium text-[var(--brand)] mb-3">
+                                <span>{isLive ? "LIVE NOW" : "EVENT"}</span>
                                 <span>•</span>
-                                <span>{startsOn.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
-                                <span>•</span>
-                                <span>{event.space.organization.name}</span>
+                                <span>{event.location || "SAN FRANCISCO"}</span>
                               </div>
 
                               <Link href={`/events/${event.id}`} className="block mt-2">
-                                <h3 className="serif text-3xl leading-tight text-ink md:text-4xl group-hover:underline decoration-1 decoration-g4 underline-offset-4 font-light">
+                                <h3 className="serif text-3xl leading-tight text-ink md:text-5xl group-hover:text-g5 transition-colors font-light">
                                   {event.title}
                                 </h3>
                               </Link>
 
-                              <p className="mt-4 max-w-[62ch] text-[15px] leading-[1.6] text-g5">
+                              <p className="mt-4 max-w-[62ch] text-[15px] leading-[1.6] text-g5 font-sans">
                                 {event.description || "Gathering details are forming. Stay tuned for details."}
                               </p>
 
-                              <div className="mt-6 flex flex-wrap gap-4 text-[11px] mono uppercase tracking-wider text-g4">
-                                <span>Location: {event.location || "Online"}</span>
+                              <div className="mt-8 flex flex-wrap gap-4 text-[13px] font-sans text-g5">
+                                <span>
+                                  {startsOn.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                                  {" "}•{" "}
+                                  {startsOn.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                                </span>
                                 <span>•</span>
-                                <span>Attendance: {event._count.attendance} / {event.capacity || "Open"}</span>
+                                <span>{event._count.attendance}+ going</span>
                               </div>
-                            </div>
-
-                            <div className="mt-8">
-                              <Link 
-                                href={`/events/${event.id}`}
-                                className="text-[13px] font-medium text-ink hover:underline underline-offset-4 inline-flex items-center gap-2"
-                              >
-                                <span>View Gathering</span>
-                                <span className="text-[11px] opacity-70">→</span>
-                              </Link>
                             </div>
                           </div>
                         </div>

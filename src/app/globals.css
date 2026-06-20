@@ -116,11 +116,11 @@
   /* Image defaults: grayscale with 110% contrast, transition back on hover */
   img {
     filter: grayscale(100%) contrast(110%);
-    transition: filter 700ms ease;
+    transition: filter 800ms ease;
   }
 
   img:hover {
-    filter: grayscale(0%) contrast(100%);
+    filter: grayscale(0%) saturate(105%);
   }
 }
 

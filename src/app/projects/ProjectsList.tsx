@@ -8,6 +8,7 @@ import { Avatar } from "@/components/Avatar";
 import { motion, AnimatePresence } from "framer-motion";
 import { createProject } from "@/app/actions/workspace";
 import { getFallbackPhoto } from "@/lib/photos";
+import { CardRing } from "@/components/ui/card-ring";
 
 interface ProjectWithDetails {
   id: string;
@@ -125,10 +126,14 @@ export function ProjectsList({ initialProjects }: { initialProjects: ProjectWith
           {projects.map((proj) => {
             const banner = proj.bannerUrl || getFallbackPhoto(proj.id, "project");
             return (
-              <div key={proj.id} className="group flex flex-col">
+              <div key={proj.id} className="group flex flex-col premium-card campus-frame p-6 relative border border-[#1a1a1a] hover:border-[#2f2f2f] transition-all duration-700 hover:-translate-y-[2px] ease-[cubic-bezier(0.22,0.61,0.36,1)] overflow-hidden">
+                <div className="absolute -right-[20%] top-1/2 -translate-y-1/2 opacity-8 group-hover:opacity-25 transition-opacity duration-700 ease-[cubic-bezier(0.22,0.61,0.36,1)] hidden md:block">
+                  <CardRing size={500} text="PROJECT • PROJECT • PROJECT • PROJECT • " />
+                </div>
+                
                 <Link 
                   href={`/projects/${proj.id}`} 
-                  className="relative aspect-[16/10] w-full overflow-hidden rounded-md border border-g3 bg-g1 block"
+                  className="relative aspect-[16/10] w-full overflow-hidden bg-g1 block z-10"
                 >
                   <img 
                     src={banner} 
@@ -137,7 +142,7 @@ export function ProjectsList({ initialProjects }: { initialProjects: ProjectWith
                   />
                 </Link>
 
-                <div className="mt-5 flex-1 flex flex-col">
+                <div className="mt-5 flex-1 flex flex-col z-10 relative">
                   {/* Builder details */}
                   <div className="flex items-center gap-2.5 mb-3.5">
                     <Avatar src={proj.user.avatarUrl || ""} name={proj.user.name || "Builder"} size={22} />
@@ -145,7 +150,7 @@ export function ProjectsList({ initialProjects }: { initialProjects: ProjectWith
                       {proj.user.name || "Builder"}
                     </Link>
                     <span className="text-g3">•</span>
-                    <span className="mono text-[10px] text-g5 uppercase tracking-wider">
+                    <span className="mono text-[10px] text-[var(--brand)] uppercase tracking-[0.2em] font-medium">
                       {proj.stack ? proj.stack.split(",")[0] : "Product"}
                     </span>
                   </div>
@@ -161,7 +166,7 @@ export function ProjectsList({ initialProjects }: { initialProjects: ProjectWith
                   </Link>
 
                   {/* Actions & Metrics */}
-                  <div className="mt-5 flex items-center justify-between text-g5 text-[12px] pt-4 hairline-t">
+                  <div className="mt-5 flex items-center justify-between text-g5 text-[12px] pt-4 border-t border-g3/60">
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-1.5">
                         <Eye size={14} className="text-g4" /> 

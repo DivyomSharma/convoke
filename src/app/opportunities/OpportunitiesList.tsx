@@ -7,6 +7,7 @@ import { ArrowRight, Building2, CircleDollarSign, MapPin, Plus, X, Loader2, Sear
 import { motion, AnimatePresence } from "framer-motion";
 import { createOpportunity } from "@/app/actions/workspace";
 import { getFallbackPhoto } from "@/lib/photos";
+import { CardRing } from "@/components/ui/card-ring";
 
 interface OpportunityWithDetails {
   id: string;
@@ -205,14 +206,19 @@ export function OpportunitiesList({
           {filteredOpportunities.map((opportunity) => {
             const banner = opportunity.bannerUrl || getFallbackPhoto(opportunity.id, "opportunity");
             return (
-              <div key={opportunity.id} className="group transition-colors duration-200">
+              <div key={opportunity.id} className="group premium-card campus-frame overflow-hidden relative border border-[#1a1a1a] hover:border-[#2f2f2f] transition-all duration-700 hover:-translate-y-[2px] ease-[cubic-bezier(0.22,0.61,0.36,1)] mb-4">
+                {/* Opportunity Card Ring */}
+                <div className="absolute -right-[10%] top-1/2 -translate-y-1/2 opacity-8 group-hover:opacity-25 transition-opacity duration-700 ease-[cubic-bezier(0.22,0.61,0.36,1)] hidden md:block z-0 pointer-events-none">
+                  <CardRing size={500} text="OPPORTUNITY • ROLE • GRANT • CHALLENGE • " />
+                </div>
+                
                 <Link 
                   href={`/opportunities/${opportunity.id}`} 
-                  className="grid grid-cols-12 gap-4 py-4 md:py-5 items-center hover:bg-g1/30 px-3 -mx-3 rounded-md"
+                  className="grid grid-cols-12 gap-6 p-5 md:p-6 items-center relative z-10"
                 >
                   {/* Left Column: Image Banner */}
-                  <div className="col-span-12 sm:col-span-2 md:col-span-1">
-                    <div className="relative aspect-[16/10] sm:aspect-square md:aspect-[16/10] w-full bg-g2 rounded-md overflow-hidden border border-g3">
+                  <div className="col-span-12 sm:col-span-3 md:col-span-2">
+                    <div className="relative aspect-[16/10] sm:aspect-[4/3] w-full bg-g1 rounded-sm overflow-hidden border border-g3">
                       <img 
                         src={banner} 
                         alt={opportunity.title} 
@@ -222,47 +228,51 @@ export function OpportunitiesList({
                   </div>
 
                   {/* Title & Organization Info */}
-                  <div className="col-span-12 sm:col-span-6 md:col-span-5 flex flex-col justify-center">
-                    <div className="flex items-center gap-2">
-                      <span className="mono text-[9px] uppercase tracking-widest text-[var(--brand)] px-1.5 py-0.5 rounded border border-[var(--brand)]/20 bg-[var(--brand)]/5 font-semibold">
+                  <div className="col-span-12 sm:col-span-9 md:col-span-6 flex flex-col justify-center">
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="mono text-[10px] uppercase tracking-[0.2em] font-medium text-[var(--brand)]">
                         {opportunity.type}
                       </span>
-                      <span className="mono text-[10px] uppercase tracking-wider text-g5">
+                      <span className="text-g4 text-[10px]">•</span>
+                      <span className="mono text-[10px] uppercase tracking-[0.15em] text-g5">
                         {opportunity.organization.name}
                       </span>
                     </div>
-                    <h2 className="mt-1.5 text-lg font-medium text-ink group-hover:text-[var(--brand)] transition-colors line-clamp-1">
+                    <h2 className="serif text-2xl md:text-3xl font-light text-ink group-hover:text-g5 transition-colors line-clamp-1">
                       {opportunity.title}
                     </h2>
                     {opportunity.description && (
-                      <p className="mt-1 text-[13px] text-g5 line-clamp-1 leading-normal">
+                      <p className="mt-2 text-[14px] text-g5 line-clamp-1 leading-relaxed font-sans">
                         {opportunity.description}
                       </p>
                     )}
                   </div>
 
-                  {/* Location & Compensation */}
-                  <div className="col-span-6 sm:col-span-2 md:col-span-3 text-left sm:text-right md:text-left flex flex-col sm:justify-center">
-                    <span className="text-[13px] text-ink font-medium truncate flex items-center gap-1.5 sm:justify-end md:justify-start">
-                      <MapPin size={13} className="text-g5 shrink-0" />
-                      {opportunity.location || "Remote"}
-                    </span>
-                    <span className="mt-1 text-[12px] text-g5 truncate flex items-center gap-1.5 sm:justify-end md:justify-start">
-                      <CircleDollarSign size={13} className="text-g5 shrink-0" />
-                      {opportunity.compensation || "Competitive"}
-                    </span>
-                  </div>
+                  {/* Right Align Metadata Wrapper */}
+                  <div className="col-span-12 md:col-span-4 flex flex-col md:items-end justify-center gap-4 mt-4 md:mt-0 pt-4 md:pt-0 border-t border-g3/50 md:border-t-0">
+                    {/* Location & Compensation */}
+                    <div className="flex flex-row md:flex-col items-center md:items-end gap-4 md:gap-1.5 w-full md:w-auto">
+                      <span className="text-[13px] text-ink font-sans flex items-center gap-2">
+                        <MapPin size={14} className="text-[var(--brand)] shrink-0" />
+                        {opportunity.location || "Remote"}
+                      </span>
+                      <span className="text-[13px] text-g5 font-sans flex items-center gap-2">
+                        <CircleDollarSign size={14} className="text-[var(--brand)] shrink-0" />
+                        {opportunity.compensation || "Competitive"}
+                      </span>
+                    </div>
 
-                  {/* Deadline & Applications count */}
-                  <div className="col-span-6 sm:col-span-2 md:col-span-3 text-right flex flex-col justify-center">
-                    <span className="text-[13px] text-ink font-medium">
-                      {String(opportunity._count.applications).padStart(2, "0")} applications
-                    </span>
-                    <span className="mt-1 text-[11px] text-g5">
-                      {opportunity.deadline
-                        ? `Due ${new Date(opportunity.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
-                        : "Rolling basis"}
-                    </span>
+                    {/* Deadline & Applications count */}
+                    <div className="flex flex-row md:flex-col items-center md:items-end gap-4 md:gap-1.5 w-full md:w-auto">
+                      <span className="text-[12px] mono text-ink uppercase tracking-wider">
+                        {String(opportunity._count.applications).padStart(2, "0")} applications
+                      </span>
+                      <span className="text-[12px] font-sans text-g5">
+                        {opportunity.deadline
+                          ? `Due ${new Date(opportunity.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
+                          : "Rolling basis"}
+                      </span>
+                    </div>
                   </div>
                 </Link>
               </div>

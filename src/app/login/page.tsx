@@ -26,7 +26,8 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const result = await signIn.create({
+      const authSignIn = signIn as any;
+      const result = await authSignIn.create({
         identifier: email,
         password,
       });
@@ -36,16 +37,15 @@ export default function LoginPage() {
           || result.error.message 
           || "Failed to sign in. Please check your credentials.";
         setError(message);
-      } else if (signIn.status === "complete") {
-        const finalizeRes = await signIn.finalize();
+      } else if (authSignIn.status === "complete") {
+        const finalizeRes = await authSignIn.finalize();
         if (finalizeRes.error) {
           setError(finalizeRes.error.message || "Failed to finalize session.");
         } else {
           router.push("/workspace");
         }
       } else {
-        // Needs additional verification (e.g. 2FA)
-        console.log("Sign-in status:", signIn.status);
+        console.log("Sign-in status:", authSignIn.status);
         setError("Additional verification required. Please check your email or authenticator app.");
       }
     } catch (err: any) {
@@ -68,7 +68,8 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const result = await signUp.create({
+      const authSignUp = signUp as any;
+      const result = await authSignUp.create({
         emailAddress: email,
         password,
         firstName: name.split(" ")[0] || "User",
@@ -80,16 +81,15 @@ export default function LoginPage() {
           || result.error.message 
           || "Failed to create account. Try a different email or stronger password.";
         setError(message);
-      } else if (signUp.status === "complete") {
-        const finalizeRes = await signUp.finalize();
+      } else if (authSignUp.status === "complete") {
+        const finalizeRes = await authSignUp.finalize();
         if (finalizeRes.error) {
           setError(finalizeRes.error.message || "Failed to finalize session.");
         } else {
           router.push("/workspace");
         }
       } else {
-        // Needs email verification or additional steps
-        console.log("Sign-up status:", signUp.status);
+        console.log("Sign-up status:", authSignUp.status);
         setError("Account created. Please check your inbox to verify your email address.");
       }
     } catch (err: any) {
@@ -104,21 +104,25 @@ export default function LoginPage() {
     }
   };
 
-  const handleSocialAuth = async (strategy: "oauth_google" | "oauth_apple" | "oauth_discord") => {
+  const handleSocialAuth = async (strategy: "oauth_google" | "oauth_discord" | "oauth_linkedin_oidc") => {
     if (!signIn) return;
 
     try {
-      const result = await signIn.sso({
-        strategy,
-        redirectUrl: "/sso-callback",
-        redirectCallbackUrl: "/workspace",
-      });
-
-      if (result.error) {
-        const message = result.error.longMessage 
-          || result.error.message 
-          || "Social authentication failed to initialize.";
-        setError(message);
+      const authSignIn = signIn as any;
+      if (authSignIn.authenticateWithRedirect) {
+        await authSignIn.authenticateWithRedirect({
+          strategy,
+          redirectUrl: "/sso-callback",
+          redirectUrlComplete: "/workspace",
+        });
+      } else if (authSignIn.sso) {
+        await authSignIn.sso({
+          strategy,
+          redirectUrl: "/sso-callback",
+          redirectCallbackUrl: "/workspace",
+        });
+      } else {
+        throw new Error("No valid SSO method found on signIn object");
       }
     } catch (err: any) {
       console.error("Social auth error:", err);
@@ -208,6 +212,17 @@ export default function LoginPage() {
                 <path d="M107.7,8.07A105.15,105.15,0,0,0,77.26,0a77.19,77.19,0,0,0-3.3,6.83A96.67,96.67,0,0,0,53.22,6.83,77.19,77.19,0,0,0,49.88,0,105.15,105.15,0,0,0,19.44,8.07C3.66,31.58-1.86,54.65,1,77.53A105.73,105.73,0,0,0,32,96.36a77.7,77.7,0,0,0,6.63-10.85,68.43,68.43,0,0,1-10.5-5c.9-.65,1.76-1.34,2.58-2.06a75.48,75.48,0,0,0,72.84,0c.82.72,1.68,1.41,2.58,2.06a68.43,68.43,0,0,1-10.5,5,77.7,77.7,0,0,0,6.63,10.85,105.73,105.73,0,0,0,31-18.83C129,54.65,123.48,31.58,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53S36.18,40.36,42.45,40.36,53.83,46,53.83,53,48.72,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.24,60,73.24,53S78.41,40.36,84.69,40.36,96.07,46,96.07,53,91,65.69,84.69,65.69Z" />
               </svg>
               <span>Continue with Discord</span>
+            </button>
+
+            <button 
+              onClick={() => handleSocialAuth("oauth_linkedin_oidc")}
+              disabled={!signIn}
+              className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-full border border-g3 bg-g1/50 hover:bg-g2 text-ink text-[14px] font-medium transition-all active:scale-98 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <svg className="w-4 h-4 shrink-0 fill-current text-[#0A66C2]" viewBox="0 0 24 24">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+              </svg>
+              <span>Continue with LinkedIn</span>
             </button>
           </div>
 

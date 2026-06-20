@@ -3,7 +3,7 @@
 The entire UI/UX of Convoke must adhere to these strict brand guidelines:
 
 ## Typography
-* **Headlines & Logo**: `Newsreader` (Google Font). Used for all major headers (`h1`, `h2`, `h3`), logos, and premium editorial moments.
+* **Headlines & Logo**: `Instrument Serif` (Google Font). Used for all major headers (`h1`, `h2`, `h3`), logos, and premium editorial moments.
 * **UI, Body, Metadata**: `Inter` (Google Font). Used for all standard text, metadata, labels, and paragraph bodies.
 
 ## Color Palette
@@ -17,6 +17,6 @@ The primary aesthetic is deep dark mode with a metallic gold accent.
 * Used in hero moments (massive 3D rotating rings), loading states (small rotating rings), backgrounds, and across the product (e.g., event cards).
 
 ## Identity
-* **Primary Logo**: The wordmark `Convoke.` written in Newsreader.
-* **App Icon**: `C.` written in Newsreader inside a dark squircle.
+* **Primary Logo**: The wordmark `Convoke.` written in Instrument Serif.
+* **App Icon**: `C.` written in Instrument Serif inside a dark squircle.
 * **Tagline**: "For people building the future."

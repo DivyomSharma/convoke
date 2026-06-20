@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 interface CircularMarqueeProps {
   className?: string;
@@ -17,6 +17,8 @@ export function CircularMarquee({
   text = "CONVOKE • FOR PEOPLE BUILDING THE FUTURE • "
 }: CircularMarqueeProps) {
   
+  const shouldReduceMotion = useReducedMotion();
+
   // Calculate SVG paths based on size
   const radius = size / 2;
   const pathRadius = radius - 10; // inset slightly
@@ -27,7 +29,7 @@ export function CircularMarquee({
       style={{ width: size, height: size, perspective: "1000px" }}
     >
       <motion.div
-        animate={{ rotate: 360 }}
+        animate={shouldReduceMotion ? {} : { rotate: 360 }}
         transition={{ repeat: Infinity, duration: duration, ease: "linear" }}
         className="absolute inset-0"
         style={{ transformStyle: "preserve-3d" }}

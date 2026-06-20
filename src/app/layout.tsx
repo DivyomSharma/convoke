@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter_Tight, Newsreader, JetBrains_Mono, Instrument_Serif } from "next/font/google";
+import { Inter_Tight, JetBrains_Mono, Instrument_Serif } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
@@ -9,22 +9,16 @@ const fontSans = Inter_Tight({
   subsets: ["latin"],
 });
 
-const fontSerif = Newsreader({
+const fontSerif = Instrument_Serif({
   variable: "--font-serif",
   subsets: ["latin"],
   style: ["normal", "italic"],
+  weight: "400",
 });
 
 const fontMono = JetBrains_Mono({
   variable: "--font-mono",
   subsets: ["latin"],
-});
-
-const fontAccent = Instrument_Serif({
-  variable: "--font-accent",
-  subsets: ["latin"],
-  style: ["italic"],
-  weight: "400",
 });
 
 export const metadata: Metadata = {
@@ -94,7 +88,7 @@ export default function RootLayout({
         }
       }}
     >
-      <html lang="en" suppressHydrationWarning className={`${fontSans.variable} ${fontSerif.variable} ${fontMono.variable} ${fontAccent.variable} antialiased h-full`}>
+      <html lang="en" suppressHydrationWarning className={`${fontSans.variable} ${fontSerif.variable} ${fontMono.variable} antialiased h-full`}>
         <body className="min-h-full flex flex-col font-sans">
           <ThemeProvider
             attribute="class"
