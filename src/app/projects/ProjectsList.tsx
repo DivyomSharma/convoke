@@ -228,100 +228,105 @@ export function ProjectsList({ initialProjects }: { initialProjects: ProjectWith
               </div>
 
               {/* Scrollable Form */}
-              <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-6 py-6 space-y-5">
-                {error && (
-                  <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-xs text-center">
-                    {error}
-                  </div>
-                )}
-
-                <div>
-                  <label className="text-ink font-medium text-xs mb-1.5 block">Project Title <span className="text-red-500">*</span></label>
-                  <input 
-                    type="text"
-                    required
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="E.g. Convoke Search v2"
-                    className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-ink font-medium text-xs mb-1.5 block">Tech Stack (comma separated)</label>
-                  <input 
-                    type="text"
-                    value={stack}
-                    onChange={(e) => setStack(e.target.value)}
-                    placeholder="E.g. Next.js, Prisma, Framer Motion"
-                    className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-ink font-medium text-xs mb-1.5 block">GitHub Repository URL</label>
-                    <input 
-                      type="url"
-                      value={githubUrl}
-                      onChange={(e) => setGithubUrl(e.target.value)}
-                      placeholder="https://github.com/username/repo"
-                      className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
+              <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-6 py-6">
+                <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+                  <div className="space-y-5">
+                    <ImageUploadField
+                      label="Project cover"
+                      value={bannerUrl}
+                      fileName={bannerFileName}
+                      onChange={setBannerUrl}
+                      onFileNameChange={setBannerFileName}
+                      onError={setError}
                     />
+                    <div>
+                      <label className="text-ink font-medium text-xs mb-1.5 block">Project Description</label>
+                      <textarea
+                        rows={8}
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder="Describe what your project does, how you built it, the problem it solves, and its features..."
+                        className="w-full rounded-[22px] border border-g3 bg-transparent p-4 text-sm text-ink outline-none focus:border-[var(--brand)] transition-all resize-none"
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <label className="text-ink font-medium text-xs mb-1.5 block">Figma / Design URL</label>
-                    <input 
-                      type="url"
-                      value={figmaUrl}
-                      onChange={(e) => setFigmaUrl(e.target.value)}
-                      placeholder="https://figma.com/file/..."
-                      className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
-                    />
-                  </div>
-                </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-ink font-medium text-xs mb-1.5 block">Live Demo URL</label>
-                    <input 
-                      type="url"
-                      value={demoUrl}
-                      onChange={(e) => setDemoUrl(e.target.value)}
-                      placeholder="https://myproject.com"
-                      className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-ink font-medium text-xs mb-1.5 block">Project Website URL</label>
-                    <input 
-                      type="url"
-                      value={url}
-                      onChange={(e) => setUrl(e.target.value)}
-                      placeholder="https://landingpage.com"
-                      className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
-                    />
-                  </div>
-                </div>
+                  <div className="space-y-5">
+                    {error && (
+                      <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-xs text-center">
+                        {error}
+                      </div>
+                    )}
 
-                <ImageUploadField
-                  label="Project cover"
-                  value={bannerUrl}
-                  fileName={bannerFileName}
-                  onChange={setBannerUrl}
-                  onFileNameChange={setBannerFileName}
-                  onError={setError}
-                />
+                    <div>
+                      <label className="text-ink font-medium text-xs mb-1.5 block">Project Title <span className="text-red-500">*</span></label>
+                      <input 
+                        type="text"
+                        required
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        placeholder="E.g. Convoke Search v2"
+                        className="w-full h-11 px-4 rounded-2xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
+                      />
+                    </div>
 
-                <div>
-                  <label className="text-ink font-medium text-xs mb-1.5 block">Project Description</label>
-                  <textarea 
-                    rows={6}
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Describe what your project does, how you built it, the problem it solves, and its features..."
-                    className="w-full p-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all resize-none"
-                  />
+                    <div>
+                      <label className="text-ink font-medium text-xs mb-1.5 block">Tech Stack (comma separated)</label>
+                      <input 
+                        type="text"
+                        value={stack}
+                        onChange={(e) => setStack(e.target.value)}
+                        placeholder="E.g. Next.js, Prisma, Framer Motion"
+                        className="w-full h-11 px-4 rounded-2xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <div>
+                        <label className="text-ink font-medium text-xs mb-1.5 block">GitHub Repository URL</label>
+                        <input 
+                          type="url"
+                          value={githubUrl}
+                          onChange={(e) => setGithubUrl(e.target.value)}
+                          placeholder="https://github.com/username/repo"
+                          className="w-full h-11 px-4 rounded-2xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-ink font-medium text-xs mb-1.5 block">Figma / Design URL</label>
+                        <input 
+                          type="url"
+                          value={figmaUrl}
+                          onChange={(e) => setFigmaUrl(e.target.value)}
+                          placeholder="https://figma.com/file/..."
+                          className="w-full h-11 px-4 rounded-2xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <div>
+                        <label className="text-ink font-medium text-xs mb-1.5 block">Live Demo URL</label>
+                        <input 
+                          type="url"
+                          value={demoUrl}
+                          onChange={(e) => setDemoUrl(e.target.value)}
+                          placeholder="https://myproject.com"
+                          className="w-full h-11 px-4 rounded-2xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-ink font-medium text-xs mb-1.5 block">Project Website URL</label>
+                        <input 
+                          type="url"
+                          value={url}
+                          onChange={(e) => setUrl(e.target.value)}
+                          placeholder="https://landingpage.com"
+                          className="w-full h-11 px-4 rounded-2xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </form>
 

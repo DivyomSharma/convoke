@@ -52,8 +52,8 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider
-      signInUrl="/login"
-      signUpUrl="/login"
+      signInUrl="/auth"
+      signUpUrl="/auth"
       appearance={{
         variables: {
           colorBackground: 'var(--paper)',

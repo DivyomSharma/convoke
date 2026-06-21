@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
@@ -77,13 +77,27 @@ const phrases = [
 
 export function HomeClient({ feedItems, featured }: HomeClientProps) {
   const [phraseIndex, setPhraseIndex] = useState(0);
+  const [typed, setTyped] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
+    const fullText = phrases[phraseIndex].join("\n");
+    let timeout: NodeJS.Timeout | undefined;
+
+    if (!deleting && typed === fullText) {
+      timeout = setTimeout(() => setDeleting(true), 2400);
+    } else if (deleting && typed === "") {
+      setDeleting(false);
       setPhraseIndex((prev) => (prev + 1) % phrases.length);
-    }, 4200);
+    } else {
+      timeout = setTimeout(() => {
+        const nextLength = typed.length + (deleting ? -1 : 1);
+        setTyped(fullText.slice(0, Math.max(0, nextLength)));
+      }, deleting ? 18 : 42);
+    }
+
     return () => clearTimeout(timeout);
-  }, [phraseIndex]);
+  }, [typed, deleting, phraseIndex]);
 
   const rolesFeed = feedItems.filter((item) => item.tag === "NOW HIRING");
   const projectsFeed = feedItems.filter((item) => item.tag === "NEW PROJECT");
@@ -99,7 +113,7 @@ export function HomeClient({ feedItems, featured }: HomeClientProps) {
     { label: "Featured Research", value: featured.research },
   ];
 
-  const currentPhrase = phrases[phraseIndex];
+  const currentPhrase = typed.split("\n");
 
   return (
     <div className="relative overflow-hidden">
@@ -123,22 +137,18 @@ export function HomeClient({ feedItems, featured }: HomeClientProps) {
               </div>
 
               <div className="min-h-[2.18em] max-w-[980px] sm:min-h-[1.92em]">
-                <AnimatePresence mode="wait">
-                  <motion.h1
-                    key={phraseIndex}
-                    initial={{ opacity: 0, y: 18, filter: "blur(10px)" }}
-                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                    exit={{ opacity: 0, y: -14, filter: "blur(8px)" }}
-                    transition={{ duration: 0.78, ease: [0.22, 1, 0.36, 1] }}
-                    className="serif text-[clamp(4rem,8.15vw,7.35rem)] font-light leading-[0.9] tracking-[-0.07em] text-ink"
-                  >
-                    <span className="block whitespace-nowrap">{currentPhrase[0]}</span>
-                    <span className="block whitespace-nowrap text-brand">
-                      {currentPhrase[1]}
-                      <span className="ml-3 inline-block animate-pulse text-brand/70">|</span>
-                    </span>
-                  </motion.h1>
-                </AnimatePresence>
+                <motion.h1
+                  initial={{ opacity: 0, y: 18, filter: "blur(10px)" }}
+                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                  transition={{ duration: 0.78, ease: [0.22, 1, 0.36, 1] }}
+                  className="serif text-[clamp(4rem,8.15vw,7.35rem)] font-light leading-[0.9] tracking-[-0.07em] text-ink"
+                >
+                  <span className="block whitespace-nowrap">{currentPhrase[0] || "\u00A0"}</span>
+                  <span className="block whitespace-nowrap text-brand">
+                    {currentPhrase[1] || "\u00A0"}
+                    <span className="ml-3 inline-block animate-pulse text-brand/70">|</span>
+                  </span>
+                </motion.h1>
               </div>
 
               <p className="mt-7 max-w-[580px] text-[16px] leading-[1.72] text-g6 md:text-[18px]">
