@@ -36,6 +36,11 @@ export const metadata: Metadata = {
     locale: "en_US",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Convoke",
+    description: "Where ambitious people gather.",
+  },
 };
 
 export default function RootLayout({
