@@ -13,6 +13,8 @@ type HomeFeedItem = {
   link: string;
   actionText: string;
   timestamp: number;
+  logoUrl?: string | null;
+  logoName: string;
 };
 
 export default async function HomePage() {
@@ -146,6 +148,8 @@ export default async function HomePage() {
       link: `/events/${e.id}`,
       actionText: isLive ? "Join" : "RSVP",
       timestamp: e.startTime.getTime(),
+      logoUrl: e.space.organization.logoUrl,
+      logoName: e.space.organization.name,
     });
   });
 
@@ -160,6 +164,8 @@ export default async function HomePage() {
       link: `/projects/${p.id}`,
       actionText: "View",
       timestamp: p.createdAt.getTime(),
+      logoUrl: p.user?.avatarUrl,
+      logoName: p.user?.name || "Builder",
     });
   });
 
@@ -172,6 +178,8 @@ export default async function HomePage() {
       link: `/opportunities/${o.id}`,
       actionText: "Apply",
       timestamp: o.createdAt.getTime(),
+      logoUrl: o.organization?.logoUrl,
+      logoName: o.organization?.name || "Organization",
     });
   });
 
@@ -184,6 +192,8 @@ export default async function HomePage() {
       link: `/spaces/${s.id}`,
       actionText: "Join",
       timestamp: s.createdAt.getTime(),
+      logoUrl: s.organization.logoUrl,
+      logoName: s.organization.name,
     });
   });
 

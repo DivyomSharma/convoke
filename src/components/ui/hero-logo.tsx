@@ -52,20 +52,20 @@ export function HeroLogo() {
         rotateY: useSpring(rotateY, { stiffness: 150, damping: 20 }),
         transformStyle: "preserve-3d",
       }}
-      className="relative flex items-center justify-center w-full max-w-[320px] aspect-square md:max-w-[420px] rounded-[32px] bg-[#0c0c0c] border border-white/5 overflow-hidden shadow-2xl cursor-crosshair group perspective-1000"
+      className="relative flex aspect-square w-full max-w-[190px] items-center justify-center overflow-hidden rounded-[34px] border border-g3 bg-ink shadow-[0_24px_90px_rgba(0,0,0,0.18)] cursor-crosshair group perspective-1000 dark:max-w-[240px] dark:border-white/10 dark:bg-[#070707] lg:max-w-[250px] xl:max-w-[280px]"
     >
       {/* Background radial torch */}
       <motion.div
         className="pointer-events-none absolute inset-0 z-0 transition-opacity duration-500"
         style={{
-          background: useMotionTemplate`radial-gradient(350px circle at ${mouseX}px ${mouseY}px, rgba(0, 178, 255, 0.15), transparent 80%)`,
+          background: useMotionTemplate`radial-gradient(320px circle at ${mouseX}px ${mouseY}px, color-mix(in srgb, var(--brand) 20%, transparent), transparent 78%)`,
           opacity: isHovered ? 1 : 0,
         }}
       />
       
       {/* Subdued background text/pattern */}
-      <div className="absolute inset-0 opacity-[0.03] flex items-center justify-center mix-blend-screen pointer-events-none">
-        <div className="serif text-[20rem] text-white">C.</div>
+      <div className="absolute inset-0 opacity-[0.04] flex items-center justify-center mix-blend-screen pointer-events-none">
+        <div className="serif text-[13rem] text-white lg:text-[16rem]">C.</div>
       </div>
 
       {/* 3D Content - Front text */}
@@ -73,13 +73,13 @@ export function HeroLogo() {
         style={{ translateZ: 60 }}
         className="relative z-10 flex flex-col items-center justify-center pointer-events-none"
       >
-        <h1 className="serif text-9xl md:text-[14rem] text-white leading-none tracking-tighter drop-shadow-2xl font-normal">
+        <h1 className="serif text-[7.8rem] leading-none tracking-tighter text-white drop-shadow-2xl font-normal lg:text-[10.5rem]">
           C.
         </h1>
       </motion.div>
 
-      {/* Top highlight to mimic glass edge */}
-      <div className="absolute inset-0 rounded-[32px] border-t border-white/20 pointer-events-none mix-blend-overlay" />
+      <div className="absolute inset-x-5 top-3 h-px bg-white/35 pointer-events-none" />
+      <div className="absolute inset-0 rounded-[34px] border-t border-white/25 pointer-events-none mix-blend-overlay" />
     </motion.div>
   );
 }

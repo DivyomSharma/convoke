@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { Avatar } from "@/components/Avatar";
 import { CircularMarquee } from "@/components/CircularMarquee";
 import { CardRing } from "@/components/ui/card-ring";
+import { HeroLogo } from "@/components/ui/hero-logo";
 
 interface FeedItem {
   id: string;
@@ -14,6 +16,8 @@ interface FeedItem {
   meta: string;
   link: string;
   actionText: string;
+  logoUrl?: string | null;
+  logoName: string;
 }
 
 interface StatItem {
@@ -63,19 +67,15 @@ const itemVariants = {
   },
 };
 
-import { HeroLogo } from "@/components/ui/hero-logo";
+const phrases = [
+  "Work among\nbuilders.",
+  "Find your\npeople.",
+  "Quiet people\nbuild loud things.",
+  "Find people\nworth building with.",
+  "Build quietly.\nGrow together.",
+];
 
-export function HomeClient({ stats, feedItems, featured }: HomeClientProps) {
-  const phrases = [
-    "Work among\nbuilders.",
-    "Find your\npeople.",
-    "Quiet people\nbuild loud things.",
-    "The internet home\nfor builders.",
-    "Find people\nworth building with.",
-    "Build quietly.\nGrow together.",
-    "Better work starts\nwith better company."
-  ];
-
+export function HomeClient({ feedItems, featured }: HomeClientProps) {
   const [phraseIndex, setPhraseIndex] = useState(0);
   const [text, setText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
@@ -85,38 +85,23 @@ export function HomeClient({ stats, feedItems, featured }: HomeClientProps) {
     let timeout: NodeJS.Timeout;
 
     if (!isDeleting && text === currentPhrase) {
-      timeout = setTimeout(() => setIsDeleting(true), 4000);
+      timeout = setTimeout(() => setIsDeleting(true), 3600);
     } else if (isDeleting && text === "") {
       setIsDeleting(false);
       setPhraseIndex((prev) => (prev + 1) % phrases.length);
     } else {
-      const delay = isDeleting ? 30 : 60;
       timeout = setTimeout(() => {
+        text.length;
         setText(currentPhrase.substring(0, text.length + (isDeleting ? -1 : 1)));
-      }, delay);
+      }, isDeleting ? 28 : 54);
     }
+
     return () => clearTimeout(timeout);
   }, [text, isDeleting, phraseIndex]);
 
-  const eventsFeed = feedItems.filter((item) => item.tag === "LIVE NOW" || item.tag === "TONIGHT");
   const rolesFeed = feedItems.filter((item) => item.tag === "NOW HIRING");
   const projectsFeed = feedItems.filter((item) => item.tag === "NEW PROJECT");
   const communityFeed = feedItems.filter((item) => item.tag === "NEW COMMUNITY");
-
-  const getIndicator = (tag: string) => {
-    switch (tag) {
-      case "LIVE NOW":
-        return "Live";
-      case "TONIGHT":
-        return "Today";
-      case "NOW HIRING":
-        return "Open";
-      case "NEW COMMUNITY":
-        return "New";
-      default:
-        return "Update";
-    }
-  };
 
   const featuredCards = [
     { label: "Featured Event", value: featured.event },
@@ -127,107 +112,89 @@ export function HomeClient({ stats, feedItems, featured }: HomeClientProps) {
     { label: "Featured Research", value: featured.research },
   ];
 
-  const textParts = text.split('\n');
+  const textParts = text.split("\n");
 
   return (
     <div className="relative overflow-hidden">
-      <section className="relative px-5 pt-20 pb-16 sm:px-8 sm:pt-28 sm:pb-24">
-        {/* Subtle Vignette Background */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0)_60%,rgba(0,0,0,0.85)_100%)] pointer-events-none z-10 dark:bg-transparent" />
-        
-        {/* Slow Marquee Ribbon */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.25] pointer-events-none hidden md:block">
-          <CircularMarquee size={1400} duration={85} />
+      <section className="relative px-5 pb-14 pt-14 sm:px-8 sm:pb-20 sm:pt-20">
+        <div className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_center,transparent_50%,rgba(0,0,0,0.18)_100%)] dark:bg-[radial-gradient(circle_at_center,transparent_56%,rgba(0,0,0,0.82)_100%)]" />
+
+        <div className="pointer-events-none absolute left-1/2 top-[50%] hidden -translate-x-1/2 -translate-y-1/2 opacity-[0.34] md:block dark:opacity-[0.24]">
+          <CircularMarquee size={1120} duration={85} />
         </div>
 
         <div className="relative z-20 mx-auto max-w-[1240px]">
-          <div className="flex flex-col lg:flex-row items-center lg:items-center justify-start gap-12 lg:gap-24 xl:gap-32 pt-12 md:pt-24">
+          <div className="grid min-h-[calc(100svh-11rem)] items-center gap-10 lg:grid-cols-[minmax(0,1.05fr)_340px] lg:gap-16 xl:grid-cols-[minmax(0,1.08fr)_400px]">
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-              className="flex flex-col items-start text-left shrink-0"
+              className="flex max-w-[820px] flex-col items-start text-left"
             >
-              {/* Tagline */}
-              <div className="mono text-[11px] tracking-[0.24em] uppercase text-g4 font-medium mb-8">
+              <div className="mono mb-7 text-[11px] font-semibold uppercase tracking-[0.24em] text-g5">
                 A quiet place to build
               </div>
-              
-              {/* Editorial Heading */}
-              <h1 className="serif text-5xl leading-[1.05] tracking-tight md:text-7xl xl:text-[7.5rem] max-w-4xl text-ink font-light min-h-[3em] md:min-h-[2.5em]">
+
+              <h1 className="serif min-h-[2.35em] max-w-[820px] text-[clamp(4.2rem,10vw,8.35rem)] font-light leading-[0.86] tracking-[-0.075em] text-ink sm:min-h-[1.78em]">
                 {textParts[0]}
                 {textParts.length > 1 && (
                   <>
                     <br />
-                    <span className="text-[var(--brand)]">{textParts[1]}</span>
+                    <span className="text-brand">{textParts[1]}</span>
                   </>
                 )}
-                <span className="animate-pulse text-[var(--brand)] ml-1 opacity-60">|</span>
+                <span className="ml-2 animate-pulse text-brand opacity-65">|</span>
               </h1>
-              
-              {/* Description */}
-              <p className="mt-8 max-w-xl text-[16px] leading-[1.6] text-g5 md:text-[18px]">
+
+              <p className="mt-7 max-w-[580px] text-[16px] leading-[1.72] text-g6 md:text-[18px]">
                 A continuous, high-signal ecosystem where ambitious people meet, collaborate, launch startups, and grow together.
               </p>
-              
-              {/* Buttons */}
-              <div className="mt-10 flex flex-wrap items-center gap-6">
-                <Link 
-                  href="/login" 
-                  className="bg-ink text-paper dark:bg-white dark:text-black rounded-full px-6 py-3 transition hover:opacity-80 font-sans font-medium text-[14px] inline-flex items-center gap-2"
-                >
+
+              <div className="mt-9 flex flex-wrap items-center gap-4 sm:gap-6">
+                <Link href="/login" className="ink-button px-6 py-3 text-[14px]">
                   <span>Step Inside</span>
-                  <span className="text-[12px] opacity-70">→</span>
+                  <ArrowRight size={14} />
                 </Link>
-                <Link 
-                  href="/events" 
-                  className="text-ink hover:underline underline-offset-4 font-sans font-medium text-[14px] transition inline-flex items-center gap-2"
-                >
+                <Link href="/events" className="ghost-button text-[14px]">
                   <span>Explore Events</span>
-                  <span className="text-[12px] opacity-70">→</span>
+                  <ArrowRight size={14} />
                 </Link>
               </div>
             </motion.div>
 
-            {/* 3D Hero Logo */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95, rotateY: 10 }}
               animate={{ opacity: 1, scale: 1, rotateY: 0 }}
               transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-              className="hidden lg:flex w-full lg:w-auto shrink-0 justify-center"
+              className="hidden justify-center lg:flex"
             >
               <HeroLogo />
             </motion.div>
           </div>
-          
-          {/* Established Footer */}
-          <motion.div 
+
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 0.8 }}
-            className="mt-20 w-full flex items-center justify-between border-t border-g3/60 pt-6"
+            className="mt-6 flex w-full items-center justify-between border-t border-g3/70 pt-5"
           >
-            <div className="mono text-[11px] tracking-[0.16em] uppercase text-g4 font-medium">
-              (01) ESTABLISHED MMXXVI
+            <div className="mono text-[11px] font-medium uppercase tracking-[0.16em] text-g5">
+              (01) Established MMXXVI
             </div>
-            <div className="mono text-[11px] tracking-[0.16em] uppercase text-g4 font-medium">
-              GLOBAL BUILDER NETWORK
+            <div className="mono text-[11px] font-medium uppercase tracking-[0.16em] text-g5">
+              Global builder network
             </div>
           </motion.div>
         </div>
       </section>
 
-      <section className="relative z-10 mx-auto mt-24 max-w-[1240px] px-5 sm:px-8">
-        <div className="mb-12 flex flex-col gap-4 border-b border-g3/40 pb-6 md:flex-row md:items-end md:justify-between">
+      <section className="relative z-10 mx-auto mt-16 max-w-[1240px] px-5 sm:px-8">
+        <div className="mb-7 flex flex-col gap-4 border-b border-g3/60 pb-5 md:flex-row md:items-end md:justify-between">
           <div>
-            <div className="mono text-[11px] uppercase tracking-[0.18em] text-g5 mb-4">
-              CAMPUS FEED
-            </div>
-            <h2 className="serif text-5xl tracking-tight md:text-7xl">What's happening.</h2>
+            <div className="mono mb-3 text-[11px] uppercase tracking-[0.18em] text-brand">Campus Feed</div>
+            <h2 className="serif text-4xl leading-none tracking-[-0.05em] md:text-6xl">What's happening.</h2>
           </div>
-          <div className="mono text-[11px] uppercase tracking-[0.18em] text-g4">
-            A live record of work and people
-          </div>
+          <div className="mono text-[11px] uppercase tracking-[0.18em] text-g5">A live record of work and people</div>
         </div>
 
         <motion.div
@@ -235,115 +202,37 @@ export function HomeClient({ stats, feedItems, featured }: HomeClientProps) {
           initial="initial"
           whileInView="animate"
           viewport={{ once: true, margin: "-100px" }}
-          className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-24"
+          className="grid grid-cols-1 gap-7 lg:grid-cols-[1.08fr_0.92fr]"
         >
-          {/* Left Column */}
-          <div className="flex flex-col gap-16">
-            
-            {/* Featured Event */}
-            <motion.div variants={itemVariants} className="flex flex-col">
-              <div className="mono text-[11px] uppercase tracking-[0.18em] text-[var(--brand)] mb-6">
-                FEATURED EVENT
-              </div>
+          <div className="flex flex-col gap-7">
+            <motion.div variants={itemVariants} className="premium-card p-5 sm:p-6">
+              <div className="mono mb-4 text-[11px] uppercase tracking-[0.18em] text-brand">Featured Event</div>
               <Link href={featured.event.link} className="group block">
-                <div className="w-full aspect-[4/3] bg-g2 overflow-hidden mb-6">
+                <div className="mb-5 aspect-[16/10] w-full overflow-hidden rounded-[22px] border border-g3 bg-g2">
                   {featured.event.imageUrl ? (
-                    <img 
-                      src={featured.event.imageUrl} 
-                      alt={featured.event.title}
-                      className="w-full h-full object-cover grayscale transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:grayscale-0"
-                    />
+                    <img src={featured.event.imageUrl} alt={featured.event.title} className="h-full w-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0" />
                   ) : (
-                    <div className="w-full h-full bg-g2 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:bg-g3" />
+                    <div className="h-full w-full bg-g2 transition-colors duration-700 group-hover:bg-g3" />
                   )}
                 </div>
-                <div className="mono text-[11px] uppercase tracking-[0.18em] text-[var(--brand)] mb-3">
-                  {featured.event.meta}
-                </div>
-                <h3 className="serif text-4xl tracking-tight text-ink md:text-5xl mb-3">
-                  {featured.event.title}
-                </h3>
-                <p className="text-[16px] text-g5 leading-relaxed font-sans mb-6">
-                  {featured.event.description}
-                </p>
-                <div className="flex items-center justify-between border-t border-g3/40 pt-4">
-                  <span className="mono text-[12px] text-g5 uppercase tracking-wide">120 attending</span>
-                  <span className="font-sans font-medium text-[14px] text-[var(--brand)] group-hover:text-ink transition-colors">
-                    Register →
+                <div className="mono mb-3 text-[11px] uppercase tracking-[0.18em] text-brand">{featured.event.meta}</div>
+                <h3 className="serif mb-3 text-3xl tracking-[-0.045em] text-ink md:text-5xl">{featured.event.title}</h3>
+                <p className="mb-5 text-[16px] leading-relaxed text-g6">{featured.event.description}</p>
+                <div className="flex items-center justify-between border-t border-g3/60 pt-4">
+                  <span className="mono text-[12px] uppercase tracking-wide text-g5">Live event workflow</span>
+                  <span className="inline-flex items-center gap-2 text-[14px] font-medium text-brand transition-colors group-hover:text-ink">
+                    Register <ArrowRight size={14} />
                   </span>
                 </div>
               </Link>
             </motion.div>
 
-            {/* Communities */}
-            <motion.div variants={itemVariants} className="flex flex-col">
-              <div className="mono text-[11px] uppercase tracking-[0.18em] text-[var(--brand)] mb-6">
-                COMMUNITIES
-              </div>
-              <div className="flex flex-col gap-6">
-                {communityFeed.map((item, i) => (
-                  <Link href={item.link} key={item.id} className="group block pb-6 border-b border-g3/30 last:border-0 last:pb-0">
-                    <h4 className="serif text-2xl tracking-tight text-ink mb-2 group-hover:text-[var(--brand)] transition-colors">{item.title}</h4>
-                    <p className="font-sans text-[15px] text-g5 mb-3">{item.meta}</p>
-                    <span className="font-sans font-medium text-[13px] text-ink group-hover:text-[var(--brand)] transition-colors">
-                      {item.actionText} →
-                    </span>
-                  </Link>
-                ))}
-              </div>
-              <div className="mt-8 pt-4">
-                <Link href="/communities" className="font-sans font-medium text-[14px] text-g5 hover:text-ink transition-colors">
-                  See all →
-                </Link>
-              </div>
-            </motion.div>
-
+            <FeedSection title="Communities" empty="New communities will appear here as they launch." items={communityFeed} footerHref="/spaces" footerLabel="See all" />
           </div>
 
-          {/* Right Column */}
-          <div className="flex flex-col gap-16">
-            
-            {/* Open Roles */}
-            <motion.div variants={itemVariants} className="flex flex-col">
-              <div className="mono text-[11px] uppercase tracking-[0.18em] text-[#C6A36B] mb-6">
-                OPEN ROLES
-              </div>
-              <div className="flex flex-col gap-6">
-                {rolesFeed.map((item, i) => (
-                  <Link href={item.link} key={item.id} className="group block pb-6 border-b border-g3/30 last:border-0 last:pb-0">
-                    <h4 className="serif text-2xl tracking-tight text-ink mb-2 group-hover:text-[var(--brand)] transition-colors">{item.title}</h4>
-                    <p className="font-sans text-[15px] text-g5 mb-3">{item.meta}</p>
-                    <span className="font-sans font-medium text-[13px] text-ink group-hover:text-[var(--brand)] transition-colors">
-                      {item.actionText} →
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Projects */}
-            <motion.div variants={itemVariants} className="flex flex-col">
-              <div className="mono text-[11px] uppercase tracking-[0.18em] text-[#C6A36B] mb-6">
-                PROJECTS
-              </div>
-              <div className="flex flex-col gap-6">
-                {projectsFeed.map((item, i) => (
-                  <Link href={item.link} key={item.id} className="group block pb-6 border-b border-g3/30 last:border-0 last:pb-0">
-                    <h4 className="serif text-2xl tracking-tight text-ink mb-2 group-hover:text-[var(--brand)] transition-colors">{item.title}</h4>
-                    <p className="font-sans text-[15px] text-g5 mb-3">{item.meta}</p>
-                    <span className="font-sans font-medium text-[13px] text-ink group-hover:text-[var(--brand)] transition-colors">
-                      {item.actionText} →
-                    </span>
-                  </Link>
-                ))}
-              </div>
-              <div className="mt-8 pt-4">
-                <Link href="/projects" className="font-sans font-medium text-[14px] text-g5 hover:text-ink transition-colors">
-                  Explore →
-                </Link>
-              </div>
-            </motion.div>
-
+          <div className="flex flex-col gap-7">
+            <FeedSection title="Open Roles" empty="Open roles from organizations will appear here." items={rolesFeed} />
+            <FeedSection title="Projects" empty="Builder launches will appear here." items={projectsFeed} footerHref="/projects" footerLabel="Explore" />
           </div>
         </motion.div>
       </section>
@@ -354,38 +243,33 @@ export function HomeClient({ stats, feedItems, featured }: HomeClientProps) {
             <div className="eyebrow">Curated signal</div>
             <h2 className="mt-3 serif text-4xl tracking-tight md:text-6xl">Featured this week.</h2>
           </div>
-          <Link href="/explore" className="mono text-[12px] uppercase tracking-[0.18em] text-[var(--brand)] hover:text-ink">
+          <Link href="/explore" className="mono text-[12px] uppercase tracking-[0.18em] text-brand hover:text-ink">
             Open full registry
           </Link>
         </div>
 
-        <motion.div
-          variants={containerVariants}
-          initial="initial"
-          animate="animate"
-          className="grid gap-5 md:grid-cols-2"
-        >
+        <motion.div variants={containerVariants} initial="initial" animate="animate" className="grid gap-5 md:grid-cols-2">
           {featuredCards.map((card) => (
-            <motion.div key={card.label} variants={itemVariants} className="premium-card group campus-frame p-6 md:p-7 flex flex-col justify-between hover:-translate-y-[2px] transition-transform duration-700 ease-[cubic-bezier(0.22,0.61,0.36,1)] border border-[#1a1a1a] hover:border-[#2f2f2f] overflow-hidden relative">
-              <div className="absolute -right-[20%] top-1/2 -translate-y-1/2 opacity-8 group-hover:opacity-25 transition-opacity duration-700 ease-[cubic-bezier(0.22,0.61,0.36,1)] hidden md:block">
+            <motion.div key={card.label} variants={itemVariants} className="premium-card group campus-frame flex flex-col justify-between overflow-hidden p-6 transition-transform duration-700 hover:-translate-y-[2px] md:p-7">
+              <div className="absolute -right-[20%] top-1/2 hidden -translate-y-1/2 opacity-10 transition-opacity duration-700 group-hover:opacity-25 md:block">
                 <CardRing size={400} text="CONVOKE • FOR PEOPLE BUILDING THE FUTURE • " />
               </div>
               <div className="relative z-10">
-                <div className="eyebrow text-[var(--brand)]">{card.label}</div>
+                <div className="eyebrow text-brand">{card.label}</div>
                 <Link href={card.value.link} className="mt-4 block">
                   <h3 className="serif text-3xl tracking-tight md:text-4xl">{card.value.title}</h3>
                 </Link>
-                <p className="mt-4 max-w-[60ch] text-[15px] leading-7 text-g5">{card.value.description}</p>
+                <p className="mt-4 max-w-[60ch] text-[15px] leading-7 text-g6">{card.value.description}</p>
               </div>
-              <div className="mt-6 relative z-10">
+              <div className="relative z-10 mt-6">
                 {card.value.imageUrl && (
-                  <Link href={card.value.link} className="block aspect-[16/9] w-full overflow-hidden rounded-md border border-g3 mb-5 bg-g1">
-                     <img src={card.value.imageUrl} alt={card.value.title} className="w-full h-full object-cover" />
+                  <Link href={card.value.link} className="mb-5 block aspect-[16/9] w-full overflow-hidden rounded-[20px] border border-g3 bg-g1">
+                    <img src={card.value.imageUrl} alt={card.value.title} className="h-full w-full object-cover" />
                   </Link>
                 )}
                 <div className="flex items-center justify-between gap-4 border-t border-g3 pt-4 text-[13px]">
-                  <span className="text-g5">{card.value.meta}</span>
-                  <Link href={card.value.link} className="font-medium text-[var(--brand)] hover:text-ink">
+                  <span className="text-g6">{card.value.meta}</span>
+                  <Link href={card.value.link} className="font-medium text-brand hover:text-ink">
                     {card.value.actionText}
                   </Link>
                 </div>
@@ -398,4 +282,60 @@ export function HomeClient({ stats, feedItems, featured }: HomeClientProps) {
   );
 }
 
+function FeedSection({
+  title,
+  empty,
+  items,
+  footerHref,
+  footerLabel,
+}: {
+  title: string;
+  empty: string;
+  items: FeedItem[];
+  footerHref?: string;
+  footerLabel?: string;
+}) {
+  return (
+    <motion.div variants={itemVariants} className="premium-card p-5 sm:p-6">
+      <div className="mono mb-4 text-[11px] uppercase tracking-[0.18em] text-brand">{title}</div>
+      <div className="flex flex-col gap-3">
+        {items.length > 0 ? items.map((item) => <FeedCard key={item.id} item={item} />) : <EmptyFeed label={empty} />}
+      </div>
+      {footerHref && footerLabel ? (
+        <div className="mt-6 pt-2">
+          <Link href={footerHref} className="inline-flex items-center gap-2 text-[14px] font-medium text-g6 transition-colors hover:text-ink">
+            {footerLabel} <ArrowRight size={14} />
+          </Link>
+        </div>
+      ) : null}
+    </motion.div>
+  );
+}
 
+function FeedCard({ item }: { item: FeedItem }) {
+  return (
+    <Link
+      href={item.link}
+      className="group grid grid-cols-[44px_1fr_auto] items-center gap-4 rounded-[20px] border border-g3/70 bg-paper-elevated/60 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-brand/35 hover:bg-paper-elevated"
+    >
+      <Avatar src={item.logoUrl || ""} name={item.logoName || item.title} size={44} />
+      <div className="min-w-0">
+        <div className="mono mb-1 text-[10px] uppercase tracking-[0.16em] text-brand">{item.tag}</div>
+        <h4 className="truncate text-[16px] font-semibold text-ink transition-colors group-hover:text-brand">{item.title}</h4>
+        <p className="mt-1 truncate text-[13px] leading-5 text-g6">{item.meta}</p>
+      </div>
+      <span className="hidden items-center gap-1 text-[13px] font-medium text-g6 transition-colors group-hover:text-brand sm:inline-flex">
+        {item.actionText}
+        <ArrowRight size={13} />
+      </span>
+    </Link>
+  );
+}
+
+function EmptyFeed({ label }: { label: string }) {
+  return (
+    <div className="rounded-[20px] border border-dashed border-g3 bg-paper-elevated/45 p-5 text-[14px] leading-6 text-g6">
+      {label}
+    </div>
+  );
+}

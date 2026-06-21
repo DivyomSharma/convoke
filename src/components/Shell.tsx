@@ -1,5 +1,4 @@
-"use"
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -84,7 +83,7 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
             >
               <Search size={11} className="text-brand" />
               <span>Search</span>
-              <span className="ml-auto text-[9px] text-g4">⌘K</span>
+              <span className="ml-auto text-[9px] text-g4">Ctrl K</span>
             </button>
             <ThemeToggle />
             {isSignedIn ? (
