@@ -11,8 +11,8 @@ export const size = {
 export const contentType = 'image/png';
 
 export default async function Image() {
-  // Try to load Instrument Serif font
-  const fontUrl = 'https://fonts.gstatic.com/s/instrumentserif/v1/2s2bZMI_8mE1-E-AOKyK-G477A14bds2x222_Z8.woff'
+  // Satori requires .ttf or .otf, not .woff
+  const fontUrl = 'https://raw.githubusercontent.com/google/fonts/main/ofl/instrumentserif/InstrumentSerif-Regular.ttf';
   const fontData = await fetch(fontUrl).then((res) => res.arrayBuffer());
 
   return new ImageResponse(
