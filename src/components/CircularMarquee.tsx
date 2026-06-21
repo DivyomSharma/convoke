@@ -26,7 +26,12 @@ export function CircularMarquee({
   return (
     <div 
       className={`relative flex items-center justify-center ${className}`} 
-      style={{ width: size, height: size, perspective: "1000px" }}
+      style={{ 
+        width: size, 
+        height: size, 
+        perspective: "1200px",
+        transform: "rotateX(65deg) rotateY(-15deg)" 
+      }}
     >
       <motion.div
         animate={shouldReduceMotion ? {} : { rotate: 360 }}
@@ -38,7 +43,7 @@ export function CircularMarquee({
           width={size} 
           height={size} 
           viewBox={`0 0 ${size} ${size}`} 
-          className="fill-[var(--brand)] opacity-80"
+          className="opacity-90"
         >
           <path
             id="textPath"
@@ -51,10 +56,15 @@ export function CircularMarquee({
             fill="none"
           />
           <text 
-            className="mono text-[11px] md:text-[13px] tracking-[0.2em] uppercase font-medium"
+            className="mono text-[14px] md:text-[18px] tracking-[0.25em] uppercase font-medium"
           >
             <textPath href="#textPath" startOffset="0%">
-              {text.repeat(3)}
+              {Array.from({ length: 6 }).map((_, i) => (
+                <React.Fragment key={i}>
+                  <tspan fill="var(--brand)">CONVOKE</tspan>
+                  <tspan fill="currentColor" className="text-ink-muted dark:text-g5"> • FOR PEOPLE BUILDING THE FUTURE • </tspan>
+                </React.Fragment>
+              ))}
             </textPath>
           </text>
         </svg>

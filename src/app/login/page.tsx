@@ -32,20 +32,13 @@ export default function LoginPage() {
         password,
       });
 
-      if (result.error) {
-        const message = result.error.longMessage 
-          || result.error.message 
-          || "Failed to sign in. Please check your credentials.";
-        setError(message);
-      } else if (authSignIn.status === "complete") {
-        const finalizeRes = await authSignIn.finalize();
-        if (finalizeRes.error) {
-          setError(finalizeRes.error.message || "Failed to finalize session.");
-        } else {
-          router.push("/workspace");
+      if (result.status === "complete") {
+        if (authSignIn.setActive) {
+          await authSignIn.setActive({ session: result.createdSessionId });
         }
+        router.push("/workspace");
       } else {
-        console.log("Sign-in status:", authSignIn.status);
+        console.log("Sign-in status:", result.status);
         setError("Additional verification required. Please check your email or authenticator app.");
       }
     } catch (err: any) {
@@ -76,20 +69,13 @@ export default function LoginPage() {
         lastName: name.split(" ").slice(1).join(" ") || "",
       });
 
-      if (result.error) {
-        const message = result.error.longMessage 
-          || result.error.message 
-          || "Failed to create account. Try a different email or stronger password.";
-        setError(message);
-      } else if (authSignUp.status === "complete") {
-        const finalizeRes = await authSignUp.finalize();
-        if (finalizeRes.error) {
-          setError(finalizeRes.error.message || "Failed to finalize session.");
-        } else {
-          router.push("/workspace");
+      if (result.status === "complete") {
+        if (authSignUp.setActive) {
+          await authSignUp.setActive({ session: result.createdSessionId });
         }
+        router.push("/workspace");
       } else {
-        console.log("Sign-up status:", authSignUp.status);
+        console.log("Sign-up status:", result.status);
         setError("Account created. Please check your inbox to verify your email address.");
       }
     } catch (err: any) {
@@ -108,22 +94,15 @@ export default function LoginPage() {
     if (!signIn) return;
 
     try {
+      // In Clerk v5, authenticateWithRedirect takes fallbackRedirectUrl
       const authSignIn = signIn as any;
-      if (authSignIn.authenticateWithRedirect) {
-        await authSignIn.authenticateWithRedirect({
-          strategy,
-          redirectUrl: "/sso-callback",
-          redirectUrlComplete: "/workspace",
-        });
-      } else if (authSignIn.sso) {
-        await authSignIn.sso({
-          strategy,
-          redirectUrl: "/sso-callback",
-          redirectCallbackUrl: "/workspace",
-        });
-      } else {
-        throw new Error("No valid SSO method found on signIn object");
-      }
+      await authSignIn.authenticateWithRedirect({
+        strategy,
+        redirectUrl: "/sso-callback",
+        redirectUrlComplete: "/workspace",
+        fallbackRedirectUrl: "/workspace",
+        signUpFallbackRedirectUrl: "/workspace"
+      });
     } catch (err: any) {
       console.error("Social auth error:", err);
       const message = err?.errors?.[0]?.longMessage 

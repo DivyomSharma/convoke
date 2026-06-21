@@ -140,12 +140,12 @@ export function HomeClient({ stats, feedItems, featured }: HomeClientProps) {
         </div>
 
         <div className="relative z-20 mx-auto max-w-[1240px]">
-          <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-12 lg:gap-8 pt-12 md:pt-24">
+          <div className="flex flex-col lg:flex-row items-center lg:items-center justify-start gap-12 lg:gap-24 xl:gap-32 pt-12 md:pt-24">
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-              className="flex flex-col items-start text-left flex-1"
+              className="flex flex-col items-start text-left shrink-0"
             >
               {/* Tagline */}
               <div className="mono text-[11px] tracking-[0.24em] uppercase text-g4 font-medium mb-8">

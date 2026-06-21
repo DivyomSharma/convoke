@@ -77,7 +77,7 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
             ))}
           </nav>
 
-          <div className="ml-auto flex items-center gap-2 md:ml-0">
+          <div className="ml-auto flex items-center gap-2">
             <button
               onClick={() => setCommandOpen(true)}
               className="hidden items-center gap-2 border border-g3 bg-g1/35 px-3 h-8 rounded-sm text-left mono text-[10px] uppercase tracking-wider text-g5 transition hover:border-g4 hover:bg-g1/60 md:flex md:w-48 cursor-pointer"
