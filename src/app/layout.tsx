@@ -48,8 +48,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
   return (
     <ClerkProvider
+      publishableKey={publishableKey}
       signInUrl="/auth"
       signUpUrl="/auth"
       appearance={{
@@ -96,10 +99,24 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            {children}
+            {publishableKey ? children : <MissingClerkKey />}
           </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>
+  );
+}
+
+function MissingClerkKey() {
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-paper px-6 text-center">
+      <div className="max-w-md rounded-[24px] border border-g3 bg-paper-elevated p-8">
+        <div className="eyebrow text-brand">Clerk not configured</div>
+        <h1 className="serif mt-4 text-4xl tracking-tight text-ink">Missing publishable key</h1>
+        <p className="mt-4 text-[15px] leading-7 text-g6">
+          Set <code>NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY</code> in your environment so the auth flow can load.
+        </p>
+      </div>
+    </main>
   );
 }
