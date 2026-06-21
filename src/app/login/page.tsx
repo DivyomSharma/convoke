@@ -94,15 +94,24 @@ export default function LoginPage() {
     if (!signIn) return;
 
     try {
-      // In Clerk v5, authenticateWithRedirect takes fallbackRedirectUrl
       const authSignIn = signIn as any;
-      await authSignIn.authenticateWithRedirect({
-        strategy,
-        redirectUrl: "/sso-callback",
-        redirectUrlComplete: "/workspace",
-        fallbackRedirectUrl: "/workspace",
-        signUpFallbackRedirectUrl: "/workspace"
-      });
+      if (typeof authSignIn.authenticateWithRedirect === "function") {
+        await authSignIn.authenticateWithRedirect({
+          strategy,
+          redirectUrl: "/sso-callback",
+          redirectUrlComplete: "/workspace",
+          fallbackRedirectUrl: "/workspace",
+          signUpFallbackRedirectUrl: "/workspace"
+        });
+      } else if (typeof authSignIn.sso === "function") {
+        await authSignIn.sso({
+          strategy,
+          redirectUrl: "/sso-callback",
+          redirectCallbackUrl: "/workspace",
+        });
+      } else {
+        throw new Error("Unable to initialize social sign in: method not found.");
+      }
     } catch (err: any) {
       console.error("Social auth error:", err);
       const message = err?.errors?.[0]?.longMessage 
