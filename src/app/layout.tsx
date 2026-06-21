@@ -91,7 +91,7 @@ export default function RootLayout({
       }}
     >
       <html lang="en" suppressHydrationWarning className={`${fontSans.variable} ${fontSerif.variable} ${fontMono.variable} antialiased h-full`}>
-        <body className="min-h-full flex flex-col font-sans">
+        <body className="min-h-full flex flex-col font-sans overflow-x-hidden">
           <ThemeProvider
             attribute="class"
             defaultTheme="system"

@@ -30,7 +30,7 @@ export function RsvpClient({
   const handleRsvp = async () => {
     if (!userId) {
       alert("Authentication required to register.");
-      router.push("/login");
+      router.push("/auth");
       return;
     }
     

@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
@@ -67,38 +66,7 @@ const itemVariants = {
   },
 };
 
-const phrases = [
-  ["Work among", "builders."],
-  ["Find your", "people."],
-  ["Quiet people", "build loud things."],
-  ["Find people", "worth building with."],
-  ["Build quietly.", "Grow together."],
-] as const;
-
 export function HomeClient({ feedItems, featured }: HomeClientProps) {
-  const [phraseIndex, setPhraseIndex] = useState(0);
-  const [typed, setTyped] = useState("");
-  const [deleting, setDeleting] = useState(false);
-
-  useEffect(() => {
-    const fullText = phrases[phraseIndex].join("\n");
-    let timeout: NodeJS.Timeout | undefined;
-
-    if (!deleting && typed === fullText) {
-      timeout = setTimeout(() => setDeleting(true), 2400);
-    } else if (deleting && typed === "") {
-      setDeleting(false);
-      setPhraseIndex((prev) => (prev + 1) % phrases.length);
-    } else {
-      timeout = setTimeout(() => {
-        const nextLength = typed.length + (deleting ? -1 : 1);
-        setTyped(fullText.slice(0, Math.max(0, nextLength)));
-      }, deleting ? 18 : 42);
-    }
-
-    return () => clearTimeout(timeout);
-  }, [typed, deleting, phraseIndex]);
-
   const rolesFeed = feedItems.filter((item) => item.tag === "NOW HIRING");
   const projectsFeed = feedItems.filter((item) => item.tag === "NEW PROJECT");
   const communityFeed = feedItems.filter((item) => item.tag === "NEW COMMUNITY");
@@ -113,11 +81,10 @@ export function HomeClient({ feedItems, featured }: HomeClientProps) {
     { label: "Featured Research", value: featured.research },
   ];
 
-  const currentPhrase = typed.split("\n");
-
   return (
     <div className="relative overflow-hidden">
       <section className="relative bg-paper px-5 pb-14 pt-14 sm:px-8 sm:pb-20 sm:pt-20">
+        <div className="vignette-frame pointer-events-none absolute inset-0 z-10 hidden dark:block" />
         <div className="pointer-events-none absolute inset-0 z-10 hidden dark:block dark:bg-[radial-gradient(circle_at_center,transparent_56%,rgba(0,0,0,0.82)_100%)]" />
 
         <div className="pointer-events-none absolute left-1/2 top-[50%] hidden -translate-x-1/2 -translate-y-1/2 opacity-[0.34] md:block dark:opacity-[0.24]">
@@ -143,11 +110,8 @@ export function HomeClient({ feedItems, featured }: HomeClientProps) {
                   transition={{ duration: 0.78, ease: [0.22, 1, 0.36, 1] }}
                   className="serif text-[clamp(4rem,8.15vw,7.35rem)] font-light leading-[0.9] tracking-[-0.07em] text-ink"
                 >
-                  <span className="block whitespace-nowrap">{currentPhrase[0] || "\u00A0"}</span>
-                  <span className="block whitespace-nowrap text-brand">
-                    {currentPhrase[1] || "\u00A0"}
-                    <span className="ml-3 inline-block animate-pulse text-brand/70">|</span>
-                  </span>
+                  <span className="block whitespace-nowrap">Work among builders.</span>
+                  <span className="block whitespace-nowrap text-brand">Find your people.</span>
                 </motion.h1>
               </div>
 
@@ -156,8 +120,8 @@ export function HomeClient({ feedItems, featured }: HomeClientProps) {
               </p>
 
               <div className="mt-9 flex flex-wrap items-center gap-4 sm:gap-6">
-                <Link href="/login" className="ink-button px-6 py-3 text-[14px]">
-                  <span>Step Inside</span>
+                <Link href="/auth" className="ink-button px-6 py-3 text-[14px]">
+                  <span>Continue</span>
                   <ArrowRight size={14} />
                 </Link>
                 <Link href="/events" className="ghost-button text-[14px]">
@@ -197,7 +161,7 @@ export function HomeClient({ feedItems, featured }: HomeClientProps) {
         <div className="mb-7 flex flex-col gap-4 border-b border-g3/60 pb-5 md:flex-row md:items-end md:justify-between">
           <div>
             <div className="mono mb-3 text-[11px] uppercase tracking-[0.18em] text-brand">Campus Feed</div>
-            <h2 className="serif text-4xl leading-none tracking-[-0.05em] md:text-6xl">What's happening.</h2>
+            <h2 className="serif text-4xl leading-none tracking-[-0.05em] md:text-6xl">What&apos;s happening.</h2>
           </div>
           <div className="mono text-[11px] uppercase tracking-[0.18em] text-g5">A live record of work and people</div>
         </div>

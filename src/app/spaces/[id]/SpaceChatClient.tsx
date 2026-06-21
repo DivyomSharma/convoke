@@ -56,7 +56,7 @@ export function SpaceChatClient({
   return (
     <div className="flex flex-col h-[60vh] md:h-[70vh] rounded-md border border-g3 glass-panel overflow-hidden">
       {/* Messages list */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin">
+      <div className="flex-1 overflow-y-auto p-6 space-y-6">
         {initialMessages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-center text-g5">
             <span className="serif text-xl italic">Silence is golden.</span>
