@@ -146,7 +146,7 @@ export function HomeClient({ feedItems, featured }: HomeClientProps) {
             </motion.div>
           </div>
 
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, delay: 0.8 }} className="mt-6 flex w-full items-center justify-between border-t border-g3/70 pt-5">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, delay: 0.8 }} className="mt-6 flex w-full items-center justify-between pt-5">
             <div className="mono text-[11px] font-medium uppercase tracking-[0.16em] text-g5">(01) Established MMXXVI</div>
             <div className="mono text-[11px] font-medium uppercase tracking-[0.16em] text-g5">Global builder network</div>
           </motion.div>
