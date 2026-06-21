@@ -78,6 +78,17 @@
   --shadow-card: none;
 }
 
+html:not(.dark) .hero-light-flat {
+  background: radial-gradient(circle at center, #fbfaf7 0%, #f6f4ef 100%);
+}
+
+html:not(.dark) .hero-light-flat *::before,
+html:not(.dark) .hero-light-flat *::after {
+  mix-blend-mode: normal;
+  filter: none;
+  backdrop-filter: none;
+}
+
 @layer base {
   * {
     border-color: var(--color-border);
@@ -222,6 +233,11 @@
     0 0 0 1px rgba(255, 255, 255, 0.55);
   mask-image: radial-gradient(circle at center, black 58%, transparent 100%);
   opacity: 0.65;
+}
+
+html:not(.dark) .vignette-frame::after {
+  content: none;
+  display: none;
 }
 
 .dark .vignette-frame::after {

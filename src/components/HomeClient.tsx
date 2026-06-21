@@ -108,9 +108,8 @@ export function HomeClient({ feedItems, featured }: HomeClientProps) {
 
   return (
     <div className="relative overflow-hidden">
-      <section className="relative bg-paper px-5 pb-14 pt-14 sm:px-8 sm:pb-20 sm:pt-20">
+      <section className="hero-light-flat relative bg-paper px-5 pb-14 pt-14 sm:px-8 sm:pb-20 sm:pt-20 dark:bg-[#000]">
         <div className="pointer-events-none absolute inset-0 z-10 hidden dark:block dark:bg-[radial-gradient(circle_at_center,transparent_56%,rgba(0,0,0,0.82)_100%)]" />
-        <div className="pointer-events-none absolute inset-0 z-10 dark:hidden bg-[radial-gradient(circle_at_center,transparent_54%,rgba(255,255,255,0.88)_100%)]" />
 
         <div className="pointer-events-none absolute left-1/2 top-[50%] hidden -translate-x-1/2 -translate-y-1/2 opacity-[0.34] md:block dark:opacity-[0.24]">
           <CircularMarquee size={1120} duration={85} />

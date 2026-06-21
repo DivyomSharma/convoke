@@ -76,11 +76,10 @@ export default function AuthPage() {
   };
 
   return (
-    <main className="grid min-h-screen bg-paper lg:grid-cols-[1.02fr_0.98fr]">
-      <section className="relative hidden overflow-hidden border-r border-g3 lg:flex">
-        <div className="absolute inset-0 bg-[#070707]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_35%,rgba(0,178,255,0.18),transparent_34%),radial-gradient(circle_at_75%_80%,rgba(127,29,45,0.22),transparent_30%)]" />
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,transparent_52%,rgba(0,0,0,0.8)_100%)]" />
+    <main className="grid min-h-screen bg-paper lg:grid-cols-[1.02fr_0.98fr] dark:bg-[#000]">
+      <section className="hero-light-flat relative hidden overflow-hidden border-r border-g3 lg:flex dark:bg-[#070707]">
+        <div className="absolute inset-0 hidden dark:block dark:bg-[radial-gradient(circle_at_30%_35%,rgba(0,178,255,0.18),transparent_34%),radial-gradient(circle_at_75%_80%,rgba(127,29,45,0.22),transparent_30%)]" />
+        <div className="pointer-events-none absolute inset-0 hidden dark:block dark:bg-[radial-gradient(circle_at_50%_50%,transparent_52%,rgba(0,0,0,0.8)_100%)]" />
         <div className="relative z-10 flex h-full flex-col justify-between p-12 text-white">
           <div className="max-w-[35rem]">
             <div className="mono mb-5 text-[11px] uppercase tracking-[0.24em] text-white/55">
@@ -108,16 +107,16 @@ export default function AuthPage() {
         </div>
       </section>
 
-      <section className="relative flex items-center justify-center px-6 py-12">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_12%,color-mix(in_srgb,var(--brand)_14%,transparent),transparent_38%)]" />
-        <div className="premium-card relative z-10 w-full max-w-[500px] p-7 sm:p-9">
+      <section className="hero-light-flat relative flex items-center justify-center px-6 py-12 dark:bg-[#000]">
+        <div className="absolute inset-0 hidden dark:block dark:bg-[radial-gradient(circle_at_50%_12%,color-mix(in_srgb,var(--brand)_14%,transparent),transparent_38%)]" />
+        <div className="premium-card relative z-10 w-full max-w-[500px] p-7 sm:p-9 dark:bg-[rgba(12,13,15,0.72)]">
           <div className="text-center">
             <div className="serif text-4xl tracking-tight text-ink">Convoke.</div>
             <div className="mt-3 text-[15px] leading-6 text-g6">For people building the future.</div>
           </div>
 
           {message ? (
-            <div className="mt-6 rounded-[18px] border border-g3 bg-paper-elevated p-4 text-center text-[13px] leading-6 text-g6">
+            <div className="mt-6 rounded-[18px] border border-g3 bg-paper-elevated p-4 text-center text-[13px] leading-6 text-g6 dark:bg-[rgba(12,13,15,0.72)]">
               {message}
             </div>
           ) : null}
@@ -131,16 +130,16 @@ export default function AuthPage() {
                   type="button"
                   onClick={() => handleOAuth(door.strategy)}
                   disabled={Boolean(loadingStrategy) || emailLoading}
-                  className="group flex h-12 w-full items-center justify-between rounded-full border border-white/10 bg-black/65 px-4 text-[14px] font-medium text-white transition-all hover:-translate-y-0.5 hover:border-brand/35 hover:bg-black/78 disabled:cursor-wait disabled:opacity-80"
+                  className="group flex h-12 w-full items-center justify-between rounded-full border border-g3 bg-paper-card px-4 text-[14px] font-medium text-ink transition-all hover:-translate-y-0.5 hover:border-brand/35 hover:bg-paper-elevated disabled:cursor-wait disabled:opacity-80 dark:border-white/10 dark:bg-black/65 dark:text-white dark:hover:bg-black/78"
                 >
                   <span className="flex items-center gap-3">
-                    <Icon size={15} className="text-white/75" />
+                    <Icon size={15} className="text-g5 dark:text-white/75" />
                     <span>{door.label}</span>
                   </span>
                   {loadingStrategy === door.strategy ? (
                     <Loader2 size={16} className="animate-spin text-brand" />
                   ) : (
-                    <ArrowRight size={15} className="text-white/55 transition-colors group-hover:text-brand" />
+                    <ArrowRight size={15} className="text-g4 transition-colors group-hover:text-brand dark:text-white/55" />
                   )}
                 </button>
               );
@@ -154,32 +153,32 @@ export default function AuthPage() {
           </div>
 
           <div className="space-y-3">
-            <label className="block text-xs font-medium text-ink">Email Address</label>
+            <label className="block text-xs font-medium text-ink dark:text-white">Email Address</label>
             <input
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               placeholder="you@example.com"
-              className="h-12 w-full rounded-full border border-g3 bg-transparent px-4 text-[14px] text-ink outline-none focus:border-brand/55"
+              className="h-12 w-full rounded-full border border-g3 bg-paper-card px-4 text-[14px] text-ink outline-none focus:border-brand/55 dark:bg-transparent dark:text-white"
             />
             <button
               type="button"
               onClick={continueWithEmail}
               disabled={emailLoading || Boolean(loadingStrategy)}
-              className="ink-button h-12 w-full px-5 text-[14px]"
+              className="ink-button h-12 w-full px-5 text-[14px] dark:bg-white dark:text-black"
             >
               <span>Continue</span>
               {emailLoading ? <Loader2 size={15} className="animate-spin" /> : null}
             </button>
           </div>
 
-          <p className="mt-7 text-center text-[11px] leading-relaxed text-g5">
+          <p className="mt-7 text-center text-[11px] leading-relaxed text-g5 dark:text-white/55">
             By continuing, you agree to{" "}
-            <Link href="/terms" className="font-medium text-ink hover:text-brand">
+            <Link href="/terms" className="font-medium text-ink hover:text-brand dark:text-white dark:hover:text-brand">
               Terms
             </Link>{" "}
             and{" "}
-            <Link href="/privacy" className="font-medium text-ink hover:text-brand">
+            <Link href="/privacy" className="font-medium text-ink hover:text-brand dark:text-white dark:hover:text-brand">
               Privacy
             </Link>
             .
