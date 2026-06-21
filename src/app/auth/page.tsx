@@ -4,30 +4,30 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSignIn } from "@clerk/nextjs";
-import { ArrowRight, Github, Loader2, Mail, Disc3, Chrome } from "lucide-react";
+import { ArrowRight, Code2, Loader2, Mail, MessageSquare, Search } from "lucide-react";
 
 type OAuthStrategy = "oauth_google" | "oauth_discord" | "oauth_github";
 
 const oauthDoors: Array<{
   label: string;
   strategy: OAuthStrategy;
-  icon: typeof Chrome;
+  icon: typeof ArrowRight;
 }> = [
-  { label: "Continue with Google", strategy: "oauth_google", icon: Chrome },
-  { label: "Continue with GitHub", strategy: "oauth_github", icon: Github },
-  { label: "Continue with Discord", strategy: "oauth_discord", icon: Disc3 },
+  { label: "Continue with Google", strategy: "oauth_google", icon: Search },
+  { label: "Continue with GitHub", strategy: "oauth_github", icon: Code2 },
+  { label: "Continue with Discord", strategy: "oauth_discord", icon: MessageSquare },
 ];
 
 export default function AuthPage() {
   const router = useRouter();
-  const { signIn, isLoaded } = useSignIn();
+  const { signIn } = useSignIn();
   const [loadingStrategy, setLoadingStrategy] = useState<OAuthStrategy | null>(null);
   const [email, setEmail] = useState("");
   const [emailLoading, setEmailLoading] = useState(false);
   const [message, setMessage] = useState("");
 
   const handleOAuth = async (strategy: OAuthStrategy) => {
-    if (!isLoaded || !signIn || loadingStrategy || emailLoading) return;
+    if (!signIn || loadingStrategy || emailLoading) return;
 
     setMessage("");
     setLoadingStrategy(strategy);
@@ -45,7 +45,7 @@ export default function AuthPage() {
   };
 
   const continueWithEmail = async () => {
-    if (!isLoaded || !signIn || emailLoading || loadingStrategy) return;
+    if (!signIn || emailLoading || loadingStrategy) return;
 
     const identifier = email.trim();
     if (!identifier) return;
