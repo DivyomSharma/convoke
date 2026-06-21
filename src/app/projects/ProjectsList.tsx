@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { createProject } from "@/app/actions/workspace";
 import { getFallbackPhoto } from "@/lib/photos";
 import { CardRing } from "@/components/ui/card-ring";
+import { ImageUploadField } from "@/components/forms/ImageUploadField";
 
 interface ProjectWithDetails {
   id: string;
@@ -41,6 +42,7 @@ export function ProjectsList({ initialProjects }: { initialProjects: ProjectWith
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [bannerUrl, setBannerUrl] = useState("");
+  const [bannerFileName, setBannerFileName] = useState("");
   const [url, setUrl] = useState("");
   const [demoUrl, setDemoUrl] = useState("");
   const [githubUrl, setGithubUrl] = useState("");
@@ -74,6 +76,7 @@ export function ProjectsList({ initialProjects }: { initialProjects: ProjectWith
         setTitle("");
         setDescription("");
         setBannerUrl("");
+        setBannerFileName("");
         setUrl("");
         setDemoUrl("");
         setGithubUrl("");
@@ -301,16 +304,14 @@ export function ProjectsList({ initialProjects }: { initialProjects: ProjectWith
                   </div>
                 </div>
 
-                <div>
-                  <label className="text-ink font-medium text-xs mb-1.5 block">Banner Image URL</label>
-                  <input 
-                    type="url"
-                    value={bannerUrl}
-                    onChange={(e) => setBannerUrl(e.target.value)}
-                    placeholder="https://unsplash.com/... or direct image link"
-                    className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
-                  />
-                </div>
+                <ImageUploadField
+                  label="Project cover"
+                  value={bannerUrl}
+                  fileName={bannerFileName}
+                  onChange={setBannerUrl}
+                  onFileNameChange={setBannerFileName}
+                  onError={setError}
+                />
 
                 <div>
                   <label className="text-ink font-medium text-xs mb-1.5 block">Project Description</label>

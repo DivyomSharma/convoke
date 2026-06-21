@@ -59,6 +59,7 @@ export function EventsList({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [bannerUrl, setBannerUrl] = useState("");
+  const [bannerFileName, setBannerFileName] = useState("");
   const [spaceId, setSpaceId] = useState(spaces[0]?.id || "");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
@@ -87,6 +88,21 @@ export function EventsList({
       const diff = new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
       return sort === "ASC" ? diff : -diff;
     });
+
+  const handleBannerUpload = (file?: File) => {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setError("Please upload an image file for the meet banner.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setBannerUrl(String(reader.result));
+      setBannerFileName(file.name);
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -117,6 +133,7 @@ export function EventsList({
         setTitle("");
         setDescription("");
         setBannerUrl("");
+        setBannerFileName("");
         setStartTime("");
         setEndTime("");
         setLocation("ONLINE");
@@ -351,19 +368,20 @@ export function EventsList({
                         <img src={bannerUrl} alt="" className="h-full w-full object-cover" />
                       ) : (
                         <div className="flex h-full items-center justify-center text-center text-[13px] leading-6 text-g5">
-                          Paste a banner image URL to preview the meet cover.
+                          Upload a banner image to preview the meet cover.
                         </div>
                       )}
                     </div>
-                    <label className="mt-4 block text-xs font-medium text-ink">Banner Image URL</label>
-                    <input 
-                      type="url"
-                      value={bannerUrl}
-                      onChange={(e) => setBannerUrl(e.target.value)}
-                      placeholder="https://..."
-                      className="mt-2 h-11 w-full rounded-2xl border border-g3 bg-paper-elevated px-4 text-sm text-ink outline-none transition-all focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20"
-                    />
-                    <p className="mt-3 text-[12px] leading-5 text-g5">UploadThing support can replace URL paste once storage keys are configured.</p>
+                    <label className="mt-4 flex h-11 cursor-pointer items-center justify-center rounded-2xl border border-g3 bg-paper-elevated px-4 text-sm font-medium text-ink transition-all hover:border-brand/45">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="sr-only"
+                        onChange={(event) => handleBannerUpload(event.target.files?.[0])}
+                      />
+                      {bannerFileName || "Upload banner image"}
+                    </label>
+                    <p className="mt-3 text-[12px] leading-5 text-g5">Images are selected from your device and previewed instantly. Production storage can be switched to UploadThing when keys are configured.</p>
                   </div>
                 </div>
 

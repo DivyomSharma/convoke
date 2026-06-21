@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { createOrganization } from "@/app/actions/workspace";
 import { getFallbackPhoto } from "@/lib/photos";
 import { CardRing } from "@/components/ui/card-ring";
+import { ImageUploadField } from "@/components/forms/ImageUploadField";
 
 interface OrganizationWithMembers {
   id: string;
@@ -34,7 +35,9 @@ export function OrganizationsList({ initialOrgs }: { initialOrgs: OrganizationWi
   const [location, setLocation] = useState("");
   const [website, setWebsite] = useState("");
   const [logoUrl, setLogoUrl] = useState("");
+  const [logoFileName, setLogoFileName] = useState("");
   const [bannerUrl, setBannerUrl] = useState("");
+  const [bannerFileName, setBannerFileName] = useState("");
   const [description, setDescription] = useState("");
   const [mission, setMission] = useState("");
   const [vision, setVision] = useState("");
@@ -78,7 +81,9 @@ export function OrganizationsList({ initialOrgs }: { initialOrgs: OrganizationWi
         setLocation("");
         setWebsite("");
         setLogoUrl("");
+        setLogoFileName("");
         setBannerUrl("");
+        setBannerFileName("");
         setDescription("");
         setMission("");
         setVision("");
@@ -292,25 +297,24 @@ export function OrganizationsList({ initialOrgs }: { initialOrgs: OrganizationWi
                   />
                 </div>
 
-                <div>
-                  <label className="text-ink font-medium text-xs mb-1.5 block">Logo Image URL</label>
-                  <input 
-                    type="url"
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <ImageUploadField
+                    label="Organization logo"
                     value={logoUrl}
-                    onChange={(e) => setLogoUrl(e.target.value)}
-                    placeholder="https://unsplash.com/... or direct image link"
-                    className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                    fileName={logoFileName}
+                    onChange={setLogoUrl}
+                    onFileNameChange={setLogoFileName}
+                    onError={setError}
+                    compact
                   />
-                </div>
-
-                <div>
-                  <label className="text-ink font-medium text-xs mb-1.5 block">Banner Image URL</label>
-                  <input 
-                    type="url"
+                  <ImageUploadField
+                    label="Organization banner"
                     value={bannerUrl}
-                    onChange={(e) => setBannerUrl(e.target.value)}
-                    placeholder="https://unsplash.com/... or direct image link"
-                    className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                    fileName={bannerFileName}
+                    onChange={setBannerUrl}
+                    onFileNameChange={setBannerFileName}
+                    onError={setError}
+                    compact
                   />
                 </div>
 

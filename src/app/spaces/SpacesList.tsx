@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { createSpace } from "@/app/actions/workspace";
 import { getFallbackPhoto } from "@/lib/photos";
 import { CardRing } from "@/components/ui/card-ring";
+import { ImageUploadField } from "@/components/forms/ImageUploadField";
 
 interface SpaceWithDetails {
   id: string;
@@ -46,6 +47,7 @@ export function SpacesList({
   const [organizationId, setOrganizationId] = useState(organizations[0]?.id || "");
   const [description, setDescription] = useState("");
   const [bannerUrl, setBannerUrl] = useState("");
+  const [bannerFileName, setBannerFileName] = useState("");
   const [rules, setRules] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -72,6 +74,7 @@ export function SpacesList({
         setName("");
         setDescription("");
         setBannerUrl("");
+        setBannerFileName("");
         setRules("");
         router.refresh();
       }
@@ -252,16 +255,14 @@ export function SpacesList({
                   )}
                 </div>
 
-                <div>
-                  <label className="text-ink font-medium text-xs mb-1.5 block">Banner Image URL</label>
-                  <input 
-                    type="url"
-                    value={bannerUrl}
-                    onChange={(e) => setBannerUrl(e.target.value)}
-                    placeholder="https://unsplash.com/... or direct image link"
-                    className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
-                  />
-                </div>
+                <ImageUploadField
+                  label="Space banner"
+                  value={bannerUrl}
+                  fileName={bannerFileName}
+                  onChange={setBannerUrl}
+                  onFileNameChange={setBannerFileName}
+                  onError={setError}
+                />
 
                 <div>
                   <label className="text-ink font-medium text-xs mb-1.5 block">Space Rules & Description</label>

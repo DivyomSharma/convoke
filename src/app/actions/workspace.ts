@@ -206,8 +206,8 @@ export async function createOrganization(data: {
       industry: data.industry,
       location: data.location,
       website: data.website,
-      logoUrl: data.logoUrl || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=256&auto=format&fit=crop",
-      bannerUrl: data.bannerUrl || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop",
+      logoUrl: data.logoUrl,
+      bannerUrl: data.bannerUrl,
       members: {
         create: {
           userId: user.id,
@@ -239,7 +239,7 @@ export async function createSpace(data: {
     data: {
       name: data.name,
       description: data.description,
-      bannerUrl: data.bannerUrl || "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?q=80&w=1200&auto=format&fit=crop",
+      bannerUrl: data.bannerUrl,
       rules: data.rules,
       organizationId: data.organizationId,
     },
@@ -272,7 +272,7 @@ export async function createEvent(data: {
     data: {
       title: data.title,
       description: data.description,
-      bannerUrl: data.bannerUrl || "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=1200&auto=format&fit=crop",
+      bannerUrl: data.bannerUrl,
       spaceId: data.spaceId,
       startTime: new Date(data.startTime),
       endTime: new Date(data.endTime),
@@ -321,7 +321,7 @@ export async function createOpportunity(data: {
       location: data.location || "REMOTE",
       compensation: data.compensation,
       stipend: data.stipend,
-      bannerUrl: data.bannerUrl || "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1200&auto=format&fit=crop",
+      bannerUrl: data.bannerUrl,
       deadline: data.deadline ? new Date(data.deadline) : undefined,
       organizationId: data.organizationId,
     },
@@ -355,7 +355,7 @@ export async function createProject(data: {
     data: {
       title: data.title,
       description: data.description,
-      bannerUrl: data.bannerUrl || "https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1200&auto=format&fit=crop",
+      bannerUrl: data.bannerUrl,
       url: data.url,
       demoUrl: data.demoUrl,
       githubUrl: data.githubUrl,
@@ -499,4 +499,3 @@ export async function checkInAttendee(eventId: string, userId: string) {
   revalidatePath("/workspace");
   return { success: true };
 }
-

@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { createOpportunity } from "@/app/actions/workspace";
 import { getFallbackPhoto } from "@/lib/photos";
 import { CardRing } from "@/components/ui/card-ring";
+import { ImageUploadField } from "@/components/forms/ImageUploadField";
 
 interface OpportunityWithDetails {
   id: string;
@@ -64,6 +65,7 @@ export function OpportunitiesList({
   const [compensation, setCompensation] = useState("");
   const [stipend, setStipend] = useState("");
   const [bannerUrl, setBannerUrl] = useState("");
+  const [bannerFileName, setBannerFileName] = useState("");
   const [deadline, setDeadline] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -106,6 +108,7 @@ export function OpportunitiesList({
         setCompensation("");
         setStipend("");
         setBannerUrl("");
+        setBannerFileName("");
         setDeadline("");
         router.refresh();
       }
@@ -462,16 +465,14 @@ export function OpportunitiesList({
                   </div>
                 </div>
 
-                <div>
-                  <label className="text-ink font-medium text-xs mb-1.5 block">Banner Image URL</label>
-                  <input 
-                    type="url"
-                    value={bannerUrl}
-                    onChange={(e) => setBannerUrl(e.target.value)}
-                    placeholder="https://unsplash.com/... or direct image link"
-                    className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
-                  />
-                </div>
+                <ImageUploadField
+                  label="Opportunity cover"
+                  value={bannerUrl}
+                  fileName={bannerFileName}
+                  onChange={setBannerUrl}
+                  onFileNameChange={setBannerFileName}
+                  onError={setError}
+                />
 
                 <div>
                   <label className="text-ink font-medium text-xs mb-1.5 block">Opportunity Description</label>

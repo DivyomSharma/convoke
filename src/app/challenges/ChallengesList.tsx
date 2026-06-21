@@ -7,6 +7,7 @@ import { Trophy, Code, MapPin, Users, Plus, X, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createOpportunity } from "@/app/actions/workspace";
 import { CardRing } from "@/components/ui/card-ring";
+import { ImageUploadField } from "@/components/forms/ImageUploadField";
 
 interface ChallengeWithDetails {
   id: string;
@@ -50,6 +51,7 @@ export function ChallengesList({
   const [location, setLocation] = useState("ONLINE");
   const [compensation, setCompensation] = useState(""); // Prize pool
   const [bannerUrl, setBannerUrl] = useState("");
+  const [bannerFileName, setBannerFileName] = useState("");
   const [deadline, setDeadline] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -82,6 +84,7 @@ export function ChallengesList({
         setLocation("ONLINE");
         setCompensation("");
         setBannerUrl("");
+        setBannerFileName("");
         setDeadline("");
         router.refresh();
       }
@@ -280,7 +283,7 @@ export function ChallengesList({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
                     <label className="text-ink font-medium text-xs mb-1.5 block">Location</label>
                     <input 
@@ -291,17 +294,16 @@ export function ChallengesList({
                       className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
                     />
                   </div>
-                  <div>
-                    <label className="text-ink font-medium text-xs mb-1.5 block">Banner Image URL</label>
-                    <input 
-                      type="url"
-                      value={bannerUrl}
-                      onChange={(e) => setBannerUrl(e.target.value)}
-                      placeholder="https://unsplash.com/... or direct image link"
-                      className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
-                    />
-                  </div>
                 </div>
+
+                <ImageUploadField
+                  label="Challenge cover"
+                  value={bannerUrl}
+                  fileName={bannerFileName}
+                  onChange={setBannerUrl}
+                  onFileNameChange={setBannerFileName}
+                  onError={setError}
+                />
 
                 <div>
                   <label className="text-ink font-medium text-xs mb-1.5 block">Challenge Description & Rules</label>
