@@ -18,12 +18,20 @@ model User {
   avatarUrl  String?
   bannerUrl  String?
   role       String? // Student, Founder, Creator, Researcher, etc.
+  pronouns   String?
+  dob        DateTime?
+  country    String?
+  state      String?
+  city       String?
+  timezone   String?
+  visibility String?
   university String?
   company    String?
   location   String?
   website    String?
   github     String?
   linkedin   String?
+  onboardingCompleted Boolean @default(false)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 

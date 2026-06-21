@@ -3,12 +3,17 @@ import { Shell } from "@/components/Shell";
 import { Avatar } from "@/components/Avatar";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
+import { redirect } from "next/navigation";
 import { Ticket, Calendar, Clock, MapPin, CheckCircle, ArrowRight, UserPlus, Building2 } from "lucide-react";
 
 export const revalidate = 0;
 
 export default async function Workspace() {
   const dbUser = await requireUser();
+
+  if (!dbUser.onboardingCompleted) {
+    redirect("/onboarding");
+  }
 
   const memberships = dbUser ? await prisma.membership.findMany({
     where: { userId: dbUser.id },
