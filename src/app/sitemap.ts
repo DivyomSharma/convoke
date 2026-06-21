@@ -52,7 +52,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
 
     const profileUrls = people.map((p) => ({
-      url: `${baseUrl}/profile/${p.handle || p.id}`,
+      url: `${baseUrl}/profile/${p.handle || "builder"}`,
       lastModified: p.updatedAt,
     }));
 

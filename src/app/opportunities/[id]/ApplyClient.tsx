@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 import { applyToOpportunity } from "@/app/actions/workspace";
 import { Check, Loader2, Bookmark, Share2 } from "lucide-react";
 
@@ -17,8 +18,14 @@ export function ApplyClient({
   const [applied, setApplied] = useState(initialApplied);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { isSignedIn } = useUser();
 
   const handleApply = async () => {
+    if (!isSignedIn) {
+      router.push("/auth");
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await applyToOpportunity(opportunityId);
@@ -28,7 +35,7 @@ export function ApplyClient({
       }
     } catch (err) {
       console.error(err);
-      alert(err instanceof Error ? err.message : "Authentication required to apply.");
+      alert(err instanceof Error ? err.message : "Unable to apply right now.");
     } finally {
       setLoading(false);
     }

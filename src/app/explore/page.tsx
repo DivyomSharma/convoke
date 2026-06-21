@@ -136,7 +136,7 @@ export default async function Explore(props: { searchParams?: Promise<{ f?: stri
           name: project.user.name || "Builder",
           role: project.user.role || "Member",
           avatar: project.user.avatarUrl || "",
-          href: `/profile/${project.user.handle || project.user.id}`,
+          href: `/profile/${project.user.handle || "builder"}`,
         },
       });
     });

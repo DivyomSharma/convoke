@@ -10,13 +10,13 @@ export async function generateMetadata(props: { params?: Promise<{ handle: strin
   if (!handle) return { title: "Profile not found" };
 
   const user = await prisma.user.findFirst({
-    where: { OR: [{ handle: handle }, { id: handle }] },
+    where: { OR: [{ handle }, { username: handle }] },
   });
 
   if (!user) return { title: "Profile not found" };
 
   return {
-    title: `${user.name} (@${user.handle})`,
+    title: `${user.name} (@${user.handle || user.username})`,
     description: user.bio || `${user.name}'s profile on Convoke.`,
   };
 }
@@ -27,51 +27,55 @@ export default async function Profile(props: { params?: Promise<{ handle: string
   if (!handle) return notFound();
 
   const user = await prisma.user.findFirst({
-    where: {
-      OR: [
-        { handle: handle },
-        { id: handle }
-      ]
-    },
+    where: { OR: [{ handle }, { username: handle }] },
     include: {
       projects: true,
       memberships: {
-        include: { organization: { include: { spaces: true } } }
+        include: { organization: { include: { spaces: true } } },
       },
       vouchesRecv: {
-        include: { giver: true }
+        include: { giver: true },
       },
       activity: {
-        orderBy: { createdAt: "desc" }
-      }
-    }
+        orderBy: { createdAt: "desc" },
+      },
+    },
   });
-  
+
   if (!user) return notFound();
 
-  const spaces = user.memberships.flatMap(m => m.organization.spaces);
+  const spaces = user.memberships.flatMap((m) => m.organization.spaces);
   const vouches = user.vouchesRecv;
   const projects = user.projects;
-  const activityDates = user.activity.map(a => a.createdAt);
+  const activityDates = user.activity.map((a) => a.createdAt);
+  const passportHandle = user.handle || user.username || user.displayName || "builder";
 
   return (
     <Shell>
-      <div className="mx-auto max-w-[920px] px-5 sm:px-8 py-12">
-        <header className="hairline-b pb-10 grid grid-cols-[auto_1fr] gap-6 items-end">
+      <div className="mx-auto max-w-[920px] px-5 py-12 sm:px-8">
+        <header className="grid grid-cols-[auto_1fr] items-end gap-6 border-b border-g3 pb-10">
           <Avatar src={user.avatarUrl || ""} name={user.name || "User"} size={120} />
           <div>
-            <div className="eyebrow">@{user.handle || user.id.slice(0, 8)} {user.university && `· ${user.university}`}</div>
-            <h1 className="serif text-6xl md:text-7xl leading-[0.95] mt-2">{user.name || "Unknown"}</h1>
-            <p className="text-g6 text-[16px] mt-3 max-w-[44ch]">{user.role || "Member"}. {user.bio || "No bio added yet."}</p>
+            <div className="eyebrow">@{passportHandle}{user.university ? ` · ${user.university}` : ""}</div>
+            <h1 className="serif mt-2 text-6xl leading-[0.95] md:text-7xl">{user.name || "Unknown"}</h1>
+            <p className="mt-3 max-w-[44ch] text-[16px] text-g6">
+              {user.role || "Member"}. {user.bio || "No bio added yet."}
+            </p>
             <div className="mt-5 flex gap-6 text-[13px] text-g5">
-              <span><b className="text-ink">{projects.length}</b> projects</span>
-              <span><b className="text-ink">{spaces.length}</b> spaces</span>
-              <span><b className="text-ink">{vouches.length}</b> vouches</span>
+              <span>
+                <b className="text-ink">{projects.length}</b> projects
+              </span>
+              <span>
+                <b className="text-ink">{spaces.length}</b> spaces
+              </span>
+              <span>
+                <b className="text-ink">{vouches.length}</b> vouches
+              </span>
             </div>
           </div>
         </header>
 
-        <div className="grid grid-cols-12 gap-10 mt-12">
+        <div className="mt-12 grid grid-cols-12 gap-10">
           <section className="col-span-12 md:col-span-7">
             <div className="eyebrow mb-4">Momentum · last 24 weeks</div>
             <Heat activityDates={activityDates} />
@@ -83,12 +87,12 @@ export default async function Profile(props: { params?: Promise<{ handle: string
                     <li key={w.id} className="grid grid-cols-[60px_1fr_auto] gap-4 py-4 text-[15px]">
                       <span className="mono text-[12px] text-g5">{w.createdAt.getFullYear()}</span>
                       <span>{w.title}</span>
-                      <span className="mono text-[11px] uppercase text-[var(--brand)] font-medium">shipped</span>
+                      <span className="mono text-[11px] font-medium uppercase text-[var(--brand)]">shipped</span>
                     </li>
                   ))}
                 </ul>
               ) : (
-                <div className="text-g5 text-[14px]">No selected work to show yet.</div>
+                <div className="text-[14px] text-g5">No selected work to show yet.</div>
               )}
             </div>
           </section>
@@ -102,16 +106,16 @@ export default async function Profile(props: { params?: Promise<{ handle: string
                     <Avatar src={v.giver.avatarUrl || ""} name={v.giver.name || "User"} size={36} />
                     <div>
                       <div className="text-[14px]">{v.giver.name || "User"}</div>
-                      <p className="text-g5 text-[13px] mt-1 italic">"{v.content}"</p>
+                      <p className="mt-1 text-[13px] italic text-g5">"{v.content}"</p>
                     </div>
                   </li>
                 ))}
               </ul>
             ) : (
-              <div className="text-g5 text-[14px]">No vouches yet.</div>
+              <div className="text-[14px] text-g5">No vouches yet.</div>
             )}
-            
-            <div className="eyebrow mt-10 mb-3">Spaces</div>
+
+            <div className="eyebrow mb-3 mt-10">Spaces</div>
             {spaces.length > 0 ? (
               <ul className="space-y-2 text-[14px]">
                 {spaces.slice(0, 4).map((s) => (
@@ -121,7 +125,7 @@ export default async function Profile(props: { params?: Promise<{ handle: string
                 ))}
               </ul>
             ) : (
-              <div className="text-g5 text-[14px]">Not in any spaces yet.</div>
+              <div className="text-[14px] text-g5">Not in any spaces yet.</div>
             )}
           </aside>
         </div>
@@ -160,11 +164,11 @@ function Heat({ activityDates }: { activityDates: Date[] }) {
           bgStyle = { backgroundColor: `rgba(198, 163, 107, ${opacity})` };
         }
         return (
-          <span 
-            key={i} 
-            className="w-[10px] h-[10px] rounded-[1px] transition-colors duration-300 hover:scale-110" 
-            style={bgStyle} 
-            title={`${v} activities`} 
+          <span
+            key={i}
+            className="h-[10px] w-[10px] rounded-[1px] transition-colors duration-300 hover:scale-110"
+            style={bgStyle}
+            title={`${v} activities`}
           />
         );
       })}

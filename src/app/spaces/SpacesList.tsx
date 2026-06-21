@@ -200,7 +200,7 @@ export function SpacesList({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 24, scale: 0.97 }}
               transition={{ duration: 0.34, ease: [0.16, 1, 0.3, 1] }}
-              className="fixed inset-x-4 top-[5vh] z-50 mx-auto flex max-h-[90vh] w-[min(760px,calc(100vw-2rem))] flex-col overflow-hidden rounded-[34px] border border-g3 bg-paper-elevated/90 shadow-[0_40px_140px_rgba(0,0,0,0.45)] backdrop-blur-2xl"
+              className="fixed inset-x-4 top-[calc(4rem+1.5rem)] z-50 mx-auto flex max-h-[calc(100vh-6.5rem)] w-[min(860px,calc(100vw-2rem))] flex-col overflow-hidden rounded-[34px] border border-g3 bg-paper-elevated/90 shadow-[0_40px_140px_rgba(0,0,0,0.45)] backdrop-blur-2xl"
             >
               {/* Header */}
               <div className="flex items-center justify-between px-6 py-5 border-b border-g3/60">

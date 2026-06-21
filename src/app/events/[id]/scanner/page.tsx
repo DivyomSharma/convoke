@@ -100,7 +100,7 @@ export default async function ScannerPage(props: {
                         {scanResult.user.name || "Anonymous"}
                       </div>
                       <div className="text-[11px] text-g5">
-                        @{scanResult.user.handle || scanResult.user.id.slice(0, 8)}
+                        @{scanResult.user.handle || "builder"}
                       </div>
                     </div>
                   </div>

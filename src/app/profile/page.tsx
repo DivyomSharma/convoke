@@ -11,12 +11,12 @@ export default async function ProfilePage() {
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { id: true, handle: true },
+    select: { id: true, handle: true, username: true },
   }).catch(() => null);
 
   if (!user) {
     redirect("/workspace");
   }
 
-  redirect(`/profile/${user.handle || user.id}`);
+  redirect(`/profile/${user.handle || user.username || "builder"}`);
 }

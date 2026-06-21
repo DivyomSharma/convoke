@@ -24,9 +24,28 @@ export async function generateMetadata(props: { params?: Promise<{ id: string }>
 
   if (!opp) return { title: "Opportunity not found" };
 
+  const title = `${opp.title} | Convoke Opportunity`;
+  const description = opp.description || `Apply for ${opp.title} on Convoke.`;
+  const image = opp.bannerUrl || "https://convoke.xyz/og-image.jpg";
+
   return {
-    title: `${opp.title} · Opportunity`,
-    description: opp.description || `${opp.title} on Convoke.`,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [image],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
+    },
+    alternates: {
+      canonical: `https://convoke.xyz/opportunities/${id}`,
+    },
   };
 }
 

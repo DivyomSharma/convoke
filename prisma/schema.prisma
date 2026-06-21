@@ -11,6 +11,8 @@ datasource db {
 model User {
   id         String   @id @default(uuid())
   email      String   @unique
+  displayName String?
+  username   String?  @unique
   name       String?
   handle     String?  @unique
   bio        String?
@@ -25,12 +27,24 @@ model User {
   city       String?
   timezone   String?
   visibility String?
+  themePreference String?
   university String?
+  degree     String?
+  graduationYear String?
+  currentRole String?
   company    String?
   location   String?
   website    String?
+  portfolio  String?
   github     String?
   linkedin   String?
+  twitter    String?
+  instagram  String?
+  youtube    String?
+  discord    String?
+  telegram   String?
+  phone      String?
+  resumeUrl  String?
   onboardingCompleted Boolean @default(false)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt

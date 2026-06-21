@@ -23,9 +23,28 @@ export async function generateMetadata(props: { params?: Promise<{ id: string }>
 
   if (!proj) return { title: "Project not found" };
 
+  const title = `${proj.title} | Convoke Project`;
+  const description = proj.description || `Explore ${proj.title} on Convoke.`;
+  const image = proj.bannerUrl || "https://convoke.xyz/og-image.jpg";
+
   return {
-    title: `${proj.title} · Project`,
-    description: proj.description || `${proj.title} on Convoke.`,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [image],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
+    },
+    alternates: {
+      canonical: `https://convoke.xyz/projects/${id}`,
+    },
   };
 }
 
@@ -202,7 +221,7 @@ export default async function ProjectDetailPage(props: { params?: Promise<{ id: 
                 <span className="text-g5 text-[13px]">@{proj.user.handle || "builder"}</span>
                 <p className="text-g5 text-[14px] mt-2 max-w-[24ch]">{proj.user.role || "Creator"}</p>
                 <Link 
-                  href={`/profile/${proj.user.handle || proj.user.id}`}
+                  href={`/profile/${proj.user.handle || "builder"}`}
                   className="mt-6 w-full py-2 border border-g3 hover:bg-g1 text-[13px] font-medium rounded-full text-ink transition-colors block text-center"
                 >
                   View Profile

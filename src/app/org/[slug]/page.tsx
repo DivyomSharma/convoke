@@ -23,9 +23,28 @@ export async function generateMetadata(props: { params?: Promise<{ slug: string 
 
   if (!org) return { title: "Organization not found" };
 
+  const title = `${org.name} | Convoke`;
+  const description = org.description || `${org.name} on Convoke.`;
+  const image = org.bannerUrl || org.logoUrl || "https://convoke.xyz/og-image.jpg";
+
   return {
-    title: org.name,
-    description: org.description || `${org.name} on Convoke.`,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [image],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
+    },
+    alternates: {
+      canonical: `https://convoke.xyz/org/${slug}`,
+    },
   };
 }
 

@@ -7,6 +7,8 @@ import { Plus, X, Loader2, Search } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createEvent } from "@/app/actions/workspace";
 import { getFallbackPhoto } from "@/lib/photos";
+import { useFormValidation } from "@/hooks/useFormValidation";
+import { toast } from "sonner";
 import { CardRing } from "@/components/ui/card-ring";
 
 interface EventWithDetails {
@@ -104,12 +106,18 @@ export function EventsList({
     reader.readAsDataURL(file);
   };
 
+  const { validate, getError, errors } = useFormValidation();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title || !spaceId || !startTime || !endTime) {
-      setError("Title, space, start time, and end time are required.");
-      return;
-    }
+    const isValid = validate([
+      { field: "event-title", value: title, message: "Title is required" },
+      { field: "event-space", value: spaceId, message: "Space is required" },
+      { field: "event-start", value: startTime, message: "Start time is required" },
+      { field: "event-end", value: endTime, message: "End time is required" },
+    ]);
+
+    if (!isValid) return;
 
     setLoading(true);
     setError("");
@@ -129,6 +137,7 @@ export function EventsList({
       });
 
       if (res.success && res.event) {
+        toast.success("Event created successfully");
         setCreationOpen(false);
         setTitle("");
         setDescription("");
@@ -344,7 +353,7 @@ export function EventsList({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 24, scale: 0.97 }}
               transition={{ duration: 0.34, ease: [0.16, 1, 0.3, 1] }}
-              className="fixed inset-x-4 top-[5vh] z-50 mx-auto flex max-h-[90vh] w-[min(980px,calc(100vw-2rem))] flex-col overflow-hidden rounded-[34px] border border-g3 bg-paper-elevated/90 shadow-[0_40px_140px_rgba(0,0,0,0.45)] backdrop-blur-2xl"
+              className="fixed inset-x-4 top-[calc(4rem+1.5rem)] z-50 mx-auto flex max-h-[calc(100vh-6.5rem)] w-[min(860px,calc(100vw-2rem))] flex-col overflow-hidden rounded-[34px] border border-g3 bg-paper-elevated/90 shadow-[0_40px_140px_rgba(0,0,0,0.45)] backdrop-blur-2xl"
             >
               <div className="flex items-center justify-between px-6 py-5 border-b border-g3/60">
                 <div>
@@ -393,58 +402,66 @@ export function EventsList({
                 )}
 
                 <div>
-                  <label className="text-ink font-medium text-xs mb-1.5 block">Meet Title <span className="text-red-500">*</span></label>
+                  <label htmlFor="event-title" className="text-ink font-medium text-xs mb-1.5 block">Meet Title <span className="text-red-500">*</span></label>
                   <input 
+                    id="event-title"
                     type="text"
-                    required
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="E.g. AI Builder Circle: Mixer #1"
-                    className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                    className={`w-full h-11 px-4 rounded-xl border ${getError("event-title") ? "border-red-500/50" : "border-g3"} bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all`}
                   />
+                  {getError("event-title") && <p className="text-red-500 text-xs mt-1.5">{getError("event-title")}</p>}
                 </div>
 
                 <div>
-                  <label className="text-ink font-medium text-xs mb-1.5 block">Target Space <span className="text-red-500">*</span></label>
+                  <label htmlFor="event-space" className="text-ink font-medium text-xs mb-1.5 block">Target Space <span className="text-red-500">*</span></label>
                   {spaces.length === 0 ? (
                     <div className="text-xs text-amber-500 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
                       You must create an organization and a space first before you can host an event.
                     </div>
                   ) : (
-                    <select 
-                      value={spaceId}
-                      onChange={(e) => setSpaceId(e.target.value)}
-                      className="w-full h-11 px-4 rounded-xl border border-g3 bg-paper text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
-                    >
-                      {spaces.map((sp) => (
-                        <option key={sp.id} value={sp.id}>
-                          {sp.name} ({sp.organization.name})
-                        </option>
-                      ))}
-                    </select>
+                    <>
+                      <select 
+                        id="event-space"
+                        value={spaceId}
+                        onChange={(e) => setSpaceId(e.target.value)}
+                        className={`w-full h-11 px-4 rounded-xl border ${getError("event-space") ? "border-red-500/50" : "border-g3"} bg-paper text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all`}
+                      >
+                        <option value="">Select a space...</option>
+                        {spaces.map((sp) => (
+                          <option key={sp.id} value={sp.id}>
+                            {sp.name} ({sp.organization.name})
+                          </option>
+                        ))}
+                      </select>
+                      {getError("event-space") && <p className="text-red-500 text-xs mt-1.5">{getError("event-space")}</p>}
+                    </>
                   )}
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="text-ink font-medium text-xs mb-1.5 block">Start Date & Time <span className="text-red-500">*</span></label>
+                    <label htmlFor="event-start" className="text-ink font-medium text-xs mb-1.5 block">Start Date & Time <span className="text-red-500">*</span></label>
                     <input 
+                      id="event-start"
                       type="datetime-local"
-                      required
                       value={startTime}
                       onChange={(e) => setStartTime(e.target.value)}
-                      className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                      className={`w-full h-11 px-4 rounded-xl border ${getError("event-start") ? "border-red-500/50" : "border-g3"} bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all`}
                     />
+                    {getError("event-start") && <p className="text-red-500 text-xs mt-1.5">{getError("event-start")}</p>}
                   </div>
                   <div>
-                    <label className="text-ink font-medium text-xs mb-1.5 block">End Date & Time <span className="text-red-500">*</span></label>
+                    <label htmlFor="event-end" className="text-ink font-medium text-xs mb-1.5 block">End Date & Time <span className="text-red-500">*</span></label>
                     <input 
+                      id="event-end"
                       type="datetime-local"
-                      required
                       value={endTime}
                       onChange={(e) => setEndTime(e.target.value)}
-                      className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                      className={`w-full h-11 px-4 rounded-xl border ${getError("event-end") ? "border-red-500/50" : "border-g3"} bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all`}
                     />
+                    {getError("event-end") && <p className="text-red-500 text-xs mt-1.5">{getError("event-end")}</p>}
                   </div>
                 </div>
 

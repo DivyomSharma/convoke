@@ -33,12 +33,11 @@ export default function AuthPage() {
     setLoadingStrategy(strategy);
 
     try {
-      void signIn.sso({
+      await signIn.sso({
         strategy,
-        redirectUrl: "/auth-complete",
-        redirectCallbackUrl: "/sso-callback",
+        redirectUrl: "/sso-callback",
+        redirectCallbackUrl: "/auth-complete",
       });
-      window.setTimeout(() => setLoadingStrategy(null), 1400);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Unable to continue right now.");
       setLoadingStrategy(null);

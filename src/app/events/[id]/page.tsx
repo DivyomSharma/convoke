@@ -37,9 +37,28 @@ export async function generateMetadata(props: { params?: Promise<{ id: string }>
 
   if (!event) return { title: "Event not found" };
 
+  const title = `${event.title} | Convoke Event`;
+  const description = event.description || `Join ${event.title} on Convoke.`;
+  const image = event.bannerUrl || "https://convoke.xyz/og-image.jpg";
+
   return {
-    title: `${event.title} | Event`,
-    description: event.description || `${event.title} on Convoke.`,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [image],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
+    },
+    alternates: {
+      canonical: `https://convoke.xyz/events/${id}`,
+    },
   };
 }
 
@@ -199,7 +218,7 @@ export default async function EventDetailPage(props: { params?: Promise<{ id: st
                     </div>
                     <div className="mt-6 flex items-center justify-between text-[9px] mono uppercase tracking-wider text-g4 border-t border-g4/20 pt-4">
                       <span>Verified MMXXVI</span>
-                      <span>ID: {myAttendance?.id.slice(0, 8)}</span>
+                      <span>Record: {myAttendance?.id.slice(0, 8)}</span>
                     </div>
                   </div>
                 </div>

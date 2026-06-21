@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -17,6 +17,12 @@ import {
   Mail,
   Search,
   Sparkles,
+  Menu,
+  X,
+  Compass,
+  Users,
+  CalendarDays,
+  Briefcase
 } from "lucide-react";
 
 const mainNav = [
@@ -35,8 +41,10 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
   const router = useRouter();
   const [commandOpen, setCommandOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, isSignedIn } = useUser();
   const { signOut } = useClerk();
+  const passportHandle = user?.username || user?.fullName?.toLowerCase().replace(/\s+/g, "") || "builder";
 
   useEffect(() => {
     const handleKeydown = (event: KeyboardEvent) => {
@@ -110,7 +118,6 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
                   <Mail size={14} strokeWidth={1.5} />
                 </Link>
                 
-                {/* Custom User Dropdown Profile Menu */}
                 <div className="relative">
                   <button 
                     onClick={() => setProfileOpen(!profileOpen)}
@@ -128,31 +135,41 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
                   {profileOpen && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setProfileOpen(false)} />
-                      <div className="absolute right-0 mt-2.5 w-56 rounded-sm border border-g3 bg-paper-card py-2 z-50 animate-in fade-in-50 slide-in-from-top-3 duration-200">
-                        <div className="px-4 py-3 border-b border-g3/60">
-                          <div className="text-sm font-semibold text-ink truncate">{user?.fullName || "Builder"}</div>
-                          <div className="text-xs text-g5 truncate">@{user?.username || user?.id.slice(0, 8)}</div>
+                      <div className="absolute right-0 mt-2.5 w-[320px] overflow-hidden rounded-[22px] border border-g3 bg-paper-card/95 shadow-2xl shadow-black/20 z-50 animate-in fade-in-50 slide-in-from-top-3 duration-200 backdrop-blur-xl">
+                        <div className="border-b border-g3/60 px-4 py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="h-11 w-11 overflow-hidden rounded-full border border-g3 bg-g1">
+                              {user?.imageUrl ? <img src={user.imageUrl} alt="" className="h-full w-full object-cover" /> : null}
+                            </div>
+                            <div className="min-w-0">
+                              <div className="truncate text-[14px] font-semibold text-ink">{user?.fullName || "Builder"}</div>
+                              <div className="truncate text-[12px] text-g5">@{passportHandle}</div>
+                            </div>
+                          </div>
+                          {user?.publicMetadata?.headline ? (
+                            <div className="mt-3 text-[12px] leading-5 text-g6">{String(user.publicMetadata.headline)}</div>
+                          ) : null}
                         </div>
-                        
-                        <div className="p-1.5 space-y-0.5">
+
+                        <div className="grid grid-cols-2 gap-2 p-3">
                           <Link 
-                            href={`/profile/${user?.username || user?.id}`}
+                            href={`/profile/${passportHandle}`}
                             onClick={() => setProfileOpen(false)}
-                            className="flex w-full items-center px-3 py-2 rounded-sm text-sm text-g6 hover:bg-g1/50 hover:text-ink transition-colors"
+                            className="flex items-center justify-center rounded-2xl border border-g3 bg-g1/30 px-3 py-3 text-[12px] text-g6 transition hover:border-g4 hover:bg-g1/60 hover:text-ink"
                           >
                             Passport
                           </Link>
                           <Link 
                             href="/workspace"
                             onClick={() => setProfileOpen(false)}
-                            className="flex w-full items-center px-3 py-2 rounded-sm text-sm text-g6 hover:bg-g1/50 hover:text-ink transition-colors"
+                            className="flex items-center justify-center rounded-2xl border border-g3 bg-g1/30 px-3 py-3 text-[12px] text-g6 transition hover:border-g4 hover:bg-g1/60 hover:text-ink"
                           >
                             Workspace
                           </Link>
                           <Link 
                             href="/settings"
                             onClick={() => setProfileOpen(false)}
-                            className="flex w-full items-center px-3 py-2 rounded-sm text-sm text-g6 hover:bg-g1/50 hover:text-ink transition-colors"
+                            className="flex items-center justify-center rounded-2xl border border-g3 bg-g1/30 px-3 py-3 text-[12px] text-g6 transition hover:border-g4 hover:bg-g1/60 hover:text-ink"
                           >
                             Settings
                           </Link>
@@ -162,7 +179,7 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
                               await signOut();
                               router.push("/");
                             }}
-                            className="flex w-full items-center px-3 py-2 rounded-sm text-sm text-red-500 hover:bg-red-500/10 transition-colors text-left cursor-pointer"
+                            className="flex items-center justify-center rounded-2xl border border-red-500/20 bg-red-500/10 px-3 py-3 text-[12px] text-red-500 transition hover:bg-red-500/15 cursor-pointer"
                           >
                             Log Out
                           </button>
@@ -256,6 +273,111 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
       </footer>
 
       {commandOpen ? <CommandK onClose={() => setCommandOpen(false)} /> : null}
+
+      {/* Mobile Bottom Tab Bar */}
+      <div className="xl:hidden fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t border-g3 bg-paper/95 backdrop-blur-xl px-2 pb-[env(safe-area-inset-bottom)] pt-2">
+        <Link href="/explore" className="flex flex-col items-center gap-1 p-2 min-h-[44px] min-w-[44px] text-g5 hover:text-ink">
+          <Compass size={20} strokeWidth={1.5} />
+          <span className="text-[10px] uppercase tracking-wider">Explore</span>
+        </Link>
+        <Link href="/spaces" className="flex flex-col items-center gap-1 p-2 min-h-[44px] min-w-[44px] text-g5 hover:text-ink">
+          <Users size={20} strokeWidth={1.5} />
+          <span className="text-[10px] uppercase tracking-wider">Spaces</span>
+        </Link>
+        <Link href="/events" className="flex flex-col items-center gap-1 p-2 min-h-[44px] min-w-[44px] text-g5 hover:text-ink">
+          <CalendarDays size={20} strokeWidth={1.5} />
+          <span className="text-[10px] uppercase tracking-wider">Events</span>
+        </Link>
+        <button 
+          onClick={() => setCommandOpen(true)}
+          className="flex flex-col items-center gap-1 p-2 min-h-[44px] min-w-[44px] text-g5 hover:text-ink cursor-pointer"
+        >
+          <Search size={20} strokeWidth={1.5} />
+          <span className="text-[10px] uppercase tracking-wider">Search</span>
+        </button>
+        <button 
+          onClick={() => setMobileMenuOpen(true)}
+          className="flex flex-col items-center gap-1 p-2 min-h-[44px] min-w-[44px] text-g5 hover:text-ink cursor-pointer"
+        >
+          <Menu size={20} strokeWidth={1.5} />
+          <span className="text-[10px] uppercase tracking-wider">Menu</span>
+        </button>
+      </div>
+
+      {/* Mobile Hamburger Menu Drawer */}
+      {mobileMenuOpen && (
+        <div className="xl:hidden fixed inset-0 z-50 flex flex-col bg-paper animate-in fade-in slide-in-from-bottom-4 duration-200">
+          <div className="flex items-center justify-between border-b border-g3 px-5 py-4">
+            <Link href="/" className="serif text-[22px] leading-none tracking-tight text-ink" onClick={() => setMobileMenuOpen(false)}>
+              Convoke.
+            </Link>
+            <button 
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-g5 hover:text-ink cursor-pointer"
+            >
+              <X size={24} strokeWidth={1.5} />
+            </button>
+          </div>
+          
+          <div className="flex-1 overflow-y-auto px-5 py-6 flex flex-col gap-8 pb-[100px]">
+            <div>
+              <h4 className="eyebrow mb-4 text-g5">Navigation</h4>
+              <ul className="space-y-4">
+                {mainNav.map((item) => (
+                  <li key={item.href}>
+                    <Link 
+                      href={item.href} 
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="text-[18px] text-ink block py-1"
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {isSignedIn ? (
+              <div>
+                <h4 className="eyebrow mb-4 text-g5">Account</h4>
+                <ul className="space-y-4">
+                  <li>
+                    <Link href="/workspace" onClick={() => setMobileMenuOpen(false)} className="text-[18px] text-ink block py-1">Workspace</Link>
+                  </li>
+                  <li>
+                  <Link href={`/profile/${passportHandle}`} onClick={() => setMobileMenuOpen(false)} className="text-[18px] text-ink block py-1">Passport</Link>
+                  </li>
+                  <li>
+                    <Link href="/settings" onClick={() => setMobileMenuOpen(false)} className="text-[18px] text-ink block py-1">Settings</Link>
+                  </li>
+                  <li>
+                    <button 
+                      onClick={async () => {
+                        setMobileMenuOpen(false);
+                        await signOut();
+                        router.push("/");
+                      }}
+                      className="text-[18px] text-red-500 block py-1 cursor-pointer text-left w-full"
+                    >
+                      Log Out
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            ) : (
+              <div className="mt-auto pt-8">
+                <Link 
+                  href="/auth" 
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="ink-button w-full py-4 text-center text-[15px]"
+                >
+                  Join Convoke
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

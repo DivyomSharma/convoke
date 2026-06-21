@@ -20,9 +20,28 @@ export async function generateMetadata(props: { params?: Promise<{ id: string }>
 
   if (!space) return { title: "Space not found" };
 
+  const title = `${space.name} · Space | Convoke`;
+  const description = space.description || `${space.name} on Convoke.`;
+  const image = space.bannerUrl || "https://convoke.xyz/og-image.jpg";
+
   return {
-    title: `${space.name} · Space`,
-    description: space.description || `${space.name} on Convoke.`,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [image],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
+    },
+    alternates: {
+      canonical: `https://convoke.xyz/spaces/${id}`,
+    },
   };
 }
 
@@ -130,7 +149,7 @@ export default async function SpaceDetailPage(props: { params?: Promise<{ id: st
               </div>
               <div className="grid grid-cols-6 gap-2">
                 {space.organization.members.slice(0, 12).map((m) => (
-                  <Link key={m.id} href={`/profile/${m.user.handle || m.user.id}`} title={m.user.name || "Member"}>
+                  <Link key={m.id} href={`/profile/${m.user.handle || "builder"}`} title={m.user.name || "Member"}>
                     <div className="w-10 h-10 rounded-xl overflow-hidden bg-g1 border border-g3 hover:scale-105 transition-transform duration-200">
                       {m.user.avatarUrl ? (
                         <img src={m.user.avatarUrl} alt="" className="w-full h-full object-cover" />

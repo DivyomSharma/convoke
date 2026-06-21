@@ -306,8 +306,8 @@ export default async function HomePage() {
       ? {
           title: dbFeaturedUser.name || "Anonymous Builder",
           description: dbFeaturedUser.bio || "Building future systems on the Convoke digital campus.",
-          meta: `@${dbFeaturedUser.handle || dbFeaturedUser.id.slice(0, 8)} · ${dbFeaturedUser.role || "Builder"}`,
-          link: `/profile/${dbFeaturedUser.handle || dbFeaturedUser.id}`,
+          meta: `@${dbFeaturedUser.handle || dbFeaturedUser.username || dbFeaturedUser.displayName || "builder"} · ${dbFeaturedUser.role || "Builder"}`,
+          link: `/profile/${dbFeaturedUser.handle || dbFeaturedUser.username || dbFeaturedUser.displayName || "builder"}`,
           actionText: "View Passport",
           imageUrl: dbFeaturedUser.avatarUrl || getFallbackPhoto(dbFeaturedUser.id, "space"),
         }

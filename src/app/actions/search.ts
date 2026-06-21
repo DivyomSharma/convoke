@@ -64,7 +64,7 @@ export async function globalSearch(query: string): Promise<SearchResult[]> {
       type: "User",
       title: u.name || u.handle || "Unknown",
       subtitle: u.role || "Member",
-      href: `/profile/${u.handle || u.id}`,
+      href: `/profile/${u.handle || u.username || u.displayName || "builder"}`,
     });
   });
 

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter_Tight, JetBrains_Mono, Instrument_Serif } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "@/components/theme-provider";
+import { PostHogProvider } from "@/components/providers/posthog-provider";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 const fontSans = Inter_Tight({
@@ -93,14 +95,17 @@ export default function RootLayout({
     >
       <html lang="en" suppressHydrationWarning className={`${fontSans.variable} ${fontSerif.variable} ${fontMono.variable} antialiased h-full`}>
         <body className="min-h-full flex flex-col font-sans overflow-x-hidden">
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {publishableKey ? children : <MissingClerkKey />}
-          </ThemeProvider>
+          <PostHogProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {publishableKey ? children : <MissingClerkKey />}
+              <Toaster theme="dark" position="bottom-center" toastOptions={{ className: "campus-frame font-mono text-[12px] uppercase tracking-widest" }} />
+            </ThemeProvider>
+          </PostHogProvider>
         </body>
       </html>
     </ClerkProvider>

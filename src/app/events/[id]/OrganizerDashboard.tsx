@@ -152,7 +152,7 @@ export function OrganizerDashboard({
                     <Avatar src={att.user.avatarUrl || ""} name={att.user.name || "Builder"} size={28} />
                     <div>
                       <div className="font-medium text-ink">{att.user.name || "Anonymous Builder"}</div>
-                      <div className="text-[11px] text-g5">@{att.user.handle || att.userId.slice(0, 8)}</div>
+                      <div className="text-[11px] text-g5">@{att.user.handle || "builder"}</div>
                     </div>
                   </td>
                   <td className="py-4">
