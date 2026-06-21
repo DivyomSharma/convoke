@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
@@ -68,36 +68,22 @@ const itemVariants = {
 };
 
 const phrases = [
-  "Work among\nbuilders.",
-  "Find your\npeople.",
-  "Quiet people\nbuild loud things.",
-  "Find people\nworth building with.",
-  "Build quietly.\nGrow together.",
-];
+  ["Work among", "builders."],
+  ["Find your", "people."],
+  ["Quiet people", "build loud things."],
+  ["Find people", "worth building with."],
+  ["Build quietly.", "Grow together."],
+] as const;
 
 export function HomeClient({ feedItems, featured }: HomeClientProps) {
   const [phraseIndex, setPhraseIndex] = useState(0);
-  const [text, setText] = useState("");
-  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    const currentPhrase = phrases[phraseIndex];
-    let timeout: NodeJS.Timeout;
-
-    if (!isDeleting && text === currentPhrase) {
-      timeout = setTimeout(() => setIsDeleting(true), 3600);
-    } else if (isDeleting && text === "") {
-      setIsDeleting(false);
+    const timeout = setTimeout(() => {
       setPhraseIndex((prev) => (prev + 1) % phrases.length);
-    } else {
-      timeout = setTimeout(() => {
-        text.length;
-        setText(currentPhrase.substring(0, text.length + (isDeleting ? -1 : 1)));
-      }, isDeleting ? 28 : 54);
-    }
-
+    }, 4200);
     return () => clearTimeout(timeout);
-  }, [text, isDeleting, phraseIndex]);
+  }, [phraseIndex]);
 
   const rolesFeed = feedItems.filter((item) => item.tag === "NOW HIRING");
   const projectsFeed = feedItems.filter((item) => item.tag === "NEW PROJECT");
@@ -113,7 +99,7 @@ export function HomeClient({ feedItems, featured }: HomeClientProps) {
     { label: "Featured Research", value: featured.research },
   ];
 
-  const textParts = text.split("\n");
+  const currentPhrase = phrases[phraseIndex];
 
   return (
     <div className="relative overflow-hidden">
@@ -136,16 +122,24 @@ export function HomeClient({ feedItems, featured }: HomeClientProps) {
                 A quiet place to build
               </div>
 
-              <h1 className="serif min-h-[2.2em] max-w-[820px] text-[clamp(4.1rem,9vw,7.65rem)] font-light leading-[0.9] tracking-[-0.07em] text-ink sm:min-h-[1.82em]">
-                {textParts[0]}
-                {textParts.length > 1 && (
-                  <>
-                    <br />
-                    <span className="text-brand">{textParts[1]}</span>
-                  </>
-                )}
-                <span className="ml-2 animate-pulse text-brand opacity-65">|</span>
-              </h1>
+              <div className="min-h-[2.18em] max-w-[980px] sm:min-h-[1.92em]">
+                <AnimatePresence mode="wait">
+                  <motion.h1
+                    key={phraseIndex}
+                    initial={{ opacity: 0, y: 18, filter: "blur(10px)" }}
+                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                    exit={{ opacity: 0, y: -14, filter: "blur(8px)" }}
+                    transition={{ duration: 0.78, ease: [0.22, 1, 0.36, 1] }}
+                    className="serif text-[clamp(4rem,8.15vw,7.35rem)] font-light leading-[0.9] tracking-[-0.07em] text-ink"
+                  >
+                    <span className="block whitespace-nowrap">{currentPhrase[0]}</span>
+                    <span className="block whitespace-nowrap text-brand">
+                      {currentPhrase[1]}
+                      <span className="ml-3 inline-block animate-pulse text-brand/70">|</span>
+                    </span>
+                  </motion.h1>
+                </AnimatePresence>
+              </div>
 
               <p className="mt-7 max-w-[580px] text-[16px] leading-[1.72] text-g6 md:text-[18px]">
                 A continuous, high-signal ecosystem where ambitious people meet, collaborate, launch startups, and grow together.

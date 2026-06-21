@@ -3,7 +3,7 @@
 import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useSignIn } from "@clerk/nextjs/legacy";
+import { useSignIn } from "@clerk/nextjs";
 import { ArrowRight, Loader2 } from "lucide-react";
 
 type OAuthStrategy = "oauth_google" | "oauth_discord" | "oauth_github";
@@ -27,7 +27,7 @@ export default function LoginPage() {
 }
 
 function LoginExperience() {
-  const { signIn, isLoaded } = useSignIn();
+  const { signIn, fetchStatus } = useSignIn();
   const searchParams = useSearchParams();
   const [loadingStrategy, setLoadingStrategy] = useState<OAuthStrategy | null>(null);
   const [error, setError] = useState("");
@@ -36,7 +36,7 @@ function LoginExperience() {
 
   const handleOAuth = async (strategy: OAuthStrategy) => {
     if (loadingStrategy) return;
-    if (!isLoaded || !signIn) {
+    if (!signIn || fetchStatus === "fetching") {
       setError("Clerk is still loading. If this stays visible, check NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY in the deployment environment.");
       return;
     }
@@ -45,11 +45,15 @@ function LoginExperience() {
     setLoadingStrategy(strategy);
 
     try {
-      await signIn.authenticateWithRedirect({
+      const result = await signIn.sso({
         strategy,
         redirectUrl: "/sso-callback",
-        redirectUrlComplete: next,
+        redirectCallbackUrl: next,
       });
+
+      if (result?.error) {
+        throw result.error;
+      }
     } catch (err) {
       const message =
         err instanceof Error
