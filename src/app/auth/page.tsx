@@ -76,7 +76,11 @@ export default function AuthPage() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_35%,rgba(0,178,255,0.18),transparent_34%),radial-gradient(circle_at_75%_80%,rgba(127,29,45,0.22),transparent_30%)]" />
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,transparent_52%,rgba(0,0,0,0.8)_100%)]" />
         <div className="relative z-10 flex h-full flex-col justify-between p-12 text-white">
-          <div className="serif text-3xl tracking-tight">C.</div>
+          <div className="flex h-[220px] items-start">
+            <div className="serif text-[11rem] leading-none tracking-[-0.11em] text-transparent bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(255,255,255,0.35)_45%,rgba(210,225,255,0.9))] bg-clip-text drop-shadow-[0_0_22px_rgba(255,255,255,0.18)]">
+              C.
+            </div>
+          </div>
           <div className="max-w-[35rem]">
             <div className="mono mb-5 text-[11px] uppercase tracking-[0.24em] text-white/55">
               Secure ecosystem access

@@ -174,7 +174,7 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
               </>
             ) : (
               <Link href="/auth" className="ink-button px-5 text-[13px] font-medium flex items-center justify-center">
-                Continue
+                Join
               </Link>
             )}
           </div>

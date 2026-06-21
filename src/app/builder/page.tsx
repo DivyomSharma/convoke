@@ -9,7 +9,7 @@ const projects = [
 export default function Builder() {
   return (
     <Shell>
-      <div className="mx-auto max-w-[1080px] px-5 sm:px-8 py-12">
+      <div className="mx-auto max-w-[1260px] px-5 py-10 sm:px-8">
         <div className="hairline-b pb-6 flex items-end justify-between flex-wrap gap-4">
           <div>
             <div className="eyebrow">Builder console</div>
@@ -18,9 +18,9 @@ export default function Builder() {
           <button className="bg-ink text-paper px-4 py-2 text-[13px]">+ New project</button>
         </div>
 
-        <ul className="mt-8 flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory">
+        <ul className="mt-8 grid grid-cols-1 gap-4 xl:grid-cols-[1.2fr_1.2fr_1.2fr]">
           {projects.map((p) => (
-            <li key={p.name} className="premium-card min-w-[320px] flex-1 snap-start p-5">
+            <li key={p.name} className="premium-card p-5">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <h2 className="serif text-3xl leading-tight">{p.name}</h2>

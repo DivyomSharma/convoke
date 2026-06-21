@@ -110,6 +110,7 @@ export function HomeClient({ feedItems, featured }: HomeClientProps) {
     <div className="relative overflow-hidden">
       <section className="relative bg-paper px-5 pb-14 pt-14 sm:px-8 sm:pb-20 sm:pt-20">
         <div className="pointer-events-none absolute inset-0 z-10 hidden dark:block dark:bg-[radial-gradient(circle_at_center,transparent_56%,rgba(0,0,0,0.82)_100%)]" />
+        <div className="pointer-events-none absolute inset-0 z-10 dark:hidden bg-[radial-gradient(circle_at_center,transparent_54%,rgba(255,255,255,0.88)_100%)]" />
 
         <div className="pointer-events-none absolute left-1/2 top-[50%] hidden -translate-x-1/2 -translate-y-1/2 opacity-[0.34] md:block dark:opacity-[0.24]">
           <CircularMarquee size={1120} duration={85} />
@@ -124,7 +125,7 @@ export function HomeClient({ feedItems, featured }: HomeClientProps) {
                   <span className="block whitespace-nowrap">{currentPhrase[0] || "\u00A0"}</span>
                   <span className="block whitespace-nowrap text-brand">
                     {currentPhrase[1] || "\u00A0"}
-                    <span className="ml-3 inline-block animate-pulse text-brand/70">|</span>
+                    <span className="ml-3 inline-block text-brand/70" aria-hidden="true"> </span>
                   </span>
                 </motion.h1>
               </div>
@@ -136,8 +137,8 @@ export function HomeClient({ feedItems, featured }: HomeClientProps) {
                   <span>Continue</span>
                   <ArrowRight size={14} />
                 </Link>
-                <Link href="/events" className="ghost-button text-[14px]">
-                  <span>Explore Meets</span>
+                <Link href="/explore" className="ghost-button text-[14px]">
+                  <span>Explore Convoke</span>
                   <ArrowRight size={14} />
                 </Link>
               </div>
