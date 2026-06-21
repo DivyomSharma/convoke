@@ -99,7 +99,8 @@ export function HomeClient({ stats, feedItems, featured }: HomeClientProps) {
   }, [text, isDeleting, phraseIndex]);
 
   const eventsFeed = feedItems.filter((item) => item.tag === "LIVE NOW" || item.tag === "TONIGHT");
-  const workFeed = feedItems.filter((item) => item.tag === "NEW PROJECT" || item.tag === "NOW HIRING");
+  const rolesFeed = feedItems.filter((item) => item.tag === "NOW HIRING");
+  const projectsFeed = feedItems.filter((item) => item.tag === "NEW PROJECT");
   const communityFeed = feedItems.filter((item) => item.tag === "NEW COMMUNITY");
 
   const getIndicator = (tag: string) => {
@@ -216,11 +217,13 @@ export function HomeClient({ stats, feedItems, featured }: HomeClientProps) {
         </div>
       </section>
 
-      <section className="relative z-10 mx-auto mt-14 max-w-[1240px] px-5 sm:px-8">
-        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+      <section className="relative z-10 mx-auto mt-24 max-w-[1240px] px-5 sm:px-8">
+        <div className="mb-12 flex flex-col gap-4 border-b border-g3/40 pb-6 md:flex-row md:items-end md:justify-between">
           <div>
-            <div className="eyebrow">Campus Feed</div>
-            <h2 className="mt-3 serif text-4xl tracking-tight md:text-6xl">What's happening.</h2>
+            <div className="mono text-[11px] uppercase tracking-[0.18em] text-g5 mb-4">
+              CAMPUS FEED
+            </div>
+            <h2 className="serif text-5xl tracking-tight md:text-7xl">What's happening.</h2>
           </div>
           <div className="mono text-[11px] uppercase tracking-[0.18em] text-g4">
             A live record of work and people
@@ -230,12 +233,118 @@ export function HomeClient({ stats, feedItems, featured }: HomeClientProps) {
         <motion.div
           variants={containerVariants}
           initial="initial"
-          animate="animate"
-          className="flex overflow-x-auto gap-5 pb-8 snap-x snap-mandatory scrollbar-hide -mx-5 px-5 sm:-mx-8 sm:px-8"
+          whileInView="animate"
+          viewport={{ once: true, margin: "-100px" }}
+          className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-24"
         >
-          <FeedColumn title="Events and gatherings" items={eventsFeed} getIndicator={getIndicator} className="min-w-[85vw] md:min-w-[420px] snap-start shrink-0" />
-          <FeedColumn title="Projects and roles" items={workFeed} getIndicator={getIndicator} className="min-w-[85vw] md:min-w-[420px] snap-start shrink-0" />
-          <FeedColumn title="Communities and rooms" items={communityFeed} getIndicator={getIndicator} className="min-w-[85vw] md:min-w-[420px] snap-start shrink-0" />
+          {/* Left Column */}
+          <div className="flex flex-col gap-16">
+            
+            {/* Featured Event */}
+            <motion.div variants={itemVariants} className="flex flex-col">
+              <div className="mono text-[11px] uppercase tracking-[0.18em] text-[var(--brand)] mb-6">
+                FEATURED EVENT
+              </div>
+              <Link href={featured.event.link} className="group block">
+                <div className="w-full aspect-[4/3] bg-g2 overflow-hidden mb-6">
+                  {featured.event.imageUrl ? (
+                    <img 
+                      src={featured.event.imageUrl} 
+                      alt={featured.event.title}
+                      className="w-full h-full object-cover grayscale transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:grayscale-0"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-g2 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:bg-g3" />
+                  )}
+                </div>
+                <div className="mono text-[11px] uppercase tracking-[0.18em] text-[var(--brand)] mb-3">
+                  {featured.event.meta}
+                </div>
+                <h3 className="serif text-4xl tracking-tight text-ink md:text-5xl mb-3">
+                  {featured.event.title}
+                </h3>
+                <p className="text-[16px] text-g5 leading-relaxed font-sans mb-6">
+                  {featured.event.description}
+                </p>
+                <div className="flex items-center justify-between border-t border-g3/40 pt-4">
+                  <span className="mono text-[12px] text-g5 uppercase tracking-wide">120 attending</span>
+                  <span className="font-sans font-medium text-[14px] text-[var(--brand)] group-hover:text-ink transition-colors">
+                    Register →
+                  </span>
+                </div>
+              </Link>
+            </motion.div>
+
+            {/* Communities */}
+            <motion.div variants={itemVariants} className="flex flex-col">
+              <div className="mono text-[11px] uppercase tracking-[0.18em] text-[var(--brand)] mb-6">
+                COMMUNITIES
+              </div>
+              <div className="flex flex-col gap-6">
+                {communityFeed.map((item, i) => (
+                  <Link href={item.link} key={item.id} className="group block pb-6 border-b border-g3/30 last:border-0 last:pb-0">
+                    <h4 className="serif text-2xl tracking-tight text-ink mb-2 group-hover:text-[var(--brand)] transition-colors">{item.title}</h4>
+                    <p className="font-sans text-[15px] text-g5 mb-3">{item.meta}</p>
+                    <span className="font-sans font-medium text-[13px] text-ink group-hover:text-[var(--brand)] transition-colors">
+                      {item.actionText} →
+                    </span>
+                  </Link>
+                ))}
+              </div>
+              <div className="mt-8 pt-4">
+                <Link href="/communities" className="font-sans font-medium text-[14px] text-g5 hover:text-ink transition-colors">
+                  See all →
+                </Link>
+              </div>
+            </motion.div>
+
+          </div>
+
+          {/* Right Column */}
+          <div className="flex flex-col gap-16">
+            
+            {/* Open Roles */}
+            <motion.div variants={itemVariants} className="flex flex-col">
+              <div className="mono text-[11px] uppercase tracking-[0.18em] text-[#C6A36B] mb-6">
+                OPEN ROLES
+              </div>
+              <div className="flex flex-col gap-6">
+                {rolesFeed.map((item, i) => (
+                  <Link href={item.link} key={item.id} className="group block pb-6 border-b border-g3/30 last:border-0 last:pb-0">
+                    <h4 className="serif text-2xl tracking-tight text-ink mb-2 group-hover:text-[var(--brand)] transition-colors">{item.title}</h4>
+                    <p className="font-sans text-[15px] text-g5 mb-3">{item.meta}</p>
+                    <span className="font-sans font-medium text-[13px] text-ink group-hover:text-[var(--brand)] transition-colors">
+                      {item.actionText} →
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Projects */}
+            <motion.div variants={itemVariants} className="flex flex-col">
+              <div className="mono text-[11px] uppercase tracking-[0.18em] text-[#C6A36B] mb-6">
+                PROJECTS
+              </div>
+              <div className="flex flex-col gap-6">
+                {projectsFeed.map((item, i) => (
+                  <Link href={item.link} key={item.id} className="group block pb-6 border-b border-g3/30 last:border-0 last:pb-0">
+                    <h4 className="serif text-2xl tracking-tight text-ink mb-2 group-hover:text-[var(--brand)] transition-colors">{item.title}</h4>
+                    <p className="font-sans text-[15px] text-g5 mb-3">{item.meta}</p>
+                    <span className="font-sans font-medium text-[13px] text-ink group-hover:text-[var(--brand)] transition-colors">
+                      {item.actionText} →
+                    </span>
+                  </Link>
+                ))}
+              </div>
+              <div className="mt-8 pt-4">
+                <Link href="/projects" className="font-sans font-medium text-[14px] text-g5 hover:text-ink transition-colors">
+                  Explore →
+                </Link>
+              </div>
+            </motion.div>
+
+          </div>
         </motion.div>
       </section>
 
@@ -289,48 +398,4 @@ export function HomeClient({ stats, feedItems, featured }: HomeClientProps) {
   );
 }
 
-function FeedColumn({
-  title,
-  items,
-  getIndicator,
-  className = "",
-}: {
-  title: string;
-  items: FeedItem[];
-  getIndicator: (tag: string) => string;
-  className?: string;
-}) {
-  return (
-    <div className={`premium-card campus-frame p-5 md:p-6 flex-1 ${className}`}>
-      <div className="eyebrow">{title}</div>
-      <div className="mt-5 flex flex-col">
-        {items.length > 0 ? (
-          items.map((item, index) => (
-            <motion.div key={item.id} variants={itemVariants}>
-              <Link
-                href={item.link}
-                className={`block rounded-[20px] px-3 py-4 transition hover:bg-g1 ${index > 0 ? "border-t border-g3" : ""}`}
-              >
-                <div className="flex items-center gap-2">
-                  <span className="mono text-[11px] uppercase tracking-[0.18em] text-[var(--brand)]">
-                    {getIndicator(item.tag)}
-                  </span>
-                  <span className="mono text-[10px] uppercase tracking-[0.18em] text-g4">/ {item.tag}</span>
-                </div>
-                <h3 className="mt-3 serif text-2xl tracking-tight md:text-3xl">{item.title}</h3>
-                <div className="mt-4 flex items-center justify-between gap-4 text-[13px] text-g5">
-                  <span>{item.meta}</span>
-                  <span className="font-medium text-ink">{item.actionText}</span>
-                </div>
-              </Link>
-            </motion.div>
-          ))
-        ) : (
-          <div className="px-3 py-6 text-[14px] italic text-g5">
-            Nothing here yet. The next real record will light up this column.
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
+
