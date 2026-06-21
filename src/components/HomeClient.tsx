@@ -63,15 +63,17 @@ const itemVariants = {
   },
 };
 
+import { HeroLogo } from "@/components/ui/hero-logo";
+
 export function HomeClient({ stats, feedItems, featured }: HomeClientProps) {
   const phrases = [
-    "Work among builders.",
-    "Find your people.",
-    "Quiet people build loud things.",
-    "The internet home for builders.",
-    "Find people worth building with.",
-    "Build quietly. Grow together.",
-    "Better work starts with better company."
+    "Work among\nbuilders.",
+    "Find your\npeople.",
+    "Quiet people\nbuild loud things.",
+    "The internet home\nfor builders.",
+    "Find people\nworth building with.",
+    "Build quietly.\nGrow together.",
+    "Better work starts\nwith better company."
   ];
 
   const [phraseIndex, setPhraseIndex] = useState(0);
@@ -124,65 +126,91 @@ export function HomeClient({ stats, feedItems, featured }: HomeClientProps) {
     { label: "Featured Research", value: featured.research },
   ];
 
+  const textParts = text.split('\n');
+
   return (
     <div className="relative overflow-hidden">
       <section className="relative px-5 pt-20 pb-16 sm:px-8 sm:pt-28 sm:pb-24">
         {/* Subtle Vignette Background */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0)_60%,rgba(0,0,0,0.85)_100%)] pointer-events-none z-10" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0)_60%,rgba(0,0,0,0.85)_100%)] pointer-events-none z-10 dark:bg-transparent" />
         
         {/* Slow Marquee Ribbon */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.08] pointer-events-none mix-blend-screen hidden md:block">
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.25] pointer-events-none hidden md:block">
           <CircularMarquee size={1400} duration={85} />
         </div>
 
         <div className="relative z-20 mx-auto max-w-[1240px]">
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-col items-start text-left pt-12 md:pt-24"
+          <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-12 lg:gap-8 pt-12 md:pt-24">
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+              className="flex flex-col items-start text-left flex-1"
+            >
+              {/* Tagline */}
+              <div className="mono text-[11px] tracking-[0.24em] uppercase text-g4 font-medium mb-8">
+                A quiet place to build
+              </div>
+              
+              {/* Editorial Heading */}
+              <h1 className="serif text-5xl leading-[1.05] tracking-tight md:text-7xl xl:text-[7.5rem] max-w-4xl text-ink font-light min-h-[3em] md:min-h-[2.5em]">
+                {textParts[0]}
+                {textParts.length > 1 && (
+                  <>
+                    <br />
+                    <span className="text-[var(--brand)]">{textParts[1]}</span>
+                  </>
+                )}
+                <span className="animate-pulse text-[var(--brand)] ml-1 opacity-60">|</span>
+              </h1>
+              
+              {/* Description */}
+              <p className="mt-8 max-w-xl text-[16px] leading-[1.6] text-g5 md:text-[18px]">
+                A continuous, high-signal ecosystem where ambitious people meet, collaborate, launch startups, and grow together.
+              </p>
+              
+              {/* Buttons */}
+              <div className="mt-10 flex flex-wrap items-center gap-6">
+                <Link 
+                  href="/login" 
+                  className="bg-ink text-paper dark:bg-white dark:text-black rounded-full px-6 py-3 transition hover:opacity-80 font-sans font-medium text-[14px] inline-flex items-center gap-2"
+                >
+                  <span>Step Inside</span>
+                  <span className="text-[12px] opacity-70">→</span>
+                </Link>
+                <Link 
+                  href="/events" 
+                  className="text-ink hover:underline underline-offset-4 font-sans font-medium text-[14px] transition inline-flex items-center gap-2"
+                >
+                  <span>Explore Events</span>
+                  <span className="text-[12px] opacity-70">→</span>
+                </Link>
+              </div>
+            </motion.div>
+
+            {/* 3D Hero Logo */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, rotateY: 10 }}
+              animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+              transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+              className="hidden lg:flex w-full lg:w-auto shrink-0 justify-center"
+            >
+              <HeroLogo />
+            </motion.div>
+          </div>
+          
+          {/* Established Footer */}
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 0.8 }}
+            className="mt-20 w-full flex items-center justify-between border-t border-g3/60 pt-6"
           >
-            {/* Tagline */}
-            <div className="mono text-[11px] tracking-[0.24em] uppercase text-g4 font-medium mb-8">
-              A quiet place to build
+            <div className="mono text-[11px] tracking-[0.16em] uppercase text-g4 font-medium">
+              (01) ESTABLISHED MMXXVI
             </div>
-            
-            {/* Editorial Heading */}
-            <h1 className="serif text-5xl leading-[1.0] tracking-tight md:text-8xl xl:text-[8rem] max-w-4xl text-ink font-light min-h-[3em] md:min-h-[2em]">
-              {text}<span className="animate-pulse">|</span>
-            </h1>
-            
-            {/* Description */}
-            <p className="mt-8 max-w-2xl text-[16px] leading-[1.6] text-g5 md:text-[18px]">
-              A continuous, high-signal ecosystem where ambitious people meet, collaborate, launch startups, and grow together.
-            </p>
-            
-            {/* Buttons */}
-            <div className="mt-10 flex flex-wrap items-center gap-6">
-              <Link 
-                href="/login" 
-                className="bg-ink text-paper dark:bg-white dark:text-black rounded-full px-6 py-3 transition hover:opacity-80 font-sans font-medium text-[14px] inline-flex items-center gap-2"
-              >
-                <span>Step Inside</span>
-                <span className="text-[12px] opacity-70">→</span>
-              </Link>
-              <Link 
-                href="/events" 
-                className="text-ink hover:underline underline-offset-4 font-sans font-medium text-[14px] transition inline-flex items-center gap-2"
-              >
-                <span>Explore Events</span>
-                <span className="text-[12px] opacity-70">→</span>
-              </Link>
-            </div>
-            
-            {/* Established Footer */}
-            <div className="mt-20 w-full flex items-center justify-between border-t border-g3/60 pt-6">
-              <div className="mono text-[11px] tracking-[0.16em] uppercase text-g4 font-medium">
-                (01) ESTABLISHED MMXXVI
-              </div>
-              <div className="mono text-[11px] tracking-[0.16em] uppercase text-g4 font-medium">
-                GLOBAL BUILDER NETWORK
-              </div>
+            <div className="mono text-[11px] tracking-[0.16em] uppercase text-g4 font-medium">
+              GLOBAL BUILDER NETWORK
             </div>
           </motion.div>
         </div>
