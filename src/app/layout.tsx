@@ -33,13 +33,6 @@ export const metadata: Metadata = {
     description: "Where ambitious people gather.",
     url: "https://www.theconvoke.xyz",
     siteName: "Convoke",
-    images: [
-      {
-        url: "/og-default.jpg", // Needs to be added to public
-        width: 1200,
-        height: 630,
-      },
-    ],
     locale: "en_US",
     type: "website",
   },

@@ -19,7 +19,7 @@ const oauthDoors: Array<{
 
 export default function AuthPage() {
   const router = useRouter();
-  const { signIn, isLoaded } = useSignIn();
+  const { signIn, isLoaded } = useSignIn() as any;
   const [loadingStrategy, setLoadingStrategy] = useState<OAuthStrategy | null>(null);
   const [email, setEmail] = useState("");
   const [emailLoading, setEmailLoading] = useState(false);
@@ -32,11 +32,24 @@ export default function AuthPage() {
     setLoadingStrategy(strategy);
 
     try {
-      await signIn.authenticateWithRedirect({
-        strategy,
-        redirectUrl: "/sso-callback",
-        redirectUrlComplete: "/auth-complete",
-      });
+      const authSignIn = signIn as any;
+      if (typeof authSignIn.authenticateWithRedirect === "function") {
+        await authSignIn.authenticateWithRedirect({
+          strategy,
+          redirectUrl: "/sso-callback",
+          redirectUrlComplete: "/auth-complete",
+          fallbackRedirectUrl: "/auth-complete",
+          signUpFallbackRedirectUrl: "/auth-complete"
+        });
+      } else if (typeof authSignIn.sso === "function") {
+        await authSignIn.sso({
+          strategy,
+          redirectUrl: "/sso-callback",
+          redirectCallbackUrl: "/auth-complete",
+        });
+      } else {
+        throw new Error("Unable to continue right now.");
+      }
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Unable to continue right now.");
       setLoadingStrategy(null);
@@ -53,10 +66,10 @@ export default function AuthPage() {
     setEmailLoading(true);
 
     try {
-      const result = await signIn.emailLink.sendLink({
+      const result = await (signIn.emailLink.sendLink as any)({
         emailAddress: identifier,
         redirectUrl: "/sso-callback",
-        redirectUrlComplete: "/auth-complete",
+        verificationUrl: "/auth-complete",
       });
 
       if (result.error) throw result.error;
