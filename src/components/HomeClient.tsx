@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
@@ -47,26 +48,48 @@ interface HomeClientProps {
 }
 
 const containerVariants = {
-  animate: {
-    transition: {
-      staggerChildren: 0.08,
-    },
-  },
+  animate: { transition: { staggerChildren: 0.08 } },
 };
 
 const itemVariants = {
   initial: { opacity: 0, y: 16 },
-  animate: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.64,
-      ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
-    },
-  },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.64, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] } },
 };
 
+const phrases = [
+  ["Work among", "builders."],
+  ["Find your", "people."],
+  ["Quiet people", "build loud things."],
+  ["Find people", "worth building with."],
+  ["Build quietly.", "Grow together."],
+] as const;
+
 export function HomeClient({ feedItems, featured }: HomeClientProps) {
+  const [phraseIndex, setPhraseIndex] = useState(0);
+  const [typed, setTyped] = useState("");
+  const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    const fullText = phrases[phraseIndex].join("\n");
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+
+    if (!deleting && typed === fullText) {
+      timeout = setTimeout(() => setDeleting(true), 2200);
+    } else if (deleting && typed === "") {
+      timeout = setTimeout(() => {
+        setDeleting(false);
+        setPhraseIndex((prev) => (prev + 1) % phrases.length);
+      }, 140);
+    } else {
+      timeout = setTimeout(() => {
+        const nextLength = typed.length + (deleting ? -1 : 1);
+        setTyped(fullText.slice(0, Math.max(0, nextLength)));
+      }, deleting ? 18 : 42);
+    }
+
+    return () => timeout && clearTimeout(timeout);
+  }, [typed, deleting, phraseIndex]);
+
   const rolesFeed = feedItems.filter((item) => item.tag === "NOW HIRING");
   const projectsFeed = feedItems.filter((item) => item.tag === "NEW PROJECT");
   const communityFeed = feedItems.filter((item) => item.tag === "NEW COMMUNITY");
@@ -81,10 +104,11 @@ export function HomeClient({ feedItems, featured }: HomeClientProps) {
     { label: "Featured Research", value: featured.research },
   ];
 
+  const currentPhrase = typed.split("\n");
+
   return (
     <div className="relative overflow-hidden">
       <section className="relative bg-paper px-5 pb-14 pt-14 sm:px-8 sm:pb-20 sm:pt-20">
-        <div className="vignette-frame pointer-events-none absolute inset-0 z-10 hidden dark:block" />
         <div className="pointer-events-none absolute inset-0 z-10 hidden dark:block dark:bg-[radial-gradient(circle_at_center,transparent_56%,rgba(0,0,0,0.82)_100%)]" />
 
         <div className="pointer-events-none absolute left-1/2 top-[50%] hidden -translate-x-1/2 -translate-y-1/2 opacity-[0.34] md:block dark:opacity-[0.24]">
@@ -93,32 +117,20 @@ export function HomeClient({ feedItems, featured }: HomeClientProps) {
 
         <div className="relative z-20 mx-auto max-w-[1240px]">
           <div className="grid min-h-[calc(100svh-11rem)] items-center gap-8 lg:grid-cols-[minmax(0,0.98fr)_minmax(390px,0.9fr)] lg:gap-10 xl:grid-cols-[minmax(0,0.96fr)_minmax(500px,0.94fr)]">
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-              className="flex max-w-[820px] flex-col items-start text-left"
-            >
-              <div className="mono mb-7 text-[11px] font-semibold uppercase tracking-[0.24em] text-g5">
-                A quiet place to build
-              </div>
-
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }} className="flex max-w-[820px] flex-col items-start text-left">
+              <div className="mono mb-7 text-[11px] font-semibold uppercase tracking-[0.24em] text-g5">A quiet place to build</div>
               <div className="min-h-[2.18em] max-w-[980px] sm:min-h-[1.92em]">
-                <motion.h1
-                  initial={{ opacity: 0, y: 18, filter: "blur(10px)" }}
-                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                  transition={{ duration: 0.78, ease: [0.22, 1, 0.36, 1] }}
-                  className="serif text-[clamp(4rem,8.15vw,7.35rem)] font-light leading-[0.9] tracking-[-0.07em] text-ink"
-                >
-                  <span className="block whitespace-nowrap">Work among builders.</span>
-                  <span className="block whitespace-nowrap text-brand">Find your people.</span>
+                <motion.h1 initial={{ opacity: 0, y: 18, filter: "blur(10px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} transition={{ duration: 0.78, ease: [0.22, 1, 0.36, 1] }} className="serif text-[clamp(4rem,8.15vw,7.35rem)] font-light leading-[0.9] tracking-[-0.07em] text-ink">
+                  <span className="block whitespace-nowrap">{currentPhrase[0] || "\u00A0"}</span>
+                  <span className="block whitespace-nowrap text-brand">
+                    {currentPhrase[1] || "\u00A0"}
+                    <span className="ml-3 inline-block animate-pulse text-brand/70">|</span>
+                  </span>
                 </motion.h1>
               </div>
-
               <p className="mt-7 max-w-[580px] text-[16px] leading-[1.72] text-g6 md:text-[18px]">
                 A continuous, high-signal ecosystem where ambitious people meet, collaborate, launch startups, and grow together.
               </p>
-
               <div className="mt-9 flex flex-wrap items-center gap-4 sm:gap-6">
                 <Link href="/auth" className="ink-button px-6 py-3 text-[14px]">
                   <span>Continue</span>
@@ -131,28 +143,14 @@ export function HomeClient({ feedItems, featured }: HomeClientProps) {
               </div>
             </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, rotateY: 10 }}
-              animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-              transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-              className="hidden justify-center lg:flex"
-            >
+            <motion.div initial={{ opacity: 0, scale: 0.95, rotateY: 10 }} animate={{ opacity: 1, scale: 1, rotateY: 0 }} transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.2 }} className="hidden justify-center lg:flex">
               <HeroLogo />
             </motion.div>
           </div>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 0.8 }}
-            className="mt-6 flex w-full items-center justify-between border-t border-g3/70 pt-5"
-          >
-            <div className="mono text-[11px] font-medium uppercase tracking-[0.16em] text-g5">
-              (01) Established MMXXVI
-            </div>
-            <div className="mono text-[11px] font-medium uppercase tracking-[0.16em] text-g5">
-              Global builder network
-            </div>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, delay: 0.8 }} className="mt-6 flex w-full items-center justify-between border-t border-g3/70 pt-5">
+            <div className="mono text-[11px] font-medium uppercase tracking-[0.16em] text-g5">(01) Established MMXXVI</div>
+            <div className="mono text-[11px] font-medium uppercase tracking-[0.16em] text-g5">Global builder network</div>
           </motion.div>
         </div>
       </section>
@@ -166,19 +164,11 @@ export function HomeClient({ feedItems, featured }: HomeClientProps) {
           <div className="mono text-[11px] uppercase tracking-[0.18em] text-g5">A live record of work and people</div>
         </div>
 
-        <motion.div
-          variants={containerVariants}
-          initial="initial"
-          whileInView="animate"
-          viewport={{ once: true, margin: "-100px" }}
-          className="grid grid-cols-1 gap-7 lg:grid-cols-[1.08fr_0.92fr]"
-        >
+        <motion.div variants={containerVariants} initial="initial" whileInView="animate" viewport={{ once: true, margin: "-100px" }} className="grid grid-cols-1 gap-7 lg:grid-cols-[1.08fr_0.92fr]">
           <div className="flex flex-col gap-7">
             <FeedSection title="Upcoming Meets" empty="New meetups, workshops, seminars, and gatherings will appear here." items={upcomingMeetsFeed} footerHref="/events" footerLabel="View all meets" />
-
             <FeedSection title="Communities" empty="New communities will appear here as they launch." items={communityFeed} footerHref="/spaces" footerLabel="View all communities" />
           </div>
-
           <div className="flex flex-col gap-7">
             <FeedSection title="Open Roles" empty="Open roles from organizations will appear here." items={rolesFeed} footerHref="/opportunities" footerLabel="View all roles" />
             <FeedSection title="Projects" empty="Builder launches will appear here." items={projectsFeed} footerHref="/projects" footerLabel="View all projects" />
@@ -263,10 +253,7 @@ function FeedSection({
 
 function FeedCard({ item }: { item: FeedItem }) {
   return (
-    <Link
-      href={item.link}
-      className="group grid grid-cols-[44px_1fr_auto] items-center gap-4 rounded-[20px] border border-g3/70 bg-paper-elevated/60 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-brand/35 hover:bg-paper-elevated"
-    >
+    <Link href={item.link} className="group grid grid-cols-[44px_1fr_auto] items-center gap-4 rounded-[20px] border border-g3/70 bg-paper-elevated/60 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-brand/35 hover:bg-paper-elevated">
       <Avatar src={item.logoUrl || ""} name={item.logoName || item.title} size={44} />
       <div className="min-w-0">
         <div className="mono mb-1 text-[10px] uppercase tracking-[0.16em] text-brand">{item.tag}</div>
@@ -282,9 +269,5 @@ function FeedCard({ item }: { item: FeedItem }) {
 }
 
 function EmptyFeed({ label }: { label: string }) {
-  return (
-    <div className="rounded-[20px] border border-dashed border-g3 bg-paper-elevated/45 p-5 text-[14px] leading-6 text-g6">
-      {label}
-    </div>
-  );
+  return <div className="rounded-[20px] border border-dashed border-g3 bg-paper-elevated/45 p-5 text-[14px] leading-6 text-g6">{label}</div>;
 }
