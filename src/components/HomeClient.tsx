@@ -123,10 +123,7 @@ export function HomeClient({ feedItems, featured }: HomeClientProps) {
               <div className="min-h-[2.18em] max-w-[980px] sm:min-h-[1.92em]">
                 <motion.h1 initial={{ opacity: 0, y: 18, filter: "blur(10px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} transition={{ duration: 0.78, ease: [0.22, 1, 0.36, 1] }} className="serif text-[clamp(4rem,8.15vw,7.35rem)] font-light leading-[0.9] tracking-[-0.07em] text-ink">
                   <span className="block whitespace-nowrap">{currentPhrase[0] || "\u00A0"}</span>
-                  <span className="block whitespace-nowrap text-brand">
-                    {currentPhrase[1] || "\u00A0"}
-                    <span className="ml-3 inline-block text-brand/70" aria-hidden="true"> </span>
-                  </span>
+                  <span className="block whitespace-nowrap text-brand">{currentPhrase[1] || "\u00A0"}</span>
                 </motion.h1>
               </div>
               <p className="mt-7 max-w-[580px] text-[16px] leading-[1.72] text-g6 md:text-[18px]">
@@ -134,11 +131,11 @@ export function HomeClient({ feedItems, featured }: HomeClientProps) {
               </p>
               <div className="mt-9 flex flex-wrap items-center gap-4 sm:gap-6">
                 <Link href="/auth" className="ink-button px-6 py-3 text-[14px]">
-                  <span>Continue</span>
+                  <span>Step Inside</span>
                   <ArrowRight size={14} />
                 </Link>
                 <Link href="/explore" className="ghost-button text-[14px]">
-                  <span>Explore Convoke</span>
+                  <span>Explore Meets</span>
                   <ArrowRight size={14} />
                 </Link>
               </div>
