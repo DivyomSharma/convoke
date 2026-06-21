@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CalendarDays, Clock3, MapPin, Plus, Users, X, Loader2 } from "lucide-react";
+import { Plus, X, Loader2, Search } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createEvent } from "@/app/actions/workspace";
 import { getFallbackPhoto } from "@/lib/photos";
@@ -48,9 +48,12 @@ export function EventsList({
 }) {
   const router = useRouter();
   const [events, setEvents] = useState<EventWithDetails[]>(initialEvents);
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [creationOpen, setCreationOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [query, setQuery] = useState("");
+  const [timeframe, setTimeframe] = useState<"ALL" | "TODAY" | "WEEK" | "UPCOMING">("ALL");
+  const [sort, setSort] = useState<"ASC" | "DESC">("ASC");
 
   // Form states
   const [title, setTitle] = useState("");
@@ -63,6 +66,27 @@ export function EventsList({
   const [venue, setVenue] = useState("");
   const [capacity, setCapacity] = useState("");
   const [requirements, setRequirements] = useState("");
+  const nowForFilters = new Date();
+  const todayForFilters = new Date(nowForFilters.getFullYear(), nowForFilters.getMonth(), nowForFilters.getDate());
+  const tomorrowForFilters = new Date(todayForFilters.getTime() + 24 * 60 * 60 * 1000);
+  const endOfWeekForFilters = new Date(todayForFilters.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const visibleEvents = events
+    .filter((event) => {
+      const haystack = `${event.title} ${event.description || ""} ${event.space.name} ${event.space.organization.name} ${event.location || ""}`.toLowerCase();
+      const startsOn = new Date(event.startTime);
+      const matchesQuery = !query.trim() || haystack.includes(query.toLowerCase().trim());
+      const matchesTimeframe =
+        timeframe === "ALL" ||
+        (timeframe === "TODAY" && startsOn >= todayForFilters && startsOn < tomorrowForFilters) ||
+        (timeframe === "WEEK" && startsOn >= todayForFilters && startsOn <= endOfWeekForFilters) ||
+        (timeframe === "UPCOMING" && startsOn >= nowForFilters);
+
+      return matchesQuery && matchesTimeframe;
+    })
+    .sort((a, b) => {
+      const diff = new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
+      return sort === "ASC" ? diff : -diff;
+    });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,7 +113,7 @@ export function EventsList({
       });
 
       if (res.success && res.event) {
-        setDrawerOpen(false);
+        setCreationOpen(false);
         setTitle("");
         setDescription("");
         setBannerUrl("");
@@ -110,57 +134,66 @@ export function EventsList({
 
   return (
     <>
-      <section className="campus-frame premium-card p-7 md:p-10 z-10 relative">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-3xl">
-            <div className="eyebrow">Live calendar</div>
-            <h1 className="mt-3 serif text-5xl tracking-tight md:text-7xl">
-              Rooms worth entering.
-            </h1>
-            <p className="mt-5 max-w-2xl text-[15px] leading-7 text-g5 md:text-[17px]">
-              Workshops, dinners, and quiet places to build. A live registry of tech events, founder circles, and hacker houses that actually connect people.
-            </p>
-          </div>
-          <button 
-            onClick={() => setDrawerOpen(true)}
-            className="ink-button px-5 text-[14px] font-medium flex items-center justify-center gap-2 cursor-pointer shrink-0"
-          >
-            <Plus size={16} />
-            <span>Host Event</span>
-          </button>
-        </div>
-      </section>
-
       <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between border-b border-g3 pb-8 z-10 relative">
         <div>
           <div className="mono text-[11px] tracking-[0.2em] uppercase text-g5">
-            (04) Calendar
+            (04) Meets
           </div>
-          <h1 className="serif text-5xl md:text-7xl mt-4 tracking-tight">Gatherings</h1>
+          <h1 className="serif text-5xl md:text-7xl mt-4 tracking-tight">Meets</h1>
           <p className="text-g5 mt-4 text-[16px] max-w-[50ch] leading-relaxed">
-            Rooms worth entering. Workshops, dinners, and quiet places to build.
+            Conferences, meetups, gatherings, seminars, workshops, founder circles, and quiet rooms worth entering.
           </p>
         </div>
         <button 
-          onClick={() => setDrawerOpen(true)}
+          onClick={() => setCreationOpen(true)}
           className="ink-button px-5 text-[14px] font-medium flex items-center justify-center gap-2 cursor-pointer shrink-0"
         >
           <Plus size={15} />
-          <span>Host Event</span>
+          <span>Host Meet</span>
         </button>
       </div>
 
-      {events.length === 0 ? (
+      <div className="relative z-10 mt-6 grid gap-3 rounded-[28px] border border-g3 bg-paper-elevated/55 p-3 backdrop-blur-xl md:grid-cols-[1fr_auto_auto]">
+        <label className="flex h-11 items-center gap-3 rounded-full border border-g3 bg-paper-card/70 px-4">
+          <Search size={15} className="text-brand" />
+          <input
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search meets, spaces, cities..."
+            className="w-full bg-transparent text-[14px] text-ink outline-none placeholder:text-g4"
+          />
+        </label>
+        <select
+          value={timeframe}
+          onChange={(event) => setTimeframe(event.target.value as typeof timeframe)}
+          className="h-11 rounded-full border border-g3 bg-paper-card/70 px-4 text-[13px] text-ink outline-none"
+        >
+          <option value="ALL">All meets</option>
+          <option value="TODAY">Today</option>
+          <option value="WEEK">This week</option>
+          <option value="UPCOMING">Upcoming</option>
+        </select>
+        <select
+          value={sort}
+          onChange={(event) => setSort(event.target.value as typeof sort)}
+          className="h-11 rounded-full border border-g3 bg-paper-card/70 px-4 text-[13px] text-ink outline-none"
+        >
+          <option value="ASC">Soonest first</option>
+          <option value="DESC">Newest first</option>
+        </select>
+      </div>
+
+      {visibleEvents.length === 0 ? (
         <section className="mt-16 text-center py-20 relative z-10">
-          <h2 className="serif text-4xl text-ink font-light">No gatherings scheduled</h2>
+          <h2 className="serif text-4xl text-ink font-light">No meets found</h2>
           <p className="mx-auto mt-4 max-w-[36ch] text-[15px] leading-relaxed text-g5">
-            Launch the first mixer, circle, or code sprint.
+            Adjust the filters or launch the first mixer, circle, seminar, or code sprint.
           </p>
           <button 
-            onClick={() => setDrawerOpen(true)}
+            onClick={() => setCreationOpen(true)}
             className="ink-button px-5 mt-8 text-[14px] font-medium cursor-pointer"
           >
-            Create the first event
+            Create the first meet
           </button>
         </section>
       ) : (
@@ -172,23 +205,23 @@ export function EventsList({
             const dayAfterTomorrow = new Date(tomorrow.getTime() + 24 * 60 * 60 * 1000);
             const endOfWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-            const todayEvents = events.filter(e => {
+            const todayEvents = visibleEvents.filter(e => {
               const d = new Date(e.startTime);
               return d >= today && d < tomorrow;
             });
-            const tomorrowEvents = events.filter(e => {
+            const tomorrowEvents = visibleEvents.filter(e => {
               const d = new Date(e.startTime);
               return d >= tomorrow && d < dayAfterTomorrow;
             });
-            const thisWeekEvents = events.filter(e => {
+            const thisWeekEvents = visibleEvents.filter(e => {
               const d = new Date(e.startTime);
               return d >= dayAfterTomorrow && d <= endOfWeek;
             });
-            const upcomingEvents = events.filter(e => {
+            const upcomingEvents = visibleEvents.filter(e => {
               const d = new Date(e.startTime);
               return d > endOfWeek;
             });
-            const pastEvents = events.filter(e => {
+            const pastEvents = visibleEvents.filter(e => {
               const d = new Date(e.startTime);
               return d < today;
             });
@@ -230,7 +263,7 @@ export function EventsList({
                           <div className="lg:col-span-8 flex flex-col justify-between p-6 md:p-8 relative z-10">
                             <div>
                               <div className="flex flex-wrap items-center gap-3 text-[11px] mono uppercase tracking-[0.25em] font-medium text-[var(--brand)] mb-3">
-                                <span>{isLive ? "LIVE NOW" : "EVENT"}</span>
+                                <span>{isLive ? "LIVE NOW" : "MEET"}</span>
                                 <span>•</span>
                                 <span>{event.location || "SAN FRANCISCO"}</span>
                               </div>
@@ -277,43 +310,64 @@ export function EventsList({
         </div>
       )}
 
-      {/* Creation Drawer Overlay */}
+      {/* Creation Studio */}
       <AnimatePresence>
-        {drawerOpen && (
+        {creationOpen && (
           <>
-            {/* Backdrop */}
             <motion.div 
               initial={{ opacity: 0 }}
-              animate={{ opacity: 0.5 }}
+              animate={{ opacity: 0.72 }}
               exit={{ opacity: 0 }}
-              onClick={() => setDrawerOpen(false)}
-              className="fixed inset-0 bg-[#000000] z-40 backdrop-blur-sm"
+              onClick={() => setCreationOpen(false)}
+              className="fixed inset-0 z-40 bg-[#000000] backdrop-blur-md"
             />
 
-            {/* Slide-over Drawer */}
             <motion.div 
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className="fixed inset-y-0 right-0 w-full max-w-[500px] bg-paper border-l border-g3/80 shadow-[0_0_80px_rgba(0,0,0,0.8)] z-50 flex flex-col h-full"
+              initial={{ opacity: 0, y: 24, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 24, scale: 0.97 }}
+              transition={{ duration: 0.34, ease: [0.16, 1, 0.3, 1] }}
+              className="fixed inset-x-4 top-[5vh] z-50 mx-auto flex max-h-[90vh] w-[min(980px,calc(100vw-2rem))] flex-col overflow-hidden rounded-[34px] border border-g3 bg-paper-elevated/90 shadow-[0_40px_140px_rgba(0,0,0,0.45)] backdrop-blur-2xl"
             >
-              {/* Header */}
               <div className="flex items-center justify-between px-6 py-5 border-b border-g3/60">
                 <div>
-                  <h2 className="serif text-2xl text-ink">Host an Event</h2>
-                  <p className="text-xs text-g5 mt-0.5">Publish a workshop, mixer, or demo night.</p>
+                  <div className="eyebrow text-brand">Creation Studio</div>
+                  <h2 className="serif mt-1 text-3xl text-ink">Host a Meet</h2>
+                  <p className="text-xs text-g5 mt-1">Publish a conference, meetup, gathering, seminar, or workshop.</p>
                 </div>
                 <button 
-                  onClick={() => setDrawerOpen(false)}
+                  onClick={() => setCreationOpen(false)}
                   className="p-2 rounded-full hover:bg-g1/80 text-g5 hover:text-ink transition-colors cursor-pointer"
                 >
                   <X size={18} />
                 </button>
               </div>
 
-              {/* Scrollable Form */}
-              <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-6 py-6 space-y-5">
+              <form onSubmit={handleSubmit} className="grid flex-1 gap-6 overflow-y-auto px-6 py-6 lg:grid-cols-[0.9fr_1.1fr]">
+                <div className="space-y-5">
+                  <div className="rounded-[28px] border border-dashed border-g3 bg-g1/50 p-5">
+                    <div className="aspect-[16/10] overflow-hidden rounded-[22px] border border-g3 bg-g2">
+                      {bannerUrl ? (
+                        <img src={bannerUrl} alt="" className="h-full w-full object-cover" />
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-center text-[13px] leading-6 text-g5">
+                          Paste a banner image URL to preview the meet cover.
+                        </div>
+                      )}
+                    </div>
+                    <label className="mt-4 block text-xs font-medium text-ink">Banner Image URL</label>
+                    <input 
+                      type="url"
+                      value={bannerUrl}
+                      onChange={(e) => setBannerUrl(e.target.value)}
+                      placeholder="https://..."
+                      className="mt-2 h-11 w-full rounded-2xl border border-g3 bg-paper-elevated px-4 text-sm text-ink outline-none transition-all focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20"
+                    />
+                    <p className="mt-3 text-[12px] leading-5 text-g5">UploadThing support can replace URL paste once storage keys are configured.</p>
+                  </div>
+                </div>
+
+                <div className="space-y-5">
                 {error && (
                   <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-xs text-center">
                     {error}
@@ -321,7 +375,7 @@ export function EventsList({
                 )}
 
                 <div>
-                  <label className="text-ink font-medium text-xs mb-1.5 block">Event Title <span className="text-red-500">*</span></label>
+                  <label className="text-ink font-medium text-xs mb-1.5 block">Meet Title <span className="text-red-500">*</span></label>
                   <input 
                     type="text"
                     required
@@ -353,7 +407,7 @@ export function EventsList({
                   )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
                     <label className="text-ink font-medium text-xs mb-1.5 block">Start Date & Time <span className="text-red-500">*</span></label>
                     <input 
@@ -376,7 +430,7 @@ export function EventsList({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
                     <label className="text-ink font-medium text-xs mb-1.5 block">Location Type</label>
                     <select 
@@ -401,7 +455,7 @@ export function EventsList({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
                     <label className="text-ink font-medium text-xs mb-1.5 block">Capacity (Max Seats)</label>
                     <input 
@@ -412,20 +466,10 @@ export function EventsList({
                       className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
                     />
                   </div>
-                  <div>
-                    <label className="text-ink font-medium text-xs mb-1.5 block">Banner Image URL</label>
-                    <input 
-                      type="url"
-                      value={bannerUrl}
-                      onChange={(e) => setBannerUrl(e.target.value)}
-                      placeholder="https://unsplash.com/... or direct image link"
-                      className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
-                    />
-                  </div>
                 </div>
 
                 <div>
-                  <label className="text-ink font-medium text-xs mb-1.5 block">Event Description</label>
+                  <label className="text-ink font-medium text-xs mb-1.5 block">Meet Description</label>
                   <textarea 
                     rows={4}
                     value={description}
@@ -445,13 +489,13 @@ export function EventsList({
                     className="w-full p-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all resize-none"
                   />
                 </div>
+                </div>
               </form>
 
-              {/* Footer */}
               <div className="px-6 py-4 border-t border-g3/60 bg-g1/20 flex gap-3">
                 <button 
                   type="button"
-                  onClick={() => setDrawerOpen(false)}
+                  onClick={() => setCreationOpen(false)}
                   className="flex-1 h-11 rounded-full border border-g3 text-xs font-semibold hover:bg-g1 text-ink transition-colors cursor-pointer"
                 >
                   Cancel
@@ -463,7 +507,7 @@ export function EventsList({
                   className="flex-1 h-11 rounded-full bg-ink hover:opacity-95 text-paper text-xs font-semibold transition-all shadow-md active:scale-98 flex items-center justify-center gap-2 border border-[var(--brand)]/20 cursor-pointer"
                 >
                   {loading && <Loader2 size={14} className="animate-spin" />}
-                  <span>Host Gathering</span>
+                  <span>Publish Meet</span>
                 </button>
               </div>
             </motion.div>

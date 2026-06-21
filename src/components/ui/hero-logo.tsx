@@ -1,85 +1,40 @@
 "use client";
-import { motion, useMotionTemplate, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { useState, useRef } from "react";
+
+import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
 
 export function HeroLogo() {
-  const ref = useRef<HTMLDivElement>(null);
-  
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  const rotateX = useTransform(y, [-200, 200], [15, -15]);
-  const rotateY = useTransform(x, [-200, 200], [-15, 15]);
-
-  const [isHovered, setIsHovered] = useState(false);
-
-  function handleMouseMove(event: React.MouseEvent<HTMLDivElement>) {
-    const rect = ref.current?.getBoundingClientRect();
-    if (!rect) return;
-
-    const width = rect.width;
-    const height = rect.height;
-
-    const mouseXPos = event.clientX - rect.left;
-    const mouseYPos = event.clientY - rect.top;
-
-    const xPos = mouseXPos - width / 2;
-    const yPos = mouseYPos - height / 2;
-
-    x.set(xPos);
-    y.set(yPos);
-    mouseX.set(mouseXPos);
-    mouseY.set(mouseYPos);
-  }
-
-  function handleMouseLeave() {
-    x.set(0);
-    y.set(0);
-    setIsHovered(false);
-  }
+  const mouseX = useMotionValue(50);
+  const mouseY = useMotionValue(50);
 
   return (
     <motion.div
-      ref={ref}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={handleMouseLeave}
-      style={{
-        rotateX: useSpring(rotateX, { stiffness: 150, damping: 20 }),
-        rotateY: useSpring(rotateY, { stiffness: 150, damping: 20 }),
-        transformStyle: "preserve-3d",
+      onMouseMove={(event) => {
+        const rect = event.currentTarget.getBoundingClientRect();
+        mouseX.set(event.clientX - rect.left);
+        mouseY.set(event.clientY - rect.top);
       }}
-      className="relative flex aspect-square w-full max-w-[190px] items-center justify-center overflow-hidden rounded-[34px] border border-g3 bg-ink shadow-[0_24px_90px_rgba(0,0,0,0.18)] cursor-crosshair group perspective-1000 dark:max-w-[240px] dark:border-white/10 dark:bg-[#070707] lg:max-w-[250px] xl:max-w-[280px]"
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
+      className="relative flex h-[240px] w-[520px] max-w-full items-center justify-center overflow-visible"
     >
-      {/* Background radial torch */}
       <motion.div
-        className="pointer-events-none absolute inset-0 z-0 transition-opacity duration-500"
+        className="pointer-events-none absolute inset-[-90px] opacity-80 blur-2xl dark:opacity-70"
         style={{
-          background: useMotionTemplate`radial-gradient(320px circle at ${mouseX}px ${mouseY}px, color-mix(in srgb, var(--brand) 20%, transparent), transparent 78%)`,
-          opacity: isHovered ? 1 : 0,
+          background: useMotionTemplate`radial-gradient(360px circle at ${mouseX}px ${mouseY}px, color-mix(in srgb, var(--brand) 26%, transparent), transparent 68%)`,
         }}
       />
-      
-      {/* Subdued background text/pattern */}
-      <div className="absolute inset-0 opacity-[0.04] flex items-center justify-center mix-blend-screen pointer-events-none">
-        <div className="serif text-[13rem] text-white lg:text-[16rem]">C.</div>
+      <div className="pointer-events-none absolute left-0 right-0 top-1/2 h-px -translate-y-1/2 bg-gradient-to-r from-transparent via-ink/18 to-transparent dark:via-white/16" />
+      <div className="relative select-none font-sans text-[8rem] font-black uppercase leading-none tracking-[-0.115em] text-ink/10 [text-shadow:0_1px_0_rgba(255,255,255,0.08)] dark:text-white/[0.055] sm:text-[10rem]">
+        Convoke
       </div>
-
-      {/* 3D Content - Front text */}
-      <motion.div 
-        style={{ translateZ: 60 }}
-        className="relative z-10 flex flex-col items-center justify-center pointer-events-none"
-      >
-        <h1 className="serif text-[7.8rem] leading-none tracking-tighter text-white drop-shadow-2xl font-normal lg:text-[10.5rem]">
-          C.
-        </h1>
-      </motion.div>
-
-      <div className="absolute inset-x-5 top-3 h-px bg-white/35 pointer-events-none" />
-      <div className="absolute inset-0 rounded-[34px] border-t border-white/25 pointer-events-none mix-blend-overlay" />
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="font-sans text-[8rem] font-black uppercase leading-none tracking-[-0.115em] text-transparent sm:text-[10rem]">
+          <span className="bg-[radial-gradient(circle_at_50%_42%,rgba(255,255,255,0.42),transparent_18%),linear-gradient(180deg,color-mix(in_srgb,var(--ink)_24%,transparent),transparent_70%)] bg-clip-text dark:bg-[radial-gradient(circle_at_50%_42%,rgba(255,255,255,0.32),transparent_18%),linear-gradient(180deg,rgba(255,255,255,0.13),transparent_72%)]">
+            Convoke
+          </span>
+        </div>
+      </div>
     </motion.div>
   );
 }

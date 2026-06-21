@@ -102,6 +102,7 @@ export function HomeClient({ feedItems, featured }: HomeClientProps) {
   const rolesFeed = feedItems.filter((item) => item.tag === "NOW HIRING");
   const projectsFeed = feedItems.filter((item) => item.tag === "NEW PROJECT");
   const communityFeed = feedItems.filter((item) => item.tag === "NEW COMMUNITY");
+  const upcomingMeetsFeed = feedItems.filter((item) => item.tag === "LIVE NOW" || item.tag === "TONIGHT");
 
   const featuredCards = [
     { label: "Featured Event", value: featured.event },
@@ -117,14 +118,14 @@ export function HomeClient({ feedItems, featured }: HomeClientProps) {
   return (
     <div className="relative overflow-hidden">
       <section className="relative px-5 pb-14 pt-14 sm:px-8 sm:pb-20 sm:pt-20">
-        <div className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_center,transparent_50%,rgba(0,0,0,0.18)_100%)] dark:bg-[radial-gradient(circle_at_center,transparent_56%,rgba(0,0,0,0.82)_100%)]" />
+        <div className="pointer-events-none absolute inset-0 z-10 hidden dark:block dark:bg-[radial-gradient(circle_at_center,transparent_56%,rgba(0,0,0,0.82)_100%)]" />
 
         <div className="pointer-events-none absolute left-1/2 top-[50%] hidden -translate-x-1/2 -translate-y-1/2 opacity-[0.34] md:block dark:opacity-[0.24]">
           <CircularMarquee size={1120} duration={85} />
         </div>
 
         <div className="relative z-20 mx-auto max-w-[1240px]">
-          <div className="grid min-h-[calc(100svh-11rem)] items-center gap-10 lg:grid-cols-[minmax(0,1.05fr)_340px] lg:gap-16 xl:grid-cols-[minmax(0,1.08fr)_400px]">
+          <div className="grid min-h-[calc(100svh-11rem)] items-center gap-8 lg:grid-cols-[minmax(0,0.98fr)_minmax(390px,0.9fr)] lg:gap-10 xl:grid-cols-[minmax(0,0.96fr)_minmax(500px,0.94fr)]">
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -135,7 +136,7 @@ export function HomeClient({ feedItems, featured }: HomeClientProps) {
                 A quiet place to build
               </div>
 
-              <h1 className="serif min-h-[2.35em] max-w-[820px] text-[clamp(4.2rem,10vw,8.35rem)] font-light leading-[0.86] tracking-[-0.075em] text-ink sm:min-h-[1.78em]">
+              <h1 className="serif min-h-[2.2em] max-w-[820px] text-[clamp(4.1rem,9vw,7.65rem)] font-light leading-[0.9] tracking-[-0.07em] text-ink sm:min-h-[1.82em]">
                 {textParts[0]}
                 {textParts.length > 1 && (
                   <>
@@ -156,7 +157,7 @@ export function HomeClient({ feedItems, featured }: HomeClientProps) {
                   <ArrowRight size={14} />
                 </Link>
                 <Link href="/events" className="ghost-button text-[14px]">
-                  <span>Explore Events</span>
+                  <span>Explore Meets</span>
                   <ArrowRight size={14} />
                 </Link>
               </div>
@@ -205,34 +206,14 @@ export function HomeClient({ feedItems, featured }: HomeClientProps) {
           className="grid grid-cols-1 gap-7 lg:grid-cols-[1.08fr_0.92fr]"
         >
           <div className="flex flex-col gap-7">
-            <motion.div variants={itemVariants} className="premium-card p-5 sm:p-6">
-              <div className="mono mb-4 text-[11px] uppercase tracking-[0.18em] text-brand">Featured Event</div>
-              <Link href={featured.event.link} className="group block">
-                <div className="mb-5 aspect-[16/10] w-full overflow-hidden rounded-[22px] border border-g3 bg-g2">
-                  {featured.event.imageUrl ? (
-                    <img src={featured.event.imageUrl} alt={featured.event.title} className="h-full w-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0" />
-                  ) : (
-                    <div className="h-full w-full bg-g2 transition-colors duration-700 group-hover:bg-g3" />
-                  )}
-                </div>
-                <div className="mono mb-3 text-[11px] uppercase tracking-[0.18em] text-brand">{featured.event.meta}</div>
-                <h3 className="serif mb-3 text-3xl tracking-[-0.045em] text-ink md:text-5xl">{featured.event.title}</h3>
-                <p className="mb-5 text-[16px] leading-relaxed text-g6">{featured.event.description}</p>
-                <div className="flex items-center justify-between border-t border-g3/60 pt-4">
-                  <span className="mono text-[12px] uppercase tracking-wide text-g5">Live event workflow</span>
-                  <span className="inline-flex items-center gap-2 text-[14px] font-medium text-brand transition-colors group-hover:text-ink">
-                    Register <ArrowRight size={14} />
-                  </span>
-                </div>
-              </Link>
-            </motion.div>
+            <FeedSection title="Upcoming Meets" empty="New meetups, workshops, seminars, and gatherings will appear here." items={upcomingMeetsFeed} footerHref="/events" footerLabel="View all meets" />
 
-            <FeedSection title="Communities" empty="New communities will appear here as they launch." items={communityFeed} footerHref="/spaces" footerLabel="See all" />
+            <FeedSection title="Communities" empty="New communities will appear here as they launch." items={communityFeed} footerHref="/spaces" footerLabel="View all communities" />
           </div>
 
           <div className="flex flex-col gap-7">
-            <FeedSection title="Open Roles" empty="Open roles from organizations will appear here." items={rolesFeed} />
-            <FeedSection title="Projects" empty="Builder launches will appear here." items={projectsFeed} footerHref="/projects" footerLabel="Explore" />
+            <FeedSection title="Open Roles" empty="Open roles from organizations will appear here." items={rolesFeed} footerHref="/opportunities" footerLabel="View all roles" />
+            <FeedSection title="Projects" empty="Builder launches will appear here." items={projectsFeed} footerHref="/projects" footerLabel="View all projects" />
           </div>
         </motion.div>
       </section>

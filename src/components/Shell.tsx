@@ -22,7 +22,7 @@ import {
 const mainNav = [
   { href: "/explore", label: "Explore" },
   { href: "/spaces", label: "Spaces" },
-  { href: "/events", label: "Events" },
+  { href: "/events", label: "Meets" },
   { href: "/challenges", label: "Challenges" },
   { href: "/opportunities", label: "Opportunities" },
   { href: "/projects", label: "Projects" },

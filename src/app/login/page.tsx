@@ -35,7 +35,11 @@ function LoginExperience() {
   const next = requestedNext.startsWith("/") && !requestedNext.startsWith("//") ? requestedNext : "/workspace";
 
   const handleOAuth = async (strategy: OAuthStrategy) => {
-    if (!isLoaded || !signIn || loadingStrategy) return;
+    if (loadingStrategy) return;
+    if (!isLoaded || !signIn) {
+      setError("Clerk is still loading. If this stays visible, check NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY in the deployment environment.");
+      return;
+    }
 
     setError("");
     setLoadingStrategy(strategy);
@@ -119,8 +123,8 @@ function LoginExperience() {
                 key={door.strategy}
                 type="button"
                 onClick={() => handleOAuth(door.strategy)}
-                disabled={!isLoaded || Boolean(loadingStrategy)}
-                className="group flex h-12 w-full items-center justify-between rounded-full border border-g3 bg-paper-elevated/60 px-4 text-[14px] font-medium text-ink transition-all hover:-translate-y-0.5 hover:border-brand/35 hover:bg-paper-elevated disabled:cursor-not-allowed disabled:opacity-55"
+                disabled={Boolean(loadingStrategy)}
+                className="group flex h-12 w-full items-center justify-between rounded-full border border-g3 bg-paper-elevated/60 px-4 text-[14px] font-medium text-ink transition-all hover:-translate-y-0.5 hover:border-brand/35 hover:bg-paper-elevated disabled:cursor-wait disabled:opacity-80"
               >
                 <span className="inline-flex items-center gap-3">
                   <ProviderIcon icon={door.icon} />
