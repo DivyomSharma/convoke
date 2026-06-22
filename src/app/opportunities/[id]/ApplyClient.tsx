@@ -32,6 +32,8 @@ export function ApplyClient({
       if (res.success) {
         setApplied(true);
         router.refresh();
+      } else {
+        alert(res.error || "Failed to apply right now.");
       }
     } catch (err) {
       console.error(err);

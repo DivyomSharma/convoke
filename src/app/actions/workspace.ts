@@ -78,41 +78,46 @@ export async function rsvpToEvent(eventId: string, status: "GOING" | "INTERESTED
 }
 
 export async function applyToOpportunity(opportunityId: string) {
-  const user = await requireUser();
-  const opportunity = await prisma.opportunity.findUnique({
-    where: { id: opportunityId },
-    select: { type: true },
-  });
+  try {
+    const user = await requireUser();
+    const opportunity = await prisma.opportunity.findUnique({
+      where: { id: opportunityId },
+      select: { type: true },
+    });
 
-  if (!opportunity) {
-    throw new Error("Opportunity not found.");
+    if (!opportunity) {
+      return { success: false, error: "Opportunity not found." };
+    }
+
+    const existing = await prisma.application.findFirst({
+      where: { opportunityId, userId: user.id },
+    });
+
+    if (existing) {
+      return { success: false, error: "Already applied to this opportunity." };
+    }
+
+    await prisma.application.create({
+      data: {
+        opportunityId,
+        userId: user.id,
+        status: "PENDING",
+      },
+    });
+
+    revalidatePath("/workspace");
+    revalidatePath("/workspace/tickets");
+    revalidatePath("/opportunities");
+    revalidatePath(`/opportunities/${opportunityId}`);
+    if (opportunity.type === "HACKATHON" || opportunity.type === "CHALLENGE") {
+      revalidatePath("/challenges");
+      revalidatePath(`/challenges/${opportunityId}`);
+    }
+    return { success: true };
+  } catch (err: any) {
+    console.error("Error in applyToOpportunity:", err);
+    return { success: false, error: err.message || "Failed to apply." };
   }
-
-  const existing = await prisma.application.findFirst({
-    where: { opportunityId, userId: user.id },
-  });
-
-  if (existing) {
-    throw new Error("Already applied to this opportunity.");
-  }
-
-  await prisma.application.create({
-    data: {
-      opportunityId,
-      userId: user.id,
-      status: "PENDING",
-    },
-  });
-
-  revalidatePath("/workspace");
-  revalidatePath("/workspace/tickets");
-  revalidatePath("/opportunities");
-  revalidatePath(`/opportunities/${opportunityId}`);
-  if (opportunity.type === "HACKATHON" || opportunity.type === "CHALLENGE") {
-    revalidatePath("/challenges");
-    revalidatePath(`/challenges/${opportunityId}`);
-  }
-  return { success: true };
 }
 
 export async function joinSpace(organizationId: string) {

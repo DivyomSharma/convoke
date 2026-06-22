@@ -135,7 +135,7 @@ export function HomeClient({ feedItems, featured }: HomeClientProps) {
                   <ArrowRight size={14} />
                 </Link>
                 <Link href="/explore" className="ghost-button text-[14px]">
-                  <span>Explore Meets</span>
+                  <span>Explore Convoke</span>
                   <ArrowRight size={14} />
                 </Link>
               </div>
