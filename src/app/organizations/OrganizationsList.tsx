@@ -250,15 +250,15 @@ export function OrganizationsList({ initialOrgs }: { initialOrgs: OrganizationWi
 
                 <div>
                   <label className="text-ink font-medium text-xs mb-1.5 block">Organization Slug (URL path) <span className="text-red-500">*</span></label>
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-g4 text-xs font-mono">theconvoke.xyz/org/</span>
+                  <div className="relative flex items-center h-11 rounded-xl border border-g3 bg-transparent focus-within:border-[var(--brand)]/55 focus-within:ring-1 focus-within:ring-[var(--brand)]/20 transition-all overflow-hidden">
+                    <span className="pl-4 pr-0.5 text-g4 text-sm font-mono select-none">theconvoke.xyz/org/</span>
                     <input 
                       type="text"
                       required
                       value={slug}
                       onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
                       placeholder="delhi-hacker-club"
-                      className="w-full h-11 pl-[135px] pr-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none font-mono focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                      className="flex-1 h-full pr-4 bg-transparent text-sm text-ink outline-none font-mono min-w-0"
                     />
                   </div>
                 </div>
