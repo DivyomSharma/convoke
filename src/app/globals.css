@@ -125,6 +125,20 @@ html:not(.dark) .hero-light-flat *::after {
     overflow-x: hidden;
   }
 
+  /* Ensure native dropdowns match the theme */
+  select option {
+    background-color: var(--paper);
+    color: var(--ink);
+  }
+
+  /* Make sure calendar pickers adapt to color-scheme */
+  input[type="date"],
+  input[type="time"],
+  input[type="datetime-local"],
+  input[type="month"] {
+    color-scheme: dark light;
+  }
+
   a {
     text-underline-offset: 0.22em;
   }
