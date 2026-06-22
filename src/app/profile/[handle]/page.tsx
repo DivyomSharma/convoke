@@ -3,6 +3,7 @@ import { Shell } from "@/components/Shell";
 import { Avatar } from "@/components/Avatar";
 import { prisma } from "@/lib/prisma";
 import { Metadata } from "next";
+import { ProfileTabsClient } from "./ProfileTabsClient";
 
 export async function generateMetadata(props: { params?: Promise<{ handle: string }> }): Promise<Metadata> {
   const params = await props.params;
@@ -15,9 +16,28 @@ export async function generateMetadata(props: { params?: Promise<{ handle: strin
 
   if (!user) return { title: "Profile not found" };
 
+  const title = `${user.name} (@${user.handle || user.username}) | Convoke`;
+  const description = user.bio || `${user.name}'s profile on Convoke.`;
+  const image = user.avatarUrl || "https://convoke.xyz/og-profile.jpg";
+
   return {
-    title: `${user.name} (@${user.handle || user.username})`,
-    description: user.bio || `${user.name}'s profile on Convoke.`,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [image],
+      type: "profile",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
+    },
+    alternates: {
+      canonical: `https://convoke.xyz/profile/${handle}`,
+    },
   };
 }
 
@@ -29,7 +49,8 @@ export default async function Profile(props: { params?: Promise<{ handle: string
   const user = await prisma.user.findFirst({
     where: { OR: [{ handle }, { username: handle }] },
     include: {
-      projects: true,
+      projects: { orderBy: { createdAt: "desc" } },
+      research: { orderBy: { createdAt: "desc" } },
       memberships: {
         include: { organization: { include: { spaces: true } } },
       },
@@ -47,6 +68,7 @@ export default async function Profile(props: { params?: Promise<{ handle: string
   const spaces = user.memberships.flatMap((m) => m.organization.spaces);
   const vouches = user.vouchesRecv;
   const projects = user.projects;
+  const research = user.research;
   const activityDates = user.activity.map((a) => a.createdAt);
   const passportHandle = user.handle || user.username || user.displayName || "builder";
 
@@ -77,24 +99,12 @@ export default async function Profile(props: { params?: Promise<{ handle: string
 
         <div className="mt-12 grid grid-cols-12 gap-10">
           <section className="col-span-12 md:col-span-7">
-            <div className="eyebrow mb-4">Momentum · last 24 weeks</div>
-            <Heat activityDates={activityDates} />
-            <div className="mt-12">
-              <div className="eyebrow mb-4">Selected work</div>
-              {projects.length > 0 ? (
-                <ul className="divide-y divide-g3">
-                  {projects.map((w) => (
-                    <li key={w.id} className="grid grid-cols-[60px_1fr_auto] gap-4 py-4 text-[15px]">
-                      <span className="mono text-[12px] text-g5">{w.createdAt.getFullYear()}</span>
-                      <span>{w.title}</span>
-                      <span className="mono text-[11px] font-medium uppercase text-[var(--brand)]">shipped</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <div className="text-[14px] text-g5">No selected work to show yet.</div>
-              )}
-            </div>
+            <ProfileTabsClient 
+              projects={projects} 
+              research={research} 
+              activityDates={activityDates} 
+              Heat={<Heat activityDates={activityDates} />} 
+            />
           </section>
 
           <aside className="col-span-12 md:col-span-5">

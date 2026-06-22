@@ -24,9 +24,28 @@ export async function generateMetadata(props: { params?: Promise<{ id: string }>
 
   if (!opp) return { title: "Challenge not found" };
 
+  const title = `${opp.title} | Convoke Challenge`;
+  const description = opp.description || `${opp.title} on Convoke.`;
+  const image = opp.bannerUrl || "https://convoke.xyz/og-challenge.jpg";
+
   return {
-    title: `${opp.title} · Challenge`,
-    description: opp.description || `${opp.title} on Convoke.`,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [image],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
+    },
+    alternates: {
+      canonical: `https://convoke.xyz/challenges/${id}`,
+    },
   };
 }
 
@@ -56,6 +75,9 @@ export default async function ChallengeDetailPage(props: { params?: Promise<{ id
 
   const dbUser = await requireUser().catch(() => null);
   const initialRegistered = dbUser ? opp.applications.some(a => a.userId === dbUser.id) : false;
+  const initialBookmarked = dbUser ? (await prisma.bookmark.findFirst({
+    where: { userId: dbUser.id, itemId: opp.id, itemType: "OPPORTUNITY" }
+  })) !== null : false;
 
   const deadlineStr = opp.deadline 
     ? new Date(opp.deadline).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
@@ -146,6 +168,17 @@ export default async function ChallengeDetailPage(props: { params?: Promise<{ id
                   <div className="text-g6 text-[15px] leading-relaxed whitespace-pre-line p-5 rounded-md glass-panel border border-[var(--brand)]/10">
                     {opp.benefits}
                   </div>
+                  
+                  {/* Contextual Commerce */}
+                  <div className="mt-4 flex items-center justify-between p-4 rounded-md bg-g1/50 border border-g3/50">
+                    <div>
+                      <div className="text-[14px] font-medium text-ink">Level up the experience</div>
+                      <div className="text-[13px] text-g5 mt-0.5">Winner Merchandise • Sponsor Gifts • Participant Kits</div>
+                    </div>
+                    <a href="https://merch.theplotarmour.xyz" target="_blank" rel="noopener noreferrer" className="px-4 py-2 text-[12px] font-medium bg-paper border border-g3 rounded-full hover:bg-g2 transition-colors text-ink">
+                      Order Swag
+                    </a>
+                  </div>
                 </section>
               )}
 
@@ -177,6 +210,7 @@ export default async function ChallengeDetailPage(props: { params?: Promise<{ id
                 <RegisterClient 
                   challengeId={opp.id}
                   initialRegistered={initialRegistered}
+                  initialBookmarked={initialBookmarked}
                   deadlineStr={deadlineStr}
                 />
 

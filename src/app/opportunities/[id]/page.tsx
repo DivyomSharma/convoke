@@ -75,6 +75,9 @@ export default async function OpportunityDetailPage(props: { params?: Promise<{ 
 
   const dbUser = await requireUser().catch(() => null);
   const initialApplied = dbUser ? opp.applications.some(a => a.userId === dbUser.id) : false;
+  const initialBookmarked = dbUser ? (await prisma.bookmark.findFirst({
+    where: { userId: dbUser.id, itemId: opp.id, itemType: "OPPORTUNITY" }
+  })) !== null : false;
 
   const deadlineStr = opp.deadline 
     ? new Date(opp.deadline).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
@@ -215,9 +218,11 @@ export default async function OpportunityDetailPage(props: { params?: Promise<{ 
                 
                 {/* Apply Panel */}
                 <ApplyClient 
-                  opportunityId={opp.id}
+                  opportunityId={opp.id} 
                   initialApplied={initialApplied}
-                  deadlineStr={deadlineStr}
+                  initialBookmarked={initialBookmarked}
+                  deadlineStr={deadlineStr} 
+                  type={opp.type}
                 />
 
                 {/* Resources */}

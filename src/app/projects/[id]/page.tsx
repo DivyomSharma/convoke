@@ -1,5 +1,6 @@
 import { Shell } from "@/components/Shell";
 import { AmbientGlow } from "@/components/AmbientGlow";
+import { ProjectActionsClient } from "./ProjectActionsClient";
 import { notFound } from "next/navigation";
 import { 
   Eye, Download, Share2, Globe, Layers, Calendar, 
@@ -114,9 +115,7 @@ export default async function ProjectDetailPage(props: { params?: Promise<{ id: 
 
             {/* Actions */}
             <div className="flex items-center gap-3 pb-2">
-              <button className="w-10 h-10 flex items-center justify-center rounded-full border border-g3 text-g5 hover:text-ink hover:bg-g1 transition-colors shadow-sm">
-                <Share2 size={16} />
-              </button>
+              <ProjectActionsClient projectId={proj.id} />
               {proj.url && (
                 <a 
                   href={proj.url} 

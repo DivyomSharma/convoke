@@ -138,6 +138,19 @@ export default async function SpaceDetailPage(props: { params?: Promise<{ id: st
               </div>
             )}
 
+            {/* Community Merch */}
+            <div className="premium-card p-5 bg-gradient-to-br from-g1 to-paper border-[var(--brand)]/20 border relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-10">
+                <span className="text-4xl">🛍️</span>
+              </div>
+              <h3 className="mono text-[11px] uppercase tracking-wider text-[var(--brand)] mb-2 font-semibold">Community Drops</h3>
+              <p className="text-[13px] text-ink font-medium">Rep your space</p>
+              <p className="text-[12px] text-g5 mt-1 leading-relaxed">Official hoodies, member drops, and collective identity wear.</p>
+              <a href="https://merch.theplotarmour.xyz" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 mt-4 text-[12px] font-medium text-paper bg-ink px-4 py-1.5 rounded-full hover:bg-ink-2 transition-colors relative z-10">
+                View Collection <ChevronRight size={14} />
+              </a>
+            </div>
+
             {/* Members in space */}
             <div className="premium-card p-5">
               <div className="flex items-center justify-between mb-4">

@@ -15,7 +15,7 @@ export default function Builder() {
             <div className="eyebrow">Builder console</div>
             <h1 className="serif text-5xl mt-2">What you&apos;re shipping.</h1>
           </div>
-          <button className="bg-ink text-paper px-4 py-2 text-[13px]">+ New project</button>
+            <button onClick={() => alert('Feature coming soon')} className="bg-ink text-paper px-4 py-2 text-[13px]">+ New project</button>
         </div>
 
         <div className="mt-8 overflow-x-auto pb-2">
@@ -31,7 +31,7 @@ export default function Builder() {
                 </div>
                 <div className="mt-6 flex items-center justify-between border-t border-g3 pt-4">
                   <span className="mono text-[11px] uppercase tracking-[0.18em] text-g5">{p.week}</span>
-                  <button className="ghost-button text-[13px]">Open</button>
+                  <button onClick={() => alert('Feature coming soon')} className="ghost-button text-[13px]">Open</button>
                 </div>
               </li>
             ))}

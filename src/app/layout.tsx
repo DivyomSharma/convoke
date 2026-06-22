@@ -29,11 +29,11 @@ export const metadata: Metadata = {
     template: "%s | Convoke",
     default: "Convoke | Where ambitious people gather.",
   },
-  description: "A calm, editorial operating system for builders, researchers, and creators. Join spaces, find opportunities, and build momentum.",
+  description: "Discover organisations, spaces, meets, challenges, opportunities, projects, research, and culture. For people building the future.",
   metadataBase: new URL("https://www.theconvoke.xyz"),
   openGraph: {
     title: "Convoke",
-    description: "Where ambitious people gather.",
+    description: "Discover organisations, spaces, meets, challenges, opportunities, projects, research, and culture. For people building the future.",
     url: "https://www.theconvoke.xyz",
     siteName: "Convoke",
     locale: "en_US",
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Convoke",
-    description: "Where ambitious people gather.",
+    description: "Discover organisations, spaces, meets, challenges, opportunities, projects, research, and culture. For people building the future.",
   },
 };
 

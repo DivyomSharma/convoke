@@ -163,8 +163,19 @@ export function SettingsForm({ user }: { user: any }) {
         )}
 
         {activeTab === "Integrations" && (
-          <div className="py-6 text-center text-g5 text-[14px]">
-            Third-party integrations coming soon!
+          <div className="py-8 border border-g3 rounded-xl p-6 bg-g1/30">
+            <h3 className="text-ink font-medium mb-1 text-[15px]">Developer Integrations</h3>
+            <p className="text-g5 text-[13px] mb-4">Connect external accounts and webhooks to sync your Convoke profile.</p>
+            <div className="flex items-center justify-between p-4 bg-paper border border-g3 rounded-lg">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-g2 rounded-full flex items-center justify-center text-ink font-bold">GH</div>
+                <div>
+                  <div className="text-[14px] font-medium text-ink">GitHub</div>
+                  <div className="text-[12px] text-g5">Sync repositories and commits</div>
+                </div>
+              </div>
+              <button type="button" className="text-[12px] font-medium px-4 py-1.5 border border-g3 rounded-full hover:bg-g1 transition-colors text-ink">Connect</button>
+            </div>
           </div>
         )}
       </div>

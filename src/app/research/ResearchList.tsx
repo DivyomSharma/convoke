@@ -4,8 +4,18 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { FileText, Link2, Loader2, Plus, Share2, Upload, User, X } from "lucide-react";
+import { FileText, Link2, Loader2, Plus, Share2, Upload, User, X, Check } from "lucide-react";
 import { createResearch } from "@/app/actions/workspace";
+import { useShare } from "@/hooks/useShare";
+
+function ResearchActions({ paperUrl }: { paperUrl?: string | null }) {
+  const { share, copied } = useShare();
+  return (
+    <button onClick={() => share("Check out this research paper", paperUrl || window.location.href)} className="flex items-center gap-1.5 hover:text-ink ml-auto">
+      {copied ? <Check size={14} className="text-green-500" /> : <Share2 size={14} />} {copied ? "Copied" : "Share"}
+    </button>
+  );
+}
 
 type ResearchPaper = {
   id: string;
@@ -126,9 +136,7 @@ export function ResearchList({ papers }: { papers: ResearchPaper[] }) {
                       <Link2 size={14} /> Read Paper
                     </a>
                   )}
-                  <button className="flex items-center gap-1.5 hover:text-ink ml-auto">
-                    <Share2 size={14} /> Share
-                  </button>
+                  <ResearchActions paperUrl={paper.url} />
                 </div>
               </div>
             ))}

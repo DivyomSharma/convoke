@@ -4,24 +4,32 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { applyToOpportunity } from "@/app/actions/workspace";
+import { toggleBookmark } from "@/app/actions/bookmark";
+import { useShare } from "@/hooks/useShare";
 import { Check, Loader2, Bookmark, Share2, X, Briefcase, FileText } from "lucide-react";
 
 export function ApplyClient({ 
   opportunityId, 
   initialApplied,
-  deadlineStr
+  initialBookmarked,
+  deadlineStr,
+  type
 }: { 
   opportunityId: string; 
   initialApplied: boolean;
+  initialBookmarked: boolean;
   deadlineStr: string;
+  type: string;
 }) {
   const [applied, setApplied] = useState(initialApplied);
+  const [bookmarked, setBookmarked] = useState(initialBookmarked);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [pitch, setPitch] = useState("");
   const [resumeUrl, setResumeUrl] = useState("");
   const router = useRouter();
   const { user, isSignedIn } = useUser();
+  const { share, copied } = useShare();
 
   const handleApplyClick = () => {
     if (!isSignedIn) {
@@ -53,6 +61,24 @@ export function ApplyClient({
     }
   };
 
+  const handleBookmark = async () => {
+    try {
+      setBookmarked(!bookmarked);
+      await toggleBookmark(opportunityId, "OPPORTUNITY");
+    } catch (err) {
+      setBookmarked(bookmarked);
+      alert("Authentication required to bookmark.");
+    }
+  };
+
+  const handleShare = () => {
+    share("Check out this opportunity on Convoke", window.location.href);
+  };
+
+  const ctaText = type === "GRANT" ? "Apply for Grant" : 
+                 type === "FELLOWSHIP" ? "Apply for Fellowship" : 
+                 "Submit Application";
+
   return (
     <>
       <div className="premium-card p-6 shadow-2xl border-[var(--brand)]/20">
@@ -72,16 +98,18 @@ export function ApplyClient({
             disabled={loading}
             className="w-full py-3.5 bg-[var(--brand)] text-white rounded-full text-[15px] font-medium transition-all shadow-lg flex items-center justify-center gap-2 hover:opacity-90 hover:-translate-y-0.5 active:scale-95"
           >
-            <span>Apply Now</span>
+            <span>{ctaText}</span>
           </button>
         )}
 
         <div className="mt-4 flex items-center justify-center gap-4 border-t border-g3 pt-4">
-          <button className="flex items-center gap-2 text-[13px] text-g5 hover:text-ink transition-colors">
-            <Share2 size={14} /> Share
+          <button onClick={handleShare} className="flex items-center gap-2 text-[13px] text-g5 hover:text-ink transition-colors">
+            {copied ? <Check size={14} className="text-green-500" /> : <Share2 size={14} />} 
+            {copied ? "Copied" : "Share"}
           </button>
-          <button className="flex items-center gap-2 text-[13px] text-g5 hover:text-ink transition-colors">
-            <Bookmark size={14} /> Bookmark
+          <button onClick={handleBookmark} className={`flex items-center gap-2 text-[13px] transition-colors ${bookmarked ? "text-[var(--brand)]" : "text-g5 hover:text-ink"}`}>
+            <Bookmark size={14} fill={bookmarked ? "currentColor" : "none"} /> 
+            {bookmarked ? "Saved" : "Watchlist"}
           </button>
         </div>
       </div>

@@ -34,6 +34,7 @@ const mainNav = [
   { href: "/projects", label: "Projects" },
   { href: "/organizations", label: "Organizations" },
   { href: "/research", label: "Research" },
+  { href: "https://merch.theplotarmour.xyz", label: "Merch", external: true },
 ] as const;
 
 export function Shell({ children, wide = false }: { children: ReactNode; wide?: boolean }) {
@@ -74,9 +75,11 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
               <Link
                 key={item.href}
                 href={item.href}
+                target={'external' in item ? "_blank" : undefined}
+                rel={'external' in item ? "noopener noreferrer" : undefined}
                 className={
                   "transition-colors " +
-                  (pathname.startsWith(item.href) ? "text-brand" : "hover:text-ink")
+                  (!('external' in item) && pathname.startsWith(item.href) ? "text-brand" : "hover:text-ink")
                 }
               >
                 {item.label}
@@ -173,6 +176,13 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
                           >
                             Settings
                           </Link>
+                          <Link 
+                            href="/bookmarks"
+                            onClick={() => setProfileOpen(false)}
+                            className="col-span-2 flex items-center justify-center rounded-2xl border border-g3 bg-g1/30 px-3 py-3 text-[12px] text-g6 transition hover:border-g4 hover:bg-g1/60 hover:text-ink"
+                          >
+                            Bookmarks & Saved
+                          </Link>
                           <button 
                             onClick={async () => {
                               setProfileOpen(false);
@@ -262,7 +272,10 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
           </div>
 
           <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-g3 pt-8 text-[12px] text-g4 mono md:flex-row">
-            <span>{new Date().getFullYear()} Convoke. All rights reserved.</span>
+            <div className="flex flex-col gap-2 md:items-start items-center">
+              <span>{new Date().getFullYear()} Convoke. All rights reserved.</span>
+              <a href="https://merch.theplotarmour.xyz" target="_blank" rel="noopener noreferrer" className="hover:text-ink transition-colors text-[10px]">Fulfillment by PlotArmour Merch</a>
+            </div>
             <div className="flex gap-4">
               <span>Midnight network theme.</span>
               <span className="hidden sm:inline">/</span>
@@ -329,6 +342,8 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
                       href={item.href} 
                       onClick={() => setMobileMenuOpen(false)}
                       className="text-[18px] text-ink block py-1"
+                      target={'external' in item ? "_blank" : undefined}
+                      rel={'external' in item ? "noopener noreferrer" : undefined}
                     >
                       {item.label}
                     </Link>
@@ -349,6 +364,9 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
                   </li>
                   <li>
                     <Link href="/settings" onClick={() => setMobileMenuOpen(false)} className="text-[18px] text-ink block py-1">Settings</Link>
+                  </li>
+                  <li>
+                    <Link href="/bookmarks" onClick={() => setMobileMenuOpen(false)} className="text-[18px] text-ink block py-1">Bookmarks</Link>
                   </li>
                   <li>
                     <button 

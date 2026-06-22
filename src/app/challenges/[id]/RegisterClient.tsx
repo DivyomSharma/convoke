@@ -3,20 +3,26 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { applyToOpportunity } from "@/app/actions/workspace";
+import { toggleBookmark } from "@/app/actions/bookmark";
+import { useShare } from "@/hooks/useShare";
 import { Check, Loader2, Bookmark, Share2 } from "lucide-react";
 
 export function RegisterClient({ 
   challengeId, 
   initialRegistered,
+  initialBookmarked,
   deadlineStr
 }: { 
   challengeId: string; 
   initialRegistered: boolean;
+  initialBookmarked: boolean;
   deadlineStr: string;
 }) {
   const [registered, setRegistered] = useState(initialRegistered);
+  const [bookmarked, setBookmarked] = useState(initialBookmarked);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { share, copied } = useShare();
 
   const handleRegister = async () => {
     setLoading(true);
@@ -32,6 +38,21 @@ export function RegisterClient({
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleBookmark = async () => {
+    try {
+      // Optimistic update
+      setBookmarked(!bookmarked);
+      await toggleBookmark(challengeId, "OPPORTUNITY");
+    } catch (err) {
+      setBookmarked(bookmarked);
+      alert("Authentication required to bookmark.");
+    }
+  };
+
+  const handleShare = () => {
+    share("Check out this challenge on Convoke", window.location.href);
   };
 
   return (
@@ -58,11 +79,13 @@ export function RegisterClient({
       )}
 
       <div className="mt-4 flex items-center justify-center gap-4 border-t border-g3 pt-4">
-        <button className="flex items-center gap-2 text-[13px] text-g5 hover:text-ink transition-colors">
-          <Share2 size={14} /> Share
+        <button onClick={handleShare} className="flex items-center gap-2 text-[13px] text-g5 hover:text-ink transition-colors">
+          {copied ? <Check size={14} className="text-green-500" /> : <Share2 size={14} />} 
+          {copied ? "Copied" : "Share"}
         </button>
-        <button className="flex items-center gap-2 text-[13px] text-g5 hover:text-ink transition-colors">
-          <Bookmark size={14} /> Watchlist
+        <button onClick={handleBookmark} className={`flex items-center gap-2 text-[13px] transition-colors ${bookmarked ? "text-[var(--brand)]" : "text-g5 hover:text-ink"}`}>
+          <Bookmark size={14} fill={bookmarked ? "currentColor" : "none"} /> 
+          {bookmarked ? "Saved" : "Watchlist"}
         </button>
       </div>
     </div>

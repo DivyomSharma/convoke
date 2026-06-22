@@ -1,10 +1,12 @@
 import { Shell } from "@/components/Shell";
 import { AmbientGlow } from "@/components/AmbientGlow";
 import Link from "next/link";
+import { requireUser } from "@/lib/auth";
+import { OrgActionsClient } from "./OrgActionsClient";
 import { notFound } from "next/navigation";
 import { 
   Building2, Calendar, FileText, Link2, MapPin, Users, Share, 
-  Bookmark, CheckCircle2, ChevronDown, Plus 
+  Bookmark, CheckCircle2, ChevronDown, Plus, ArrowRight 
 } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
 import { prisma } from "@/lib/prisma";
@@ -48,9 +50,11 @@ export async function generateMetadata(props: { params?: Promise<{ slug: string 
   };
 }
 
-export default async function OrgDetailPage(props: { params?: Promise<{ slug: string }> }) {
+export default async function OrgDetailPage(props: { params?: Promise<{ slug: string }>, searchParams?: Promise<{ tab?: string }> }) {
   const params = await props.params;
+  const searchParams = await props.searchParams;
   const slug = params?.slug;
+  const currentTab = searchParams?.tab || "overview";
   if (!slug) return notFound();
 
   // Query organization by Slug with all relations
@@ -71,6 +75,13 @@ export default async function OrgDetailPage(props: { params?: Promise<{ slug: st
   if (!org) {
     return notFound();
   }
+
+  const dbUser = await requireUser().catch(() => null);
+  const isMember = dbUser ? org.members.some(m => m.userId === dbUser.id) : false;
+  const isAdmin = dbUser ? org.members.some(m => m.userId === dbUser.id && (m.role === "ADMIN" || m.role === "FOUNDER")) : false;
+  const initialBookmarked = dbUser ? (await prisma.bookmark.findFirst({
+    where: { userId: dbUser.id, itemId: org.id, itemType: "ORGANIZATION" }
+  })) !== null : false;
 
   // Count open roles
   const openRolesCount = org.opportunities.filter(o => o.type === "ROLE").length;
@@ -127,22 +138,48 @@ export default async function OrgDetailPage(props: { params?: Promise<{ slug: st
             </div>
 
             {/* Actions */}
-            <div className="flex items-center gap-3 pb-2">
-              <button className="w-10 h-10 flex items-center justify-center rounded-full border border-g3 text-g5 hover:text-ink hover:bg-g1 transition-colors shadow-sm">
-                <Share size={16} />
-              </button>
-              <button className="w-10 h-10 flex items-center justify-center rounded-full border border-g3 text-g5 hover:text-ink hover:bg-g1 transition-colors shadow-sm">
-                <Bookmark size={16} />
-              </button>
-              <button className="bg-ink text-paper px-8 py-2.5 rounded-full text-[14px] font-medium hover:bg-ink-2 transition-all active:scale-95 border border-[var(--brand)]/20">
-                Join Space
-              </button>
-            </div>
+            <OrgActionsClient 
+              orgId={org.id} 
+              initialBookmarked={initialBookmarked}
+              isMember={isMember}
+            />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mt-12">
+          <div className="mt-12 border-b border-g3 overflow-x-auto no-scrollbar">
+            <nav className="flex items-center gap-6 px-1 min-w-max">
+              {[
+                { id: "overview", label: "Overview" },
+                { id: "meets", label: "Meets" },
+                { id: "challenges", label: "Challenges" },
+                { id: "opportunities", label: "Opportunities" },
+                { id: "projects", label: "Projects" },
+                { id: "research", label: "Research" },
+                { id: "merch", label: "Merch" },
+                { id: "members", label: "Members" },
+                { id: "resources", label: "Resources" },
+                ...(isAdmin ? [{ id: "recruit", label: "Recruit" }] : []),
+              ].map((tab) => (
+                <Link
+                  key={tab.id}
+                  href={`/org/${slug}?tab=${tab.id}`}
+                  className={`pb-4 text-[14px] font-medium transition-colors border-b-2 ${
+                    currentTab === tab.id
+                      ? "border-[var(--brand)] text-ink"
+                      : "border-transparent text-g5 hover:text-ink hover:border-g4"
+                  }`}
+                >
+                  {tab.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mt-8">
             {/* MAIN CONTENT (Left 2 Columns) */}
             <div className="lg:col-span-2 space-y-16">
+              
+              {currentTab === "overview" && (
+                <>
               
               {/* About Section */}
               <section>
@@ -238,6 +275,34 @@ export default async function OrgDetailPage(props: { params?: Promise<{ slug: st
                   </div>
                 )}
               </section>
+                </>
+              )}
+
+              {currentTab === "merch" && (
+                <section className="premium-card p-10 text-center space-y-6">
+                  <h2 className="serif text-3xl text-ink">Need custom merchandise for your team?</h2>
+                  <div className="flex flex-wrap items-center justify-center gap-4 text-g5 text-[14px]">
+                    <span>Apparel</span>
+                    <span>•</span>
+                    <span>Welcome Kits</span>
+                    <span>•</span>
+                    <span>Corporate Gifting</span>
+                    <span>•</span>
+                    <span>Conference Merchandise</span>
+                  </div>
+                  <div className="pt-4">
+                    <a href="https://merch.theplotarmour.xyz" target="_blank" rel="noopener noreferrer" className="ink-button px-6 py-3 text-[14px] font-medium inline-flex items-center gap-2">
+                      Get Quote <ArrowRight size={16} />
+                    </a>
+                  </div>
+                </section>
+              )}
+
+              {currentTab !== "overview" && currentTab !== "merch" && (
+                <div className="py-20 text-center text-g5 italic rounded-md glass-panel text-[14px]">
+                  No {currentTab} available yet.
+                </div>
+              )}
             </div>
 
             {/* SIDEBAR (Right Column) */}

@@ -86,6 +86,28 @@ export default async function Workspace() {
           <Momentum activities={myActivities} />
 
           <div className="space-y-4">
+            <div className="eyebrow">Quick Actions</div>
+            <div className="flex flex-col gap-2">
+              <Link href="/meets/create" className="flex items-center gap-2 hover:text-[var(--brand)] text-g6 transition-colors text-[14px]">
+                <Calendar size={14} className="text-g4" />
+                <span>Create Event</span>
+              </Link>
+              <Link href="/spaces/create" className="flex items-center gap-2 hover:text-[var(--brand)] text-g6 transition-colors text-[14px]">
+                <Building2 size={14} className="text-g4" />
+                <span>Create Space</span>
+              </Link>
+              <Link href="/opportunities/create" className="flex items-center gap-2 hover:text-[var(--brand)] text-g6 transition-colors text-[14px]">
+                <UserPlus size={14} className="text-g4" />
+                <span>Post Opportunity</span>
+              </Link>
+              <a href="https://merch.theplotarmour.xyz" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-[var(--brand)] text-g6 transition-colors text-[14px]">
+                <Ticket size={14} className="text-g4" />
+                <span>Order Merch</span>
+              </a>
+            </div>
+          </div>
+
+          <div className="space-y-4">
             <div className="eyebrow">My Spaces & Collectives</div>
             {mySpaces.length > 0 ? (
               <ul className="space-y-2.5 text-[14px]">
