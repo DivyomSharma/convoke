@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { createOrganization } from "@/app/actions/workspace";
 import { getFallbackPhoto } from "@/lib/photos";
 import { CardRing } from "@/components/ui/card-ring";
+
 import { ImageUploadField } from "@/components/forms/ImageUploadField";
 
 interface OrganizationWithMembers {
@@ -16,6 +17,7 @@ interface OrganizationWithMembers {
   slug: string;
   description: string | null;
   logoUrl: string | null;
+  bannerUrl: string | null;
   industry: string | null;
   location: string | null;
   members: any[];
@@ -146,9 +148,11 @@ export function OrganizationsList({ initialOrgs }: { initialOrgs: OrganizationWi
       ) : (
         <div className="mt-12 flex flex-col gap-20 relative z-10">
           {orgs.map((org, index) => {
-            const banner = org.logoUrl || getFallbackPhoto(org.id, 'space');
+            const banner = org.bannerUrl || getFallbackPhoto(org.id, 'space');
+            const logo = org.logoUrl || getFallbackPhoto(org.id, 'space');
+
             return (
-              <div key={org.id} className="group premium-card campus-frame overflow-hidden flex flex-col relative border border-[#1a1a1a] hover:border-[#2f2f2f] transition-all duration-700 hover:-translate-y-[2px] ease-[cubic-bezier(0.22,0.61,0.36,1)] h-[420px]">
+              <div key={org.id} className="group premium-card network-frame overflow-hidden flex flex-col relative border border-[#1a1a1a] hover:border-[#2f2f2f] transition-all duration-700 hover:-translate-y-[2px] ease-[cubic-bezier(0.22,0.61,0.36,1)] h-[420px]">
                 {/* Org Card Ring */}
                 <div className="absolute -right-[15%] top-1/2 -translate-y-1/2 opacity-8 group-hover:opacity-25 transition-opacity duration-700 ease-[cubic-bezier(0.22,0.61,0.36,1)] hidden md:block pointer-events-none z-0">
                   <CardRing size={400} text="ORGANIZATION • COLLECTIVE • ORGANIZATION • " />
@@ -163,9 +167,20 @@ export function OrganizationsList({ initialOrgs }: { initialOrgs: OrganizationWi
                   />
                 </Link>
 
+                {/* Circular Profile Avatar */}
+                <div className="absolute left-6 top-[164px] z-20">
+                  <Link href={`/org/${org.slug}`}>
+                    <img 
+                      src={logo} 
+                      alt={`${org.name} logo`} 
+                      className="w-16 h-16 rounded-full border-4 border-[#0a0a0a] object-cover bg-g1 transition-transform duration-500 hover:scale-105"
+                    />
+                  </Link>
+                </div>
+
                 {/* Feature Content */}
                 <div className="flex flex-col flex-1 p-6 relative z-10">
-                  <div className="flex items-center gap-3 mono text-[10px] uppercase tracking-[0.25em] font-medium text-[var(--brand)] mb-3">
+                  <div className="flex items-center gap-3 mono text-[10px] uppercase tracking-[0.25em] font-medium text-[var(--brand)] mb-3 mt-4">
                     <span>(0{index + 1})</span>
                     <span>•</span>
                     <span className="truncate">{org.industry || "Ecosystem Hub"}</span>
