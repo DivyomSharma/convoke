@@ -22,9 +22,9 @@ export const revalidate = 60;
 export async function generateMetadata(props: { params?: Promise<{ id: string }> }): Promise<Metadata> {
   const params = await props.params;
   const id = params?.id;
-  if (!id) return { title: "Event not found" };
+  if (!id) return { title: "Meet not found" };
 
-  const event = await prisma.event.findUnique({
+  const meet = await prisma.meet.findUnique({
     where: { id },
     include: {
       space: {
@@ -35,11 +35,11 @@ export async function generateMetadata(props: { params?: Promise<{ id: string }>
     },
   }).catch(() => null);
 
-  if (!event) return { title: "Event not found" };
+  if (!meet) return { title: "Meet not found" };
 
-  const title = `${event.title} | Convoke Event`;
-  const description = event.description || `Join ${event.title} on Convoke.`;
-  const image = event.bannerUrl || "https://convoke.xyz/og-image.jpg";
+  const title = `${meet.title} | Convoke Meet`;
+  const description = meet.description || `Join ${meet.title} on Convoke.`;
+  const image = meet.bannerUrl || "https://convoke.xyz/og-image.jpg";
 
   return {
     title,
@@ -57,7 +57,7 @@ export async function generateMetadata(props: { params?: Promise<{ id: string }>
       images: [image],
     },
     alternates: {
-      canonical: `https://convoke.xyz/events/${id}`,
+      canonical: `https://convoke.xyz/meets/${id}`,
     },
   };
 }
@@ -69,7 +69,7 @@ export default async function EventDetailPage(props: { params?: Promise<{ id: st
   const id = params?.id;
   if (!id) return notFound();
 
-  const event = await prisma.event.findUnique({
+  const meet = await prisma.meet.findUnique({
     where: { id },
     include: {
       space: {
@@ -96,28 +96,28 @@ export default async function EventDetailPage(props: { params?: Promise<{ id: st
     },
   }).catch(() => null);
 
-  if (!event) return notFound();
+  if (!meet) return notFound();
 
   const viewer = await requireUser().catch(() => null);
-  const myAttendance = viewer ? event.attendance.find((entry) => entry.userId === viewer.id) : null;
+  const myAttendance = viewer ? meet.attendance.find((entry) => entry.userId === viewer.id) : null;
   const initialStatus = myAttendance ? myAttendance.status : null;
   
-  const isOrganizer = viewer ? event.space.organization.members.some(
+  const isOrganizer = viewer ? meet.space.organization.members.some(
     (m) => m.userId === viewer.id && (m.role === "ADMIN" || m.role === "FOUNDER")
   ) : false;
 
-  const isFull = Boolean(event.capacity && event.attendance.filter(a => a.status === "GOING" || a.status === "CHECKED_IN").length >= event.capacity);
+  const isFull = Boolean(meet.capacity && meet.attendance.filter(a => a.status === "GOING" || a.status === "CHECKED_IN").length >= meet.capacity);
   const price = "Free";
 
-  const attendeesCount = event.attendance.filter(a => a.status === "GOING" || a.status === "CHECKED_IN").length;
+  const attendeesCount = meet.attendance.filter(a => a.status === "GOING" || a.status === "CHECKED_IN").length;
 
   return (
     <Shell wide>
       <div className="relative min-h-screen pb-20 text-ink">
         {/* Banner area */}
         <div className="relative h-[220px] w-full overflow-hidden border-b border-g3 bg-g1 md:h-[300px]">
-          {event.bannerUrl ? (
-            <img src={event.bannerUrl} alt={event.title} className="h-full w-full object-cover opacity-80" />
+          {meet.bannerUrl ? (
+            <img src={meet.bannerUrl} alt={meet.title} className="h-full w-full object-cover opacity-80" />
           ) : (
             <div className="h-full w-full bg-[#0A0A0A] border-b border-g3 flex items-center justify-center">
               <span className="serif text-8xl text-g2 select-none">C.</span>
@@ -128,39 +128,39 @@ export default async function EventDetailPage(props: { params?: Promise<{ id: st
         <div className="relative z-20 mx-auto -mt-16 max-w-[1080px] px-5 sm:px-8">
           <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
             <div className="space-y-8">
-              {/* Event briefing */}
+              {/* Meet briefing */}
               <section className="border border-g3 rounded-sm p-6 md:p-8 bg-paper-card">
                 <div className="mono text-[10px] uppercase tracking-wider text-brand mb-4">
                   (Gathering)
                 </div>
-                <h1 className="serif text-4xl leading-tight md:text-5xl font-light">{event.title}</h1>
+                <h1 className="serif text-4xl leading-tight md:text-5xl font-light">{meet.title}</h1>
                 <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-g5">
-                  {event.description || "No public overview has been published yet."}
+                  {meet.description || "No public overview has been published yet."}
                 </p>
 
                 <div className="mt-6 grid gap-4 sm:grid-cols-2">
                   <div className="border border-g3 rounded-sm p-4">
                     <div className="eyebrow">Date</div>
                     <div className="mt-2 text-[14px] text-ink font-medium">
-                      {new Date(event.startTime).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                      {new Date(meet.startTime).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
                     </div>
                   </div>
                   <div className="border border-g3 rounded-sm p-4">
                     <div className="eyebrow">Time</div>
                     <div className="mt-2 text-[14px] text-ink font-medium">
-                      {new Date(event.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                      {new Date(meet.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                     </div>
                   </div>
                   <div className="border border-g3 rounded-sm p-4">
                     <div className="eyebrow">Location</div>
                     <div className="mt-2 text-[14px] text-ink font-medium">
-                      {event.location || "Online"}
+                      {meet.location || "Online"}
                     </div>
                   </div>
                   <div className="border border-g3 rounded-sm p-4">
                     <div className="eyebrow">Capacity</div>
                     <div className="mt-2 text-[14px] text-ink font-medium">
-                      {event.capacity ? `${event.capacity} seats` : "Open RSVP"}
+                      {meet.capacity ? `${meet.capacity} seats` : "Open RSVP"}
                     </div>
                   </div>
                 </div>
@@ -170,30 +170,30 @@ export default async function EventDetailPage(props: { params?: Promise<{ id: st
               <section className="grid gap-6 md:grid-cols-2">
                 <div className="border border-g3 rounded-sm p-6 bg-paper-card">
                   <div className="eyebrow">Host</div>
-                  <Link href={`/org/${event.space.organization.slug}`} className="mt-4 flex items-center gap-4 group">
+                  <Link href={`/org/${meet.space.organization.slug}`} className="mt-4 flex items-center gap-4 group">
                     <div className="flex h-12 w-12 items-center justify-center rounded-sm border border-g3 bg-g1 overflow-hidden">
-                      {event.space.organization.logoUrl ? (
-                        <img src={event.space.organization.logoUrl} alt="" className="h-full w-full object-cover" />
+                      {meet.space.organization.logoUrl ? (
+                        <img src={meet.space.organization.logoUrl} alt="" className="h-full w-full object-cover" />
                       ) : (
                         <Building2 size={16} className="text-brand" />
                       )}
                     </div>
                     <div>
-                      <div className="serif text-xl group-hover:underline">{event.space.organization.name}</div>
-                      <div className="text-[11px] mono uppercase text-g4">{event.space.name}</div>
+                      <div className="serif text-xl group-hover:underline">{meet.space.organization.name}</div>
+                      <div className="text-[11px] mono uppercase text-g4">{meet.space.name}</div>
                     </div>
                   </Link>
                   <p className="mt-4 text-[13px] leading-relaxed text-g5">
-                    {event.space.organization.description || "Collective space updates are synced here."}
+                    {meet.space.organization.description || "Collective space updates are synced here."}
                   </p>
                 </div>
 
                 <div className="border border-g3 rounded-sm p-6 bg-paper-card">
                   <div className="eyebrow">Venue Notes</div>
                   <div className="mt-4 space-y-2 text-[13px] text-g5">
-                    <div className="text-ink font-medium">{event.venue || "TBA"}</div>
-                    <div>{event.location || "Details drop before start."}</div>
-                    {event.requirements && <div className="mt-2 pt-2 border-t border-g1">{event.requirements}</div>}
+                    <div className="text-ink font-medium">{meet.venue || "TBA"}</div>
+                    <div>{meet.location || "Details drop before start."}</div>
+                    {meet.requirements && <div className="mt-2 pt-2 border-t border-g1">{meet.requirements}</div>}
                   </div>
                 </div>
               </section>
@@ -214,7 +214,7 @@ export default async function EventDetailPage(props: { params?: Promise<{ id: st
                       <p className="text-[13px] text-g5 font-light">
                         This certifies that <span className="text-[#EAEAEA] font-medium">{viewer?.name || "Builder"}</span> checked in and participated in
                       </p>
-                      <p className="serif text-xl italic text-white leading-tight">{event.title}</p>
+                      <p className="serif text-xl italic text-white leading-tight">{meet.title}</p>
                     </div>
                     <div className="mt-6 flex items-center justify-between text-[9px] mono uppercase tracking-wider text-g4 border-t border-g4/20 pt-4">
                       <span>Verified MMXXVI</span>
@@ -227,18 +227,18 @@ export default async function EventDetailPage(props: { params?: Promise<{ id: st
               {/* Organizer Dashboard Panel */}
               {isOrganizer && (
                 <OrganizerDashboard
-                  eventId={event.id}
-                  eventTitle={event.title}
-                  initialAttendance={event.attendance as any}
+                  meetId={meet.id}
+                  eventTitle={meet.title}
+                  initialAttendance={meet.attendance as any}
                 />
               )}
 
               {/* FAQs */}
-              {event.faqs.length > 0 && (
+              {meet.faqs.length > 0 && (
                 <section className="space-y-4">
                   <div className="eyebrow">FAQs</div>
                   <div className="space-y-3">
-                    {event.faqs.map((faq) => (
+                    {meet.faqs.map((faq) => (
                       <details key={faq.id} className="border border-g3 rounded-sm p-4 bg-paper-card group">
                         <summary className="flex cursor-pointer items-center justify-between text-[14px] font-medium text-ink outline-none list-none">
                           <span>{faq.question}</span>
@@ -258,20 +258,20 @@ export default async function EventDetailPage(props: { params?: Promise<{ id: st
             <div className="space-y-6">
               <div className="sticky top-20 space-y-6">
                 <RsvpClient
-                  eventId={event.id}
+                  meetId={meet.id}
                   initialStatus={initialStatus}
                   isFull={isFull}
                   price={price}
                   attendeesCount={attendeesCount}
-                  capacity={event.capacity}
+                  capacity={meet.capacity}
                   userId={viewer?.id}
                 />
 
                 <div className="border border-g3 rounded-sm p-6 bg-paper-card">
                   <div className="eyebrow mb-4">Attendees</div>
                   <div className="flex flex-wrap gap-2">
-                    {event.attendance.filter(a => a.status === "GOING" || a.status === "CHECKED_IN").length > 0 ? (
-                      event.attendance.filter(a => a.status === "GOING" || a.status === "CHECKED_IN").map((entry) => (
+                    {meet.attendance.filter(a => a.status === "GOING" || a.status === "CHECKED_IN").length > 0 ? (
+                      meet.attendance.filter(a => a.status === "GOING" || a.status === "CHECKED_IN").map((entry) => (
                         <div key={entry.id} className="flex items-center gap-2 rounded-sm border border-g3 bg-g1 px-2.5 py-1 text-[12px]">
                           <Avatar src={entry.user.avatarUrl || ""} name={entry.user.name || "Member"} size={20} />
                           <span className="text-ink font-medium">{entry.user.name || "Member"}</span>
@@ -285,11 +285,11 @@ export default async function EventDetailPage(props: { params?: Promise<{ id: st
                   </div>
                 </div>
 
-                {event.sponsors.length > 0 && (
+                {meet.sponsors.length > 0 && (
                   <div className="border border-g3 rounded-sm p-6 bg-paper-card">
                     <div className="eyebrow">Sponsors</div>
                     <div className="mt-4 flex flex-wrap gap-2">
-                      {event.sponsors.map((sponsor) => (
+                      {meet.sponsors.map((sponsor) => (
                         <span key={sponsor.id} className="rounded-sm border border-g3 bg-g1 px-2.5 py-1 text-[12px] text-ink">
                           {sponsor.name}
                         </span>
@@ -298,11 +298,11 @@ export default async function EventDetailPage(props: { params?: Promise<{ id: st
                   </div>
                 )}
 
-                {event.resources.length > 0 && (
+                {meet.resources.length > 0 && (
                   <div className="border border-g3 rounded-sm p-6 bg-paper-card">
                     <div className="eyebrow">Resources</div>
                     <div className="mt-4 space-y-2">
-                      {event.resources.map((resource) => (
+                      {meet.resources.map((resource) => (
                         <a
                           key={resource.id}
                           href={resource.url}

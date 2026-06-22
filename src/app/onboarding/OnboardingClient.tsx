@@ -72,8 +72,8 @@ export function OnboardingClient({ initialUser }: { initialUser: InitialUser }) 
 
   const locationPreview = [city, state, country].filter(Boolean).join(" · ") || "Your location";
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
+  const handleSubmit = async (meet: React.FormEvent) => {
+    meet.preventDefault();
     setSaving(true);
     setError("");
     try {
@@ -139,7 +139,7 @@ export function OnboardingClient({ initialUser }: { initialUser: InitialUser }) 
             <label className="mb-1.5 block text-xs font-medium text-ink">Bio</label>
             <textarea
               value={bio}
-              onChange={(event) => setBio(event.target.value)}
+              onChange={(meet) => setBio(meet.target.value)}
               rows={4}
               placeholder="A short line about what you are building, learning, or chasing."
               className="w-full resize-none rounded-2xl border border-g3 bg-transparent p-4 text-sm text-ink outline-none focus:border-brand/55"
@@ -217,7 +217,7 @@ function Field({
       <input
         type={type}
         value={value}
-        onChange={(event) => onChange(event.target.value)}
+        onChange={(meet) => onChange(meet.target.value)}
         placeholder={placeholder}
         className="h-11 w-full rounded-2xl border border-g3 bg-transparent px-4 text-sm text-ink outline-none focus:border-brand/55"
       />
@@ -241,7 +241,7 @@ function SelectField({
       <label className="mb-1.5 block text-xs font-medium text-ink">{label}</label>
       <select
         value={value}
-        onChange={(event) => onChange(event.target.value)}
+        onChange={(meet) => onChange(meet.target.value)}
         className="h-11 w-full rounded-2xl border border-g3 bg-transparent px-4 text-sm text-ink outline-none focus:border-brand/55"
       >
         <option value="">Select {label.toLowerCase()}</option>

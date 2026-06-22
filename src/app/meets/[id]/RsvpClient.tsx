@@ -7,7 +7,7 @@ import { Check, Loader2, Users, AlertCircle } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 
 export function RsvpClient({ 
-  eventId, 
+  meetId, 
   initialStatus, 
   isFull,
   price,
@@ -15,7 +15,7 @@ export function RsvpClient({
   capacity,
   userId
 }: { 
-  eventId: string; 
+  meetId: string; 
   initialStatus: string | null; 
   isFull: boolean;
   price: string;
@@ -36,7 +36,7 @@ export function RsvpClient({
     
     setLoading(true);
     try {
-      const res = await rsvpToEvent(eventId, "GOING");
+      const res = await rsvpToEvent(meetId, "GOING");
       if (res.success) {
         setStatus(res.status || "GOING");
         router.refresh();
@@ -51,7 +51,7 @@ export function RsvpClient({
 
   const getTicketUrl = () => {
     if (typeof window !== "undefined" && userId) {
-      return `${window.location.origin}/events/${eventId}/scanner?u=${userId}`;
+      return `${window.location.origin}/meets/${meetId}/scanner?u=${userId}`;
     }
     return "";
   };

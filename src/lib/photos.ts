@@ -16,9 +16,9 @@ export const portraits = [
   "/assets/ph-portrait-4.jpg",
 ];
 
-export function getFallbackPhoto(id: string, type: 'event' | 'project' | 'space' | 'opportunity'): string {
+export function getFallbackPhoto(id: string, type: 'meet' | 'project' | 'space' | 'opportunity'): string {
   const hash = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  if (type === 'event') {
+  if (type === 'meet') {
     const options = [photos.meetup, photos.demoday, photos.coffee];
     return options[hash % options.length];
   } else if (type === 'project') {

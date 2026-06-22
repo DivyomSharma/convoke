@@ -221,7 +221,7 @@ export default function AuthPage() {
             <input
               type="email"
               value={email}
-              onChange={(event) => setEmail(event.target.value)}
+              onChange={(meet) => setEmail(meet.target.value)}
               placeholder="you@example.com"
               className={`h-12 w-full rounded-full px-4 text-[14px] outline-none focus:border-brand focus:ring-0 ${
                 isDark ? "border border-g3 bg-transparent text-white" : "border border-[#CFC8BF] bg-white text-[#111111]"

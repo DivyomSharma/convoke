@@ -17,7 +17,7 @@ export default async function ScannerPage(props: {
   const { id } = params;
   const userId = searchParams.u;
 
-  const event = await prisma.event.findUnique({
+  const meet = await prisma.meet.findUnique({
     where: { id },
     include: {
       space: {
@@ -28,7 +28,7 @@ export default async function ScannerPage(props: {
     },
   });
 
-  if (!event) return notFound();
+  if (!meet) return notFound();
 
   let scanResult: { success: boolean; message: string; user?: any } = {
     success: false,
@@ -63,11 +63,11 @@ export default async function ScannerPage(props: {
     <Shell>
       <main className="mx-auto max-w-[480px] px-5 py-16 sm:px-8">
         <Link 
-          href={`/events/${id}`}
+          href={`/meets/${id}`}
           className="inline-flex items-center gap-2 mono text-[11px] uppercase tracking-wider text-g5 hover:text-ink mb-8"
         >
           <ArrowLeft size={13} />
-          <span>Back to Event</span>
+          <span>Back to Meet</span>
         </Link>
 
         <div className="border border-g3 rounded-sm p-8 bg-paper-card text-ink space-y-6 text-center">
@@ -75,7 +75,7 @@ export default async function ScannerPage(props: {
             Attendance Scanner
           </div>
           
-          <h1 className="serif text-3xl font-light leading-tight">{event.title}</h1>
+          <h1 className="serif text-3xl font-light leading-tight">{meet.title}</h1>
           
           {userId ? (
             scanResult.success ? (

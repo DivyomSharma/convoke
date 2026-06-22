@@ -8,6 +8,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { createOpportunity } from "@/app/actions/workspace";
 import { CardRing } from "@/components/ui/card-ring";
 import { ImageUploadField } from "@/components/forms/ImageUploadField";
+import { FileUploadField } from "@/components/forms/FileUploadField";
+
+import { LocationAutocomplete } from "@/components/forms/LocationAutocomplete";
 
 interface ChallengeWithDetails {
   id: string;
@@ -42,6 +45,16 @@ export function ChallengesList({
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [discord, setDiscord] = useState("");
+  const [instagram, setInstagram] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [twitter, setTwitter] = useState("");
+  const [linkedin, setLinkedin] = useState("");
+  const [mode, setMode] = useState("ONLINE");
+  const [brochureUrl, setBrochureUrl] = useState("");
+  const [brochureFileName, setBrochureFileName] = useState("");
+  const [currentTab, setCurrentTab] = useState(0);
+  const TABS = ["Basic Info", "Details", "Links"];
 
   // Form states
   const [title, setTitle] = useState("");
@@ -74,7 +87,14 @@ export function ChallengesList({
         compensation: compensation || undefined, // maps to compensation field in Prisma
         bannerUrl: bannerUrl || undefined,
         deadline: deadline || undefined,
-      });
+      discord: discord || undefined,
+        instagram: instagram || undefined,
+        whatsapp: whatsapp || undefined,
+        twitter: twitter || undefined,
+        linkedin: linkedin || undefined,
+        mode: mode || undefined,
+        brochureUrl: brochureUrl || undefined,
+        });
 
       if (res.success && res.opportunity) {
         setDrawerOpen(false);
@@ -85,6 +105,8 @@ export function ChallengesList({
         setCompensation("");
         setBannerUrl("");
         setBannerFileName("");
+        setBrochureUrl("");
+        setBrochureFileName("");
         setDeadline("");
         router.refresh();
       }
@@ -210,110 +232,185 @@ export function ChallengesList({
               </div>
 
               {/* Scrollable Form */}
-              <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-6 py-6 space-y-5">
-                {error && (
-                  <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-xs text-center">
-                    {error}
-                  </div>
-                )}
-
-                <div>
-                  <label className="text-ink font-medium text-xs mb-1.5 block">Challenge Title <span className="text-red-500">*</span></label>
-                  <input 
-                    type="text"
-                    required
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="E.g. India Web3 Buildathon 2026"
-                    className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-ink font-medium text-xs mb-1.5 block">Challenge Type <span className="text-red-500">*</span></label>
-                    <select 
-                      value={type}
-                      onChange={(e) => setType(e.target.value)}
-                      className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+              <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+                <div className="flex border-b border-g3/60 px-6 shrink-0">
+                  {TABS.map((tab, idx) => (
+                    <button
+                      key={tab}
+                      type="button"
+                      onClick={() => setCurrentTab(idx)}
+                      className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${currentTab === idx ? "border-brand text-ink" : "border-transparent text-g5 hover:text-ink hover:border-g3"}`}
                     >
-                      <option value="HACKATHON">Hackathon</option>
-                      <option value="CHALLENGE">Technical Challenge</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-ink font-medium text-xs mb-1.5 block">Host Organization <span className="text-red-500">*</span></label>
-                    {organizations.length === 0 ? (
-                      <div className="text-[11px] text-amber-500 p-2 rounded bg-amber-500/10 border border-amber-500/20">
-                        No organizations found.
+                      {tab}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex-1 overflow-y-auto px-6 py-6">
+                  {currentTab === 0 && (
+                    <div className="space-y-5">
+                      {error && (
+                        <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-xs text-center">
+                          {error}
+                        </div>
+                      )}
+
+                      <div>
+                        <label className="text-ink font-medium text-xs mb-1.5 block">Challenge Name <span className="text-red-500">*</span></label>
+                        <input 
+                          type="text"
+                          required
+                          value={title}
+                          onChange={(e) => setTitle(e.target.value)}
+                          placeholder="E.g. AI for Healthcare Hackathon"
+                          className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                        />
                       </div>
-                    ) : (
-                      <select 
-                        value={organizationId}
-                        onChange={(e) => setOrganizationId(e.target.value)}
-                        className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
-                      >
-                        {organizations.map((org) => (
-                          <option key={org.id} value={org.id}>{org.name}</option>
-                        ))}
-                      </select>
-                    )}
-                  </div>
-                </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-ink font-medium text-xs mb-1.5 block">Awards & Prize Pool</label>
-                    <input 
-                      type="text"
-                      value={compensation}
-                      onChange={(e) => setCompensation(e.target.value)}
-                      placeholder="E.g. $10,000 in grants"
-                      className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-ink font-medium text-xs mb-1.5 block">Submission Deadline</label>
-                    <input 
-                      type="date"
-                      value={deadline}
-                      onChange={(e) => setDeadline(e.target.value)}
-                      className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
-                    />
-                  </div>
-                </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-ink font-medium text-xs mb-1.5 block">Type <span className="text-red-500">*</span></label>
+                          <select 
+                            value={type}
+                            onChange={(e) => setType(e.target.value)}
+                            className="w-full h-11 px-4 rounded-xl border border-g3 bg-paper text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                          >
+                            <option value="HACKATHON">Hackathon</option>
+                            <option value="IDEATHON">Ideathon</option>
+                            <option value="CASE_STUDY">Case Study</option>
+                            <option value="QUIZ">Quiz</option>
+                            <option value="CODING_CHALLENGE">Coding Challenge</option>
+                            <option value="HIRING_CHALLENGE">Hiring Challenge</option>
+                            <option value="TREASURE_HUNT">Treasure Hunt</option>
+                            <option value="BUSINESS_PITCH">Business Pitch</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-ink font-medium text-xs mb-1.5 block">Host Organization <span className="text-red-500">*</span></label>
+                          {organizations.length === 0 ? (
+                            <div className="text-[11px] text-amber-500 p-2 rounded bg-amber-500/10 border border-amber-500/20">
+                              No organizations found.
+                            </div>
+                          ) : (
+                            <select 
+                              value={organizationId}
+                              onChange={(e) => setOrganizationId(e.target.value)}
+                              className="w-full h-11 px-4 rounded-xl border border-g3 bg-paper text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                            >
+                              {organizations.map((org) => (
+                                <option key={org.id} value={org.id}>{org.name}</option>
+                              ))}
+                            </select>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        <ImageUploadField
+                          label="Challenge cover"
+                          value={bannerUrl}
+                          fileName={bannerFileName}
+                          onChange={setBannerUrl}
+                          onFileNameChange={setBannerFileName}
+                          onError={setError}
+                        />
+                        <FileUploadField
+                          label="Challenge Brochure (PDF)"
+                          value={brochureUrl}
+                          fileName={brochureFileName}
+                          onChange={setBrochureUrl}
+                          onFileNameChange={setBrochureFileName}
+                          onError={setError}
+                        />
+                      </div>
+                    </div>
+                  )}
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <div>
-                    <label className="text-ink font-medium text-xs mb-1.5 block">Location</label>
-                    <input 
-                      type="text"
-                      value={location}
-                      onChange={(e) => setLocation(e.target.value)}
-                      placeholder="E.g. Online, IIT Delhi"
-                      className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
-                    />
-                  </div>
-                </div>
+                  {currentTab === 1 && (
+                    <div className="space-y-5 max-w-2xl mx-auto w-full">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-ink font-medium text-xs mb-1.5 block">Awards & Prize Pool</label>
+                          <input 
+                            type="text"
+                            value={compensation}
+                            onChange={(e) => setCompensation(e.target.value)}
+                            placeholder="E.g. $10,000 in grants"
+                            className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-ink font-medium text-xs mb-1.5 block">Submission Deadline</label>
+                          <input 
+                            type="date"
+                            value={deadline}
+                            onChange={(e) => setDeadline(e.target.value)}
+                            className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                          />
+                        </div>
+                      </div>
 
-                <ImageUploadField
-                  label="Challenge cover"
-                  value={bannerUrl}
-                  fileName={bannerFileName}
-                  onChange={setBannerUrl}
-                  onFileNameChange={setBannerFileName}
-                  onError={setError}
-                />
+                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        <div>
+                          <label className="text-ink font-medium text-xs mb-1.5 block">Mode</label>
+                          <select 
+                            value={mode}
+                            onChange={(e) => setMode(e.target.value)}
+                            className="w-full h-11 px-4 rounded-xl border border-g3 bg-paper text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                          >
+                            <option value="ONLINE">Online</option>
+                            <option value="OFFLINE">Offline</option>
+                            <option value="HYBRID">Hybrid</option>
+                          </select>
+                        </div>
+                        {mode !== "ONLINE" && (
+                          <div>
+                            <label className="text-ink font-medium text-xs mb-1.5 block">Location</label>
+                            <LocationAutocomplete 
+                              value={location}
+                              onChange={(val) => setLocation(val)}
+                              className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                            />
+                          </div>
+                        )}
+                      </div>
 
-                <div>
-                  <label className="text-ink font-medium text-xs mb-1.5 block">Challenge Description & Rules</label>
-                  <textarea 
-                    rows={6}
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Provide a detailed brief, track details, rules, judging criteria, and schedules..."
-                    className="w-full p-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all resize-none"
-                  />
+                      <div>
+                        <label className="text-ink font-medium text-xs mb-1.5 block">Challenge Description & Rules</label>
+                        <textarea 
+                          rows={6}
+                          value={description}
+                          onChange={(e) => setDescription(e.target.value)}
+                          placeholder="Provide a detailed brief, track details, rules, judging criteria, and schedules..."
+                          className="w-full p-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all resize-none"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {currentTab === 2 && (
+                    <div className="space-y-4 max-w-2xl mx-auto w-full">
+                      <div>
+                        <label className="text-ink font-medium text-xs mb-1.5 block">Discord</label>
+                        <input type="text" value={discord} onChange={(e) => setDiscord(e.target.value)} className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all" placeholder="https://discord.gg/..." />
+                      </div>
+                      <div>
+                        <label className="text-ink font-medium text-xs mb-1.5 block">Instagram</label>
+                        <input type="text" value={instagram} onChange={(e) => setInstagram(e.target.value)} className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all" placeholder="https://instagram.com/..." />
+                      </div>
+                      <div>
+                        <label className="text-ink font-medium text-xs mb-1.5 block">WhatsApp Group</label>
+                        <input type="text" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all" placeholder="https://chat.whatsapp.com/..." />
+                      </div>
+                      <div>
+                        <label className="text-ink font-medium text-xs mb-1.5 block">Twitter</label>
+                        <input type="text" value={twitter} onChange={(e) => setTwitter(e.target.value)} className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all" placeholder="https://twitter.com/..." />
+                      </div>
+                      <div>
+                        <label className="text-ink font-medium text-xs mb-1.5 block">LinkedIn</label>
+                        <input type="text" value={linkedin} onChange={(e) => setLinkedin(e.target.value)} className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all" placeholder="https://linkedin.com/in/..." />
+                      </div>
+                    </div>
+                  )}
                 </div>
               </form>
 

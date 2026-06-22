@@ -11,7 +11,7 @@ import { useFormValidation } from "@/hooks/useFormValidation";
 import { toast } from "sonner";
 import { CardRing } from "@/components/ui/card-ring";
 
-interface EventWithDetails {
+interface MeetWithDetails {
   id: string;
   title: string;
   description: string | null;
@@ -41,21 +41,29 @@ interface SpaceOption {
   };
 }
 
-export function EventsList({ 
+export function MeetsList({ 
   initialEvents, 
   spaces 
 }: { 
-  initialEvents: EventWithDetails[];
+  initialEvents: MeetWithDetails[];
   spaces: SpaceOption[];
 }) {
   const router = useRouter();
-  const [events, setEvents] = useState<EventWithDetails[]>(initialEvents);
+  const [meets, setEvents] = useState<MeetWithDetails[]>(initialEvents);
   const [creationOpen, setCreationOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [discord, setDiscord] = useState("");
+  const [instagram, setInstagram] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [twitter, setTwitter] = useState("");
+  const [linkedin, setLinkedin] = useState("");
+  const [currentTab, setCurrentTab] = useState(0);
   const [query, setQuery] = useState("");
   const [timeframe, setTimeframe] = useState<"ALL" | "TODAY" | "WEEK" | "UPCOMING">("ALL");
   const [sort, setSort] = useState<"ASC" | "DESC">("ASC");
+  
+  const TABS = ["Basic Info", "Details", "Links"];
 
   // Form states
   const [title, setTitle] = useState("");
@@ -73,10 +81,10 @@ export function EventsList({
   const todayForFilters = new Date(nowForFilters.getFullYear(), nowForFilters.getMonth(), nowForFilters.getDate());
   const tomorrowForFilters = new Date(todayForFilters.getTime() + 24 * 60 * 60 * 1000);
   const endOfWeekForFilters = new Date(todayForFilters.getTime() + 7 * 24 * 60 * 60 * 1000);
-  const visibleEvents = events
-    .filter((event) => {
-      const haystack = `${event.title} ${event.description || ""} ${event.space.name} ${event.space.organization.name} ${event.location || ""}`.toLowerCase();
-      const startsOn = new Date(event.startTime);
+  const visibleEvents = meets
+    .filter((meet) => {
+      const haystack = `${meet.title} ${meet.description || ""} ${meet.space.name} ${meet.space.organization.name} ${meet.location || ""}`.toLowerCase();
+      const startsOn = new Date(meet.startTime);
       const matchesQuery = !query.trim() || haystack.includes(query.toLowerCase().trim());
       const matchesTimeframe =
         timeframe === "ALL" ||
@@ -111,7 +119,7 @@ export function EventsList({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const isValid = validate([
-      { field: "event-title", value: title, message: "Title is required" },
+      { field: "meet-title", value: title, message: "Title is required" },
       { field: "event-space", value: spaceId, message: "Space is required" },
       { field: "event-start", value: startTime, message: "Start time is required" },
       { field: "event-end", value: endTime, message: "End time is required" },
@@ -134,11 +142,41 @@ export function EventsList({
         venue: venue || undefined,
         capacity: capacity ? Number(capacity) : undefined,
         requirements: requirements || undefined,
-      });
+      discord: discord || undefined,
+        instagram: instagram || undefined,
+        whatsapp: whatsapp || undefined,
+        twitter: twitter || undefined,
+        linkedin: linkedin || undefined,
+        mode: location || undefined,
+        });
 
-      if (res.success && res.event) {
-        toast.success("Event created successfully");
+      if (res.success && res.meet) {
+        toast.success("Meet created successfully");
         setCreationOpen(false);
+        setCurrentTab(0);
+        setDiscord("");
+        setInstagram("");
+        setWhatsapp("");
+        setTwitter("");
+        setLinkedin("");
+        setCurrentTab(0);
+        setDiscord("");
+        setInstagram("");
+        setWhatsapp("");
+        setTwitter("");
+        setLinkedin("");
+        setCurrentTab(0);
+        setDiscord("");
+        setInstagram("");
+        setWhatsapp("");
+        setTwitter("");
+        setLinkedin("");
+        setCurrentTab(0);
+        setDiscord("");
+        setInstagram("");
+        setWhatsapp("");
+        setTwitter("");
+        setLinkedin("");
         setTitle("");
         setDescription("");
         setBannerUrl("");
@@ -152,7 +190,7 @@ export function EventsList({
         router.refresh();
       }
     } catch (err: any) {
-      setError(err.message || "Failed to host event.");
+      setError(err.message || "Failed to host meet.");
     } finally {
       setLoading(false);
     }
@@ -184,14 +222,14 @@ export function EventsList({
           <Search size={15} className="text-brand" />
           <input
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
+            onChange={(meet) => setQuery(meet.target.value)}
             placeholder="Search meets, spaces, cities..."
             className="w-full bg-transparent text-[14px] text-ink outline-none placeholder:text-g4"
           />
         </label>
         <select
           value={timeframe}
-          onChange={(event) => setTimeframe(event.target.value as typeof timeframe)}
+          onChange={(meet) => setTimeframe(meet.target.value as typeof timeframe)}
           className="h-11 rounded-full border border-g3 bg-paper-card/70 px-4 text-[13px] text-ink outline-none"
         >
           <option value="ALL">All meets</option>
@@ -201,7 +239,7 @@ export function EventsList({
         </select>
         <select
           value={sort}
-          onChange={(event) => setSort(event.target.value as typeof sort)}
+          onChange={(meet) => setSort(meet.target.value as typeof sort)}
           className="h-11 rounded-full border border-g3 bg-paper-card/70 px-4 text-[13px] text-ink outline-none"
         >
           <option value="ASC">Soonest first</option>
@@ -252,7 +290,7 @@ export function EventsList({
               return d < today;
             });
 
-            const renderSection = (title: string, list: EventWithDetails[]) => {
+            const renderSection = (title: string, list: MeetWithDetails[]) => {
               if (list.length === 0) return null;
               return (
                 <div className="border-b border-g3/60 pb-12 last:border-0 last:pb-0">
@@ -260,48 +298,48 @@ export function EventsList({
                     {title}
                   </h2>
                   <div className="flex flex-col gap-12">
-                    {list.map((event) => {
-                      const startsOn = new Date(event.startTime);
-                      const endsOn = new Date(event.endTime);
+                    {list.map((meet) => {
+                      const startsOn = new Date(meet.startTime);
+                      const endsOn = new Date(meet.endTime);
                       const isLive = new Date() >= startsOn && new Date() <= endsOn;
-                      const banner = event.bannerUrl || getFallbackPhoto(event.id, 'event');
+                      const banner = meet.bannerUrl || getFallbackPhoto(meet.id, 'meet');
 
                       return (
-                        <div key={event.id} className="group grid gap-0 lg:grid-cols-12 lg:items-stretch premium-card campus-frame overflow-hidden relative border border-[#1a1a1a] hover:border-[#2f2f2f] transition-all duration-700 hover:-translate-y-[2px] ease-[cubic-bezier(0.22,0.61,0.36,1)]">
+                        <div key={meet.id} className="group grid gap-0 lg:grid-cols-12 lg:items-stretch premium-card campus-frame overflow-hidden relative border border-[#1a1a1a] hover:border-[#2f2f2f] transition-all duration-700 hover:-translate-y-[2px] ease-[cubic-bezier(0.22,0.61,0.36,1)]">
                           
-                          {/* Event Card Ring */}
+                          {/* Meet Card Ring */}
                           <div className="absolute -right-[15%] top-1/2 -translate-y-1/2 opacity-8 group-hover:opacity-25 transition-opacity duration-700 ease-[cubic-bezier(0.22,0.61,0.36,1)] hidden md:block">
                             <CardRing size={600} text="CONVOKE • FOR PEOPLE BUILDING THE FUTURE • " />
                           </div>
 
-                          {/* Event B/W Photography Banner */}
+                          {/* Meet B/W Photography Banner */}
                           <div className="lg:col-span-4 relative z-10">
-                            <Link href={`/events/${event.id}`} className="block overflow-hidden bg-g1 h-full min-h-[240px] relative">
+                            <Link href={`/meets/${meet.id}`} className="block overflow-hidden bg-g1 h-full min-h-[240px] relative">
                               <img 
                                 src={banner} 
-                                alt={event.title} 
+                                alt={meet.title} 
                                 className="absolute inset-0 w-full h-full object-cover" 
                               />
                             </Link>
                           </div>
 
-                          {/* Event details */}
+                          {/* Meet details */}
                           <div className="lg:col-span-8 flex flex-col justify-between p-6 md:p-8 relative z-10">
                             <div>
                               <div className="flex flex-wrap items-center gap-3 text-[11px] mono uppercase tracking-[0.25em] font-medium text-[var(--brand)] mb-3">
                                 <span>{isLive ? "LIVE NOW" : "MEET"}</span>
                                 <span>•</span>
-                                <span>{event.location || "SAN FRANCISCO"}</span>
+                                <span>{meet.location || "SAN FRANCISCO"}</span>
                               </div>
 
-                              <Link href={`/events/${event.id}`} className="block mt-2">
+                              <Link href={`/meets/${meet.id}`} className="block mt-2">
                                 <h3 className="serif text-3xl leading-tight text-ink md:text-5xl group-hover:text-g5 transition-colors font-light">
-                                  {event.title}
+                                  {meet.title}
                                 </h3>
                               </Link>
 
                               <p className="mt-4 max-w-[62ch] text-[15px] leading-[1.6] text-g5 font-sans">
-                                {event.description || "Gathering details are forming. Stay tuned for details."}
+                                {meet.description || "Gathering details are forming. Stay tuned for details."}
                               </p>
 
                               <div className="mt-8 flex flex-wrap gap-4 text-[13px] font-sans text-g5">
@@ -311,7 +349,7 @@ export function EventsList({
                                   {startsOn.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                                 </span>
                                 <span>•</span>
-                                <span>{event._count.attendance}+ going</span>
+                                <span>{meet._count.attendance}+ going</span>
                               </div>
                             </div>
                           </div>
@@ -368,162 +406,161 @@ export function EventsList({
                   <X size={18} />
                 </button>
               </div>
-
-              <form onSubmit={handleSubmit} className="grid flex-1 gap-6 overflow-y-auto px-6 py-6 lg:grid-cols-[0.9fr_1.1fr]">
-                <div className="space-y-5">
-                  <div className="rounded-[28px] border border-dashed border-g3 bg-g1/50 p-5">
-                    <div className="aspect-[16/10] overflow-hidden rounded-[22px] border border-g3 bg-g2">
-                      {bannerUrl ? (
-                        <img src={bannerUrl} alt="" className="h-full w-full object-cover" />
-                      ) : (
-                        <div className="flex h-full items-center justify-center text-center text-[13px] leading-6 text-g5">
-                          Upload a banner image to preview the meet cover.
-                        </div>
-                      )}
-                    </div>
-                    <label className="mt-4 flex h-11 cursor-pointer items-center justify-center rounded-2xl border border-g3 bg-paper-elevated px-4 text-sm font-medium text-ink transition-all hover:border-brand/45">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="sr-only"
-                        onChange={(event) => handleBannerUpload(event.target.files?.[0])}
-                      />
-                      {bannerFileName || "Upload banner image"}
-                    </label>
-                    <p className="mt-3 text-[12px] leading-5 text-g5">Images are selected from your device and previewed instantly. Production storage can be switched to UploadThing when keys are configured.</p>
-                  </div>
-                </div>
-
-                <div className="space-y-5">
-                {error && (
-                  <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-xs text-center">
-                    {error}
-                  </div>
-                )}
-
-                <div>
-                  <label htmlFor="event-title" className="text-ink font-medium text-xs mb-1.5 block">Meet Title <span className="text-red-500">*</span></label>
-                  <input 
-                    id="event-title"
-                    type="text"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="E.g. AI Builder Circle: Mixer #1"
-                    className={`w-full h-11 px-4 rounded-xl border ${getError("event-title") ? "border-red-500/50" : "border-g3"} bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all`}
-                  />
-                  {getError("event-title") && <p className="text-red-500 text-xs mt-1.5">{getError("event-title")}</p>}
-                </div>
-
-                <div>
-                  <label htmlFor="event-space" className="text-ink font-medium text-xs mb-1.5 block">Target Space <span className="text-red-500">*</span></label>
-                  {spaces.length === 0 ? (
-                    <div className="text-xs text-amber-500 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
-                      You must create an organization and a space first before you can host an event.
-                    </div>
-                  ) : (
-                    <>
-                      <select 
-                        id="event-space"
-                        value={spaceId}
-                        onChange={(e) => setSpaceId(e.target.value)}
-                        className={`w-full h-11 px-4 rounded-xl border ${getError("event-space") ? "border-red-500/50" : "border-g3"} bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all`}
-                      >
-                        <option value="">Select a space...</option>
-                        {spaces.map((sp) => (
-                          <option key={sp.id} value={sp.id}>
-                            {sp.name} ({sp.organization.name})
-                          </option>
-                        ))}
-                      </select>
-                      {getError("event-space") && <p className="text-red-500 text-xs mt-1.5">{getError("event-space")}</p>}
-                    </>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div>
-                    <label htmlFor="event-start" className="text-ink font-medium text-xs mb-1.5 block">Start Date & Time <span className="text-red-500">*</span></label>
-                    <input 
-                      id="event-start"
-                      type="datetime-local"
-                      value={startTime}
-                      onChange={(e) => setStartTime(e.target.value)}
-                      className={`w-full h-11 px-4 rounded-xl border ${getError("event-start") ? "border-red-500/50" : "border-g3"} bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all`}
-                    />
-                    {getError("event-start") && <p className="text-red-500 text-xs mt-1.5">{getError("event-start")}</p>}
-                  </div>
-                  <div>
-                    <label htmlFor="event-end" className="text-ink font-medium text-xs mb-1.5 block">End Date & Time <span className="text-red-500">*</span></label>
-                    <input 
-                      id="event-end"
-                      type="datetime-local"
-                      value={endTime}
-                      onChange={(e) => setEndTime(e.target.value)}
-                      className={`w-full h-11 px-4 rounded-xl border ${getError("event-end") ? "border-red-500/50" : "border-g3"} bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all`}
-                    />
-                    {getError("event-end") && <p className="text-red-500 text-xs mt-1.5">{getError("event-end")}</p>}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div>
-                    <label className="text-ink font-medium text-xs mb-1.5 block">Location Type</label>
-                    <select 
-                      value={location}
-                      onChange={(e) => setLocation(e.target.value)}
-                      className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+              <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+                <div className="flex border-b border-g3/60 px-6 shrink-0">
+                  {TABS.map((tab, idx) => (
+                    <button
+                      key={tab}
+                      type="button"
+                      onClick={() => setCurrentTab(idx)}
+                      className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${currentTab === idx ? "border-brand text-ink" : "border-transparent text-g5 hover:text-ink hover:border-g3"}`}
                     >
-                      <option value="ONLINE">Online</option>
-                      <option value="IN_PERSON">In Person</option>
-                      <option value="HYBRID">Hybrid</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-ink font-medium text-xs mb-1.5 block">Venue Name</label>
-                    <input 
-                      type="text"
-                      value={venue}
-                      onChange={(e) => setVenue(e.target.value)}
-                      placeholder="E.g. Seminar Hall, Zoom Link"
-                      className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
-                    />
-                  </div>
+                      {tab}
+                    </button>
+                  ))}
                 </div>
+                <div className="flex-1 overflow-y-auto px-6 py-6">
+                  {currentTab === 0 && (
+                    <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+                      <div className="space-y-5">
+                        <div className="rounded-[28px] border border-dashed border-g3 bg-g1/50 p-5">
+                          <div className="aspect-[16/10] overflow-hidden rounded-[22px] border border-g3 bg-g2">
+                            {bannerUrl ? (
+                              <img src={bannerUrl} alt="" className="h-full w-full object-cover" />
+                            ) : (
+                              <div className="flex h-full items-center justify-center text-center text-[13px] leading-6 text-g5">
+                                Upload a banner image to preview the meet cover.
+                              </div>
+                            )}
+                          </div>
+                          <label className="mt-4 flex h-11 cursor-pointer items-center justify-center rounded-2xl border border-g3 bg-paper-elevated px-4 text-sm font-medium text-ink transition-all hover:border-brand/45">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="sr-only"
+                              onChange={(e) => handleBannerUpload(e.target.files?.[0])}
+                            />
+                            {bannerFileName || "Upload banner image"}
+                          </label>
+                        </div>
+                      </div>
+                      <div className="space-y-5">
+                        {error && (
+                          <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-xs text-center">
+                            {error}
+                          </div>
+                        )}
+                        <div>
+                          <label htmlFor="meet-title" className="text-ink font-medium text-xs mb-1.5 block">Meet Title <span className="text-red-500">*</span></label>
+                          <input 
+                            id="meet-title"
+                            type="text"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            placeholder="E.g. AI Builder Circle: Mixer #1"
+                            className={`w-full h-11 px-4 rounded-xl border ${getError("meet-title") ? "border-red-500/50" : "border-g3"} bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all`}
+                          />
+                          {getError("meet-title") && <p className="text-red-500 text-xs mt-1.5">{getError("meet-title")}</p>}
+                        </div>
+                        <div>
+                          <label htmlFor="event-space" className="text-ink font-medium text-xs mb-1.5 block">Target Space <span className="text-red-500">*</span></label>
+                          {spaces.length === 0 ? (
+                            <div className="text-xs text-amber-500 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                              You must create an organization and a space first before you can host a meet.
+                            </div>
+                          ) : (
+                            <select 
+                              id="event-space"
+                              value={spaceId}
+                              onChange={(e) => setSpaceId(e.target.value)}
+                              className={`w-full h-11 px-4 rounded-xl border ${getError("event-space") ? "border-red-500/50" : "border-g3"} bg-paper text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all`}
+                            >
+                              <option value="">Select a space...</option>
+                              {spaces.map((sp) => (
+                                <option key={sp.id} value={sp.id}>
+                                  {sp.name} ({sp.organization.name})
+                                </option>
+                              ))}
+                            </select>
+                          )}
+                        </div>
+                        <div>
+                          <label className="text-ink font-medium text-xs mb-1.5 block">Meet Description</label>
+                          <textarea 
+                            rows={4}
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            placeholder="Provide details about what will happen at the meet..."
+                            className="w-full p-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all resize-none"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div>
-                    <label className="text-ink font-medium text-xs mb-1.5 block">Capacity (Max Seats)</label>
-                    <input 
-                      type="number"
-                      value={capacity}
-                      onChange={(e) => setCapacity(e.target.value)}
-                      placeholder="Leave empty for unlimited"
-                      className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
-                    />
-                  </div>
-                </div>
+                  {currentTab === 1 && (
+                    <div className="space-y-5 max-w-2xl mx-auto w-full">
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div>
+                          <label className="text-ink font-medium text-xs mb-1.5 block">Start Date & Time <span className="text-red-500">*</span></label>
+                          <input type="datetime-local" value={startTime} onChange={(e) => setStartTime(e.target.value)} className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none" />
+                        </div>
+                        <div>
+                          <label className="text-ink font-medium text-xs mb-1.5 block">End Date & Time <span className="text-red-500">*</span></label>
+                          <input type="datetime-local" value={endTime} onChange={(e) => setEndTime(e.target.value)} className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none" />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div>
+                          <label className="text-ink font-medium text-xs mb-1.5 block">Location Type</label>
+                          <select value={location} onChange={(e) => setLocation(e.target.value)} className="w-full h-11 px-4 rounded-xl border border-g3 bg-paper text-sm text-ink outline-none">
+                            <option value="ONLINE">Online</option>
+                            <option value="IN_PERSON">In Person</option>
+                            <option value="HYBRID">Hybrid</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-ink font-medium text-xs mb-1.5 block">Venue Name / URL</label>
+                          <input type="text" value={venue} onChange={(e) => setVenue(e.target.value)} className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none" />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div>
+                          <label className="text-ink font-medium text-xs mb-1.5 block">Capacity (Max Seats)</label>
+                          <input type="number" value={capacity} onChange={(e) => setCapacity(e.target.value)} placeholder="Leave empty for unlimited" className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none" />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-ink font-medium text-xs mb-1.5 block">Participation Requirements</label>
+                        <textarea rows={3} value={requirements} onChange={(e) => setRequirements(e.target.value)} className="w-full p-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none resize-none" />
+                      </div>
+                    </div>
+                  )}
 
-                <div>
-                  <label className="text-ink font-medium text-xs mb-1.5 block">Meet Description</label>
-                  <textarea 
-                    rows={4}
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Provide details about what will happen at the event, who it's for, speakers, agendas, etc..."
-                    className="w-full p-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all resize-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-ink font-medium text-xs mb-1.5 block">Participation Requirements / Pre-requisites</label>
-                  <textarea 
-                    rows={3}
-                    value={requirements}
-                    onChange={(e) => setRequirements(e.target.value)}
-                    placeholder="E.g. Laptop required, bring github project, RSVP required, etc."
-                    className="w-full p-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all resize-none"
-                  />
-                </div>
+                  {currentTab === 2 && (
+                    <div className="space-y-4 max-w-2xl mx-auto w-full">
+                      <div>
+                        <label className="text-ink font-medium text-xs mb-1.5 block">Discord</label>
+                        <input type="text" value={discord} onChange={(e) => setDiscord(e.target.value)} className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none" placeholder="https://discord.gg/..." />
+                      </div>
+                      <div>
+                        <label className="text-ink font-medium text-xs mb-1.5 block">Instagram</label>
+                        <input type="text" value={instagram} onChange={(e) => setInstagram(e.target.value)} className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none" placeholder="https://instagram.com/..." />
+                      </div>
+                      <div>
+                        <label className="text-ink font-medium text-xs mb-1.5 block">WhatsApp Group</label>
+                        <input type="text" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none" placeholder="https://chat.whatsapp.com/..." />
+                      </div>
+                      <div>
+                        <label className="text-ink font-medium text-xs mb-1.5 block">Twitter</label>
+                        <input type="text" value={twitter} onChange={(e) => setTwitter(e.target.value)} className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none" placeholder="https://twitter.com/..." />
+                      </div>
+                      <div>
+                        <label className="text-ink font-medium text-xs mb-1.5 block">LinkedIn</label>
+                        <input type="text" value={linkedin} onChange={(e) => setLinkedin(e.target.value)} className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none" placeholder="https://linkedin.com/in/..." />
+                      </div>
+                    </div>
+                  )}
                 </div>
               </form>
 

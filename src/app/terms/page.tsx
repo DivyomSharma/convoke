@@ -3,7 +3,7 @@ import { Shell } from "@/components/Shell";
 const sections = [
   {
     title: "Using Convoke",
-    body: "Convoke exists for legitimate opportunities, events, communities, projects, sponsorships, certificates, and collaboration. You agree to provide accurate information and to use the platform in a way that protects participants, organizers, sponsors, and creators.",
+    body: "Convoke exists for legitimate opportunities, meets, communities, projects, sponsorships, certificates, and collaboration. You agree to provide accurate information and to use the platform in a way that protects participants, organizers, sponsors, and creators.",
   },
   {
     title: "Accounts And Roles",
@@ -11,11 +11,11 @@ const sections = [
   },
   {
     title: "Organizer Responsibilities",
-    body: "Organizations must publish truthful event and opportunity details, review applications fairly, honor commitments made to participants, and avoid misleading claims about sponsorships, certificates, hiring, compensation, prizes, or affiliations.",
+    body: "Organizations must publish truthful meet and opportunity details, review applications fairly, honor commitments made to participants, and avoid misleading claims about sponsorships, certificates, hiring, compensation, prizes, or affiliations.",
   },
   {
     title: "Participant Responsibilities",
-    body: "Participants must submit truthful applications, respect community guidelines, avoid spam or harassment, and follow organizer instructions for events, hackathons, volunteering, interviews, and team collaboration.",
+    body: "Participants must submit truthful applications, respect community guidelines, avoid spam or harassment, and follow organizer instructions for meets, hackathons, volunteering, interviews, and team collaboration.",
   },
   {
     title: "Content And Files",

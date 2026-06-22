@@ -18,7 +18,7 @@ export async function sendWelcomeEmail(to: string, name: string) {
 export async function sendRSVPEmail(to: string, eventTitle: string, status: string) {
   if (!resend) return;
   await resend.emails.send({
-    from: "Convoke <events@theconvoke.xyz>",
+    from: "Convoke <meets@theconvoke.xyz>",
     to,
     subject: `RSVP Confirmed: ${eventTitle}`,
     html: `<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #111;">

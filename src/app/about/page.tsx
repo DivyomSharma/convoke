@@ -45,7 +45,7 @@ export default function AboutPage() {
             {
               icon: Award,
               title: "Verified Reputation",
-              copy: "Identity built on proof of work, projects shipped, events hosted, and trusted recommendations."
+              copy: "Identity built on proof of work, projects shipped, meets hosted, and trusted recommendations."
             },
             {
               icon: Shield,

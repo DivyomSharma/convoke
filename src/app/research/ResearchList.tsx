@@ -46,8 +46,8 @@ export function ResearchList({ papers }: { papers: ResearchPaper[] }) {
     reader.readAsDataURL(file);
   };
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
+  const handleSubmit = async (meet: React.FormEvent) => {
+    meet.preventDefault();
     if (!title.trim()) {
       setError("Research title is required.");
       return;
@@ -93,7 +93,7 @@ export function ResearchList({ papers }: { papers: ResearchPaper[] }) {
             <FileText size={28} className="text-brand" />
           </div>
           <h3 className="serif text-3xl text-ink mb-2">No research publications dropped yet</h3>
-          <p className="text-g5 text-[15px] max-w-[40ch] leading-relaxed mb-8">Share your findings with the builder community.</p>
+          <p className="text-g5 text-[15px] max-w-[40ch] leading-relaxed mb-8">Share your findings with the builder space.</p>
           <button onClick={() => setOpen(true)} className="ink-button px-6 text-[14px] font-medium">
             Drop a Paper
           </button>
@@ -177,7 +177,7 @@ export function ResearchList({ papers }: { papers: ResearchPaper[] }) {
                     <span className="text-[14px]">{paperFileName || "Upload PDF, DOCX, TXT, or MD"}</span>
                   </div>
                   <label className="mt-4 flex h-11 cursor-pointer items-center justify-center rounded-2xl border border-g3 bg-paper-elevated px-4 text-sm font-medium text-ink transition-all hover:border-brand/45">
-                    <input type="file" accept=".pdf,.docx,.txt,.md" className="sr-only" onChange={(event) => handlePaperUpload(event.target.files?.[0])} />
+                    <input type="file" accept=".pdf,.docx,.txt,.md" className="sr-only" onChange={(meet) => handlePaperUpload(meet.target.files?.[0])} />
                     Choose file
                   </label>
                 </div>
@@ -186,11 +186,11 @@ export function ResearchList({ papers }: { papers: ResearchPaper[] }) {
                   {error ? <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-center text-xs text-red-500">{error}</div> : null}
                   <div>
                     <label className="mb-1.5 block text-xs font-medium text-ink">Title</label>
-                    <input value={title} onChange={(event) => setTitle(event.target.value)} className="h-11 w-full rounded-2xl border border-g3 bg-transparent px-4 text-sm text-ink outline-none focus:border-brand/55" placeholder="Paper title" />
+                    <input value={title} onChange={(meet) => setTitle(meet.target.value)} className="h-11 w-full rounded-2xl border border-g3 bg-transparent px-4 text-sm text-ink outline-none focus:border-brand/55" placeholder="Paper title" />
                   </div>
                   <div>
                     <label className="mb-1.5 block text-xs font-medium text-ink">Abstract</label>
-                    <textarea value={abstract} onChange={(event) => setAbstract(event.target.value)} rows={8} className="w-full resize-none rounded-2xl border border-g3 bg-transparent p-4 text-sm text-ink outline-none focus:border-brand/55" placeholder="Summarize the paper and what builders should take away." />
+                    <textarea value={abstract} onChange={(meet) => setAbstract(meet.target.value)} rows={8} className="w-full resize-none rounded-2xl border border-g3 bg-transparent p-4 text-sm text-ink outline-none focus:border-brand/55" placeholder="Summarize the paper and what builders should take away." />
                   </div>
                 </div>
               </form>

@@ -50,7 +50,7 @@ model User {
   updatedAt  DateTime @updatedAt
 
   memberships   Membership[]
-  events        EventAttendance[]
+  meets         MeetAttendance[]
   vouchesGiven  Vouch[]           @relation("VouchesGiven")
   vouchesRecv   Vouch[]           @relation("VouchesReceived")
   messages      Message[]
@@ -89,6 +89,11 @@ model Organization {
   timeline      TimelineEvent[]
   resources     Resource[]
   partners      Partner[]
+  discord       String?
+  instagram     String?
+  whatsapp      String?
+  twitter       String?
+  linkedin      String?
 }
 
 model Membership {
@@ -115,11 +120,16 @@ model Space {
   updatedAt      DateTime @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  events       Event[]
+  meets        Meet[]
   messages     Message[]
+  discord      String?
+  instagram    String?
+  whatsapp     String?
+  twitter      String?
+  linkedin     String?
 }
 
-model Event {
+model Meet {
   id            String   @id @default(uuid())
   title         String
   description   String?  @db.Text
@@ -143,25 +153,32 @@ model Event {
   updatedAt     DateTime @updatedAt
 
   space      Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  attendance EventAttendance[]
+  attendance MeetAttendance[]
   faqs       FAQ[]
   sponsors   Sponsor[]
   gallery    GalleryImage[]
   resources  Resource[]
   partners   Partner[]
+  
+  mode       String?
+  discord    String?
+  instagram  String?
+  whatsapp   String?
+  twitter    String?
+  linkedin   String?
 }
 
-model EventAttendance {
+model MeetAttendance {
   id        String   @id @default(uuid())
-  eventId   String
+  meetId    String
   userId    String
   status    String // GOING, INTERESTED, WAITLISTED
   createdAt DateTime @default(now())
 
-  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  meet Meet @relation(fields: [meetId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([eventId, userId])
+  @@unique([meetId, userId])
 }
 
 model Opportunity {
@@ -181,6 +198,13 @@ model Opportunity {
   benefits       String?   @db.Text
   stipend        String?
   bannerUrl      String?
+  brochureUrl    String?
+  mode           String?
+  discord        String?
+  instagram      String?
+  whatsapp       String?
+  twitter        String?
+  linkedin       String?
   deadline       DateTime?
   views          Int       @default(0)
   organizationId String
@@ -250,12 +274,12 @@ model FAQ {
   id             String  @id @default(uuid())
   question       String
   answer         String  @db.Text
-  eventId        String?
+  meetId         String?
   organizationId String?
   opportunityId  String?
   projectId      String?
 
-  event        Event?        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  meet         Meet?         @relation(fields: [meetId], references: [id], onDelete: Cascade)
   organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   opportunity  Opportunity?  @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
   project      Project?      @relation(fields: [projectId], references: [id], onDelete: Cascade)
@@ -266,10 +290,10 @@ model Sponsor {
   name           String
   logoUrl        String?
   tier           String?
-  eventId        String?
+  meetId         String?
   organizationId String?
 
-  event        Event?        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  meet         Meet?         @relation(fields: [meetId], references: [id], onDelete: Cascade)
   organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 }
 
@@ -277,10 +301,10 @@ model Partner {
   id             String  @id @default(uuid())
   name           String
   logoUrl        String?
-  eventId        String?
+  meetId         String?
   organizationId String?
 
-  event        Event?        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  meet         Meet?         @relation(fields: [meetId], references: [id], onDelete: Cascade)
   organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 }
 
@@ -288,11 +312,11 @@ model GalleryImage {
   id             String  @id @default(uuid())
   url            String
   caption        String?
-  eventId        String?
+  meetId         String?
   organizationId String?
   projectId      String?
 
-  event        Event?        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  meet         Meet?         @relation(fields: [meetId], references: [id], onDelete: Cascade)
   organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   project      Project?      @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }
@@ -314,12 +338,12 @@ model Resource {
   name           String
   url            String
   type           String // PDF, LINK, VIDEO
-  eventId        String?
+  meetId         String?
   organizationId String?
   projectId      String?
   opportunityId  String?
 
-  event        Event?        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  meet         Meet?         @relation(fields: [meetId], references: [id], onDelete: Cascade)
   organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   project      Project?      @relation(fields: [projectId], references: [id], onDelete: Cascade)
   opportunity  Opportunity?  @relation(fields: [opportunityId], references: [id], onDelete: Cascade)

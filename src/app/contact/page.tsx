@@ -47,7 +47,7 @@ export default function ContactPage() {
                 Let's build together.
               </h1>
               <p className="mt-6 text-[16px] leading-8 text-g5">
-                Have a question about organizers, spaces, events, security, or platform capabilities? We are here to help student builders and collectives.
+                Have a question about organizers, spaces, meets, security, or platform capabilities? We are here to help student builders and collectives.
               </p>
             </div>
 
@@ -62,7 +62,7 @@ export default function ContactPage() {
                 {
                   icon: Mail,
                   title: "Platform Support",
-                  copy: "Get assistance with your workspace, passport, or events.",
+                  copy: "Get assistance with your workspace, passport, or meets.",
                   email: "support@theconvoke.xyz"
                 },
                 {

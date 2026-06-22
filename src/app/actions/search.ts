@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 export type SearchResult = {
   id: string;
-  type: "User" | "Event" | "Opportunity" | "Challenge" | "Space" | "Project" | "Organization" | "Research";
+  type: "User" | "Meet" | "Opportunity" | "Challenge" | "Space" | "Project" | "Organization" | "Research";
   title: string;
   subtitle: string;
   href: string;
@@ -15,7 +15,7 @@ export async function globalSearch(query: string): Promise<SearchResult[]> {
 
   const safeQuery = query.toLowerCase();
 
-  const [users, events, opportunities, spaces, projects, organizations, research] = await Promise.all([
+  const [users, meets, opportunities, spaces, projects, organizations, research] = await Promise.all([
     prisma.user.findMany({
       where: {
         OR: [
@@ -25,7 +25,7 @@ export async function globalSearch(query: string): Promise<SearchResult[]> {
       },
       take: 2,
     }),
-    prisma.event.findMany({
+    prisma.meet.findMany({
       where: { title: { contains: safeQuery, mode: "insensitive" } },
       include: { space: true },
       take: 2,
@@ -79,14 +79,14 @@ export async function globalSearch(query: string): Promise<SearchResult[]> {
     });
   });
 
-  // 3. Events
-  events.forEach((e) => {
+  // 3. Meets
+  meets.forEach((e) => {
     results.push({
       id: `event-${e.id}`,
-      type: "Event",
+      type: "Meet",
       title: e.title,
       subtitle: e.space.name,
-      href: `/events/${e.id}`,
+      href: `/meets/${e.id}`,
     });
   });
 

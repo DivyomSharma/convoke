@@ -15,6 +15,16 @@ export const ourFileRouter = {
       console.log("file url", file.url);
       return { uploadedBy: metadata.userId, url: file.url };
     }),
+
+  documentUploader: f({ pdf: { maxFileSize: "16MB", maxFileCount: 1 } })
+    .middleware(async () => {
+      const user = await currentUser();
+      if (!user) throw new Error("Unauthorized");
+      return { userId: user.id };
+    })
+    .onUploadComplete(async ({ metadata, file }) => {
+      return { uploadedBy: metadata.userId, url: file.url };
+    }),
 } satisfies FileRouter;
 
 export type OurFileRouter = typeof ourFileRouter;

@@ -5,6 +5,8 @@ import { SpacesList } from "./SpacesList";
 
 export const revalidate = 0; // Fresh listing upon space creation
 
+import { auth } from "@clerk/nextjs/server";
+
 export default async function SpacesPage() {
   const spaces = await prisma.space.findMany({
     include: {
@@ -24,13 +26,23 @@ export default async function SpacesPage() {
     },
   }).catch(() => []);
 
+  const { userId } = await auth();
+
   // Fetch organizations to allow user to select which organization they belong to
-  const organizations = await prisma.organization.findMany({
+  const organizations = userId ? await prisma.organization.findMany({
+    where: {
+      members: {
+        some: {
+          userId,
+          role: { in: ["ADMIN", "FOUNDER"] }
+        }
+      }
+    },
     select: {
       id: true,
       name: true,
     },
-  }).catch(() => []);
+  }).catch(() => []) : [];
 
   return (
     <Shell>

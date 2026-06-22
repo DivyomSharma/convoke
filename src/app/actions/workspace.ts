@@ -4,22 +4,22 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 
-export async function rsvpToEvent(eventId: string, status: "GOING" | "INTERESTED") {
+export async function rsvpToEvent(meetId: string, status: "GOING" | "INTERESTED") {
   const user = await requireUser();
 
-  const event = await prisma.event.findUnique({
-    where: { id: eventId },
+  const meet = await prisma.meet.findUnique({
+    where: { id: meetId },
     select: { capacity: true }
   });
 
-  if (!event) {
-    throw new Error("Event not found.");
+  if (!meet) {
+    throw new Error("Meet not found.");
   }
 
-  const existingAttendance = await prisma.eventAttendance.findUnique({
+  const existingAttendance = await prisma.meetAttendance.findUnique({
     where: {
-      eventId_userId: {
-        eventId,
+      meetId_userId: {
+        meetId,
         userId: user.id,
       },
     },
@@ -28,22 +28,22 @@ export async function rsvpToEvent(eventId: string, status: "GOING" | "INTERESTED
   let finalStatus: string = status;
   if (status === "GOING" && existingAttendance?.status !== "GOING") {
     // Check current GOING count
-    const goingCount = await prisma.eventAttendance.count({
+    const goingCount = await prisma.meetAttendance.count({
       where: {
-        eventId,
+        meetId,
         status: "GOING",
       },
     });
 
-    if (event.capacity && goingCount >= event.capacity) {
+    if (meet.capacity && goingCount >= meet.capacity) {
       finalStatus = "WAITLISTED";
     }
   }
 
-  await prisma.eventAttendance.upsert({
+  await prisma.meetAttendance.upsert({
     where: {
-      eventId_userId: {
-        eventId,
+      meetId_userId: {
+        meetId,
         userId: user.id,
       },
     },
@@ -51,29 +51,29 @@ export async function rsvpToEvent(eventId: string, status: "GOING" | "INTERESTED
       status: finalStatus,
     },
     create: {
-      eventId,
+      meetId,
       userId: user.id,
       status: finalStatus,
     },
   });
 
-  // Re-calculate waitlist count for the event
-  const waitlistCount = await prisma.eventAttendance.count({
+  // Re-calculate waitlist count for the meet
+  const waitlistCount = await prisma.meetAttendance.count({
     where: {
-      eventId,
+      meetId,
       status: "WAITLISTED",
     },
   });
 
-  await prisma.event.update({
-    where: { id: eventId },
+  await prisma.meet.update({
+    where: { id: meetId },
     data: { waitlistCount },
   });
 
   revalidatePath("/workspace");
   revalidatePath("/workspace/tickets");
-  revalidatePath("/events");
-  revalidatePath(`/events/${eventId}`);
+  revalidatePath("/meets");
+  revalidatePath(`/meets/${meetId}`);
   return { success: true, status: finalStatus };
 }
 
@@ -188,6 +188,11 @@ export async function createOrganization(data: {
   website?: string;
   logoUrl?: string;
   bannerUrl?: string;
+  discord?: string;
+  instagram?: string;
+  whatsapp?: string;
+  twitter?: string;
+  linkedin?: string;
 }) {
   const user = await requireUser();
 
@@ -215,6 +220,11 @@ export async function createOrganization(data: {
       website: data.website,
       logoUrl: data.logoUrl,
       bannerUrl: data.bannerUrl,
+      discord: data.discord,
+      instagram: data.instagram,
+      whatsapp: data.whatsapp,
+      twitter: data.twitter,
+      linkedin: data.linkedin,
       members: {
         create: {
           userId: user.id,
@@ -235,6 +245,11 @@ export async function createSpace(data: {
   bannerUrl?: string;
   rules?: string;
   organizationId: string;
+  discord?: string;
+  instagram?: string;
+  whatsapp?: string;
+  twitter?: string;
+  linkedin?: string;
 }) {
   await requireUser();
 
@@ -249,6 +264,11 @@ export async function createSpace(data: {
       bannerUrl: data.bannerUrl,
       rules: data.rules,
       organizationId: data.organizationId,
+      discord: data.discord,
+      instagram: data.instagram,
+      whatsapp: data.whatsapp,
+      twitter: data.twitter,
+      linkedin: data.linkedin,
     },
   });
 
@@ -268,14 +288,20 @@ export async function createEvent(data: {
   venue?: string;
   capacity?: number;
   requirements?: string;
+  mode?: string;
+  discord?: string;
+  instagram?: string;
+  whatsapp?: string;
+  twitter?: string;
+  linkedin?: string;
 }) {
   await requireUser();
 
   if (!data.title || !data.spaceId || !data.startTime || !data.endTime) {
-    throw new Error("Event title, space, start time, and end time are required.");
+    throw new Error("Meet title, space, start time, and end time are required.");
   }
 
-  const event = await prisma.event.create({
+  const meet = await prisma.meet.create({
     data: {
       title: data.title,
       description: data.description,
@@ -287,12 +313,18 @@ export async function createEvent(data: {
       venue: data.venue,
       capacity: data.capacity ? Number(data.capacity) : undefined,
       requirements: data.requirements,
+      mode: data.mode,
+      discord: data.discord,
+      instagram: data.instagram,
+      whatsapp: data.whatsapp,
+      twitter: data.twitter,
+      linkedin: data.linkedin,
     },
   });
 
-  revalidatePath("/events");
+  revalidatePath("/meets");
   revalidatePath("/workspace");
-  return { success: true, event };
+  return { success: true, meet };
 }
 
 export async function createOpportunity(data: {
@@ -305,8 +337,16 @@ export async function createOpportunity(data: {
   experience?: string;
   location?: string;
   compensation?: string;
+  benefits?: string;
   stipend?: string;
   bannerUrl?: string;
+  brochureUrl?: string;
+  mode?: string;
+  discord?: string;
+  instagram?: string;
+  whatsapp?: string;
+  twitter?: string;
+  linkedin?: string;
   deadline?: string | Date;
   organizationId: string;
 }) {
@@ -327,8 +367,16 @@ export async function createOpportunity(data: {
       experience: data.experience,
       location: data.location || "REMOTE",
       compensation: data.compensation,
+      benefits: data.benefits,
       stipend: data.stipend,
       bannerUrl: data.bannerUrl,
+      brochureUrl: data.brochureUrl,
+      mode: data.mode,
+      discord: data.discord,
+      instagram: data.instagram,
+      whatsapp: data.whatsapp,
+      twitter: data.twitter,
+      linkedin: data.linkedin,
       deadline: data.deadline ? new Date(data.deadline) : undefined,
       organizationId: data.organizationId,
     },
@@ -402,11 +450,11 @@ export async function createResearch(data: {
   return { success: true, research };
 }
 
-export async function promoteAttendee(eventId: string, userId: string, status: string) {
+export async function promoteAttendee(meetId: string, userId: string, status: string) {
   const viewer = await requireUser();
 
-  const event = await prisma.event.findUnique({
-    where: { id: eventId },
+  const meet = await prisma.meet.findUnique({
+    where: { id: meetId },
     include: {
       space: {
         include: {
@@ -420,24 +468,24 @@ export async function promoteAttendee(eventId: string, userId: string, status: s
     },
   });
 
-  if (!event) throw new Error("Event not found.");
+  if (!meet) throw new Error("Meet not found.");
 
-  const isOrganizer = event.space.organization.members.some(
+  const isOrganizer = meet.space.organization.members.some(
     (m) => m.userId === viewer.id && (m.role === "ADMIN" || m.role === "FOUNDER")
   );
 
   if (!isOrganizer) throw new Error("Unauthorized.");
 
   if (status === "REJECTED") {
-    await prisma.eventAttendance.delete({
+    await prisma.meetAttendance.delete({
       where: {
-        eventId_userId: { eventId, userId },
+        meetId_userId: { meetId, userId },
       },
     }).catch(() => {});
   } else {
-    await prisma.eventAttendance.update({
+    await prisma.meetAttendance.update({
       where: {
-        eventId_userId: { eventId, userId },
+        meetId_userId: { meetId, userId },
       },
       data: {
         status,
@@ -445,28 +493,28 @@ export async function promoteAttendee(eventId: string, userId: string, status: s
     });
   }
 
-  const waitlistCount = await prisma.eventAttendance.count({
+  const waitlistCount = await prisma.meetAttendance.count({
     where: {
-      eventId,
+      meetId,
       status: "WAITLISTED",
     },
   });
 
-  await prisma.event.update({
-    where: { id: eventId },
+  await prisma.meet.update({
+    where: { id: meetId },
     data: { waitlistCount },
   });
 
-  revalidatePath(`/events/${eventId}`);
+  revalidatePath(`/meets/${meetId}`);
   revalidatePath("/workspace");
   return { success: true };
 }
 
-export async function checkInAttendee(eventId: string, userId: string) {
+export async function checkInAttendee(meetId: string, userId: string) {
   const viewer = await requireUser();
 
-  const event = await prisma.event.findUnique({
-    where: { id: eventId },
+  const meet = await prisma.meet.findUnique({
+    where: { id: meetId },
     include: {
       space: {
         include: {
@@ -480,29 +528,29 @@ export async function checkInAttendee(eventId: string, userId: string) {
     },
   });
 
-  if (!event) throw new Error("Event not found.");
+  if (!meet) throw new Error("Meet not found.");
 
-  const isOrganizer = event.space.organization.members.some(
+  const isOrganizer = meet.space.organization.members.some(
     (m) => m.userId === viewer.id && (m.role === "ADMIN" || m.role === "FOUNDER")
   );
 
   if (!isOrganizer) throw new Error("Unauthorized.");
 
-  await prisma.eventAttendance.upsert({
+  await prisma.meetAttendance.upsert({
     where: {
-      eventId_userId: { eventId, userId },
+      meetId_userId: { meetId, userId },
     },
     update: {
       status: "CHECKED_IN",
     },
     create: {
-      eventId,
+      meetId,
       userId,
       status: "CHECKED_IN",
     },
   });
 
-  revalidatePath(`/events/${eventId}`);
+  revalidatePath(`/meets/${meetId}`);
   revalidatePath("/workspace");
   return { success: true };
 }

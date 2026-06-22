@@ -9,6 +9,7 @@ import { createOpportunity } from "@/app/actions/workspace";
 import { getFallbackPhoto } from "@/lib/photos";
 import { CardRing } from "@/components/ui/card-ring";
 import { ImageUploadField } from "@/components/forms/ImageUploadField";
+import { LocationAutocomplete } from "@/components/forms/LocationAutocomplete";
 
 interface OpportunityWithDetails {
   id: string;

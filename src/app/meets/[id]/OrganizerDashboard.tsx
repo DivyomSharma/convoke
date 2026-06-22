@@ -21,11 +21,11 @@ interface Attendee {
 }
 
 export function OrganizerDashboard({
-  eventId,
+  meetId,
   eventTitle,
   initialAttendance,
 }: {
-  eventId: string;
+  meetId: string;
   eventTitle: string;
   initialAttendance: Attendee[];
 }) {
@@ -39,9 +39,9 @@ export function OrganizerDashboard({
       try {
         let res;
         if (actionStatus === "CHECKED_IN") {
-          res = await checkInAttendee(eventId, userId);
+          res = await checkInAttendee(meetId, userId);
         } else {
-          res = await promoteAttendee(eventId, userId, actionStatus);
+          res = await promoteAttendee(meetId, userId, actionStatus);
         }
         
         if (res.success) {
@@ -102,7 +102,7 @@ export function OrganizerDashboard({
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <Link
-            href={`/events/${eventId}/scanner`}
+            href={`/meets/${meetId}/scanner`}
             className="inline-flex items-center gap-2 border border-g3 rounded-full px-4 h-9 text-xs mono uppercase tracking-wider hover:bg-g1 hover:text-ink transition-colors"
           >
             <Camera size={13} className="text-brand" />

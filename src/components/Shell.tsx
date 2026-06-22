@@ -28,7 +28,7 @@ import {
 const mainNav = [
   { href: "/explore", label: "Explore" },
   { href: "/spaces", label: "Spaces" },
-  { href: "/events", label: "Meets" },
+  { href: "/meets", label: "Meets" },
   { href: "/challenges", label: "Challenges" },
   { href: "/opportunities", label: "Opportunities" },
   { href: "/projects", label: "Projects" },
@@ -47,12 +47,12 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
   const passportHandle = user?.username || user?.fullName?.toLowerCase().replace(/\s+/g, "") || "builder";
 
   useEffect(() => {
-    const handleKeydown = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
-        event.preventDefault();
+    const handleKeydown = (meet: KeyboardEvent) => {
+      if ((meet.metaKey || meet.ctrlKey) && meet.key.toLowerCase() === "k") {
+        meet.preventDefault();
         setCommandOpen((current) => !current);
       }
-      if (event.key === "Escape") setCommandOpen(false);
+      if (meet.key === "Escape") setCommandOpen(false);
     };
 
     window.addEventListener("keydown", handleKeydown);
@@ -235,7 +235,7 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
               <ul className="space-y-3 text-[14px] text-g5">
                 <li><Link href="/explore" className="hover:text-ink transition-colors">Explore Feed</Link></li>
                 <li><Link href="/spaces" className="hover:text-ink transition-colors">Spaces Directory</Link></li>
-                <li><Link href="/events" className="hover:text-ink transition-colors">Events</Link></li>
+                <li><Link href="/meets" className="hover:text-ink transition-colors">Meets</Link></li>
                 <li><Link href="/opportunities" className="hover:text-ink transition-colors">Opportunities</Link></li>
               </ul>
             </div>
@@ -284,9 +284,9 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
           <Users size={20} strokeWidth={1.5} />
           <span className="text-[10px] uppercase tracking-wider">Spaces</span>
         </Link>
-        <Link href="/events" className="flex flex-col items-center gap-1 p-2 min-h-[44px] min-w-[44px] text-g5 hover:text-ink">
+        <Link href="/meets" className="flex flex-col items-center gap-1 p-2 min-h-[44px] min-w-[44px] text-g5 hover:text-ink">
           <CalendarDays size={20} strokeWidth={1.5} />
-          <span className="text-[10px] uppercase tracking-wider">Events</span>
+          <span className="text-[10px] uppercase tracking-wider">Meets</span>
         </Link>
         <button 
           onClick={() => setCommandOpen(true)}
@@ -389,7 +389,7 @@ function CommandK({ onClose }: { onClose: () => void }) {
 
   const staticItems = [
     { type: "Page", title: "Explore", subtitle: "Live discovery feed", href: "/explore", id: "page-explore" },
-    { type: "Page", title: "Events", subtitle: "Upcoming and live gatherings", href: "/events", id: "page-events" },
+    { type: "Page", title: "Meets", subtitle: "Upcoming and live gatherings", href: "/meets", id: "page-events" },
     { type: "Page", title: "Spaces", subtitle: "Communities and collectives", href: "/spaces", id: "page-spaces" },
     { type: "Page", title: "Workspace", subtitle: "Your private operating surface", href: "/workspace", id: "page-workspace" },
   ];
@@ -424,15 +424,15 @@ function CommandK({ onClose }: { onClose: () => void }) {
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/45 px-4 pt-[12vh]" onClick={onClose}>
       <div
         className="premium-card campus-frame relative w-full max-w-2xl"
-        onClick={(event) => event.stopPropagation()}
+        onClick={(meet) => meet.stopPropagation()}
       >
         <div className="flex items-center gap-3 border-b border-g3 px-5 py-4">
           <Search size={16} className="text-[var(--brand)]" />
           <input
             autoFocus
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Jump into people, spaces, events, opportunities"
+            onChange={(meet) => setQuery(meet.target.value)}
+            placeholder="Jump into people, spaces, meets, opportunities"
             className="w-full bg-transparent text-[15px] text-ink outline-none placeholder:text-g4"
           />
           <span className="mono text-[11px] text-g4">Esc</span>

@@ -6,7 +6,7 @@ import { VerticalMarquee } from "@/components/VerticalMarquee";
 import { prisma } from "@/lib/prisma";
 import { getFallbackPhoto } from "@/lib/photos";
 
-const filters = ["All", "Events", "Opportunities", "Challenges", "Projects"] as const;
+const filters = ["All", "Meets", "Opportunities", "Challenges", "Projects"] as const;
 type Filter = (typeof filters)[number];
 
 type FeedItem = {
@@ -43,8 +43,8 @@ export default async function Explore(props: { searchParams?: Promise<{ f?: stri
   const searchParams = await props.searchParams;
   const selected = filters.includes(searchParams?.f as Filter) ? (searchParams?.f as Filter) : "All";
 
-  const [events, opportunities, projects] = await Promise.all([
-    prisma.event
+  const [meets, opportunities, projects] = await Promise.all([
+    prisma.meet
       .findMany({
         include: { space: { include: { organization: true } } },
         orderBy: { createdAt: "desc" },
@@ -69,23 +69,23 @@ export default async function Explore(props: { searchParams?: Promise<{ f?: stri
 
   const items: FeedItem[] = [];
 
-  if (selected === "All" || selected === "Events") {
-    events.forEach((event) => {
+  if (selected === "All" || selected === "Meets") {
+    meets.forEach((meet) => {
       items.push({
-        id: `event-${event.id}`,
-        kind: "Event",
-        title: event.title,
-        body: event.description,
-        meta: `${event.location || event.venue || "Online"} · Starting ${event.startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
-        at: event.createdAt,
-        href: `/events/${event.id}`,
+        id: `event-${meet.id}`,
+        kind: "Meet",
+        title: meet.title,
+        body: meet.description,
+        meta: `${meet.location || meet.venue || "Online"} · Starting ${meet.startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
+        at: meet.createdAt,
+        href: `/meets/${meet.id}`,
         icon: CalendarDays,
-        banner: event.bannerUrl || getFallbackPhoto(event.id, 'event'),
+        banner: meet.bannerUrl || getFallbackPhoto(meet.id, 'meet'),
         who: {
-          name: event.space.name,
-          role: event.space.organization.name,
-          avatar: event.space.organization.logoUrl || "",
-          href: `/spaces/${event.space.id}`,
+          name: meet.space.name,
+          role: meet.space.organization.name,
+          avatar: meet.space.organization.logoUrl || "",
+          href: `/spaces/${meet.space.id}`,
         },
       });
     });

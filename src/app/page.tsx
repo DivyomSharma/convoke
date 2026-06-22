@@ -32,7 +32,7 @@ export default async function HomePage() {
     newMembersCount,
     communitiesCount,
   ] = await Promise.all([
-    prisma.event.count({
+    prisma.meet.count({
       where: {
         startTime: {
           gte: todayStart,
@@ -53,7 +53,7 @@ export default async function HomePage() {
       },
     }).catch(() => 0),
     prisma.project.count().catch(() => 0),
-    prisma.event.count({
+    prisma.meet.count({
       where: {
         title: {
           contains: "office hour",
@@ -73,7 +73,7 @@ export default async function HomePage() {
   ]);
 
   const stats = [
-    { count: eventsTodayCount, label: "Events Today" },
+    { count: eventsTodayCount, label: "Meets Today" },
     { count: hackathonsCount, label: "Hackathons Open" },
     { count: opportunitiesCount, label: "Opportunities Hiring" },
     { count: projectsCount, label: "Projects Launched" },
@@ -84,7 +84,7 @@ export default async function HomePage() {
   ].filter((s) => s.count > 0);
 
   const [todayEvents, recentProjects, recentOpportunities, recentSpaces] = await Promise.all([
-    prisma.event.findMany({
+    prisma.meet.findMany({
       where: {
         startTime: {
           gte: todayStart,
@@ -145,7 +145,7 @@ export default async function HomePage() {
       tag: isLive ? "LIVE NOW" : "TONIGHT",
       title: e.title,
       meta: `${e.location || "Online"} · ${timeStr}`,
-      link: `/events/${e.id}`,
+      link: `/meets/${e.id}`,
       actionText: isLive ? "Join" : "RSVP",
       timestamp: e.startTime.getTime(),
       logoUrl: e.space.organization.logoUrl,
@@ -186,7 +186,7 @@ export default async function HomePage() {
   recentSpaces.forEach((s) => {
     feedItems.push({
       id: `space-${s.id}`,
-      tag: "NEW COMMUNITY",
+      tag: "NEW SPACE",
       title: s.name,
       meta: s.description || "A new space on Convoke",
       link: `/spaces/${s.id}`,
@@ -207,7 +207,7 @@ export default async function HomePage() {
 
   const [dbFeaturedEvent, dbFeaturedOrg, dbFeaturedProject, dbFeaturedOpp, dbFeaturedUser, dbFeaturedResearch] =
     await Promise.all([
-      prisma.event.findFirst({
+      prisma.meet.findFirst({
         orderBy: { views: "desc" },
         include: { space: { include: { organization: true } } },
       }).catch(() => null),
@@ -232,22 +232,22 @@ export default async function HomePage() {
     ]);
 
   const featured = {
-    event: dbFeaturedEvent
+    meet: dbFeaturedEvent
       ? {
           title: dbFeaturedEvent.title,
           description: dbFeaturedEvent.description || "A major campus gathering for builders.",
           meta: `Happening at ${dbFeaturedEvent.location || "Online"} · ${dbFeaturedEvent.startTime.toLocaleDateString()}`,
-          link: `/events/${dbFeaturedEvent.id}`,
+          link: `/meets/${dbFeaturedEvent.id}`,
           actionText: "RSVP Today",
-          imageUrl: getFallbackPhoto(dbFeaturedEvent.id, "event"),
+          imageUrl: getFallbackPhoto(dbFeaturedEvent.id, "meet"),
         }
       : {
-          title: "No upcoming events",
-          description: "Bring builders together for a technical paper review, workshop, or community mixer.",
-          meta: "Create the first event on campus",
-          link: "/events",
-          actionText: "Host Event",
-          imageUrl: getFallbackPhoto("empty-event", "event"),
+          title: "No upcoming meets",
+          description: "Bring builders together for a technical paper review, workshop, or space mixer.",
+          meta: "Create the first meet on campus",
+          link: "/meets",
+          actionText: "Host Meet",
+          imageUrl: getFallbackPhoto("empty-event", "meet"),
         },
     org: dbFeaturedOrg
       ? {
@@ -261,7 +261,7 @@ export default async function HomePage() {
       : {
           title: "No collectives registered",
           description: "Start a builder organization for your startup hub, college club, or hacking team.",
-          meta: "Launch a builder community",
+          meta: "Launch a builder space",
           link: "/organizations",
           actionText: "Create Org",
           imageUrl: getFallbackPhoto("empty-org", "space"),
@@ -313,7 +313,7 @@ export default async function HomePage() {
         }
       : {
           title: "Setup your passport",
-          description: "Passports verify builder identity, contribution history, memberships, and community vouches.",
+          description: "Passports verify builder identity, contribution history, memberships, and space vouches.",
           meta: "Verify your developer passport today",
           link: "/explore",
           actionText: "Explore Passports",

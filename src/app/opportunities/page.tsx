@@ -5,6 +5,8 @@ import { OpportunitiesList } from "./OpportunitiesList";
 
 export const revalidate = 0; // Fresh listing upon opportunity creations
 
+import { auth } from "@clerk/nextjs/server";
+
 export default async function OpportunitiesPage() {
   const opportunities = await prisma.opportunity.findMany({
     include: {
@@ -20,13 +22,23 @@ export default async function OpportunitiesPage() {
     },
   }).catch(() => []);
 
+  const { userId } = await auth();
+
   // Fetch organizations to allow user to select which organization they belong to
-  const organizations = await prisma.organization.findMany({
+  const organizations = userId ? await prisma.organization.findMany({
+    where: {
+      members: {
+        some: {
+          userId,
+          role: { in: ["ADMIN", "FOUNDER"] }
+        }
+      }
+    },
     select: {
       id: true,
       name: true,
     },
-  }).catch(() => []);
+  }).catch(() => []) : [];
 
   return (
     <Shell>

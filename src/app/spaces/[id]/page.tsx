@@ -109,7 +109,7 @@ export default async function SpaceDetailPage(props: { params?: Promise<{ id: st
 
             {/* Parent Org Card */}
             <div className="premium-card p-5">
-              <h3 className="mono text-[11px] uppercase tracking-wider text-g5 mb-3 font-semibold">Community Org</h3>
+              <h3 className="mono text-[11px] uppercase tracking-wider text-g5 mb-3 font-semibold">Space Org</h3>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-g1 flex items-center justify-center border border-g3 overflow-hidden shrink-0">
                   {space.organization.logoUrl ? (

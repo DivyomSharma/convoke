@@ -5,6 +5,8 @@ import { ChallengesList } from "./ChallengesList";
 
 export const revalidate = 0; // Fresh listing upon challenge creations
 
+import { auth } from "@clerk/nextjs/server";
+
 export default async function ChallengesPage() {
   const challenges = await prisma.opportunity.findMany({
     where: {
@@ -21,13 +23,23 @@ export default async function ChallengesPage() {
     },
   }).catch(() => []);
 
+  const { userId } = await auth();
+
   // Fetch organizations to allow user to select which organization hosts the challenge
-  const organizations = await prisma.organization.findMany({
+  const organizations = userId ? await prisma.organization.findMany({
+    where: {
+      members: {
+        some: {
+          userId,
+          role: { in: ["ADMIN", "FOUNDER"] }
+        }
+      }
+    },
     select: {
       id: true,
       name: true,
     },
-  }).catch(() => []);
+  }).catch(() => []) : [];
 
   return (
     <Shell>

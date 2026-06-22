@@ -97,7 +97,7 @@ export function ProjectsList({ initialProjects }: { initialProjects: ProjectWith
         <div>
           <div className="eyebrow">Recent Work</div>
           <h1 className="serif text-5xl md:text-6xl tracking-tight mt-2">Case studies.</h1>
-          <p className="text-g5 mt-2 text-md">A quiet gallery of products, designs, and technical shipments from the community.</p>
+          <p className="text-g5 mt-2 text-md">A quiet gallery of products, designs, and technical shipments from the space.</p>
         </div>
         <button 
           onClick={() => setDrawerOpen(true)}
@@ -115,7 +115,7 @@ export function ProjectsList({ initialProjects }: { initialProjects: ProjectWith
           </div>
           <h3 className="serif text-2xl text-ink mb-1">No projects shipped yet</h3>
           <p className="text-g5 text-[14px] max-w-[36ch] leading-relaxed mb-6">
-            Be the first to share your breakthrough with the community.
+            Be the first to share your breakthrough with the space.
           </p>
           <button 
             onClick={() => setDrawerOpen(true)}

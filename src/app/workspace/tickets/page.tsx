@@ -21,10 +21,10 @@ export default async function MyTicketsPage() {
   const user = await requireUser();
 
   const [registrations, challengeApplications] = await Promise.all([
-    prisma.eventAttendance.findMany({
+    prisma.meetAttendance.findMany({
       where: { userId: user.id },
       include: {
-        event: {
+        meet: {
           include: {
             space: {
               include: {
@@ -57,22 +57,22 @@ export default async function MyTicketsPage() {
   ]);
 
   const eventPasses = registrations.map((registration, index) => {
-    const event = registration.event;
+    const meet = registration.meet;
 
     return {
       ticketId: passId("EVT", registration.id),
-      eventName: event.title,
-      orgName: event.space.organization.name,
-      date: new Date(event.startTime).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
-      time: new Date(event.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      venue: event.venue || event.location || "Online",
+      eventName: meet.title,
+      orgName: meet.space.organization.name,
+      date: new Date(meet.startTime).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+      time: new Date(meet.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      venue: meet.venue || meet.location || "Online",
       userName: user.name || "Convoke member",
       userAvatar: user.avatarUrl || "",
-      seat: event.capacity ? `GEN-${String(index + 1).padStart(2, "0")}` : "OPEN",
-      type: registration.status === "INTERESTED" ? "Interested" : "Event pass",
+      seat: meet.capacity ? `GEN-${String(index + 1).padStart(2, "0")}` : "OPEN",
+      type: registration.status === "INTERESTED" ? "Interested" : "Meet pass",
       state: passState(registration.status),
-      bannerUrl: event.bannerUrl || undefined,
-      orgLogo: event.space.organization.logoUrl || undefined,
+      bannerUrl: meet.bannerUrl || undefined,
+      orgLogo: meet.space.organization.logoUrl || undefined,
     };
   });
 
@@ -111,7 +111,7 @@ export default async function MyTicketsPage() {
               <div className="eyebrow">Workspace wallet</div>
               <h1 className="mt-3 serif text-5xl tracking-tight md:text-7xl">My Passes</h1>
               <p className="mt-4 max-w-2xl text-[15px] leading-7 text-g5">
-                Event RSVPs and challenge registrations become scannable passes tied to your Convoke identity.
+                Meet RSVPs and challenge registrations become scannable passes tied to your Convoke identity.
               </p>
             </div>
             <div className="inline-flex w-fit items-center gap-2 rounded-full border border-g3 bg-g1/70 px-4 py-2 mono text-[12px] uppercase tracking-[0.16em] text-g5">
@@ -128,11 +128,11 @@ export default async function MyTicketsPage() {
             </div>
             <h2 className="mt-6 serif text-3xl">No passes yet</h2>
             <p className="mx-auto mt-3 max-w-[42ch] text-[15px] leading-7 text-g5">
-              Register for an event or join a challenge to generate your first Convoke pass.
+              Register for an meet or join a challenge to generate your first Convoke pass.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
-              <Link href="/events" className="ink-button px-5 text-[14px] font-medium">
-                Browse events
+              <Link href="/meets" className="ink-button px-5 text-[14px] font-medium">
+                Browse meets
               </Link>
               <Link href="/challenges" className="ghost-button px-5 text-[14px] font-medium">
                 Browse challenges

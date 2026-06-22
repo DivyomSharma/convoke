@@ -15,7 +15,7 @@ const sections = [
   },
   {
     title: "Email And Notifications",
-    body: "Convoke may send transactional email for login, application updates, event reminders, announcements, sponsorship workflows, merchandise requests, and security notices. You can control non-essential updates from your account settings as those controls become available.",
+    body: "Convoke may send transactional email for login, application updates, meet reminders, announcements, sponsorship workflows, merchandise requests, and security notices. You can control non-essential updates from your account settings as those controls become available.",
   },
   {
     title: "Data Processors",

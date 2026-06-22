@@ -22,16 +22,16 @@ export default async function Workspace() {
 
   const mySpaces = memberships.flatMap(m => m.organization.spaces);
 
-  // User's tickets / registered events (active or checked-in)
-  const myRSVPs = dbUser ? await prisma.eventAttendance.findMany({
+  // User's tickets / registered meets (active or checked-in)
+  const myRSVPs = dbUser ? await prisma.meetAttendance.findMany({
     where: { userId: dbUser.id },
-    include: { event: { include: { space: true } } },
-    orderBy: { event: { startTime: "asc" } }
+    include: { meet: { include: { space: true } } },
+    orderBy: { meet: { startTime: "asc" } }
   }) : [];
 
-  // Global upcoming events that user might want to RSVP to (excluding already RSVP'd)
-  const rsvpEventIds = myRSVPs.map(r => r.eventId);
-  const upcomingEvents = await prisma.event.findMany({
+  // Global upcoming meets that user might want to RSVP to (excluding already RSVP'd)
+  const rsvpEventIds = myRSVPs.map(r => r.meetId);
+  const upcomingEvents = await prisma.meet.findMany({
     where: { 
       startTime: { gte: new Date() },
       id: { notIn: rsvpEventIds }
@@ -64,8 +64,8 @@ export default async function Workspace() {
 
   // Filter user's RSVPs into active/upcoming vs past
   const now = new Date();
-  const activeTickets = myRSVPs.filter(r => new Date(r.event.endTime) >= now);
-  const pastPasses = myRSVPs.filter(r => new Date(r.event.endTime) < now);
+  const activeTickets = myRSVPs.filter(r => new Date(r.meet.endTime) >= now);
+  const pastPasses = myRSVPs.filter(r => new Date(r.meet.endTime) < now);
 
   return (
     <Shell wide>
@@ -124,7 +124,7 @@ export default async function Workspace() {
             {activeTickets.length > 0 ? (
               <div className="mt-6 divide-y divide-g3">
                 {activeTickets.map((rsvp) => {
-                  const event = rsvp.event;
+                  const meet = rsvp.meet;
                   const isCheckedIn = rsvp.status === "CHECKED_IN";
                   const isWaitlisted = rsvp.status === "WAITLISTED";
 
@@ -142,30 +142,30 @@ export default async function Workspace() {
                             {isCheckedIn ? "Checked In" : isWaitlisted ? "Waitlisted" : "Going"}
                           </span>
                           <span className="mono text-[10px] text-g5 uppercase tracking-wide">
-                            {event.space.name}
+                            {meet.space.name}
                           </span>
                         </div>
                         <h3 className="serif text-2xl text-ink leading-snug group-hover:text-[var(--brand)] transition-colors">
-                          {event.title}
+                          {meet.title}
                         </h3>
                         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px] text-g5">
                           <span className="flex items-center gap-1">
                             <Calendar size={13} className="text-g4" />
-                            {new Date(event.startTime).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                            {new Date(meet.startTime).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                           </span>
                           <span className="flex items-center gap-1">
                             <Clock size={13} className="text-g4" />
-                            {new Date(event.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            {new Date(meet.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </span>
                           <span className="flex items-center gap-1">
                             <MapPin size={13} className="text-g4" />
-                            {event.location || "TBA"}
+                            {meet.location || "TBA"}
                           </span>
                         </div>
                       </div>
 
                       <Link 
-                        href={`/events/${event.id}`}
+                        href={`/meets/${meet.id}`}
                         className="ink-button h-9 px-4 text-[12px] font-semibold flex items-center gap-1.5 self-start md:self-auto shrink-0"
                       >
                         <Ticket size={13} />
@@ -178,10 +178,10 @@ export default async function Workspace() {
             ) : (
               <div className="mt-8 text-center py-10 border border-dashed border-g3 rounded-md">
                 <p className="text-[13px] text-g5 max-w-[34ch] mx-auto leading-relaxed">
-                  You don't have any upcoming event passes. Explore campus happenings to RSVP.
+                  You don't have any upcoming meet passes. Explore campus happenings to RSVP.
                 </p>
-                <Link href="/events" className="mt-4 inline-flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-[var(--brand)] font-semibold hover:underline">
-                  <span>Browse Campus Events</span>
+                <Link href="/meets" className="mt-4 inline-flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-[var(--brand)] font-semibold hover:underline">
+                  <span>Browse Campus Meets</span>
                   <ArrowRight size={12} />
                 </Link>
               </div>
@@ -252,7 +252,7 @@ export default async function Workspace() {
                     </div>
                     <div className="col-span-12 md:col-span-3 text-right">
                       <Link 
-                        href={`/events/${e.id}`}
+                        href={`/meets/${e.id}`}
                         className="mono text-[11px] uppercase tracking-wider text-[var(--brand)] font-semibold hover:underline"
                       >
                         Register
@@ -299,11 +299,11 @@ export default async function Workspace() {
                 {pastPasses.map((rsvp) => (
                   <li key={rsvp.id} className="flex items-center justify-between gap-4">
                     <div className="min-w-0">
-                      <Link href={`/events/${rsvp.event.id}`} className="text-g6 hover:text-ink truncate block">
-                        {rsvp.event.title}
+                      <Link href={`/meets/${rsvp.meet.id}`} className="text-g6 hover:text-ink truncate block">
+                        {rsvp.meet.title}
                       </Link>
                       <span className="text-[11px] text-g5 mono uppercase">
-                        Checked In · {new Date(rsvp.event.startTime).toLocaleDateString([], { year: "numeric", month: "short" })}
+                        Checked In · {new Date(rsvp.meet.startTime).toLocaleDateString([], { year: "numeric", month: "short" })}
                       </span>
                     </div>
                     {rsvp.status === "CHECKED_IN" && (
