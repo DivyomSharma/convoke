@@ -21,7 +21,7 @@ export function RegisterClient({
   const handleRegister = async () => {
     setLoading(true);
     try {
-      const res = await applyToOpportunity(challengeId);
+      const res = await applyToOpportunity({ opportunityId: challengeId });
       if (res.success) {
         setRegistered(true);
         router.refresh();
