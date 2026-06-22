@@ -120,6 +120,25 @@ export default function AuthPage() {
               For people building the future.
             </p>
           </div>
+          <div className="mt-auto grid grid-cols-3 gap-4">
+            {[
+              ["Unified", "One path for every return visit"],
+              ["Invisible", "No sign in vs sign up split"],
+              ["Native", "Feels like the product, not a vendor"],
+            ].map(([title, copy]) => (
+              <div
+                key={title}
+                className={`rounded-[24px] p-4 backdrop-blur-xl ${
+                  isDark
+                    ? "border border-white/10 bg-white/7"
+                    : "border border-[rgba(0,0,0,0.08)] bg-[rgba(255,255,255,0.42)]"
+                }`}
+              >
+                <div className="mono text-[10px] uppercase tracking-[0.18em] text-brand">{title}</div>
+                <div className={`mt-3 text-[13px] leading-6 ${isDark ? "text-white/68" : "text-[rgba(17,17,17,0.72)]"}`}>{copy}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
