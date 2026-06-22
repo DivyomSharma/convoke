@@ -13,10 +13,10 @@ export function ConvokeLoader({ size = 128, className = "" }: ConvokeLoaderProps
   const radius = size / 2;
   const pathRadius = radius - 12;
 
-  // Dot color #00B2FF
+  // Dot color adapts to theme
   const textContent = (
     <React.Fragment>
-      CONVOKE <tspan className="fill-[#00B2FF]">•</tspan> CONVOKE <tspan className="fill-[#00B2FF]">•</tspan> CONVOKE <tspan className="fill-[#00B2FF]">•</tspan> CONVOKE <tspan className="fill-[#00B2FF]">•</tspan>{" "}
+      CONVOKE <tspan className="fill-[var(--brand)]">•</tspan> CONVOKE <tspan className="fill-[var(--brand)]">•</tspan> CONVOKE <tspan className="fill-[var(--brand)]">•</tspan> CONVOKE <tspan className="fill-[var(--brand)]">•</tspan>{" "}
     </React.Fragment>
   );
 
@@ -34,7 +34,7 @@ export function ConvokeLoader({ size = 128, className = "" }: ConvokeLoaderProps
           width={size} 
           height={size} 
           viewBox={`0 0 ${size} ${size}`} 
-          className="fill-white"
+          className="fill-ink"
         >
           <path
             id="loaderTextPath"
@@ -60,7 +60,7 @@ export function ConvokeLoader({ size = 128, className = "" }: ConvokeLoaderProps
       {/* Center Logo */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <span 
-          className="serif text-white opacity-95"
+          className="serif text-ink opacity-95"
           style={{ fontSize: size === 192 ? '36px' : size === 128 ? '24px' : '18px' }}
         >
           C.
