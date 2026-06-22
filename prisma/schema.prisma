@@ -198,6 +198,8 @@ model Application {
   userId        String
   opportunityId String
   status        String // PENDING, ACCEPTED, REJECTED, INTERVIEW
+  pitch         String?  @db.Text
+  resumeUrl     String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 

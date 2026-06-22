@@ -77,11 +77,11 @@ export async function rsvpToEvent(eventId: string, status: "GOING" | "INTERESTED
   return { success: true, status: finalStatus };
 }
 
-export async function applyToOpportunity(opportunityId: string) {
+export async function applyToOpportunity(data: { opportunityId: string; pitch?: string; resumeUrl?: string }) {
   try {
     const user = await requireUser();
     const opportunity = await prisma.opportunity.findUnique({
-      where: { id: opportunityId },
+      where: { id: data.opportunityId },
       select: { type: true },
     });
 
@@ -90,7 +90,7 @@ export async function applyToOpportunity(opportunityId: string) {
     }
 
     const existing = await prisma.application.findFirst({
-      where: { opportunityId, userId: user.id },
+      where: { opportunityId: data.opportunityId, userId: user.id },
     });
 
     if (existing) {
@@ -99,19 +99,21 @@ export async function applyToOpportunity(opportunityId: string) {
 
     await prisma.application.create({
       data: {
-        opportunityId,
+        opportunityId: data.opportunityId,
         userId: user.id,
         status: "PENDING",
+        pitch: data.pitch,
+        resumeUrl: data.resumeUrl,
       },
     });
 
     revalidatePath("/workspace");
     revalidatePath("/workspace/tickets");
     revalidatePath("/opportunities");
-    revalidatePath(`/opportunities/${opportunityId}`);
+    revalidatePath(`/opportunities/${data.opportunityId}`);
     if (opportunity.type === "HACKATHON" || opportunity.type === "CHALLENGE") {
       revalidatePath("/challenges");
-      revalidatePath(`/challenges/${opportunityId}`);
+      revalidatePath(`/challenges/${data.opportunityId}`);
     }
     return { success: true };
   } catch (err: any) {

@@ -1,19 +1,14 @@
 import { redirect } from "next/navigation";
-import { auth } from "@clerk/nextjs/server";
-import { prisma } from "@/lib/prisma";
+import { requireUser } from "@/lib/auth";
 
 export default async function AuthCompletePage() {
-  const { userId } = await auth();
-  if (!userId) {
+  const dbUser = await requireUser().catch(() => null);
+
+  if (!dbUser) {
     redirect("/auth");
   }
 
-  const dbUser = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { onboardingCompleted: true },
-  });
-
-  if (!dbUser || !dbUser.onboardingCompleted) {
+  if (!dbUser.onboardingCompleted) {
     redirect("/onboarding");
   }
 
