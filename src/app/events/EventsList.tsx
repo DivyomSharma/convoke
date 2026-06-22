@@ -276,11 +276,11 @@ export function EventsList({
 
                           {/* Event B/W Photography Banner */}
                           <div className="lg:col-span-4 relative z-10">
-                            <Link href={`/events/${event.id}`} className="block overflow-hidden bg-g1 aspect-[3/2] h-full relative">
+                            <Link href={`/events/${event.id}`} className="block overflow-hidden bg-g1 h-full min-h-[240px] relative">
                               <img 
                                 src={banner} 
                                 alt={event.title} 
-                                className="w-full h-full object-cover" 
+                                className="absolute inset-0 w-full h-full object-cover" 
                               />
                             </Link>
                           </div>

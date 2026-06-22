@@ -132,11 +132,11 @@ export function SpacesList({
 
                 {/* Large Photography */}
                 <div className="lg:col-span-5 relative z-10">
-                  <Link href={`/spaces/${space.id}`} className="block overflow-hidden bg-g1 aspect-[3/2] h-full relative">
+                  <Link href={`/spaces/${space.id}`} className="block overflow-hidden bg-g1 h-full min-h-[240px] relative">
                     <img 
                       src={banner} 
                       alt={space.name} 
-                      className="w-full h-full object-cover" 
+                      className="absolute inset-0 w-full h-full object-cover" 
                     />
                   </Link>
                 </div>
