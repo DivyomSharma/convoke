@@ -76,10 +76,10 @@ export default function AuthPage() {
   };
 
   return (
-    <main className="grid min-h-screen bg-paper lg:grid-cols-[1.02fr_0.98fr] dark:bg-[#000]">
-      <section className="hero-light-flat relative hidden overflow-hidden border-r border-g3 lg:flex dark:bg-[#070707]">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_32%_28%,rgba(0,178,255,0.10),transparent_30%),radial-gradient(circle_at_78%_78%,rgba(123,0,20,0.10),transparent_28%)] dark:bg-[radial-gradient(circle_at_30%_35%,rgba(0,178,255,0.18),transparent_34%),radial-gradient(circle_at_75%_80%,rgba(127,29,45,0.22),transparent_30%)]" />
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,.72)_0%,rgba(247,244,239,.92)_60%,#f7f4ef_100%)] dark:bg-[radial-gradient(circle_at_50%_50%,transparent_52%,rgba(0,0,0,0.8)_100%)]" />
+    <main className="grid min-h-screen bg-[#F7F4EF] lg:grid-cols-[1.02fr_0.98fr] dark:bg-[#000]">
+      <section className="relative hidden overflow-hidden border-r border-g3 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,.92)_0%,rgba(247,244,239,.98)_60%,#F7F4EF_100%)] lg:flex dark:bg-[#000]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_26%,rgba(0,178,255,0.10),transparent_30%),radial-gradient(circle_at_74%_80%,rgba(123,0,20,0.09),transparent_28%)] dark:bg-[radial-gradient(circle_at_30%_35%,rgba(0,178,255,0.18),transparent_34%),radial-gradient(circle_at_75%_80%,rgba(127,29,45,0.22),transparent_30%)]" />
+        <div className="pointer-events-none absolute inset-0 hidden dark:block dark:bg-[radial-gradient(circle_at_50%_50%,transparent_52%,rgba(0,0,0,0.8)_100%)]" />
         <div className="relative z-10 flex h-full flex-col justify-between p-12 text-ink dark:text-white">
           <div className="max-w-[35rem]">
             <div className="mono mb-5 text-[11px] uppercase tracking-[0.24em] text-g5 dark:text-white/55">
@@ -95,7 +95,7 @@ export default function AuthPage() {
         </div>
       </section>
 
-      <section className="hero-light-flat relative flex items-center justify-center px-6 py-12 dark:bg-[#000]">
+      <section className="relative flex items-center justify-center bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,.92)_0%,rgba(247,244,239,.98)_60%,#F7F4EF_100%)] px-6 py-12 dark:bg-[#000]">
         <div className="absolute inset-0 hidden dark:block dark:bg-[radial-gradient(circle_at_50%_12%,color-mix(in_srgb,var(--brand)_14%,transparent),transparent_38%)]" />
         <div className="relative z-10 w-full max-w-[500px] rounded-[40px] border border-[rgba(0,0,0,.08)] bg-[rgba(255,255,255,.65)] p-[72px] shadow-[0_20px_80px_rgba(0,0,0,.06)] backdrop-blur-[24px] dark:border-white/10 dark:bg-[rgba(12,13,15,0.72)] dark:shadow-none dark:backdrop-blur-2xl">
           <div className="text-center">
