@@ -248,7 +248,7 @@ function SelectField({
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="h-11 w-full rounded-2xl border border-g3 bg-paper-card/70 px-4 text-sm text-ink outline-none focus:border-brand/55"
+        className="h-11 w-full rounded-2xl border border-g3 bg-transparent px-4 text-sm text-ink outline-none focus:border-brand/55 [&>option]:bg-paper"
       >
         <option value="">Select {label.toLowerCase()}</option>
         {options.map((option) => (

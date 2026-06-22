@@ -345,7 +345,7 @@ export function OpportunitiesList({
                     <select 
                       value={type}
                       onChange={(e) => setType(e.target.value)}
-                      className="w-full h-11 px-4 rounded-md border border-g3 bg-paper text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
+                      className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all [&>option]:bg-paper"
                     >
                       <option value="ROLE">Role / Job</option>
                       <option value="FELLOWSHIP">Fellowship</option>
@@ -364,7 +364,7 @@ export function OpportunitiesList({
                       <select 
                         value={organizationId}
                         onChange={(e) => setOrganizationId(e.target.value)}
-                        className="w-full h-11 px-4 rounded-md border border-g3 bg-paper text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
+                        className="w-full h-11 px-4 rounded-md border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all [&>option]:bg-paper"
                       >
                         {organizations.map((org) => (
                           <option key={org.id} value={org.id}>{org.name}</option>

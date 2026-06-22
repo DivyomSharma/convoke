@@ -426,7 +426,7 @@ export function EventsList({
                         id="event-space"
                         value={spaceId}
                         onChange={(e) => setSpaceId(e.target.value)}
-                        className={`w-full h-11 px-4 rounded-xl border ${getError("event-space") ? "border-red-500/50" : "border-g3"} bg-paper text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all`}
+                        className={`w-full h-11 px-4 rounded-xl border ${getError("event-space") ? "border-red-500/50" : "border-g3"} bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all [&>option]:bg-paper`}
                       >
                         <option value="">Select a space...</option>
                         {spaces.map((sp) => (
@@ -471,7 +471,7 @@ export function EventsList({
                     <select 
                       value={location}
                       onChange={(e) => setLocation(e.target.value)}
-                      className="w-full h-11 px-4 rounded-xl border border-g3 bg-paper text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                      className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all [&>option]:bg-paper"
                     >
                       <option value="ONLINE">Online</option>
                       <option value="IN_PERSON">In Person</option>
