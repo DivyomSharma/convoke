@@ -207,7 +207,7 @@ export default async function EventDetailPage(props: { params?: Promise<{ id: st
                       <span className="serif text-[120px] font-bold">C.</span>
                     </div>
                     <div>
-                      <div className="mono text-[9px] tracking-widest text-g4 uppercase">Convoke Digital Campus Passport</div>
+                      <div className="mono text-[9px] tracking-widest text-g4 uppercase">Convoke Passport</div>
                       <h4 className="serif text-2xl mt-4 font-light tracking-tight text-brand">Certificate of Attendance</h4>
                     </div>
                     <div className="mt-4 space-y-1">

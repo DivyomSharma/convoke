@@ -139,7 +139,7 @@ export function SpacesList({
               <div key={space.id} className="group premium-card campus-frame overflow-hidden flex flex-col relative border border-[#1a1a1a] hover:border-[#2f2f2f] transition-all duration-700 hover:-translate-y-[2px] ease-[cubic-bezier(0.22,0.61,0.36,1)] h-[420px]">
                 {/* Space Card Ring */}
                 <div className="absolute -right-[15%] top-1/2 -translate-y-1/2 opacity-8 group-hover:opacity-25 transition-opacity duration-700 ease-[cubic-bezier(0.22,0.61,0.36,1)] hidden md:block pointer-events-none z-0">
-                  <CardRing size={400} text="SPACE • DIGITAL CAMPUS • SPACE • " />
+                  <CardRing size={400} text="SPACE • NETWORK • SPACE • " />
                 </div>
 
                 {/* Fixed Height Image */}
@@ -166,7 +166,7 @@ export function SpacesList({
                   </Link>
 
                   <p className="text-g5 text-[13px] leading-[1.6] font-sans line-clamp-2 flex-1">
-                    {space.description || "A collaborative circle gathered on the Convoke digital campus."}
+                    {space.description || "A collaborative circle gathered on the Convoke digital network."}
                   </p>
 
                   <div className="mt-4 pt-4 border-t border-g3/50 flex items-center justify-between text-[12px] font-sans text-g5">

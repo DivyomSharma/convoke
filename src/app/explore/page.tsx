@@ -157,7 +157,7 @@ export default async function Explore(props: { searchParams?: Promise<{ f?: stri
         <main className="relative mx-auto w-full max-w-[1040px] px-5 py-16 sm:px-8">
           <section className="border-b border-g3 pb-8">
             <div className="mono text-[11px] tracking-[0.2em] uppercase text-g5">
-              Campus Feed
+              Network Feed
             </div>
             <div className="mt-4 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
               <div>
@@ -194,7 +194,7 @@ export default async function Explore(props: { searchParams?: Promise<{ f?: stri
           <section className="mt-16 text-center py-20">
             <h2 className="serif text-4xl text-ink font-light">No dispatches published yet</h2>
             <p className="mx-auto mt-4 max-w-[42ch] text-[15px] leading-relaxed text-g5">
-              Convoke will populate this feed from real-time campus actions as they are established.
+              Convoke will populate this feed from real-time network actions as they are established.
             </p>
           </section>
         ) : (

@@ -264,7 +264,7 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
           <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-g3 pt-8 text-[12px] text-g4 mono md:flex-row">
             <span>{new Date().getFullYear()} Convoke. All rights reserved.</span>
             <div className="flex gap-4">
-              <span>Midnight campus theme.</span>
+              <span>Midnight network theme.</span>
               <span className="hidden sm:inline">/</span>
               <span>Built for India-first ambition.</span>
             </div>

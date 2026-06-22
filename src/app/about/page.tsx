@@ -75,7 +75,7 @@ export default function AboutPage() {
           </h2>
           <div className="mt-8 space-y-6 text-[15px] leading-8 text-g5">
             <p>
-              In college campuses, hacker houses, and startup hubs across the globe, builders are inventing the future. Yet the channels they use to find each other and share roles are fragmented across message groups, social platforms, and outdated job boards.
+              In global networks, hacker houses, and startup hubs across the globe, builders are inventing the future. Yet the channels they use to find each other and share roles are fragmented across message groups, social platforms, and outdated job boards.
             </p>
             <p>
               Convoke brings these elements into a unified operating surface. We provide the infrastructure for organizers to run high-trust communities, host curated gatherings, and post impactful roles—all tied to a verified builder passport.

@@ -178,7 +178,7 @@ export function OrganizationsList({ initialOrgs }: { initialOrgs: OrganizationWi
                   </Link>
 
                   <p className="text-g5 text-[13px] leading-[1.6] font-sans line-clamp-2 flex-1">
-                    {org.description || "A collective group of makers and builders shaping technology on campus."}
+                    {org.description || "A collective group of makers and builders shaping technology in the ecosystem."}
                   </p>
 
                   <div className="mt-4 pt-4 border-t border-g3/50 flex items-center justify-between text-[12px] font-sans text-g5">

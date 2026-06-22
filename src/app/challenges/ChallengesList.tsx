@@ -140,7 +140,7 @@ export function ChallengesList({
           </div>
           <h3 className="serif text-3xl text-ink mb-2">No challenges open</h3>
           <p className="text-g5 text-[15px] max-w-[40ch] leading-relaxed mb-8">
-            Host a challenge to gather campus builders.
+            Host a challenge to gather builders in the network.
           </p>
           <button 
             onClick={() => setDrawerOpen(true)}

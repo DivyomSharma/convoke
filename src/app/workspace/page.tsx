@@ -178,10 +178,10 @@ export default async function Workspace() {
             ) : (
               <div className="mt-8 text-center py-10 border border-dashed border-g3 rounded-md">
                 <p className="text-[13px] text-g5 max-w-[34ch] mx-auto leading-relaxed">
-                  You don't have any upcoming meet passes. Explore campus happenings to RSVP.
+                  You don't have any upcoming meet passes. Explore network happenings to RSVP.
                 </p>
                 <Link href="/meets" className="mt-4 inline-flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-[var(--brand)] font-semibold hover:underline">
-                  <span>Browse Campus Meets</span>
+                  <span>Browse Network Meets</span>
                   <ArrowRight size={12} />
                 </Link>
               </div>
@@ -227,7 +227,7 @@ export default async function Workspace() {
           {/* Explore / Campus Timeline Suggestions */}
           <div>
             <div className="hairline-b pb-4">
-              <div className="eyebrow">Discover campus</div>
+              <div className="eyebrow">Discover the network</div>
               <h2 className="serif text-3xl mt-1">Upcoming Gatherings</h2>
             </div>
 
@@ -263,7 +263,7 @@ export default async function Workspace() {
               </div>
             ) : (
               <div className="mt-6 text-[13px] text-g5 italic text-center py-6">
-                Your campus is quiet today. No new recommendations.
+                Your network is quiet today. No new recommendations.
               </div>
             )}
           </div>

@@ -235,7 +235,7 @@ export default async function HomePage() {
     meet: dbFeaturedEvent
       ? {
           title: dbFeaturedEvent.title,
-          description: dbFeaturedEvent.description || "A major campus gathering for builders.",
+          description: dbFeaturedEvent.description || "A major network gathering for builders.",
           meta: `Happening at ${dbFeaturedEvent.location || "Online"} · ${dbFeaturedEvent.startTime.toLocaleDateString()}`,
           link: `/meets/${dbFeaturedEvent.id}`,
           actionText: "RSVP Today",
@@ -244,7 +244,7 @@ export default async function HomePage() {
       : {
           title: "No upcoming meets",
           description: "Bring builders together for a technical paper review, workshop, or space mixer.",
-          meta: "Create the first meet on campus",
+          meta: "Create the first meet in the network",
           link: "/meets",
           actionText: "Host Meet",
           imageUrl: getFallbackPhoto("empty-event", "meet"),
@@ -252,7 +252,7 @@ export default async function HomePage() {
     org: dbFeaturedOrg
       ? {
           title: dbFeaturedOrg.name,
-          description: dbFeaturedOrg.description || "Join this growing hub on Convoke campus.",
+          description: dbFeaturedOrg.description || "Join this growing hub on Convoke network.",
           meta: `Ecosystem Hub · Since ${dbFeaturedOrg.createdAt.getFullYear()}`,
           link: `/org/${dbFeaturedOrg.slug}`,
           actionText: "Enter Hub",
@@ -278,7 +278,7 @@ export default async function HomePage() {
       : {
           title: "No projects shipped yet",
           description: "Launch what you're working on to gather feedback, downloads, and builder momentum.",
-          meta: "Share your latest build with campus",
+          meta: "Share your latest build with the network",
           link: "/projects",
           actionText: "Launch Project",
           imageUrl: getFallbackPhoto("empty-project", "project"),
@@ -296,7 +296,7 @@ export default async function HomePage() {
         }
       : {
           title: "No active opportunities",
-          description: "Hire founding developers, post roles, or offer research fellowships to campus builders.",
+          description: "Hire founding developers, post roles, or offer research fellowships to builders in the network.",
           meta: "Post a role to source builder talent",
           link: "/opportunities",
           actionText: "Post Role",
@@ -305,7 +305,7 @@ export default async function HomePage() {
     builder: dbFeaturedUser
       ? {
           title: dbFeaturedUser.name || "Anonymous Builder",
-          description: dbFeaturedUser.bio || "Building future systems on the Convoke digital campus.",
+          description: dbFeaturedUser.bio || "Building future systems on the Convoke digital network.",
           meta: `@${dbFeaturedUser.handle || dbFeaturedUser.username || dbFeaturedUser.displayName || "builder"} · ${dbFeaturedUser.role || "Builder"}`,
           link: `/profile/${dbFeaturedUser.handle || dbFeaturedUser.username || dbFeaturedUser.displayName || "builder"}`,
           actionText: "View Passport",
@@ -322,7 +322,7 @@ export default async function HomePage() {
     research: dbFeaturedResearch
       ? {
           title: dbFeaturedResearch.title,
-          description: dbFeaturedResearch.abstract || "A scientific paper published on campus.",
+          description: dbFeaturedResearch.abstract || "A scientific paper published in the network.",
           meta: `Published by ${dbFeaturedResearch.user?.name || "Researcher"}`,
           link: "/research",
           actionText: "Read Paper",

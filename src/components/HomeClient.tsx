@@ -156,7 +156,7 @@ export function HomeClient({ feedItems, featured }: HomeClientProps) {
       <section className="relative z-10 mx-auto mt-16 max-w-[1240px] px-5 sm:px-8">
         <div className="mb-7 flex flex-col gap-4 border-b border-g3/60 pb-5 md:flex-row md:items-end md:justify-between">
           <div>
-            <div className="mono mb-3 text-[11px] uppercase tracking-[0.18em] text-brand">Campus Feed</div>
+            <div className="mono mb-3 text-[11px] uppercase tracking-[0.18em] text-brand">Network Feed</div>
             <h2 className="serif text-4xl leading-none tracking-[-0.05em] md:text-6xl">What&apos;s happening.</h2>
           </div>
           <div className="mono text-[11px] uppercase tracking-[0.18em] text-g5">A live record of work and people</div>
