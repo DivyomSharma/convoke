@@ -37,10 +37,10 @@ export async function updateSettings(data: {
       bio: data.bio,
       location: data.location,
       website: data.website,
-      githubUrl: data.githubUrl,
-      linkedinUrl: data.linkedinUrl,
-      twitterUrl: data.twitterUrl,
-      readcvUrl: data.readcvUrl,
+      github: data.githubUrl,
+      linkedin: data.linkedinUrl,
+      twitter: data.twitterUrl,
+      portfolio: data.readcvUrl,
     },
   });
 

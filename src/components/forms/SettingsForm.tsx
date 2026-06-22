@@ -15,10 +15,10 @@ export function SettingsForm({ user }: { user: any }) {
     bio: user.bio || "",
     location: user.location || "",
     website: user.website || "",
-    githubUrl: user.githubUrl || "",
-    linkedinUrl: user.linkedinUrl || "",
-    twitterUrl: user.twitterUrl || "",
-    readcvUrl: user.readcvUrl || "",
+    githubUrl: user.github || "",
+    linkedinUrl: user.linkedin || "",
+    twitterUrl: user.twitter || "",
+    readcvUrl: user.portfolio || "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
