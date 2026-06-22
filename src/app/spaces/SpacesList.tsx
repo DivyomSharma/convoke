@@ -246,7 +246,7 @@ export function SpacesList({
                     <select 
                       value={organizationId}
                       onChange={(e) => setOrganizationId(e.target.value)}
-                      className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all [&>option]:bg-paper"
+                      className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
                     >
                       {organizations.map((org) => (
                         <option key={org.id} value={org.id}>{org.name}</option>
