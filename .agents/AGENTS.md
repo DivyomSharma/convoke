@@ -20,3 +20,6 @@ The primary aesthetic is deep dark mode with a metallic gold accent.
 * **Primary Logo**: The wordmark `Convoke.` written in Instrument Serif.
 * **App Icon**: `C.` written in Instrument Serif inside a dark squircle.
 * **Tagline**: "For people building the future."
+
+## Engineering Guidelines
+* **Git**: Always push code changes to the `main` branch immediately after verifying they work.

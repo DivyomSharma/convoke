@@ -108,8 +108,8 @@ export function HomeClient({ feedItems, featured }: HomeClientProps) {
 
   return (
     <div className="relative overflow-hidden">
-      <section className="relative px-5 pb-14 pt-14 sm:px-8 sm:pb-20 sm:pt-20 dark:bg-[#000]">
-        <div className="pointer-events-none absolute inset-0 z-0 dark:hidden" style={{ background: "radial-gradient(circle at center, #ffffff 0%, var(--paper) 100%)" }} />
+      <section className="relative bg-paper px-5 pb-14 pt-14 sm:px-8 sm:pb-20 sm:pt-20 dark:bg-[#000]">
+        <div className="pointer-events-none absolute inset-0 z-0 dark:hidden bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,.92)_0%,rgba(247,244,239,.98)_60%,#F7F4EF_100%)]" />
         <div className="pointer-events-none absolute inset-0 z-10 hidden dark:block dark:bg-[radial-gradient(circle_at_center,transparent_56%,rgba(0,0,0,0.82)_100%)]" />
 
         <div className="pointer-events-none absolute left-1/2 top-[50%] hidden -translate-x-1/2 -translate-y-1/2 opacity-[0.34] md:block dark:opacity-[0.24]">
