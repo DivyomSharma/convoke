@@ -41,6 +41,13 @@ export function SpacesList({
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [discord, setDiscord] = useState("");
+  const [instagram, setInstagram] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [twitter, setTwitter] = useState("");
+  const [linkedin, setLinkedin] = useState("");
+  const [currentTab, setCurrentTab] = useState(0);
+  const TABS = ["Basic Info", "Details", "Links"];
 
   // Form states
   const [name, setName] = useState("");
@@ -169,188 +176,6 @@ export function SpacesList({
                     <div className="flex items-center gap-2">
                       <span className="text-ink font-medium">{space._count.messages}</span> Dispatches
                     </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>next/link";
-import { useRouter } from "next/navigation";
-import { Hash, MessageCircle, Users, Plus, X, Loader2 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { createSpace } from "@/app/actions/workspace";
-import { getFallbackPhoto } from "@/lib/photos";
-import { CardRing } from "@/components/ui/card-ring";
-import { ImageUploadField } from "@/components/forms/ImageUploadField";
-
-interface SpaceWithDetails {
-  id: string;
-  name: string;
-  description: string | null;
-  bannerUrl: string | null;
-  organization: {
-    name: string;
-    members: any[];
-  };
-  _count: {
-    messages: number;
-  };
-}
-
-interface OrganizationOption {
-  id: string;
-  name: string;
-}
-
-export function SpacesList({ 
-  initialSpaces, 
-  organizations 
-}: { 
-  initialSpaces: SpaceWithDetails[];
-  organizations: OrganizationOption[];
-}) {
-  const router = useRouter();
-  const [spaces, setSpaces] = useState<SpaceWithDetails[]>(initialSpaces);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  // Form states
-  const [name, setName] = useState("");
-  const [organizationId, setOrganizationId] = useState(organizations[0]?.id || "");
-  const [description, setDescription] = useState("");
-  const [bannerUrl, setBannerUrl] = useState("");
-  const [bannerFileName, setBannerFileName] = useState("");
-  const [rules, setRules] = useState("");
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name || !organizationId) {
-      setError("Space name and organization are required.");
-      return;
-    }
-
-    setLoading(true);
-    setError("");
-
-    try {
-      const res = await createSpace({
-        name,
-        organizationId,
-        description: description || undefined,
-        bannerUrl: bannerUrl || undefined,
-        rules: rules || undefined,
-      discord: discord || undefined,
-        instagram: instagram || undefined,
-        whatsapp: whatsapp || undefined,
-        twitter: twitter || undefined,
-        linkedin: linkedin || undefined,
-        });
-
-      if (res.success && res.space) {
-        setDrawerOpen(false);
-        setName("");
-        setDescription("");
-        setBannerUrl("");
-        setBannerFileName("");
-        setRules("");
-        router.refresh();
-      }
-    } catch (err: any) {
-      setError(err.message || "Failed to create space.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <>
-      <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between border-b border-g3 pb-8 relative z-10">
-        <div>
-          <div className="mono text-[11px] tracking-[0.2em] uppercase text-g5">
-            (02) Spaces & Circles
-          </div>
-          <h1 className="serif text-5xl md:text-7xl mt-4 tracking-tight">Communities</h1>
-          <p className="text-g5 mt-4 text-[16px] max-w-[50ch] leading-relaxed">
-            The rooms you didn't know you were missing. Weekly conversations and quarterly meetups.
-          </p>
-        </div>
-        <button 
-          onClick={() => setDrawerOpen(true)}
-          className="ink-button px-5 text-[14px] font-medium flex items-center justify-center gap-2 cursor-pointer shrink-0"
-        >
-          <Plus size={15} />
-          <span>Create Space</span>
-        </button>
-      </div>
-
-      {spaces.length === 0 ? (
-        <div className="py-24 text-center relative z-10 flex flex-col items-center justify-center">
-          <h3 className="serif text-4xl text-ink font-light">No communities active</h3>
-          <p className="text-g5 text-[15px] max-w-[36ch] leading-relaxed mt-4 mb-8">
-            Define the rhythm. Establish the first digital space.
-          </p>
-          <button 
-            onClick={() => setDrawerOpen(true)}
-            className="ink-button px-5 text-[14px] font-medium cursor-pointer"
-          >
-            Create Space
-          </button>
-        </div>
-      ) : (
-        <div className="mt-12 flex flex-col gap-20 relative z-10">
-          {spaces.map((space, index) => {
-            const banner = space.bannerUrl || getFallbackPhoto(space.id, 'space');
-            return (
-              <div key={space.id} className="group grid gap-0 lg:grid-cols-12 lg:items-stretch premium-card campus-frame overflow-hidden relative border border-[#1a1a1a] hover:border-[#2f2f2f] transition-all duration-700 hover:-translate-y-[2px] ease-[cubic-bezier(0.22,0.61,0.36,1)]">
-                {/* Space Card Ring */}
-                <div className="absolute -right-[15%] top-1/2 -translate-y-1/2 opacity-8 group-hover:opacity-25 transition-opacity duration-700 ease-[cubic-bezier(0.22,0.61,0.36,1)] hidden md:block">
-                  <CardRing size={600} text="SPACE • CIRCLE • SPACE • SPACE • " />
-                </div>
-
-                {/* Large Photography */}
-                <div className="lg:col-span-5 relative z-10">
-                  <Link href={`/spaces/${space.id}`} className="block overflow-hidden bg-g1 h-full min-h-[240px] relative">
-                    <img 
-                      src={banner} 
-                      alt={space.name} 
-                      className="absolute inset-0 w-full h-full object-cover" 
-                    />
-                  </Link>
-                </div>
-
-                {/* Feature Content */}
-                <div className="lg:col-span-7 flex flex-col justify-center p-6 md:p-10 relative z-10">
-                  <div className="flex items-center gap-3 mono text-[11px] uppercase tracking-[0.25em] font-medium text-[var(--brand)] mb-4">
-                    <span>(0{index + 1})</span>
-                    <span>•</span>
-                    <span>{space.organization.name}</span>
-                  </div>
-
-                  <Link href={`/spaces/${space.id}`} className="block mt-2">
-                    <h3 className="serif text-4xl md:text-5xl leading-tight text-ink group-hover:text-g5 transition-colors font-light">
-                      {space.name}
-                    </h3>
-                  </Link>
-
-                  <p className="text-g5 text-[15px] mt-5 leading-[1.6] max-w-[48ch] font-sans">
-                    {space.description || "A collaborative circle gathered on the Convoke digital campus."}
-                  </p>
-
-                  <div className="mt-8 flex items-center gap-6 text-[13px] font-sans text-g5">
-                    <span>{space.organization.members.length} Builders</span>
-                    <span>•</span>
-                    <span>{space._count.messages} Dispatches</span>
-                  </div>
-
-                  <div className="mt-8">
-                    <Link 
-                      href={`/spaces/${space.id}`}
-                      className="text-[13px] font-medium text-ink hover:underline underline-offset-4 inline-flex items-center gap-2"
-                    >
-                      <span>Build With Them</span>
-                      <span className="text-[11px] opacity-70">→</span>
-                    </Link>
                   </div>
                 </div>
               </div>
