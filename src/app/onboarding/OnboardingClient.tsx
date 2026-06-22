@@ -191,12 +191,6 @@ export function OnboardingClient({ initialUser }: { initialUser: InitialUser }) 
           </div>
         </div>
 
-        <div className="premium-card p-5">
-          <div className="eyebrow mb-3 text-brand">Source of truth</div>
-          <p className="text-[14px] leading-7 text-g6">
-            This passport replaces Clerk identifiers in the user-facing UI. Your profile will be used across workspace, opportunities, events, and community surfaces.
-          </p>
-        </div>
       </aside>
     </motion.form>
   );
