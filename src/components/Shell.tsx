@@ -107,8 +107,8 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
               >
                 <LayoutGrid size={13} className="text-brand" />
                 <span className="max-w-32 truncate">
-                  {pathname.startsWith("/org/")
-                    ? workspaceContexts.organizations.find((context) => pathname.startsWith(context.href))?.label || "Organization"
+                  {pathname.startsWith("/workspace/org/") || pathname.startsWith("/org/")
+                    ? workspaceContexts.organizations.find((context) => pathname.includes(context.href.split('/').pop() || ''))?.label || "Organization"
                     : "Personal"}
                 </span>
                 <ChevronDown size={13} />

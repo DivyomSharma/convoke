@@ -62,6 +62,7 @@ export default async function ProjectDetailPage(props: { params?: Promise<{ id: 
       gallery: true,
       timeline: { orderBy: { date: "desc" } },
       resources: true,
+      buildLogs: { orderBy: { createdAt: "desc" } },
     },
   }).catch(() => null);
 
@@ -134,6 +135,24 @@ export default async function ProjectDetailPage(props: { params?: Promise<{ id: 
             {/* MAIN CONTENT */}
             <div className="lg:col-span-2 space-y-16">
               
+              {/* Build Logs */}
+              {proj.buildLogs.length > 0 && (
+                <section>
+                  <h2 className="serif text-2xl mb-6 text-ink font-medium">Build Logs</h2>
+                  <div className="space-y-6">
+                    {proj.buildLogs.map((log) => (
+                      <div key={log.id} className="relative pl-6 before:absolute before:left-0 before:top-2 before:bottom-[-24px] last:before:bottom-0 before:w-px before:bg-g3">
+                        <div className="absolute left-[-4px] top-2 w-2 h-2 rounded-full bg-[var(--brand)] shadow-[0_0_8px_var(--brand)]"></div>
+                        <p className="text-[12px] text-g5 font-medium mb-2">{log.createdAt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</p>
+                        <div className="text-[14px] leading-relaxed text-g6 bg-g1/30 border border-g3 rounded-md p-4 whitespace-pre-line">
+                          {log.summary}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+
               {/* About Section */}
               <section>
                 <h2 className="serif text-3xl mb-4 text-ink">About</h2>

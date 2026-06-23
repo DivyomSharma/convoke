@@ -21,6 +21,7 @@ model User {
   bannerUrl  String?
   role       String? // Student, Founder, Creator, Researcher, etc.
   modes      String[] @default([])
+  openTo     String[] @default([])
   pronouns   String?
   dob        DateTime?
   country    String?
@@ -67,6 +68,8 @@ model User {
   ledTeams      Team[]            @relation("TeamLeader")
   teamMemberships TeamMember[]
   teamRequests  TeamRequest[]
+  follows       Follow[]          @relation("UserFollows")
+  badges        Badge[]
 }
 
 model Organization {
@@ -529,4 +532,27 @@ model TeamRequest {
 
   team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Follow {
+  id         String   @id @default(uuid())
+  followerId String
+  targetId   String
+  targetType String   // USER, SPACE, ORGANIZATION, PROJECT, RESEARCH
+  createdAt  DateTime @default(now())
+
+  follower   User     @relation("UserFollows", fields: [followerId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, targetId, targetType])
+}
+
+model Badge {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  iconUrl     String?
+  userId      String
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

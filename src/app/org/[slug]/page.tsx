@@ -82,6 +82,9 @@ export default async function OrgDetailPage(props: { params?: Promise<{ slug: st
   const initialBookmarked = dbUser ? (await prisma.bookmark.findFirst({
     where: { userId: dbUser.id, itemId: org.id, itemType: "ORGANIZATION" }
   })) !== null : false;
+  const initialFollowing = dbUser ? (await prisma.follow.findFirst({
+    where: { followerId: dbUser.id, targetId: org.id, targetType: "ORGANIZATION" }
+  })) !== null : false;
 
   // Count open roles
   const openRolesCount = org.opportunities.filter(o => o.type === "ROLE").length;
@@ -141,6 +144,7 @@ export default async function OrgDetailPage(props: { params?: Promise<{ slug: st
             <OrgActionsClient 
               orgId={org.id} 
               initialBookmarked={initialBookmarked}
+              initialFollowing={initialFollowing}
               isMember={isMember}
             />
           </div>
@@ -151,13 +155,13 @@ export default async function OrgDetailPage(props: { params?: Promise<{ slug: st
                 { id: "overview", label: "Overview" },
                 { id: "meets", label: "Meets" },
                 { id: "challenges", label: "Challenges" },
-                { id: "opportunities", label: "Opportunities" },
+                ...(org.isRecruitingEnabled ? [{ id: "opportunities", label: "Opportunities" }] : []),
                 { id: "projects", label: "Projects" },
-                { id: "research", label: "Research" },
-                { id: "merch", label: "Merch" },
+                ...(org.isResearchEnabled ? [{ id: "research", label: "Research" }] : []),
+                ...(org.isMerchandiseEnabled ? [{ id: "merch", label: "Merch" }] : []),
                 { id: "members", label: "Members" },
                 { id: "resources", label: "Resources" },
-                ...(isAdmin ? [{ id: "recruit", label: "Recruit" }] : []),
+                ...(isAdmin ? [{ id: "settings", label: "Settings" }] : []),
               ].map((tab) => (
                 <Link
                   key={tab.id}

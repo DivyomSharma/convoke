@@ -102,14 +102,30 @@ export function ApplyClient({
           </button>
         )}
 
-        <div className="mt-4 flex items-center justify-center gap-4 border-t border-g3 pt-4">
-          <button onClick={handleShare} className="flex items-center gap-2 text-[13px] text-g5 hover:text-ink transition-colors">
-            {copied ? <Check size={14} className="text-green-500" /> : <Share2 size={14} />} 
-            {copied ? "Copied" : "Share"}
+        <div className="flex items-center gap-3 mt-4">
+          <button onClick={handleShare} className="flex-1 py-3 bg-g1 border border-g3 rounded-full text-[14px] font-medium text-g6 hover:text-ink hover:bg-g2 transition-colors flex items-center justify-center gap-2">
+            {copied ? <Check size={16} className="text-green-500" /> : <Share2 size={16} />}
+            <span>{copied ? "Copied Link" : "Share"}</span>
           </button>
-          <button onClick={handleBookmark} className={`flex items-center gap-2 text-[13px] transition-colors ${bookmarked ? "text-[var(--brand)]" : "text-g5 hover:text-ink"}`}>
-            <Bookmark size={14} fill={bookmarked ? "currentColor" : "none"} /> 
-            {bookmarked ? "Saved" : "Watchlist"}
+          <button onClick={handleBookmark} className={`w-12 h-12 flex items-center justify-center rounded-full border border-g3 transition-colors ${bookmarked ? "text-[var(--brand)] bg-[var(--brand)]/10 border-[var(--brand)]/20" : "text-g5 hover:text-ink hover:bg-g2"}`}>
+            <Bookmark size={18} fill={bookmarked ? "currentColor" : "none"} />
+          </button>
+        </div>
+
+        <div className="mt-4 border-t border-g3/60 pt-4">
+          <button 
+            onClick={() => {
+              if (!isSignedIn) {
+                router.push("/auth");
+                return;
+              }
+              const refLink = `${window.location.origin}/opportunities/${opportunityId}?ref=${user?.id}`;
+              share("I'm referring you for this opportunity on Convoke", refLink);
+            }}
+            className="w-full py-3 bg-[var(--brand)]/5 border border-[var(--brand)]/20 text-[var(--brand)] rounded-full text-[14px] font-medium hover:bg-[var(--brand)]/10 transition-colors flex items-center justify-center gap-2"
+          >
+            <Share2 size={16} />
+            <span>Refer a Builder</span>
           </button>
         </div>
       </div>

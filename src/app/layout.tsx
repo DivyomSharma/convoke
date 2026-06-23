@@ -4,6 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "@/components/theme-provider";
 import { PostHogProvider } from "@/components/providers/posthog-provider";
 import { GlobalOnboardingCheck } from "@/components/GlobalOnboardingCheck";
+import { ConvokeAssistant } from "@/components/ConvokeAssistant";
 import { Toaster } from "sonner";
 import "./globals.css";
 
@@ -105,6 +106,7 @@ export default function RootLayout({
             >
               {publishableKey ? children : <MissingClerkKey />}
               <GlobalOnboardingCheck />
+              <ConvokeAssistant />
               <Toaster theme="dark" position="bottom-center" toastOptions={{ className: "campus-frame font-mono text-[12px] uppercase tracking-widest" }} />
             </ThemeProvider>
           </PostHogProvider>

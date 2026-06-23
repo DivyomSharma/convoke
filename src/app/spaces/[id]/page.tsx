@@ -6,6 +6,8 @@ import { Building2, CalendarDays, ChevronRight, FileText, Hash, Image as ImageIc
 import { Shell } from "@/components/Shell";
 import { AmbientGlow } from "@/components/AmbientGlow";
 import { prisma } from "@/lib/prisma";
+import { requireUser } from "@/lib/auth";
+import { FollowButton } from "@/components/FollowButton";
 import { getFallbackPhoto } from "@/lib/photos";
 import { isChallengeType } from "@/lib/challenge-types";
 
@@ -109,6 +111,11 @@ export default async function SpaceDetailPage(props: { params?: Promise<{ id: st
     { id: "activity", label: "Activity" },
   ];
 
+  const dbUser = await requireUser().catch(() => null);
+  const initialFollowing = dbUser ? (await prisma.follow.findFirst({
+    where: { followerId: dbUser.id, targetId: space.id, targetType: "SPACE" }
+  })) !== null : false;
+
   return (
     <Shell wide>
       <div className="relative mx-auto min-h-screen max-w-[1440px] px-5 py-10 sm:px-8">
@@ -130,6 +137,12 @@ export default async function SpaceDetailPage(props: { params?: Promise<{ id: st
                 <button className="rounded-full bg-ink px-5 py-2 text-[13px] font-semibold text-paper transition-colors hover:bg-ink-2">
                   Join Space
                 </button>
+                <FollowButton 
+                  targetId={space.id} 
+                  targetType="SPACE" 
+                  initialFollowing={initialFollowing} 
+                  className="px-5 py-2"
+                />
                 <div className="flex h-9 items-center rounded-full border border-g3 bg-g1/50 px-4 text-[12px] font-medium text-g6">
                   {space.members.length} Members
                 </div>

@@ -5,14 +5,17 @@ import { Share, Bookmark, Check } from "lucide-react";
 import { useShare } from "@/hooks/useShare";
 import { toggleBookmark } from "@/app/actions/bookmark";
 import { useRouter } from "next/navigation";
+import { FollowButton } from "@/components/FollowButton";
 
 export function OrgActionsClient({ 
   orgId, 
   initialBookmarked,
+  initialFollowing,
   isMember
 }: { 
   orgId: string; 
   initialBookmarked: boolean;
+  initialFollowing: boolean;
   isMember: boolean;
 }) {
   const [bookmarked, setBookmarked] = useState(initialBookmarked);
@@ -41,6 +44,12 @@ export function OrgActionsClient({
       <button onClick={handleBookmark} className={`w-10 h-10 flex items-center justify-center rounded-full border border-g3 transition-colors shadow-sm ${bookmarked ? "text-[var(--brand)] bg-[var(--brand)]/10 border-[var(--brand)]/20" : "text-g5 hover:text-ink hover:bg-g1"}`}>
         <Bookmark size={16} fill={bookmarked ? "currentColor" : "none"} />
       </button>
+      <FollowButton 
+        targetId={orgId} 
+        targetType="ORGANIZATION" 
+        initialFollowing={initialFollowing} 
+        className="py-2.5 px-6 rounded-full"
+      />
       {isMember ? (
         <button disabled className="bg-[var(--brand)]/10 text-[var(--brand)] border border-[var(--brand)]/20 px-8 py-2.5 rounded-full text-[14px] font-medium flex items-center gap-2">
           <Check size={16} /> Member

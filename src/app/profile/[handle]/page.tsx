@@ -4,6 +4,8 @@ import { Avatar } from "@/components/Avatar";
 import { prisma } from "@/lib/prisma";
 import { Metadata } from "next";
 import { ProfileTabsClient } from "./ProfileTabsClient";
+import { requireUser } from "@/lib/auth";
+import { FollowButton } from "@/components/FollowButton";
 
 export async function generateMetadata(props: { params?: Promise<{ handle: string }> }): Promise<Metadata> {
   const params = await props.params;
@@ -60,10 +62,21 @@ export default async function Profile(props: { params?: Promise<{ handle: string
       activity: {
         orderBy: { createdAt: "desc" },
       },
+      badges: true,
+      follows: true,
     },
   });
 
   if (!user) return notFound();
+
+  const dbUser = await requireUser().catch(() => null);
+  const initialFollowing = dbUser ? (await prisma.follow.findFirst({
+    where: { followerId: dbUser.id, targetId: user.id, targetType: "USER" }
+  })) !== null : false;
+  
+  const followersCount = await prisma.follow.count({
+    where: { targetId: user.id, targetType: "USER" }
+  });
 
   const spaces = user.memberships.flatMap((m) => m.organization.spaces);
   const vouches = user.vouchesRecv;
@@ -83,19 +96,52 @@ export default async function Profile(props: { params?: Promise<{ handle: string
             <p className="mt-3 max-w-[44ch] text-[16px] text-g6">
               {user.role || "Member"}. {user.bio || "No bio added yet."}
             </p>
-            <div className="mt-5 flex gap-6 text-[13px] text-g5">
+            <div className="mt-5 flex items-center gap-6 text-[13px] text-g5">
+              <span>
+                <b className="text-ink">{followersCount}</b> followers
+              </span>
               <span>
                 <b className="text-ink">{projects.length}</b> projects
               </span>
               <span>
                 <b className="text-ink">{spaces.length}</b> spaces
               </span>
-              <span>
-                <b className="text-ink">{vouches.length}</b> vouches
-              </span>
             </div>
+
+            {user.openTo.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                <span className="text-[11px] font-medium uppercase tracking-wider text-g5 self-center mr-1">Open To</span>
+                {user.openTo.map(tag => (
+                  <span key={tag} className="bg-green-500/10 text-green-600 border border-green-500/20 px-2 py-0.5 rounded text-[11px] font-medium">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="flex flex-col items-end gap-3 pb-2 self-start justify-self-end mt-12 md:mt-0">
+            {dbUser?.id !== user.id && (
+              <FollowButton 
+                targetId={user.id} 
+                targetType="USER" 
+                initialFollowing={initialFollowing} 
+              />
+            )}
           </div>
         </header>
+
+        {user.badges.length > 0 && (
+          <div className="mt-8 flex flex-wrap gap-3">
+            {user.badges.map(badge => (
+              <div key={badge.id} className="flex items-center gap-2 bg-g1/50 border border-g3 rounded-full pl-1 pr-3 py-1" title={badge.description || ""}>
+                <div className="w-6 h-6 rounded-full bg-[var(--brand)]/20 flex items-center justify-center text-[var(--brand)] text-[12px]">
+                  {badge.iconUrl ? <img src={badge.iconUrl} alt="" className="w-4 h-4" /> : "★"}
+                </div>
+                <span className="text-[12px] font-medium text-ink">{badge.name}</span>
+              </div>
+            ))}
+          </div>
+        )}
 
         <div className="mt-12 grid grid-cols-12 gap-10">
           <section className="col-span-12 md:col-span-7">
