@@ -10,6 +10,7 @@ import { requireUser } from "@/lib/auth";
 import { RegisterClient } from "./RegisterClient";
 import Link from "next/link";
 import { Metadata } from "next";
+import { isChallengeType } from "@/lib/challenge-types";
 
 export const revalidate = 60;
 
@@ -69,7 +70,7 @@ export default async function ChallengeDetailPage(props: { params?: Promise<{ id
   }
 
   // Redirect standard job roles to opportunities
-  if (opp.type !== "HACKATHON" && opp.type !== "CHALLENGE") {
+  if (!isChallengeType(opp.type)) {
     redirect(`/opportunities/${opp.id}`);
   }
 

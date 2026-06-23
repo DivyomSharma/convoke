@@ -2,6 +2,7 @@ import { Shell } from "@/components/Shell";
 import { AmbientGlow } from "@/components/AmbientGlow";
 import { prisma } from "@/lib/prisma";
 import { ChallengesList } from "./ChallengesList";
+import { challengeTypes } from "@/lib/challenge-types";
 
 export const revalidate = 0; // Fresh listing upon challenge creations
 
@@ -11,7 +12,7 @@ export default async function ChallengesPage() {
   const challenges = await prisma.opportunity.findMany({
     where: {
       type: {
-        in: ["HACKATHON", "CHALLENGE"],
+        in: challengeTypes.map((type) => type.value),
       },
     },
     include: {

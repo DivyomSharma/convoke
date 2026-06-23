@@ -15,11 +15,6 @@ export default async function SpacesPage() {
           members: true,
         },
       },
-      _count: {
-        select: {
-          messages: true,
-        },
-      },
     },
     orderBy: {
       createdAt: "desc",

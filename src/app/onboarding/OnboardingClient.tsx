@@ -13,6 +13,7 @@ type InitialUser = {
   handle: string | null;
   bio: string | null;
   headline: string | null;
+  modes: string[];
   pronouns: string | null;
   avatarUrl: string | null;
   bannerUrl: string | null;
@@ -37,6 +38,8 @@ const visibilities = [
   { value: "private", label: "Private" },
 ] as const;
 
+const modeOptions = ["Student", "Builder", "Organizer", "Founder", "Recruiter", "Researcher", "Mentor", "Sponsor"] as const;
+
 export function OnboardingClient({ initialUser }: { initialUser: InitialUser }) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
@@ -44,6 +47,7 @@ export function OnboardingClient({ initialUser }: { initialUser: InitialUser }) 
   const [displayName, setDisplayName] = useState(initialUser.displayName || initialUser.name || "");
   const [username, setUsername] = useState(initialUser.username || initialUser.handle || "");
   const [headline, setHeadline] = useState(initialUser.headline || "");
+  const [modes, setModes] = useState<string[]>(initialUser.modes || []);
   const [pronouns, setPronouns] = useState(initialUser.pronouns || "");
   const [bio, setBio] = useState(initialUser.bio || "");
   const [website, setWebsite] = useState(initialUser.website || "");
@@ -81,6 +85,7 @@ export function OnboardingClient({ initialUser }: { initialUser: InitialUser }) 
         displayName,
         username,
         headline,
+        modes,
         pronouns,
         bio,
         website,
@@ -115,6 +120,27 @@ export function OnboardingClient({ initialUser }: { initialUser: InitialUser }) 
     >
       <div className="space-y-5">
         <div className="premium-card p-6 md:p-7">
+          <div className="eyebrow mb-5 text-brand">What brings you to Convoke?</div>
+          <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {modeOptions.map((mode) => {
+              const selected = modes.includes(mode);
+              return (
+                <button
+                  key={mode}
+                  type="button"
+                  onClick={() => setModes((current) => selected ? current.filter((item) => item !== mode) : [...current, mode])}
+                  className={`h-11 rounded-2xl border px-4 text-left text-sm transition-colors ${
+                    selected
+                      ? "border-brand/50 bg-brand/10 text-ink"
+                      : "border-g3 bg-transparent text-g6 hover:border-g4 hover:text-ink"
+                  }`}
+                >
+                  {mode}
+                </button>
+              );
+            })}
+          </div>
+
           <div className="eyebrow mb-5 text-brand">Identity</div>
           <div className="grid gap-5 md:grid-cols-2">
             <Field label="Display name" value={displayName} onChange={setDisplayName} placeholder="Divyom Sharma" />
@@ -184,6 +210,7 @@ export function OnboardingClient({ initialUser }: { initialUser: InitialUser }) 
                 <div>{locationPreview}</div>
                 <div>{pronouns || "Pronouns not set"}</div>
                 <div>{currentRole || "Current role not set"} {company ? `· ${company}` : ""}</div>
+                <div>{modes.length > 0 ? modes.join(" / ") : "Modes not set"}</div>
                 <div>{visibility === "public" ? "Public profile" : visibility === "members" ? "Members only profile" : "Private profile"}</div>
                 <div>{timezone}</div>
               </div>

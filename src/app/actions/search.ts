@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { isChallengeType } from "@/lib/challenge-types";
 
 export type SearchResult = {
   id: string;
@@ -92,7 +93,7 @@ export async function globalSearch(query: string): Promise<SearchResult[]> {
 
   // 4. Opportunities (Roles & Challenges)
   opportunities.forEach((o) => {
-    const isChallenge = o.type === "HACKATHON" || o.type === "CHALLENGE";
+    const isChallenge = isChallengeType(o.type);
     results.push({
       id: `opp-${o.id}`,
       type: isChallenge ? "Challenge" : "Opportunity",

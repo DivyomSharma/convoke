@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Hash, MessageCircle, Users, Plus, X, Loader2 } from "lucide-react";
+import { Users, Plus, X, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createSpace } from "@/app/actions/workspace";
 import { getFallbackPhoto } from "@/lib/photos";
@@ -18,9 +18,6 @@ interface SpaceWithDetails {
   organization: {
     name: string;
     members: any[];
-  };
-  _count: {
-    messages: number;
   };
 }
 
@@ -104,9 +101,9 @@ export function SpacesList({
           <div className="mono text-[11px] tracking-[0.2em] uppercase text-g5">
             (02) Spaces & Circles
           </div>
-          <h1 className="serif text-5xl md:text-7xl mt-4 tracking-tight">Communities</h1>
+          <h1 className="serif text-5xl md:text-7xl mt-4 tracking-tight">Spaces</h1>
           <p className="text-g5 mt-4 text-[16px] max-w-[50ch] leading-relaxed">
-            The rooms you didn't know you were missing. Weekly conversations and quarterly meetups.
+            Identity containers for clubs, chapters, circles, and collectives hosting real builder activity.
           </p>
         </div>
         <button 
@@ -120,7 +117,7 @@ export function SpacesList({
 
       {spaces.length === 0 ? (
         <div className="py-24 text-center relative z-10 flex flex-col items-center justify-center">
-          <h3 className="serif text-4xl text-ink font-light">No communities active</h3>
+          <h3 className="serif text-4xl text-ink font-light">No spaces active</h3>
           <p className="text-g5 text-[15px] max-w-[36ch] leading-relaxed mt-4 mb-8">
             Define the rhythm. Establish the first digital space.
           </p>
@@ -174,7 +171,7 @@ export function SpacesList({
                       <span className="text-ink font-medium">{space.organization.members.length}</span> Builders
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-ink font-medium">{space._count.messages}</span> Dispatches
+                      <span className="text-ink font-medium">Identity</span> Container
                     </div>
                   </div>
                 </div>
@@ -209,7 +206,7 @@ export function SpacesList({
               <div className="flex items-center justify-between px-6 py-5 border-b border-g3/60">
                 <div>
                   <h2 className="serif text-2xl text-ink">New Builder Space</h2>
-                  <p className="text-xs text-g5 mt-0.5">Build a channel for discussion and collab.</p>
+                  <p className="text-xs text-g5 mt-0.5">Create an identity container for people, meets, and opportunities.</p>
                 </div>
                 <button 
                   onClick={() => setDrawerOpen(false)}
@@ -249,7 +246,7 @@ export function SpacesList({
                           required
                           value={name}
                           onChange={(e) => setName(e.target.value)}
-                          placeholder="E.g. #general, #ai-research"
+                          placeholder="E.g. AI Tinkerers, Robotics Club"
                           className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
                         />
                       </div>

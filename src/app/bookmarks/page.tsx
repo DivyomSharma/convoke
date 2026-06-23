@@ -4,6 +4,7 @@ import { Shell } from "@/components/Shell";
 import { Bookmark, Building2, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { isChallengeType } from "@/lib/challenge-types";
 
 export const metadata = {
   title: "Bookmarks | Convoke",
@@ -62,7 +63,7 @@ export default async function BookmarksPage() {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {opportunities.map(opp => (
-                    <Link key={opp.id} href={`/${opp.type === "CHALLENGE" || opp.type === "HACKATHON" ? "challenges" : "opportunities"}/${opp.id}`} className="premium-card p-5 group hover:border-[var(--brand)]/30 transition-colors">
+                    <Link key={opp.id} href={`/${isChallengeType(opp.type) ? "challenges" : "opportunities"}/${opp.id}`} className="premium-card p-5 group hover:border-[var(--brand)]/30 transition-colors">
                       <div className="flex justify-between items-start mb-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-xl bg-g1 overflow-hidden flex items-center justify-center shrink-0">

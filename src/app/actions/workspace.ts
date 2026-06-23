@@ -3,6 +3,8 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
+import { auth } from "@clerk/nextjs/server";
+import { isChallengeType } from "@/lib/challenge-types";
 
 export async function rsvpToEvent(meetId: string, status: "GOING" | "INTERESTED") {
   const user = await requireUser();
@@ -111,7 +113,7 @@ export async function applyToOpportunity(data: { opportunityId: string; pitch?: 
     revalidatePath("/workspace/tickets");
     revalidatePath("/opportunities");
     revalidatePath(`/opportunities/${data.opportunityId}`);
-    if (opportunity.type === "HACKATHON" || opportunity.type === "CHALLENGE") {
+    if (isChallengeType(opportunity.type)) {
       revalidatePath("/challenges");
       revalidatePath(`/challenges/${data.opportunityId}`);
     }
@@ -156,24 +158,6 @@ export async function joinSpace(organizationId: string) {
   if (org) {
     revalidatePath("/org/" + org.slug);
   }
-  return { success: true };
-}
-
-export async function postMessage(spaceId: string, content: string) {
-  const user = await requireUser();
-  if (!content || !content.trim()) {
-    throw new Error("Message content cannot be empty.");
-  }
-
-  await prisma.message.create({
-    data: {
-      content: content.trim(),
-      spaceId,
-      userId: user.id,
-    },
-  });
-
-  revalidatePath(`/spaces/${spaceId}`);
   return { success: true };
 }
 
@@ -383,7 +367,7 @@ export async function createOpportunity(data: {
   });
 
   revalidatePath("/opportunities");
-  if (data.type === "HACKATHON" || data.type === "CHALLENGE") {
+  if (isChallengeType(data.type)) {
     revalidatePath("/challenges");
   }
   revalidatePath("/workspace");
@@ -423,6 +407,45 @@ export async function createProject(data: {
   revalidatePath("/projects");
   revalidatePath("/workspace");
   return { success: true, project };
+}
+
+export async function getWorkspaceContexts() {
+  const { userId } = await auth();
+
+  if (!userId) {
+    return {
+      personal: { label: "Personal", href: "/workspace" },
+      organizations: [],
+    };
+  }
+
+  const memberships = await prisma.membership.findMany({
+    where: {
+      userId,
+      role: { in: ["ADMIN", "FOUNDER"] },
+    },
+    include: {
+      organization: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "asc",
+    },
+  });
+
+  return {
+    personal: { label: "Personal", href: "/workspace" },
+    organizations: memberships.map((membership) => ({
+      id: membership.organization.id,
+      label: membership.organization.name,
+      href: `/org/${membership.organization.slug}`,
+    })),
+  };
 }
 
 export async function createResearch(data: {

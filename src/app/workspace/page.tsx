@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { Ticket, Calendar, Clock, MapPin, CheckCircle, ArrowRight, UserPlus, Building2 } from "lucide-react";
+import { isChallengeType } from "@/lib/challenge-types";
 
 export const revalidate = 0;
 
@@ -30,11 +31,11 @@ export default async function Workspace() {
   }) : [];
 
   // Global upcoming meets that user might want to RSVP to (excluding already RSVP'd)
-  const rsvpEventIds = myRSVPs.map(r => r.meetId);
-  const upcomingEvents = await prisma.meet.findMany({
+  const rsvpMeetIds = myRSVPs.map(r => r.meetId);
+  const upcomingMeets = await prisma.meet.findMany({
     where: { 
       startTime: { gte: new Date() },
-      id: { notIn: rsvpEventIds }
+      id: { notIn: rsvpMeetIds }
     },
     orderBy: { startTime: "asc" },
     take: 4,
@@ -90,7 +91,7 @@ export default async function Workspace() {
             <div className="flex flex-col gap-2">
               <Link href="/meets/create" className="flex items-center gap-2 hover:text-[var(--brand)] text-g6 transition-colors text-[14px]">
                 <Calendar size={14} className="text-g4" />
-                <span>Create Event</span>
+                <span>Create Meet</span>
               </Link>
               <Link href="/spaces/create" className="flex items-center gap-2 hover:text-[var(--brand)] text-g6 transition-colors text-[14px]">
                 <Building2 size={14} className="text-g4" />
@@ -230,7 +231,7 @@ export default async function Workspace() {
                       </div>
                     </div>
                     <Link
-                      href={a.opportunity.type === "HACKATHON" || a.opportunity.type === "CHALLENGE" ? `/challenges/${a.opportunity.id}` : `/opportunities/${a.opportunity.id}`}
+                      href={isChallengeType(a.opportunity.type) ? `/challenges/${a.opportunity.id}` : `/opportunities/${a.opportunity.id}`}
                       className="mono text-[11px] uppercase tracking-wider text-g5 hover:text-ink transition-colors flex items-center gap-1"
                     >
                       <span>Review</span>
@@ -253,9 +254,9 @@ export default async function Workspace() {
               <h2 className="serif text-3xl mt-1">Upcoming Gatherings</h2>
             </div>
 
-            {upcomingEvents.length > 0 ? (
+            {upcomingMeets.length > 0 ? (
               <div className="mt-6 divide-y divide-g3">
-                {upcomingEvents.map((e) => (
+                {upcomingMeets.map((e) => (
                   <div key={e.id} className="py-5 grid grid-cols-12 gap-4 items-center">
                     <div className="col-span-12 md:col-span-9 space-y-1">
                       <div className="flex items-center gap-2 flex-wrap">

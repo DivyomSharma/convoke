@@ -5,6 +5,7 @@ import { DigitalPass, TicketState } from "@/components/DigitalPass";
 import { Shell } from "@/components/Shell";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
+import { challengeTypes } from "@/lib/challenge-types";
 
 function passState(status: string): TicketState {
   if (status === "GOING" || status === "ACCEPTED") return "CONFIRMED";
@@ -41,7 +42,7 @@ export default async function MyTicketsPage() {
         userId: user.id,
         opportunity: {
           type: {
-            in: ["HACKATHON", "CHALLENGE"],
+            in: challengeTypes.map((type) => type.value),
           },
         },
       },

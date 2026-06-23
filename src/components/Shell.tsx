@@ -7,6 +7,7 @@ import { useUser, useClerk } from "@clerk/nextjs";
 import { ThemeToggle } from "./ThemeToggle";
 import { VerticalMarquee } from "./VerticalMarquee";
 import { globalSearch, type SearchResult } from "@/app/actions/search";
+import { getWorkspaceContexts } from "@/app/actions/workspace";
 import {
   Bell,
   ChevronDown,
@@ -25,6 +26,12 @@ import {
   Briefcase
 } from "lucide-react";
 
+type WorkspaceContext = {
+  id?: string;
+  label: string;
+  href: string;
+};
+
 const mainNav = [
   { href: "/explore", label: "Explore" },
   { href: "/spaces", label: "Spaces" },
@@ -42,6 +49,11 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
   const router = useRouter();
   const [commandOpen, setCommandOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [contextOpen, setContextOpen] = useState(false);
+  const [workspaceContexts, setWorkspaceContexts] = useState<{
+    personal: WorkspaceContext;
+    organizations: WorkspaceContext[];
+  } | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, isSignedIn } = useUser();
   const { signOut } = useClerk();
@@ -60,6 +72,22 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
     return () => window.removeEventListener("keydown", handleKeydown);
   }, []);
 
+  useEffect(() => {
+    if (!isSignedIn) {
+      setWorkspaceContexts(null);
+      return;
+    }
+
+    let active = true;
+    getWorkspaceContexts().then((contexts) => {
+      if (active) setWorkspaceContexts(contexts);
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [isSignedIn]);
+
   const widthClass = wide ? "max-w-[1440px]" : "max-w-[1240px]";
 
   return (
@@ -69,6 +97,40 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
           <Link href="/" className="serif text-[22px] leading-none tracking-tight text-ink">
             Convoke.
           </Link>
+
+          {isSignedIn && workspaceContexts ? (
+            <div className="relative hidden md:block">
+              <button
+                type="button"
+                onClick={() => setContextOpen((current) => !current)}
+                className="flex h-8 items-center gap-2 rounded-sm border border-g3 bg-paper-card px-3 text-[12px] text-g6 transition hover:border-g4 hover:text-ink"
+              >
+                <LayoutGrid size={13} className="text-brand" />
+                <span className="max-w-32 truncate">
+                  {pathname.startsWith("/org/")
+                    ? workspaceContexts.organizations.find((context) => pathname.startsWith(context.href))?.label || "Organization"
+                    : "Personal"}
+                </span>
+                <ChevronDown size={13} />
+              </button>
+
+              {contextOpen ? (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setContextOpen(false)} />
+                  <div className="absolute left-0 z-50 mt-2 w-72 overflow-hidden rounded-[18px] border border-g3 bg-paper-card/95 p-2 shadow-2xl shadow-black/20 backdrop-blur-xl">
+                    <ContextLink context={workspaceContexts.personal} onClick={() => setContextOpen(false)} />
+                    {workspaceContexts.organizations.length > 0 ? (
+                      <div className="mt-2 border-t border-g3 pt-2">
+                        {workspaceContexts.organizations.map((context) => (
+                          <ContextLink key={context.id || context.href} context={context} onClick={() => setContextOpen(false)} />
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                </>
+              ) : null}
+            </div>
+          ) : null}
 
           <nav className="hidden items-center gap-6 mono text-[11px] uppercase tracking-[0.14em] text-g5 xl:flex">
             {mainNav.map((item) => (
@@ -398,6 +460,26 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
       )}
     </div>
   );
+}
+
+function ContextLink({ context, onClick }: { context: WorkspaceContext; onClick: () => void }) {
+  return (
+    <Link
+      href={context.href}
+      onClick={onClick}
+      className="flex items-center gap-3 rounded-[14px] px-3 py-2.5 text-[13px] text-g6 transition hover:bg-g1 hover:text-ink"
+    >
+      <span className="flex h-8 w-8 items-center justify-center rounded-sm border border-g3 bg-g1 text-brand">
+        {context.label.slice(0, 1).toUpperCase()}
+      </span>
+      <span className="min-w-0 flex-1 truncate">{context.label}</span>
+      <ArrowRightIcon />
+    </Link>
+  );
+}
+
+function ArrowRightIcon() {
+  return <span className="mono text-[10px] text-g4">Open</span>;
 }
 
 function CommandK({ onClose }: { onClose: () => void }) {

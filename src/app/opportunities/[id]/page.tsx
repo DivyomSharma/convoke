@@ -10,6 +10,7 @@ import { requireUser } from "@/lib/auth";
 import { ApplyClient } from "./ApplyClient";
 import Link from "next/link";
 import { Metadata } from "next";
+import { isChallengeType } from "@/lib/challenge-types";
 
 export const revalidate = 60;
 
@@ -69,7 +70,7 @@ export default async function OpportunityDetailPage(props: { params?: Promise<{ 
   }
 
   // Redirect hackathons or challenges to their designated challenges page
-  if (opp.type === "HACKATHON" || opp.type === "CHALLENGE") {
+  if (isChallengeType(opp.type)) {
     redirect(`/challenges/${opp.id}`);
   }
 

@@ -20,6 +20,7 @@ model User {
   avatarUrl  String?
   bannerUrl  String?
   role       String? // Student, Founder, Creator, Researcher, etc.
+  modes      String[] @default([])
   pronouns   String?
   dob        DateTime?
   country    String?
@@ -53,7 +54,6 @@ model User {
   meets         MeetAttendance[]
   vouchesGiven  Vouch[]           @relation("VouchesGiven")
   vouchesRecv   Vouch[]           @relation("VouchesReceived")
-  messages      Message[]
   notifications Notification[]
   applications  Application[]
   projects      Project[]
@@ -121,7 +121,6 @@ model Space {
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   meets        Meet[]
-  messages     Message[]
   discord      String?
   instagram    String?
   whatsapp     String?
@@ -362,17 +361,6 @@ model Vouch {
 
   giver    User @relation("VouchesGiven", fields: [giverId], references: [id], onDelete: Cascade)
   receiver User @relation("VouchesReceived", fields: [receiverId], references: [id], onDelete: Cascade)
-}
-
-model Message {
-  id        String   @id @default(uuid())
-  content   String
-  userId    String
-  spaceId   String
-  createdAt DateTime @default(now())
-
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  space Space @relation(fields: [spaceId], references: [id], onDelete: Cascade)
 }
 
 model Notification {

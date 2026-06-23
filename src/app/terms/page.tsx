@@ -3,11 +3,11 @@ import { Shell } from "@/components/Shell";
 const sections = [
   {
     title: "Using Convoke",
-    body: "Convoke exists for legitimate opportunities, meets, communities, projects, sponsorships, certificates, and collaboration. You agree to provide accurate information and to use the platform in a way that protects participants, organizers, sponsors, and creators.",
+    body: "Convoke exists for legitimate opportunities, meets, spaces, projects, sponsorships, certificates, and collaboration. You agree to provide accurate information and to use the platform in a way that protects participants, organizers, sponsors, and creators.",
   },
   {
     title: "Accounts And Roles",
-    body: "Your access depends on your role and permissions. Participants, organizers, community admins, sponsors, startups, creators, volunteers, and platform admins may see different workflows. You are responsible for activity performed through your account.",
+    body: "Your access depends on your role and permissions. Participants, organizers, space admins, sponsors, startups, creators, volunteers, and platform admins may see different workflows. You are responsible for activity performed through your account.",
   },
   {
     title: "Organizer Responsibilities",
@@ -15,7 +15,7 @@ const sections = [
   },
   {
     title: "Participant Responsibilities",
-    body: "Participants must submit truthful applications, respect community guidelines, avoid spam or harassment, and follow organizer instructions for meets, hackathons, volunteering, interviews, and team collaboration.",
+    body: "Participants must submit truthful applications, respect space guidelines, avoid spam or harassment, and follow organizer instructions for meets, hackathons, volunteering, interviews, and team collaboration.",
   },
   {
     title: "Content And Files",
@@ -42,7 +42,7 @@ export default function TermsOfService() {
         </h1>
         <p className="mt-6 max-w-[700px] text-[16px] leading-8 text-g5">
           Effective June 21, 2026. These terms govern access to Convoke across discovery, applications,
-          registrations, communities, sponsorship workflows, merchandise requests, and organizer infrastructure.
+          registrations, spaces, sponsorship workflows, merchandise requests, and organizer infrastructure.
         </p>
 
         <div className="mt-12 grid gap-4">

@@ -11,6 +11,7 @@ export async function completeOnboarding(data: {
   handle?: string;
   bio?: string;
   headline?: string;
+  modes?: string[];
   pronouns?: string;
   avatarUrl?: string;
   bannerUrl?: string;
@@ -43,6 +44,7 @@ export async function completeOnboarding(data: {
       handle: data.username?.trim() || data.handle?.trim() || user.handle,
       bio: data.bio?.trim() || user.bio,
       headline: data.headline?.trim() || user.headline,
+      modes: data.modes?.filter(Boolean) || user.modes || [],
       pronouns: data.pronouns?.trim() || user.pronouns,
       avatarUrl: data.avatarUrl || user.avatarUrl,
       bannerUrl: data.bannerUrl || user.bannerUrl,

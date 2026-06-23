@@ -92,7 +92,7 @@ export function HomeClient({ feedItems, featured }: HomeClientProps) {
 
   const rolesFeed = feedItems.filter((item) => item.tag === "NOW HIRING");
   const projectsFeed = feedItems.filter((item) => item.tag === "NEW PROJECT");
-  const communityFeed = feedItems.filter((item) => item.tag === "NEW COMMUNITY");
+  const communityFeed = feedItems.filter((item) => item.tag === "NEW SPACE");
   const upcomingMeetsFeed = feedItems.filter((item) => item.tag === "LIVE NOW" || item.tag === "TONIGHT");
 
   const featuredCards = [
@@ -165,7 +165,7 @@ export function HomeClient({ feedItems, featured }: HomeClientProps) {
         <motion.div variants={containerVariants} initial="initial" whileInView="animate" viewport={{ once: true, margin: "-100px" }} className="grid grid-cols-1 gap-7 lg:grid-cols-[1.08fr_0.92fr]">
           <div className="flex flex-col gap-7">
             <FeedSection title="Upcoming Meets" empty="New meetups, workshops, seminars, and gatherings will appear here." items={upcomingMeetsFeed} footerHref="/meets" footerLabel="View all meets" />
-            <FeedSection title="Spaces" empty="New communities will appear here as they launch." items={communityFeed} footerHref="/spaces" footerLabel="View all communities" />
+            <FeedSection title="Spaces" empty="New spaces will appear here as they launch." items={communityFeed} footerHref="/spaces" footerLabel="View all spaces" />
           </div>
           <div className="flex flex-col gap-7">
             <FeedSection title="Open Roles" empty="Open roles from organizations will appear here." items={rolesFeed} footerHref="/opportunities" footerLabel="View all roles" />

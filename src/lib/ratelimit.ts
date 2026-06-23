@@ -13,6 +13,5 @@ export const ratelimit = {
   createOrg: redis ? new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(1, "1 m") }) : null,
   createEvent: redis ? new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(5, "1 m") }) : null,
   applyOpportunity: redis ? new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(10, "1 m") }) : null,
-  postMessage: redis ? new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(30, "1 m") }) : null,
   globalSearch: redis ? new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(60, "1 m") }) : null,
 };

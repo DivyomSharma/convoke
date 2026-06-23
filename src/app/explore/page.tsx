@@ -5,6 +5,7 @@ import { Avatar } from "@/components/Avatar";
 import { VerticalMarquee } from "@/components/VerticalMarquee";
 import { prisma } from "@/lib/prisma";
 import { getFallbackPhoto } from "@/lib/photos";
+import { isChallengeType } from "@/lib/challenge-types";
 
 const filters = ["All", "Meets", "Opportunities", "Challenges", "Projects"] as const;
 type Filter = (typeof filters)[number];
@@ -36,7 +37,7 @@ function formatDate(date: Date) {
 }
 
 function isChallenge(type: string) {
-  return type === "HACKATHON" || type === "CHALLENGE";
+  return isChallengeType(type);
 }
 
 export default async function Explore(props: { searchParams?: Promise<{ f?: string }> }) {

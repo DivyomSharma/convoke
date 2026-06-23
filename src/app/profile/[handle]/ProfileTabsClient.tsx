@@ -134,7 +134,7 @@ export function ProfileTabsClient({
             <div className="py-16 text-center text-g5 text-[14px] border border-dashed border-g3 rounded-xl flex flex-col items-center bg-g1/20">
               <Award size={32} className="text-[var(--brand)] mb-4" />
               <p className="font-medium text-ink mb-1 text-[16px]">Verified Credentials</p>
-              <p className="max-w-[40ch]">Event participation certificates and digital badges will appear here once issued by organizers.</p>
+              <p className="max-w-[40ch]">Meet participation certificates and digital badges will appear here once issued by organizers.</p>
             </div>
           </div>
         )}

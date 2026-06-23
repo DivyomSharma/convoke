@@ -109,7 +109,7 @@ export function OrganizerDashboard({
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-g3/60 pb-5">
         <div>
           <h2 className="serif text-2xl font-light">Organizer Control</h2>
-          <p className="text-xs text-g5 mt-0.5">Manage waitlist approvals, check-ins, and event experience.</p>
+          <p className="text-xs text-g5 mt-0.5">Manage waitlist approvals, check-ins, and meet experience.</p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <Link
@@ -258,7 +258,7 @@ export function OrganizerDashboard({
           <div className="w-12 h-12 rounded-full bg-g1 flex items-center justify-center text-g4 mb-3">
             <Download size={20} />
           </div>
-          <div className="text-ink font-medium">Event Assets</div>
+          <div className="text-ink font-medium">Meet Assets</div>
           <div className="text-g5 text-[14px] mt-1 max-w-sm">Upload slide decks, resources, and materials for attendees to download.</div>
           <button className="mt-4 px-4 py-2 bg-[var(--brand)] text-white text-[13px] font-medium rounded-full hover:opacity-90 transition-opacity">Upload Asset</button>
         </div>
@@ -281,7 +281,7 @@ export function OrganizerDashboard({
             <Camera size={20} />
           </div>
           <div className="text-ink font-medium">Digital Badges</div>
-          <div className="text-g5 text-[14px] mt-1 max-w-sm">Create verifiable digital badges for this event that attendees can display on their Passport.</div>
+          <div className="text-g5 text-[14px] mt-1 max-w-sm">Create verifiable digital badges for this meet that attendees can display on their Passport.</div>
           <button className="mt-4 px-4 py-2 bg-ink text-paper text-[13px] font-medium rounded-full hover:bg-ink-2 transition-opacity">Design Badge</button>
         </div>
       )}
@@ -292,7 +292,7 @@ export function OrganizerDashboard({
             <Share2 size={20} />
           </div>
           <div className="text-ink font-medium">Social Kit</div>
-          <div className="text-g5 text-[14px] mt-1 max-w-sm">Generate beautiful "I'm speaking" or "I'm attending" graphics for your community to share.</div>
+          <div className="text-g5 text-[14px] mt-1 max-w-sm">Generate beautiful "I'm speaking" or "I'm attending" graphics for your space to share.</div>
           <button className="mt-4 px-4 py-2 bg-[var(--brand)] text-white text-[13px] font-medium rounded-full hover:opacity-90 transition-opacity">Create Template</button>
         </div>
       )}

@@ -2,6 +2,7 @@ import { Shell } from "@/components/Shell";
 import { prisma } from "@/lib/prisma";
 import { HomeClient } from "@/components/HomeClient";
 import { getFallbackPhoto } from "@/lib/photos";
+import { challengeTypes, isChallengeType } from "@/lib/challenge-types";
 
 export const revalidate = 60;
 
@@ -43,7 +44,7 @@ export default async function HomePage() {
     prisma.opportunity.count({
       where: {
         type: {
-          in: ["HACKATHON", "CHALLENGE"],
+          in: challengeTypes.map((type) => type.value),
         },
       },
     }).catch(() => 0),
@@ -288,7 +289,7 @@ export default async function HomePage() {
           title: dbFeaturedOpp.title,
           description: dbFeaturedOpp.description || "Open application for ambitious builders.",
           meta: `Hiring at ${dbFeaturedOpp.organization?.name} · ${dbFeaturedOpp.location || "Remote"}`,
-          link: dbFeaturedOpp.type === "HACKATHON" || dbFeaturedOpp.type === "CHALLENGE" 
+          link: isChallengeType(dbFeaturedOpp.type) 
             ? `/challenges/${dbFeaturedOpp.id}` 
             : `/opportunities/${dbFeaturedOpp.id}`,
           actionText: "Apply Now",

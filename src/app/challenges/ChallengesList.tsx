@@ -9,7 +9,7 @@ import { createOpportunity } from "@/app/actions/workspace";
 import { CardRing } from "@/components/ui/card-ring";
 import { ImageUploadField } from "@/components/forms/ImageUploadField";
 import { FileUploadField } from "@/components/forms/FileUploadField";
-
+import { challengeTypes } from "@/lib/challenge-types";
 import { LocationAutocomplete } from "@/components/forms/LocationAutocomplete";
 
 interface ChallengeWithDetails {
@@ -80,11 +80,11 @@ export function ChallengesList({
     try {
       const res = await createOpportunity({
         title,
-        type, // HACKATHON or CHALLENGE
+        type,
         organizationId,
         description: description || undefined,
-        location: location || undefined,
-        compensation: compensation || undefined, // maps to compensation field in Prisma
+        location: mode === "ONLINE" ? "ONLINE" : location || undefined,
+        compensation: compensation || undefined,
         bannerUrl: bannerUrl || undefined,
         deadline: deadline || undefined,
       discord: discord || undefined,
@@ -102,6 +102,7 @@ export function ChallengesList({
         setType("HACKATHON");
         setDescription("");
         setLocation("ONLINE");
+        setMode("ONLINE");
         setCompensation("");
         setBannerUrl("");
         setBannerFileName("");
@@ -274,14 +275,11 @@ export function ChallengesList({
                             onChange={(e) => setType(e.target.value)}
                             className="w-full h-11 px-4 rounded-xl border border-g3 bg-paper text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
                           >
-                            <option value="HACKATHON">Hackathon</option>
-                            <option value="IDEATHON">Ideathon</option>
-                            <option value="CASE_STUDY">Case Study</option>
-                            <option value="QUIZ">Quiz</option>
-                            <option value="CODING_CHALLENGE">Coding Challenge</option>
-                            <option value="HIRING_CHALLENGE">Hiring Challenge</option>
-                            <option value="TREASURE_HUNT">Treasure Hunt</option>
-                            <option value="BUSINESS_PITCH">Business Pitch</option>
+                            {challengeTypes.map((challengeType) => (
+                              <option key={challengeType.value} value={challengeType.value}>
+                                {challengeType.label}
+                              </option>
+                            ))}
                           </select>
                         </div>
                         <div>
@@ -354,7 +352,10 @@ export function ChallengesList({
                           <label className="text-ink font-medium text-xs mb-1.5 block">Mode</label>
                           <select 
                             value={mode}
-                            onChange={(e) => setMode(e.target.value)}
+                            onChange={(e) => {
+                              setMode(e.target.value);
+                              if (e.target.value === "ONLINE") setLocation("ONLINE");
+                            }}
                             className="w-full h-11 px-4 rounded-xl border border-g3 bg-paper text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
                           >
                             <option value="ONLINE">Online</option>

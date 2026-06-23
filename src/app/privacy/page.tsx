@@ -3,7 +3,7 @@ import { Shell } from "@/components/Shell";
 const sections = [
   {
     title: "What We Collect",
-    body: "Convoke stores the information needed to run an opportunity and community platform: account identity, profile details, applications, registrations, memberships, messages, saved items, certificates, organizer activity, and files you choose to upload.",
+    body: "Convoke stores the information needed to run an opportunity and ecosystem platform: account identity, profile details, applications, registrations, memberships, saved items, certificates, organizer activity, and files you choose to upload.",
   },
   {
     title: "How We Use It",
@@ -34,11 +34,11 @@ export default function PrivacyPolicy() {
         <div className="absolute left-1/2 top-20 -z-10 h-72 w-72 -translate-x-1/2 rounded-full bg-brand/10 blur-[100px]" />
         <p className="mono text-[11px] uppercase tracking-[0.34em] text-brand">Convoke Trust</p>
         <h1 className="serif mt-5 max-w-[760px] text-5xl leading-[0.94] tracking-[-0.05em] text-ink sm:text-7xl">
-          Privacy that respects real people and real communities.
+          Privacy that respects real people and real spaces.
         </h1>
         <p className="mt-6 max-w-[700px] text-[16px] leading-8 text-g5">
           Effective June 21, 2026. This policy explains how Convoke handles data for students, builders,
-          organizers, sponsors, creators, and communities using the platform.
+          organizers, sponsors, creators, and spaces using the platform.
         </p>
 
         <div className="mt-12 grid gap-4">
