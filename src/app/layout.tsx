@@ -28,7 +28,7 @@ const fontMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: {
     template: "%s | Convoke",
-    default: "Convoke | Where ambitious people gather.",
+    default: "Convoke | For people building the future.",
   },
   description: "Discover organisations, spaces, meets, challenges, opportunities, projects, research, and culture. For people building the future.",
   metadataBase: new URL("https://www.theconvoke.xyz"),

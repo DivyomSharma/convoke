@@ -127,7 +127,7 @@ export function HomeClient({ feedItems, featured }: HomeClientProps) {
                 </motion.h1>
               </div>
               <p className="mt-7 max-w-[580px] text-[16px] leading-[1.72] text-g6 md:text-[18px]">
-                A continuous, high-signal ecosystem where ambitious people meet, collaborate, launch startups, and grow together.
+                For people building the future. A continuous, high-signal ecosystem to meet, collaborate, launch startups, and grow together.
               </p>
               <div className="mt-9 flex flex-wrap items-center gap-4 sm:gap-6">
                 <Link href="/auth" className="ink-button px-6 py-3 text-[14px]">

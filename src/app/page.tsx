@@ -287,7 +287,7 @@ export default async function HomePage() {
     opportunity: dbFeaturedOpp
       ? {
           title: dbFeaturedOpp.title,
-          description: dbFeaturedOpp.description || "Open application for ambitious builders.",
+          description: dbFeaturedOpp.description || "Open application for builders.",
           meta: `Hiring at ${dbFeaturedOpp.organization?.name} · ${dbFeaturedOpp.location || "Remote"}`,
           link: isChallengeType(dbFeaturedOpp.type) 
             ? `/challenges/${dbFeaturedOpp.id}` 

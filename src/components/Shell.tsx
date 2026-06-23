@@ -294,7 +294,7 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
                 Convoke.
               </Link>
               <p className="mt-4 max-w-[34ch] text-[14px] leading-relaxed text-g5">
-                The operating system for student builders, ambitious founders, creator communities, and opportunity-led ecosystems.
+                The operating system for student builders, founders, creator communities, and opportunity-led ecosystems. For people building the future.
               </p>
               <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-g3 bg-paper-card px-3 py-2 text-[11px] text-g5">
                 <Sparkles size={12} className="text-[var(--brand)]" />

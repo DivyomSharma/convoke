@@ -16,7 +16,7 @@ export default function AboutPage() {
             For people building the future.
           </h1>
           <p className="mt-8 text-[18px] leading-9 text-g5 font-light">
-            Convoke is the operating system for student builders, ambitious founders, creator collectives, and opportunity-led ecosystems. We believe the future is built by high-agency individuals who need rooms worth entering, people worth meeting, and actions worth taking.
+            Convoke is the operating system for student builders, founders, creator collectives, and opportunity-led ecosystems. For people building the future. We believe the future is built by high-agency individuals who need rooms worth entering, people worth meeting, and actions worth taking.
           </p>
         </section>
 
@@ -71,7 +71,7 @@ export default function AboutPage() {
         {/* Editorial Story */}
         <section className="mt-28 max-w-[800px] mx-auto border-t border-g3/80 pt-16">
           <h2 className="serif text-3xl sm:text-4xl text-ink leading-snug">
-            Our goal is to organize the world's most ambitious builder network.
+            Our goal is to organize the world's most capable builder network.
           </h2>
           <div className="mt-8 space-y-6 text-[15px] leading-8 text-g5">
             <p>

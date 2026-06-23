@@ -1,7 +1,7 @@
 import { Shell } from "@/components/Shell";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { ShieldAlert, ArrowLeft } from "lucide-react";
+import { ShieldAlert, ArrowLeft, X, Calendar } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -48,16 +48,29 @@ export default async function CreateMeetPage() {
   // If they have admin rights, they can create a meet. For now, it's a placeholder.
   return (
     <Shell wide>
-      <div className="max-w-[800px] mx-auto px-5 sm:px-8 py-16">
-        <Link href="/workspace" className="inline-flex items-center gap-2 text-[13px] text-g5 hover:text-ink transition-colors mb-8">
-          <ArrowLeft size={14} /> Back
-        </Link>
-        <div className="eyebrow mb-2">Host a Meet</div>
-        <h1 className="serif text-5xl text-ink mb-10">Create Meet</h1>
-        
-        <div className="p-8 border border-g3 rounded-xl bg-g1/30 text-center">
-          <div className="text-[15px] text-g6 mb-4">Meet creation wizard is currently being upgraded.</div>
-          <p className="text-[13px] text-g5">Your permissions are verified. Please check back shortly to draft your meet.</p>
+      <div className="min-h-[80vh] flex items-center justify-center p-4 py-12">
+        <div className="flex w-full max-w-[860px] flex-col overflow-hidden rounded-[34px] border border-g3 bg-paper-elevated shadow-[0_40px_140px_rgba(0,0,0,0.2)]">
+          <div className="flex items-center justify-between px-6 py-5 border-b border-g3/60">
+            <div>
+              <div className="eyebrow text-[var(--brand)]">Creation Studio</div>
+              <h2 className="serif mt-1 text-3xl text-ink">Host a Meet</h2>
+              <p className="text-xs text-g5 mt-1">Publish a conference, meetup, gathering, seminar, or workshop.</p>
+            </div>
+            <Link 
+              href="/workspace"
+              className="p-2 rounded-full hover:bg-g1/80 text-g5 hover:text-ink transition-colors cursor-pointer"
+            >
+              <X size={18} />
+            </Link>
+          </div>
+          
+          <div className="flex flex-col flex-1 p-16 text-center items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-g1 flex items-center justify-center mb-6">
+              <Calendar size={32} className="text-g4" />
+            </div>
+            <div className="text-[15px] text-ink mb-2 font-medium">Studio offline for upgrades</div>
+            <p className="text-[13px] text-g5 max-w-[40ch] leading-relaxed">Your administrator permissions are verified. Please check back shortly to draft your meet.</p>
+          </div>
         </div>
       </div>
     </Shell>
