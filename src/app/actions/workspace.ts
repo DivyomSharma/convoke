@@ -448,6 +448,11 @@ export async function getWorkspaceContexts() {
     },
   });
 
+  const dbUser = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { onboardingCompleted: true }
+  });
+
   return {
     personal: { label: "Personal", href: "/workspace" },
     organizations: memberships.map((membership) => ({
@@ -455,6 +460,7 @@ export async function getWorkspaceContexts() {
       label: membership.organization.name,
       href: `/workspace/org/${membership.organization.slug}`,
     })),
+    onboardingCompleted: dbUser?.onboardingCompleted ?? false,
   };
 }
 

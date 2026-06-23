@@ -84,6 +84,16 @@ export default async function OpportunityDetailPage(props: { params?: Promise<{ 
     ? new Date(opp.deadline).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
     : "Open Enrollment";
 
+  let isAdmin = false;
+  if (dbUser && opp.organizationId) {
+    const mem = await prisma.membership.findUnique({
+      where: { userId_organizationId: { userId: dbUser.id, organizationId: opp.organizationId } }
+    });
+    if (mem && ["FOUNDER", "ADMIN", "LEAD"].includes(mem.role)) {
+      isAdmin = true;
+    }
+  }
+
   const logistics = [
     { label: "Department", value: opp.department },
     { label: "Job Type", value: opp.jobType },
@@ -217,6 +227,17 @@ export default async function OpportunityDetailPage(props: { params?: Promise<{ 
             <div className="lg:w-[320px] shrink-0">
               <div className="sticky top-20 space-y-6">
                 
+                {/* Admin Management */}
+                {isAdmin && (
+                  <div className="border border-[var(--brand)] rounded-sm p-5 bg-[var(--brand)]/5 text-center">
+                    <h3 className="serif text-lg text-[var(--brand)] mb-1">Host Dashboard</h3>
+                    <p className="text-[13px] text-[var(--brand)]/80 mb-3">View and manage applicants.</p>
+                    <Link href={`/opportunities/${opp.id}/manage`} className="inline-block rounded-md bg-[var(--brand)] px-4 py-2 text-[13px] font-semibold text-black hover:bg-[var(--brand)]/90 transition-colors w-full">
+                      Manage Opportunity
+                    </Link>
+                  </div>
+                )}
+
                 {/* Apply Panel */}
                 <ApplyClient 
                   opportunityId={opp.id} 

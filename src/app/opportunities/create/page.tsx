@@ -1,42 +1,42 @@
 import { Shell } from "@/components/Shell";
-import { requireUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { ShieldAlert, ArrowLeft, X, UserPlus } from "lucide-react";
+import { X, Briefcase } from "lucide-react";
 import Link from "next/link";
+import { requireUser } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { createOpportunity } from "@/app/actions/opportunity";
+import { prisma } from "@/lib/prisma";
 
 export const metadata = {
   title: "Post Opportunity | Convoke",
 };
 
 export default async function CreateOpportunityPage() {
-  const dbUser = await requireUser();
+  const user = await requireUser();
 
-  const memberships = await prisma.membership.findMany({
+  const orgMemberships = await prisma.membership.findMany({
     where: { 
-      userId: dbUser.id,
-      role: { in: ["ADMIN", "FOUNDER"] }
+      userId: user.id,
+      role: { in: ["FOUNDER", "ADMIN", "LEAD"] }
     },
     include: {
       organization: true
     }
   });
 
-  const hasAdminRights = memberships.length > 0;
-
-  if (!hasAdminRights) {
+  if (orgMemberships.length === 0) {
     return (
       <Shell>
         <div className="flex flex-col items-center justify-center min-h-[70vh] px-5 text-center">
           <div className="w-16 h-16 rounded-full bg-g1 flex items-center justify-center mb-6">
-            <ShieldAlert size={32} className="text-g4" />
+            <Briefcase size={32} className="text-g4" />
           </div>
-          <h1 className="serif text-4xl text-ink mb-3">Restricted Access</h1>
+          <h1 className="serif text-4xl text-ink mb-3">Post an Opportunity</h1>
           <p className="text-[15px] text-g5 max-w-[40ch] leading-relaxed mb-8">
-            You must be an administrator or founder of an organization to post opportunities on Convoke. 
+            You need to be an administrator of an Organization to post jobs, bounties, or grants.
           </p>
           <div className="flex gap-4">
-            <Link href="/workspace" className="ink-button px-6 py-2.5 rounded-full text-[13px] font-medium">
-              Return to Workspace
+            <Link href="/organizations/create" className="ink-button px-6 py-2.5 rounded-full text-[13px] font-medium">
+              Create Organization
             </Link>
           </div>
         </div>
@@ -52,7 +52,7 @@ export default async function CreateOpportunityPage() {
             <div>
               <div className="eyebrow text-[var(--brand)]">Creation Studio</div>
               <h2 className="serif mt-1 text-3xl text-ink">Post Opportunity</h2>
-              <p className="text-xs text-g5 mt-1">Publish a job, internship, bounty, or hackathon.</p>
+              <p className="text-xs text-g5 mt-1">Hire talent, offer grants, or post bounties.</p>
             </div>
             <Link 
               href="/workspace"
@@ -62,13 +62,101 @@ export default async function CreateOpportunityPage() {
             </Link>
           </div>
           
-          <div className="flex flex-col flex-1 p-16 text-center items-center justify-center">
-            <div className="w-16 h-16 rounded-full bg-g1 flex items-center justify-center mb-6">
-              <UserPlus size={32} className="text-g4" />
+          <form action={async (formData) => {
+            "use server";
+            const res = await createOpportunity(formData);
+            if (res.success && res.redirectUrl) {
+              redirect(res.redirectUrl);
+            }
+          }} className="flex flex-col flex-1 px-8 py-6">
+            <div className="space-y-6 max-w-xl mx-auto w-full pt-4">
+              
+              <div className="space-y-2">
+                <label className="text-[13px] font-medium text-ink block">Title *</label>
+                <input 
+                  name="title" 
+                  required 
+                  className="w-full bg-g1 border border-g3 rounded px-3 py-2.5 text-[14px] text-ink outline-none focus:border-g4 transition-colors placeholder:text-g4" 
+                  placeholder="e.g. Senior Frontend Engineer" 
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[13px] font-medium text-ink block">Organization *</label>
+                  <select 
+                    name="organizationId" 
+                    required 
+                    className="w-full bg-g1 border border-g3 rounded px-3 py-2.5 text-[14px] text-ink outline-none focus:border-g4 transition-colors"
+                  >
+                    {orgMemberships.map((m) => (
+                      <option key={m.organization.id} value={m.organization.id}>
+                        {m.organization.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[13px] font-medium text-ink block">Type *</label>
+                  <select 
+                    name="type" 
+                    required 
+                    className="w-full bg-g1 border border-g3 rounded px-3 py-2.5 text-[14px] text-ink outline-none focus:border-g4 transition-colors"
+                    defaultValue="ROLE"
+                  >
+                    <option value="ROLE">Job Role</option>
+                    <option value="GRANT">Grant</option>
+                    <option value="FELLOWSHIP">Fellowship</option>
+                    <option value="BOUNTY">Bounty</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[13px] font-medium text-ink block">Location</label>
+                  <input 
+                    name="location" 
+                    placeholder="e.g. Remote, San Francisco"
+                    className="w-full bg-g1 border border-g3 rounded px-3 py-2.5 text-[14px] text-ink outline-none focus:border-g4 transition-colors placeholder:text-g4" 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[13px] font-medium text-ink block">Compensation / Prize</label>
+                  <input 
+                    name="compensation" 
+                    placeholder="e.g. $120k - $150k"
+                    className="w-full bg-g1 border border-g3 rounded px-3 py-2.5 text-[14px] text-ink outline-none focus:border-g4 transition-colors placeholder:text-g4" 
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[13px] font-medium text-ink block">Deadline</label>
+                <input 
+                  name="deadline" 
+                  type="date"
+                  className="w-full bg-g1 border border-g3 rounded px-3 py-2.5 text-[14px] text-ink outline-none focus:border-g4 transition-colors" 
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[13px] font-medium text-ink block">Description</label>
+                <textarea 
+                  name="description" 
+                  rows={4}
+                  className="w-full bg-g1 border border-g3 rounded px-3 py-2.5 text-[14px] text-ink outline-none focus:border-g4 transition-colors placeholder:text-g4 resize-none" 
+                  placeholder="Details about the opportunity..." 
+                />
+              </div>
+
+              <div className="pt-4 flex justify-end">
+                <button type="submit" className="ink-button px-6 py-2.5 text-[14px] font-semibold">
+                  Publish Opportunity
+                </button>
+              </div>
             </div>
-            <div className="text-[15px] text-ink mb-2 font-medium">Studio offline for upgrades</div>
-            <p className="text-[13px] text-g5 max-w-[40ch] leading-relaxed">Your administrator permissions are verified. Please check back shortly to post your opportunity.</p>
-          </div>
+          </form>
         </div>
       </div>
     </Shell>

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { Groq } from "groq-sdk";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: Request) {
   try {
@@ -9,37 +9,57 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Prompt is required" }, { status: 400 });
     }
 
-    // Try to get GROQ_API_KEY from environment variables
-    const apiKey = process.env.GROQ_API_KEY;
+    const lowerPrompt = prompt.toLowerCase();
+    let reply = "I'm not sure how to help with that. Try asking about 'meets', 'opportunities', 'hackathons', 'spaces', or 'projects'.";
 
-    if (!apiKey) {
-      // If no key is configured, return a mock response for now
-      return NextResponse.json({ 
-        reply: "Convoke AI is currently in preview. To enable live responses, please configure your GROQ_API_KEY in the environment settings." 
+    if (lowerPrompt.includes("opportunity") || lowerPrompt.includes("opportunities") || lowerPrompt.includes("hackathon")) {
+      const opps = await prisma.opportunity.findMany({
+        take: 3,
+        orderBy: { createdAt: "desc" },
+        include: { organization: true }
       });
+      if (opps.length > 0) {
+        reply = "Here are some recent opportunities you might be interested in:\n\n" + opps.map(o => `- **${o.title}** at ${o.organization?.name || 'Community'}\n  ${o.location || 'Remote'} · ${o.compensation || 'Competitive'}`).join("\n\n");
+      } else {
+        reply = "I couldn't find any opportunities matching your request at the moment.";
+      }
+    } else if (lowerPrompt.includes("meet") || lowerPrompt.includes("event")) {
+      const meets = await prisma.meet.findMany({
+        take: 3,
+        orderBy: { createdAt: "desc" },
+        include: { space: true }
+      });
+      if (meets.length > 0) {
+        reply = "Here are some upcoming meets:\n\n" + meets.map(m => `- **${m.title}** hosted by ${m.space.name}\n  Starts at ${m.startTime.toLocaleString()}`).join("\n\n");
+      } else {
+        reply = "There are no upcoming meets right now.";
+      }
+    } else if (lowerPrompt.includes("space") || lowerPrompt.includes("community") || lowerPrompt.includes("communities")) {
+      const spaces = await prisma.space.findMany({
+        take: 3,
+        orderBy: { createdAt: "desc" }
+      });
+      if (spaces.length > 0) {
+        reply = "Check out these spaces on Convoke:\n\n" + spaces.map(s => `- **${s.name}**\n  ${s.description?.substring(0, 50)}...`).join("\n\n");
+      } else {
+        reply = "I couldn't find any active spaces at the moment.";
+      }
+    } else if (lowerPrompt.includes("project")) {
+      const projects = await prisma.project.findMany({
+        take: 3,
+        orderBy: { createdAt: "desc" },
+        include: { user: true }
+      });
+      if (projects.length > 0) {
+        reply = "Here are some recent projects built by the community:\n\n" + projects.map(p => `- **${p.title}** by ${p.user.name}\n  ${p.description?.substring(0, 50)}...`).join("\n\n");
+      } else {
+        reply = "No projects found.";
+      }
     }
-
-    const groq = new Groq({ apiKey });
-    
-    // Check if the user is asking about Convoke
-    const systemPrompt = `You are the Convoke Assistant. 
-Convoke is an ecosystem graph for people building the future.
-Keep your answers brief, inspiring, and helpful. 
-You help builders navigate the platform, answer questions about communities, events (meets), opportunities, projects, and research.`;
-
-    const chatCompletion = await groq.chat.completions.create({
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: prompt }
-      ],
-      model: "llama3-8b-8192", // Use a fast default model
-    });
-
-    const reply = chatCompletion.choices[0]?.message?.content || "I couldn't process that request.";
 
     return NextResponse.json({ reply });
   } catch (error) {
-    console.error("Groq Assistant Error:", error);
+    console.error("Assistant Error:", error);
     return NextResponse.json({ error: "Failed to process request" }, { status: 500 });
   }
 }

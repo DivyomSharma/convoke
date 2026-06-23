@@ -4,7 +4,7 @@ import { Avatar } from "@/components/Avatar";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { Ticket, Calendar, Clock, MapPin, CheckCircle, ArrowRight, UserPlus, Building2 } from "lucide-react";
+import { Ticket, Calendar, Clock, MapPin, CheckCircle, ArrowRight, UserPlus, Building2, Bookmark as BookmarkIcon, Code2, FlaskConical, Users } from "lucide-react";
 import { isChallengeType } from "@/lib/challenge-types";
 
 export const revalidate = 0;
@@ -12,9 +12,6 @@ export const revalidate = 0;
 export default async function Workspace() {
   const dbUser = await requireUser();
 
-  if (!dbUser.onboardingCompleted) {
-    redirect("/onboarding");
-  }
 
   const memberships = dbUser ? await prisma.membership.findMany({
     where: { userId: dbUser.id },
@@ -67,6 +64,35 @@ export default async function Workspace() {
   const now = new Date();
   const activeTickets = myRSVPs.filter(r => new Date(r.meet.endTime) >= now);
   const pastPasses = myRSVPs.filter(r => new Date(r.meet.endTime) < now);
+
+  const myBookmarks = dbUser ? await prisma.bookmark.findMany({
+    where: { userId: dbUser.id },
+    take: 5,
+    orderBy: { createdAt: "desc" }
+  }) : [];
+
+  const myProjects = dbUser ? await prisma.project.findMany({
+    where: { userId: dbUser.id },
+    take: 4,
+    orderBy: { createdAt: "desc" }
+  }) : [];
+
+  const myResearch = dbUser ? await prisma.research.findMany({
+    where: { userId: dbUser.id },
+    take: 4,
+    orderBy: { createdAt: "desc" }
+  }) : [];
+
+  const myFollows = dbUser ? await prisma.follow.findMany({
+    where: { followerId: dbUser.id, targetType: "USER" },
+    take: 6,
+    orderBy: { createdAt: "desc" }
+  }) : [];
+  
+  const followedUsers = myFollows.length > 0 ? await prisma.user.findMany({
+    where: { id: { in: myFollows.map(f => f.targetId) } },
+    select: { id: true, name: true, handle: true, username: true, avatarUrl: true, headline: true }
+  }) : [];
 
   return (
     <Shell wide>
@@ -296,23 +322,77 @@ export default async function Workspace() {
         {/* Right Column: People to know & past credentials */}
         <aside className="col-span-12 lg:col-span-3 space-y-10">
           
-          {/* People to know */}
+          {/* Connections Module */}
           <div className="space-y-4">
-            <div className="eyebrow">Recent Builders</div>
-            <ul className="space-y-4">
-              {people.map((p) => (
-                <li key={p.handle || p.id} className="flex items-center gap-3">
-                  <Avatar src={p.avatarUrl || ""} name={p.name || "Builder"} size={36} />
-                  <div className="min-w-0">
-                    <Link href={`/profile/${p.handle || p.id}`} className="text-[13px] font-medium text-ink hover:underline truncate block">
-                      {p.name || "Builder"}
-                    </Link>
-                    <div className="text-g5 text-[11px] truncate uppercase tracking-wider mono">{p.role || "Member"}</div>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <div className="eyebrow">Your Connections</div>
+            {followedUsers.length > 0 ? (
+              <ul className="space-y-4">
+                {followedUsers.map((p) => (
+                  <li key={p.handle || p.id} className="flex items-center gap-3">
+                    <Avatar src={p.avatarUrl || ""} name={p.name || "Builder"} size={36} />
+                    <div className="min-w-0">
+                      <Link href={`/profile/${p.handle || p.username || p.id}`} className="text-[13px] font-medium text-ink hover:underline truncate block">
+                        {p.name || "Builder"}
+                      </Link>
+                      <div className="text-g5 text-[11px] truncate uppercase tracking-wider mono">{p.headline || "Member"}</div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="text-[13px] text-g5 italic leading-relaxed">
+                You aren't following anyone yet.
+              </div>
+            )}
           </div>
+
+          {/* Bookmarks */}
+          {myBookmarks.length > 0 && (
+            <div className="space-y-4 pt-4 hairline-t">
+              <div className="eyebrow">Recent Bookmarks</div>
+              <ul className="space-y-3.5 text-[13px]">
+                {myBookmarks.map((b) => (
+                  <li key={b.id} className="flex items-start gap-2">
+                    <BookmarkIcon size={14} className="text-g4 shrink-0 mt-0.5" />
+                    <div className="min-w-0">
+                      <span className="text-g6 block truncate">
+                        {b.itemType} item saved
+                      </span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Projects & Research */}
+          {(myProjects.length > 0 || myResearch.length > 0) && (
+            <div className="space-y-4 pt-4 hairline-t">
+              <div className="eyebrow">Your Portfolio</div>
+              <ul className="space-y-3.5 text-[13px]">
+                {myProjects.map((p) => (
+                  <li key={p.id} className="flex items-start gap-2">
+                    <Code2 size={14} className="text-g4 shrink-0 mt-0.5" />
+                    <div className="min-w-0">
+                      <Link href={`/projects/${p.id}`} className="text-g6 hover:text-ink truncate block">
+                        {p.title}
+                      </Link>
+                    </div>
+                  </li>
+                ))}
+                {myResearch.map((r) => (
+                  <li key={r.id} className="flex items-start gap-2">
+                    <FlaskConical size={14} className="text-g4 shrink-0 mt-0.5" />
+                    <div className="min-w-0">
+                      <Link href={`/research/${r.id}`} className="text-g6 hover:text-ink truncate block">
+                        {r.title}
+                      </Link>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* Past Passes / Archives */}
           {pastPasses.length > 0 && (

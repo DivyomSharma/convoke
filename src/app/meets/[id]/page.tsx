@@ -62,8 +62,6 @@ export async function generateMetadata(props: { params?: Promise<{ id: string }>
   };
 }
 
-import { OrganizerDashboard } from "./OrganizerDashboard";
-
 export default async function EventDetailPage(props: { params?: Promise<{ id: string }> }) {
   const params = await props.params;
   const id = params?.id;
@@ -224,13 +222,15 @@ export default async function EventDetailPage(props: { params?: Promise<{ id: st
                 </div>
               )}
 
-              {/* Organizer Dashboard Panel */}
+              {/* Organizer Link */}
               {isOrganizer && (
-                <OrganizerDashboard
-                  meetId={meet.id}
-                  eventTitle={meet.title}
-                  initialAttendance={meet.attendance as any}
-                />
+                <div className="border border-g3 rounded-sm p-6 bg-paper-card text-center">
+                  <div className="text-xl serif text-ink mb-2">Organizer Access</div>
+                  <p className="text-[14px] text-g5 mb-4">View applications, track attendance, and manage event settings.</p>
+                  <Link href={`/meets/${meet.id}/manage`} className="ink-button inline-flex px-6 py-2.5 text-[13px] font-semibold">
+                    Manage Event
+                  </Link>
+                </div>
               )}
 
               {/* FAQs */}

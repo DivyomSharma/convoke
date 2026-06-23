@@ -6,7 +6,12 @@ import { OrgActionsClient } from "./OrgActionsClient";
 import { notFound } from "next/navigation";
 import { 
   Building2, Calendar, FileText, Link2, MapPin, Users, Share, 
-  Bookmark, CheckCircle2, ChevronDown, Plus, ArrowRight 
+  Bookmark, CheckCircle2,  Hash,
+  Activity,
+  ArrowRight,
+  Plus,
+  ArrowUpRight,
+  Settings
 } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
 import { prisma } from "@/lib/prisma";
@@ -141,12 +146,19 @@ export default async function OrgDetailPage(props: { params?: Promise<{ slug: st
             </div>
 
             {/* Actions */}
-            <OrgActionsClient 
-              orgId={org.id} 
-              initialBookmarked={initialBookmarked}
-              initialFollowing={initialFollowing}
-              isMember={isMember}
-            />
+            <div className="flex flex-col items-end gap-3 pb-2 self-start justify-self-end mt-12 md:mt-0">
+              <OrgActionsClient 
+                orgId={org.id} 
+                initialBookmarked={initialBookmarked}
+                initialFollowing={initialFollowing}
+                isMember={isMember}
+              />
+              {isAdmin && (
+                <Link href={`/organizations/${org.id}/manage`} className="rounded-full px-5 py-2 text-[13px] font-semibold transition-colors bg-g2 text-ink border border-g3 hover:bg-g3 flex items-center gap-2">
+                  <Settings size={14} /> Manage Organization
+                </Link>
+              )}
+            </div>
           </div>
 
           <div className="mt-12 border-b border-g3 overflow-x-auto no-scrollbar">

@@ -49,3 +49,26 @@ export async function updateSettings(data: {
   revalidatePath(`/profile/${data.username || user.username}`);
   return { success: true };
 }
+
+export async function updatePreferences(data: {
+  theme?: string;
+  emailNotifs?: boolean;
+}) {
+  const user = await requireUser();
+
+  await prisma.settings.upsert({
+    where: { userId: user.id },
+    update: {
+      theme: data.theme,
+      emailNotifs: data.emailNotifs,
+    },
+    create: {
+      userId: user.id,
+      theme: data.theme || "system",
+      emailNotifs: data.emailNotifs ?? true,
+    },
+  });
+
+  revalidatePath("/settings");
+  return { success: true };
+}

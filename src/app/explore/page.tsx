@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { getFallbackPhoto } from "@/lib/photos";
 import { isChallengeType } from "@/lib/challenge-types";
 
-const filters = ["All", "Meets", "Opportunities", "Challenges", "Projects"] as const;
+const filters = ["All", "Trending", "Featured", "Nearby", "Meets", "Opportunities", "Challenges", "Projects", "Research"] as const;
 type Filter = (typeof filters)[number];
 
 type FeedItem = {
@@ -44,7 +44,7 @@ export default async function Explore(props: { searchParams?: Promise<{ f?: stri
   const searchParams = await props.searchParams;
   const selected = filters.includes(searchParams?.f as Filter) ? (searchParams?.f as Filter) : "All";
 
-  const [meets, opportunities, projects] = await Promise.all([
+  const [meets, opportunities, projects, research] = await Promise.all([
     prisma.meet
       .findMany({
         include: { space: { include: { organization: true } } },
@@ -66,11 +66,21 @@ export default async function Explore(props: { searchParams?: Promise<{ f?: stri
         take: 20,
       })
       .catch(() => []),
+    prisma.research
+      .findMany({
+        include: { user: true, space: { include: { organization: true } } },
+        orderBy: { createdAt: "desc" },
+        take: 20,
+      })
+      .catch(() => []),
   ]);
 
   const items: FeedItem[] = [];
 
-  if (selected === "All" || selected === "Meets") {
+  const globalFilters = ["All", "Trending", "Featured", "Nearby"];
+  const showAllTypes = globalFilters.includes(selected);
+
+  if (showAllTypes || selected === "Meets") {
     meets.forEach((meet) => {
       items.push({
         id: `event-${meet.id}`,
@@ -92,7 +102,7 @@ export default async function Explore(props: { searchParams?: Promise<{ f?: stri
     });
   }
 
-  if (selected === "All" || selected === "Opportunities" || selected === "Challenges") {
+  if (showAllTypes || selected === "Opportunities" || selected === "Challenges") {
     opportunities
       .filter((opportunity) => {
         if (selected === "Challenges") return isChallenge(opportunity.type);
@@ -121,7 +131,7 @@ export default async function Explore(props: { searchParams?: Promise<{ f?: stri
       });
   }
 
-  if (selected === "All" || selected === "Projects") {
+  if (showAllTypes || selected === "Projects") {
     projects.forEach((project) => {
       items.push({
         id: `project-${project.id}`,
@@ -143,7 +153,54 @@ export default async function Explore(props: { searchParams?: Promise<{ f?: stri
     });
   }
 
-  const sortedItems = items.sort((a, b) => b.at.getTime() - a.at.getTime()).slice(0, 40);
+  if (showAllTypes || selected === "Research") {
+    research.forEach((r) => {
+      items.push({
+        id: `research-${r.id}`,
+        kind: "Research",
+        title: r.title,
+        body: r.abstract,
+        meta: "Published paper",
+        at: r.createdAt,
+        href: `/research/${r.id}`,
+        icon: Sparkles,
+        banner: getFallbackPhoto(r.id, 'space'),
+        who: {
+          name: r.user.name || "Researcher",
+          role: r.user.role || "Member",
+          avatar: r.user.avatarUrl || "",
+          href: `/profile/${r.user.handle || "researcher"}`,
+        },
+      });
+    });
+  }
+
+  let processedItems = items;
+
+  if (selected === "Featured") {
+    // Faux featured: long descriptions or curated items
+    processedItems = processedItems.filter(i => (i.body?.length || 0) > 50);
+  } else if (selected === "Nearby") {
+    // Faux nearby: exclude online/remote explicit strings
+    processedItems = processedItems.filter(i => {
+      const m = i.meta?.toLowerCase() || "";
+      return !m.includes("online") && !m.includes("remote") && m.length > 5;
+    });
+  }
+
+  // Sort
+  if (selected === "Trending") {
+    // Faux trending: sort by title length + date hash to create a stable but mixed list
+    processedItems = processedItems.sort((a, b) => {
+      const scoreA = a.title.length + (a.at.getTime() % 10000);
+      const scoreB = b.title.length + (b.at.getTime() % 10000);
+      return scoreB - scoreA;
+    });
+  } else {
+    processedItems = processedItems.sort((a, b) => b.at.getTime() - a.at.getTime());
+  }
+
+  const sortedItems = processedItems.slice(0, 40);
 
   return (
     <Shell>

@@ -1,44 +1,42 @@
 import { Shell } from "@/components/Shell";
-import { X, CalendarDays } from "lucide-react";
+import { X, Trophy } from "lucide-react";
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { createMeet } from "@/app/actions/meet";
+import { createOpportunity } from "@/app/actions/opportunity";
 import { prisma } from "@/lib/prisma";
 
 export const metadata = {
-  title: "Host Meet | Convoke",
+  title: "Host Challenge | Convoke",
 };
 
-export default async function CreateMeetPage() {
+export default async function CreateChallengePage() {
   const user = await requireUser();
 
-  const spaceMemberships = await prisma.spaceMembership.findMany({
+  const orgMemberships = await prisma.membership.findMany({
     where: { 
       userId: user.id,
-      role: { in: ["FOUNDER", "LEAD", "ORGANIZER"] }
+      role: { in: ["FOUNDER", "ADMIN", "LEAD"] }
     },
     include: {
-      space: {
-        include: { organization: true }
-      }
+      organization: true
     }
   });
 
-  if (spaceMemberships.length === 0) {
+  if (orgMemberships.length === 0) {
     return (
       <Shell>
         <div className="flex flex-col items-center justify-center min-h-[70vh] px-5 text-center">
           <div className="w-16 h-16 rounded-full bg-g1 flex items-center justify-center mb-6">
-            <CalendarDays size={32} className="text-g4" />
+            <Trophy size={32} className="text-g4" />
           </div>
-          <h1 className="serif text-4xl text-ink mb-3">Host a Meet</h1>
+          <h1 className="serif text-4xl text-ink mb-3">Host a Challenge</h1>
           <p className="text-[15px] text-g5 max-w-[40ch] leading-relaxed mb-8">
-            You need to be an organizer of a Space to host meets. Create a Space or join an existing one first.
+            You need to be an administrator of an Organization to host hackathons and challenges.
           </p>
           <div className="flex gap-4">
-            <Link href="/spaces/create" className="ink-button px-6 py-2.5 rounded-full text-[13px] font-medium">
-              Create Space
+            <Link href="/organizations/create" className="ink-button px-6 py-2.5 rounded-full text-[13px] font-medium">
+              Create Organization
             </Link>
           </div>
         </div>
@@ -53,8 +51,8 @@ export default async function CreateMeetPage() {
           <div className="flex items-center justify-between px-6 py-5 border-b border-g3/60">
             <div>
               <div className="eyebrow text-[var(--brand)]">Creation Studio</div>
-              <h2 className="serif mt-1 text-3xl text-ink">Host Meet</h2>
-              <p className="text-xs text-g5 mt-1">Publish an event, conference, workshop, or meetup.</p>
+              <h2 className="serif mt-1 text-3xl text-ink">Host Challenge</h2>
+              <p className="text-xs text-g5 mt-1">Launch a hackathon, competition, or datathon.</p>
             </div>
             <Link 
               href="/workspace"
@@ -66,33 +64,34 @@ export default async function CreateMeetPage() {
           
           <form action={async (formData) => {
             "use server";
-            const res = await createMeet(formData);
-            if (res.success) {
-              redirect(`/meets/${res.meetId}`);
+            formData.set("type", "HACKATHON/CHALLENGE");
+            const res = await createOpportunity(formData);
+            if (res.success && res.redirectUrl) {
+              redirect(res.redirectUrl);
             }
           }} className="flex flex-col flex-1 px-8 py-6">
             <div className="space-y-6 max-w-xl mx-auto w-full pt-4">
               
               <div className="space-y-2">
-                <label className="text-[13px] font-medium text-ink block">Meet Title *</label>
+                <label className="text-[13px] font-medium text-ink block">Challenge Name *</label>
                 <input 
                   name="title" 
                   required 
                   className="w-full bg-g1 border border-g3 rounded px-3 py-2.5 text-[14px] text-ink outline-none focus:border-g4 transition-colors placeholder:text-g4" 
-                  placeholder="e.g. AI Tinkerers Hackathon" 
+                  placeholder="e.g. AI Agents Hackathon 2026" 
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-[13px] font-medium text-ink block">Host Space *</label>
+                <label className="text-[13px] font-medium text-ink block">Host Organization *</label>
                 <select 
-                  name="spaceId" 
+                  name="organizationId" 
                   required 
                   className="w-full bg-g1 border border-g3 rounded px-3 py-2.5 text-[14px] text-ink outline-none focus:border-g4 transition-colors"
                 >
-                  {spaceMemberships.map((m) => (
-                    <option key={m.space.id} value={m.space.id}>
-                      {m.space.organization.name} / {m.space.name}
+                  {orgMemberships.map((m) => (
+                    <option key={m.organization.id} value={m.organization.id}>
+                      {m.organization.name}
                     </option>
                   ))}
                 </select>
@@ -100,67 +99,45 @@ export default async function CreateMeetPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-[13px] font-medium text-ink block">Start Time *</label>
-                  <input 
-                    name="startTime" 
-                    type="datetime-local"
-                    required 
-                    className="w-full bg-g1 border border-g3 rounded px-3 py-2.5 text-[14px] text-ink outline-none focus:border-g4 transition-colors" 
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[13px] font-medium text-ink block">End Time *</label>
-                  <input 
-                    name="endTime" 
-                    type="datetime-local"
-                    required 
-                    className="w-full bg-g1 border border-g3 rounded px-3 py-2.5 text-[14px] text-ink outline-none focus:border-g4 transition-colors" 
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-[13px] font-medium text-ink block">Location City (Optional)</label>
+                  <label className="text-[13px] font-medium text-ink block">Location</label>
                   <input 
                     name="location" 
-                    placeholder="e.g. San Francisco, CA"
+                    placeholder="e.g. Online, New York"
                     className="w-full bg-g1 border border-g3 rounded px-3 py-2.5 text-[14px] text-ink outline-none focus:border-g4 transition-colors placeholder:text-g4" 
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[13px] font-medium text-ink block">Venue / Link (Optional)</label>
+                  <label className="text-[13px] font-medium text-ink block">Prize Pool / Rewards</label>
                   <input 
-                    name="venue" 
-                    placeholder="e.g. Hacker Dojo or Zoom Link"
+                    name="compensation" 
+                    placeholder="e.g. $10,000 Total Prizes"
                     className="w-full bg-g1 border border-g3 rounded px-3 py-2.5 text-[14px] text-ink outline-none focus:border-g4 transition-colors placeholder:text-g4" 
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-[13px] font-medium text-ink block">Capacity (Optional)</label>
+                <label className="text-[13px] font-medium text-ink block">Submission Deadline</label>
                 <input 
-                  name="capacity" 
-                  type="number"
-                  placeholder="e.g. 100"
-                  className="w-full bg-g1 border border-g3 rounded px-3 py-2.5 text-[14px] text-ink outline-none focus:border-g4 transition-colors placeholder:text-g4" 
+                  name="deadline" 
+                  type="date"
+                  className="w-full bg-g1 border border-g3 rounded px-3 py-2.5 text-[14px] text-ink outline-none focus:border-g4 transition-colors" 
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-[13px] font-medium text-ink block">Description</label>
+                <label className="text-[13px] font-medium text-ink block">Description & Rules</label>
                 <textarea 
                   name="description" 
                   rows={4}
                   className="w-full bg-g1 border border-g3 rounded px-3 py-2.5 text-[14px] text-ink outline-none focus:border-g4 transition-colors placeholder:text-g4 resize-none" 
-                  placeholder="What is this meet about?" 
+                  placeholder="What is this challenge about? What are the rules?" 
                 />
               </div>
 
               <div className="pt-4 flex justify-end">
                 <button type="submit" className="ink-button px-6 py-2.5 text-[14px] font-semibold">
-                  Publish Meet
+                  Launch Challenge
                 </button>
               </div>
             </div>

@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { Shell } from "@/components/Shell";
 import { Avatar } from "@/components/Avatar";
 import { prisma } from "@/lib/prisma";
@@ -53,6 +54,12 @@ export default async function Profile(props: { params?: Promise<{ handle: string
     include: {
       projects: { orderBy: { createdAt: "desc" } },
       research: { orderBy: { createdAt: "desc" } },
+      meetAttendance: {
+        include: { meet: true }
+      },
+      applications: {
+        include: { opportunity: true }
+      },
       memberships: {
         include: { organization: { include: { spaces: true } } },
       },
@@ -64,6 +71,7 @@ export default async function Profile(props: { params?: Promise<{ handle: string
       },
       badges: true,
       follows: true,
+      certificates: { orderBy: { createdAt: "desc" } }
     },
   });
 
@@ -85,6 +93,13 @@ export default async function Profile(props: { params?: Promise<{ handle: string
   const activityDates = user.activity.map((a) => a.createdAt);
   const passportHandle = user.handle || user.username || user.displayName || "builder";
 
+  const followingIds = user.follows.filter(f => f.targetType === "USER").map(f => f.targetId);
+  const connections = followingIds.length > 0 ? await prisma.user.findMany({
+    where: { id: { in: followingIds } },
+    take: 5,
+    select: { id: true, name: true, handle: true, username: true, avatarUrl: true }
+  }) : [];
+
   return (
     <Shell>
       <div className="mx-auto max-w-[920px] px-5 py-12 sm:px-8">
@@ -104,6 +119,9 @@ export default async function Profile(props: { params?: Promise<{ handle: string
                 <b className="text-ink">{projects.length}</b> projects
               </span>
               <span>
+                <b className="text-ink">{research.length}</b> research
+              </span>
+              <span>
                 <b className="text-ink">{spaces.length}</b> spaces
               </span>
             </div>
@@ -121,11 +139,24 @@ export default async function Profile(props: { params?: Promise<{ handle: string
           </div>
           <div className="flex flex-col items-end gap-3 pb-2 self-start justify-self-end mt-12 md:mt-0">
             {dbUser?.id !== user.id && (
-              <FollowButton 
-                targetId={user.id} 
-                targetType="USER" 
-                initialFollowing={initialFollowing} 
-              />
+              <div className="flex items-center gap-2">
+                <form action={async () => {
+                  "use server";
+                  const { startDirectMessage } = await import("@/app/actions/messages");
+                  const { redirect } = await import("next/navigation");
+                  const res = await startDirectMessage(user.id);
+                  if (res.success) redirect(`/messages`);
+                }}>
+                  <button type="submit" className="rounded-full px-4 py-1.5 text-[13px] font-medium transition-colors bg-g2 text-ink border border-g3 hover:bg-g3">
+                    Message
+                  </button>
+                </form>
+                <FollowButton 
+                  targetId={user.id} 
+                  targetType="USER" 
+                  initialFollowing={initialFollowing} 
+                />
+              </div>
             )}
           </div>
         </header>
@@ -148,6 +179,9 @@ export default async function Profile(props: { params?: Promise<{ handle: string
             <ProfileTabsClient 
               projects={projects} 
               research={research} 
+              meetAttendance={user.meetAttendance}
+              applications={user.applications}
+              certificates={user.certificates}
               activityDates={activityDates} 
               Heat={<Heat activityDates={activityDates} />} 
             />
@@ -182,6 +216,19 @@ export default async function Profile(props: { params?: Promise<{ handle: string
               </ul>
             ) : (
               <div className="text-[14px] text-g5">Not in any spaces yet.</div>
+            )}
+
+            <div className="eyebrow mb-3 mt-10">Network</div>
+            {connections.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {connections.map((c) => (
+                  <Link key={c.id} href={`/profile/${c.handle || c.username || c.id}`} title={c.name || "User"}>
+                    <Avatar src={c.avatarUrl || ""} name={c.name || "User"} size={32} />
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className="text-[14px] text-g5">Not following anyone yet.</div>
             )}
           </aside>
         </div>

@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { updateSettings } from "@/app/actions/settings";
+import { updateSettings, updatePreferences } from "@/app/actions/settings";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-export function SettingsForm({ user }: { user: any }) {
+export function SettingsForm({ user, settings }: { user: any; settings?: any }) {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("Identity");
   const [formData, setFormData] = useState({
@@ -21,6 +21,16 @@ export function SettingsForm({ user }: { user: any }) {
     readcvUrl: user.portfolio || "",
   });
 
+  const [prefData, setPrefData] = useState({
+    theme: settings?.theme || "system",
+    emailNotifs: settings?.emailNotifs ?? true,
+  });
+
+  const handlePrefChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
+    const value = e.target.type === "checkbox" ? (e.target as HTMLInputElement).checked : e.target.value;
+    setPrefData({ ...prefData, [e.target.name]: value });
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -29,18 +39,20 @@ export function SettingsForm({ user }: { user: any }) {
     e.preventDefault();
     setLoading(true);
     
-    const res = await updateSettings(formData);
-    
-    if (res.success) {
-      toast.success("Profile updated successfully");
+    if (activeTab === "Preferences") {
+      const res = await updatePreferences(prefData);
+      if (res.success) toast.success("Preferences updated");
+      else toast.error("Failed to update preferences");
     } else {
-      toast.error(res.error || "Failed to update profile");
+      const res = await updateSettings(formData);
+      if (res.success) toast.success("Profile updated successfully");
+      else toast.error(res.error || "Failed to update profile");
     }
     
     setLoading(false);
   };
 
-  const tabs = ["Identity", "Links", "Integrations"];
+  const tabs = ["Identity", "Links", "Integrations", "Preferences"];
 
   return (
     <form onSubmit={handleSubmit} className="premium-card p-6 md:p-8">
@@ -177,6 +189,38 @@ export function SettingsForm({ user }: { user: any }) {
               <button type="button" className="text-[12px] font-medium px-4 py-1.5 border border-g3 rounded-full hover:bg-g1 transition-colors text-ink">Connect</button>
             </div>
           </div>
+        )}
+
+        {activeTab === "Preferences" && (
+          <>
+            <div>
+              <label className="block text-[13px] font-medium mb-1.5">Theme</label>
+              <select
+                name="theme"
+                value={prefData.theme}
+                onChange={handlePrefChange}
+                className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-[14px] outline-none focus:border-[var(--brand)]"
+              >
+                <option value="system">System (Auto)</option>
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+              </select>
+            </div>
+            
+            <div className="flex items-center gap-3 pt-4">
+              <input
+                type="checkbox"
+                id="emailNotifs"
+                name="emailNotifs"
+                checked={prefData.emailNotifs}
+                onChange={handlePrefChange}
+                className="w-4 h-4 rounded border-g3 text-[var(--brand)] focus:ring-[var(--brand)] bg-transparent"
+              />
+              <label htmlFor="emailNotifs" className="text-[14px] font-medium text-ink cursor-pointer">
+                Receive Email Notifications
+              </label>
+            </div>
+          </>
         )}
       </div>
 

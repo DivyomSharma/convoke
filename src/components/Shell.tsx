@@ -53,6 +53,7 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
   const [workspaceContexts, setWorkspaceContexts] = useState<{
     personal: WorkspaceContext;
     organizations: WorkspaceContext[];
+    onboardingCompleted?: boolean;
   } | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, isSignedIn } = useUser();
@@ -92,6 +93,11 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
 
   return (
     <div className="min-h-screen bg-paper text-ink">
+      {workspaceContexts && workspaceContexts.onboardingCompleted === false && !pathname.startsWith('/onboarding') && (
+        <div className="bg-brand text-ink text-[13px] py-2 px-5 text-center font-medium">
+          You haven&apos;t completed your profile setup. <Link href="/onboarding" className="underline underline-offset-2">Complete it now</Link> to unlock all features.
+        </div>
+      )}
       <header className="sticky top-0 z-30 border-b border-g3/80 bg-paper/75 backdrop-blur-2xl">
         <div className="mx-auto flex h-16 w-full items-center gap-5 px-5 sm:px-8">
           <Link href="/" className="serif text-[22px] leading-none tracking-tight text-ink">

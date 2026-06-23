@@ -86,6 +86,16 @@ export default async function ChallengeDetailPage(props: { params?: Promise<{ id
     ? new Date(opp.deadline).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
     : "Open Enrollment";
 
+  let isAdmin = false;
+  if (dbUser && opp.organizationId) {
+    const mem = await prisma.membership.findUnique({
+      where: { userId_organizationId: { userId: dbUser.id, organizationId: opp.organizationId } }
+    });
+    if (mem && ["FOUNDER", "ADMIN", "LEAD"].includes(mem.role)) {
+      isAdmin = true;
+    }
+  }
+
   let teams: any[] = [];
   let myTeam: any = null;
   let incomingRequests: any[] = [];
@@ -254,6 +264,17 @@ export default async function ChallengeDetailPage(props: { params?: Promise<{ id
             <div className="lg:w-[320px] shrink-0">
               <div className="sticky top-20 space-y-6">
                 
+                {/* Admin Management */}
+                {isAdmin && (
+                  <div className="border border-[var(--brand)] rounded-sm p-5 bg-[var(--brand)]/5 text-center">
+                    <h3 className="serif text-lg text-[var(--brand)] mb-1">Host Dashboard</h3>
+                    <p className="text-[13px] text-[var(--brand)]/80 mb-3">View and manage hackers.</p>
+                    <Link href={`/opportunities/${opp.id}/manage`} className="inline-block rounded-md bg-[var(--brand)] px-4 py-2 text-[13px] font-semibold text-black hover:bg-[var(--brand)]/90 transition-colors w-full">
+                      Manage Challenge
+                    </Link>
+                  </div>
+                )}
+
                 {/* Registration Panel */}
                 <RegisterClient 
                   challengeId={opp.id}

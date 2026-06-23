@@ -70,6 +70,24 @@ model User {
   teamRequests  TeamRequest[]
   follows       Follow[]          @relation("UserFollows")
   badges        Badge[]
+  certificates  Certificate[]
+  conversations ConversationParticipant[]
+  messagesSent  Message[]
+  meetApplications MeetApplication[]
+}
+
+model Certificate {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  issuer    String
+  issueDate DateTime
+  url       String?
+  fileUrl   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Organization {
@@ -177,6 +195,7 @@ model Meet {
 
   space      Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   attendance MeetAttendance[]
+  applications MeetApplication[]
   faqs       FAQ[]
   sponsors   Sponsor[]
   gallery    GalleryImage[]
@@ -195,7 +214,22 @@ model MeetAttendance {
   id        String   @id @default(uuid())
   meetId    String
   userId    String
-  status    String // GOING, INTERESTED, WAITLISTED
+  status    String // GOING, CANCELLED
+  role      String   @default("ATTENDEE") // ATTENDEE, SPEAKER, SPONSOR, VOLUNTEER, VIP, ORGANIZER
+  createdAt DateTime @default(now())
+
+  meet Meet @relation(fields: [meetId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([meetId, userId])
+}
+
+model MeetApplication {
+  id        String   @id @default(uuid())
+  meetId    String
+  userId    String
+  status    String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  answers   String?  @db.Text
   createdAt DateTime @default(now())
 
   meet Meet @relation(fields: [meetId], references: [id], onDelete: Cascade)
@@ -555,4 +589,45 @@ model Badge {
   createdAt   DateTime @default(now())
 
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+// ==========================================
+// MESSAGING
+// ==========================================
+
+model Conversation {
+  id           String   @id @default(uuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  isGroup      Boolean  @default(false)
+  name         String?
+
+  participants ConversationParticipant[]
+  messages     Message[]
+}
+
+model ConversationParticipant {
+  id             String   @id @default(uuid())
+  conversationId String
+  userId         String
+  joinedAt       DateTime @default(now())
+  hasMuted       Boolean  @default(false)
+  hasArchived    Boolean  @default(false)
+  status         String   @default("ACCEPTED") // PENDING, ACCEPTED, REJECTED, BLOCKED
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+}
+
+model Message {
+  id             String   @id @default(uuid())
+  conversationId String
+  senderId       String
+  content        String   @db.Text
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
 }

@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { City, Country, State } from "country-state-city";
 import { completeOnboarding } from "@/app/actions/onboarding";
+import { UploadDropzone } from "@/lib/uploadthing";
+import { Camera, FileText } from "lucide-react";
 
 type InitialUser = {
   displayName: string | null;
@@ -14,9 +16,11 @@ type InitialUser = {
   bio: string | null;
   headline: string | null;
   modes: string[];
+  openTo?: string[];
   pronouns: string | null;
   avatarUrl: string | null;
   bannerUrl: string | null;
+  resumeUrl?: string | null;
   country: string | null;
   state: string | null;
   city: string | null;
@@ -39,6 +43,7 @@ const visibilities = [
 ] as const;
 
 const modeOptions = ["Student", "Builder", "Organizer", "Founder", "Recruiter", "Researcher", "Mentor", "Sponsor"] as const;
+const openToOptions = ["Jobs", "Internship", "Research", "Speaking", "Mentoring", "Volunteering", "Cofounder"] as const;
 
 export function OnboardingClient({ initialUser }: { initialUser: InitialUser }) {
   const router = useRouter();
@@ -48,6 +53,9 @@ export function OnboardingClient({ initialUser }: { initialUser: InitialUser }) 
   const [username, setUsername] = useState(initialUser.username || initialUser.handle || "");
   const [headline, setHeadline] = useState(initialUser.headline || "");
   const [modes, setModes] = useState<string[]>(initialUser.modes || []);
+  const [openTo, setOpenTo] = useState<string[]>(initialUser.openTo || []);
+  const [avatarUrl, setAvatarUrl] = useState(initialUser.avatarUrl || "");
+  const [resumeUrl, setResumeUrl] = useState(initialUser.resumeUrl || "");
   const [pronouns, setPronouns] = useState(initialUser.pronouns || "");
   const [bio, setBio] = useState(initialUser.bio || "");
   const [website, setWebsite] = useState(initialUser.website || "");
@@ -86,7 +94,10 @@ export function OnboardingClient({ initialUser }: { initialUser: InitialUser }) 
         username,
         headline,
         modes,
+        openTo,
         pronouns,
+        avatarUrl,
+        resumeUrl,
         bio,
         website,
         portfolio,
@@ -141,7 +152,62 @@ export function OnboardingClient({ initialUser }: { initialUser: InitialUser }) 
             })}
           </div>
 
+          <div className="eyebrow mb-5 mt-8 text-brand">What are you open to?</div>
+          <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {openToOptions.map((opt) => {
+              const selected = openTo.includes(opt);
+              return (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => setOpenTo((current) => selected ? current.filter((item) => item !== opt) : [...current, opt])}
+                  className={`h-11 rounded-2xl border px-4 text-left text-sm transition-colors ${
+                    selected
+                      ? "border-brand/50 bg-brand/10 text-ink"
+                      : "border-g3 bg-transparent text-g6 hover:border-g4 hover:text-ink"
+                  }`}
+                >
+                  {opt}
+                </button>
+              );
+            })}
+          </div>
+
           <div className="eyebrow mb-5 text-brand">Identity</div>
+          <div className="mb-6">
+            <label className="mb-3 block text-xs font-medium text-ink">Profile Picture</label>
+            <div className="flex items-center gap-6">
+              <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border border-g3 bg-g1">
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="Avatar" className="h-full w-full object-cover" />
+                ) : (
+                  <Camera size={24} className="text-g4" />
+                )}
+              </div>
+              <div className="flex-1 max-w-[400px]">
+                <UploadDropzone
+                  endpoint="imageUploader"
+                  onClientUploadComplete={(res) => {
+                    if (res?.[0]) setAvatarUrl(res[0].url);
+                  }}
+                  onUploadError={(error: Error) => {
+                    alert(`ERROR! ${error.message}`);
+                  }}
+                  appearance={{
+                    button: "bg-g1 text-g6 border border-g3 rounded-xl px-4 py-2 text-xs font-medium hover:bg-g2 hover:text-ink w-full transition-colors",
+                    allowedContent: "hidden",
+                    container: "p-0 min-h-0 border-none bg-transparent w-full flex items-center justify-start",
+                    label: "hidden",
+                    uploadIcon: "hidden",
+                  }}
+                  content={{
+                    button: "Upload image (max 4MB)"
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
           <div className="grid gap-5 md:grid-cols-2">
             <Field label="Display name" value={displayName} onChange={setDisplayName} placeholder="Divyom Sharma" />
             <Field label="Username" value={username} onChange={setUsername} placeholder="divyom" />
@@ -170,6 +236,46 @@ export function OnboardingClient({ initialUser }: { initialUser: InitialUser }) 
               placeholder="A short line about what you are building, learning, or chasing."
               className="w-full resize-none rounded-2xl border border-g3 bg-transparent p-4 text-sm text-ink outline-none focus:border-brand/55"
             />
+          </div>
+        </div>
+
+        <div className="premium-card p-6 md:p-7">
+          <div className="eyebrow mb-5 text-brand">Professional</div>
+          <div className="mb-6">
+            <label className="mb-3 block text-xs font-medium text-ink">Resume (PDF)</label>
+            <div className="flex items-center gap-6">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-g3 bg-g1">
+                <FileText size={20} className={resumeUrl ? "text-brand" : "text-g4"} />
+              </div>
+              <div className="flex-1 max-w-[400px]">
+                {resumeUrl ? (
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-brand font-medium">Resume uploaded</span>
+                    <button type="button" onClick={() => setResumeUrl("")} className="text-xs text-g5 hover:text-red-500 underline underline-offset-2">Remove</button>
+                  </div>
+                ) : (
+                  <UploadDropzone
+                    endpoint="documentUploader"
+                    onClientUploadComplete={(res) => {
+                      if (res?.[0]) setResumeUrl(res[0].url);
+                    }}
+                    onUploadError={(error: Error) => {
+                      alert(`ERROR! ${error.message}`);
+                    }}
+                    appearance={{
+                      button: "bg-g1 text-g6 border border-g3 rounded-xl px-4 py-2 text-xs font-medium hover:bg-g2 hover:text-ink w-full transition-colors",
+                      allowedContent: "hidden",
+                      container: "p-0 min-h-0 border-none bg-transparent w-full flex items-center justify-start",
+                      label: "hidden",
+                      uploadIcon: "hidden",
+                    }}
+                    content={{
+                      button: "Upload PDF (max 16MB)"
+                    }}
+                  />
+                )}
+              </div>
+            </div>
           </div>
         </div>
 

@@ -62,13 +62,74 @@ export default async function CreateSpacePage() {
             </Link>
           </div>
           
-          <div className="flex flex-col flex-1 p-16 text-center items-center justify-center">
-            <div className="w-16 h-16 rounded-full bg-g1 flex items-center justify-center mb-6">
-              <Building2 size={32} className="text-g4" />
+          <form action={async (formData) => {
+            "use server";
+            const { createSpace } = await import("@/app/actions/space");
+            const { redirect } = await import("next/navigation");
+            const res = await createSpace(formData);
+            if (res.success) {
+              redirect(`/spaces/${res.spaceId}`);
+            }
+          }} className="flex flex-col flex-1 px-8 py-6">
+            <div className="space-y-6 max-w-xl mx-auto w-full pt-4">
+              <div className="space-y-2">
+                <label className="text-[13px] font-medium text-ink block">Space Name *</label>
+                <input 
+                  name="name" 
+                  required 
+                  className="w-full bg-g1 border border-g3 rounded px-3 py-2.5 text-[14px] text-ink outline-none focus:border-g4 transition-colors placeholder:text-g4" 
+                  placeholder="e.g. AI Research Group" 
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[13px] font-medium text-ink block">Parent Organization *</label>
+                <select 
+                  name="organizationId" 
+                  required 
+                  className="w-full bg-g1 border border-g3 rounded px-3 py-2.5 text-[14px] text-ink outline-none focus:border-g4 transition-colors"
+                >
+                  {memberships.map((m) => (
+                    <option key={m.organization.id} value={m.organization.id}>
+                      {m.organization.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[13px] font-medium text-ink block">Space Type</label>
+                <select 
+                  name="type" 
+                  className="w-full bg-g1 border border-g3 rounded px-3 py-2.5 text-[14px] text-ink outline-none focus:border-g4 transition-colors"
+                  defaultValue="Community"
+                >
+                  <option value="Community">Community</option>
+                  <option value="Club">Club</option>
+                  <option value="Society">Society</option>
+                  <option value="Chapter">Chapter</option>
+                  <option value="Circle">Circle</option>
+                  <option value="Collective">Collective</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[13px] font-medium text-ink block">Description</label>
+                <textarea 
+                  name="description" 
+                  rows={4}
+                  className="w-full bg-g1 border border-g3 rounded px-3 py-2.5 text-[14px] text-ink outline-none focus:border-g4 transition-colors placeholder:text-g4 resize-none" 
+                  placeholder="Briefly describe what this space is about..." 
+                />
+              </div>
+
+              <div className="pt-4 flex justify-end">
+                <button type="submit" className="ink-button px-6 py-2.5 text-[14px] font-semibold">
+                  Launch Space
+                </button>
+              </div>
             </div>
-            <div className="text-[15px] text-ink mb-2 font-medium">Studio offline for upgrades</div>
-            <p className="text-[13px] text-g5 max-w-[40ch] leading-relaxed">Your administrator permissions are verified. Please check back shortly to launch your space.</p>
-          </div>
+          </form>
         </div>
       </div>
     </Shell>

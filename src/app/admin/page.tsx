@@ -40,23 +40,21 @@ export default async function Admin() {
   ];
 
   return (
-    <Shell wide>
-      <div className="mx-auto max-w-[1440px] px-5 sm:px-8 py-12">
-        <div className="hairline-b pb-6">
-          <div className="eyebrow">Operator view</div>
-          <h1 className="serif text-5xl mt-2">Admin.</h1>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-10">
-          {metrics.map((m) => (
-            <div key={m.e} className="hairline p-6">
-              <div className="eyebrow">{m.e}</div>
-              <div className="serif text-5xl mt-3 leading-none">{m.n}</div>
-              <div className="text-g5 text-[12px] mt-2 mono">{m.d}</div>
-            </div>
-          ))}
-        </div>
+    <div className="mx-auto max-w-[1440px] px-5 sm:px-8 py-12">
+      <div className="hairline-b pb-6">
+        <div className="eyebrow">Operator view</div>
+        <h1 className="serif text-5xl mt-2">Admin.</h1>
       </div>
-    </Shell>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-10">
+        {metrics.map((m) => (
+          <div key={m.e} className="hairline p-6">
+            <div className="eyebrow">{m.e}</div>
+            <div className="serif text-5xl mt-3 leading-none">{m.n}</div>
+            <div className="text-g5 text-[12px] mt-2 mono">{m.d}</div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

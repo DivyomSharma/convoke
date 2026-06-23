@@ -7,11 +7,17 @@ import { ExternalLink, Award, FileText, Layout } from "lucide-react";
 export function ProfileTabsClient({
   projects,
   research,
+  meetAttendance,
+  applications,
+  certificates,
   activityDates,
   Heat
 }: {
   projects: any[];
   research: any[];
+  meetAttendance?: any[];
+  applications?: any[];
+  certificates?: any[];
   activityDates: Date[];
   Heat: React.ReactNode;
 }) {
@@ -21,6 +27,8 @@ export function ProfileTabsClient({
     { id: "overview", label: "Overview" },
     { id: "projects", label: "Projects" },
     { id: "research", label: "Research" },
+    { id: "meets", label: "Meets" },
+    { id: "opportunities", label: "Opportunities" },
     { id: "certificates", label: "Certificates" }
   ];
 
@@ -129,13 +137,87 @@ export function ProfileTabsClient({
           </div>
         )}
 
+        {activeTab === "meets" && (
+          <div className="space-y-6 animate-in fade-in duration-300">
+            {meetAttendance && meetAttendance.length > 0 ? (
+              <div className="grid gap-4">
+                {meetAttendance.map((m: any) => (
+                  <Link key={m.id} href={`/meets/${m.meet.id}`} className="premium-card p-5 group hover:border-[var(--brand)]/30 transition-colors">
+                    <h3 className="text-[16px] text-ink font-medium mb-1">{m.meet.title}</h3>
+                    <p className="text-[13px] text-g5">
+                      Attended on {new Date(m.meet.startTime).toLocaleDateString()}
+                    </p>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className="py-12 text-center text-g5 text-[14px] border border-dashed border-g3 rounded-xl flex flex-col items-center">
+                <Layout size={24} className="text-g4 mb-3" />
+                <p>No meets attended yet.</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === "opportunities" && (
+          <div className="space-y-6 animate-in fade-in duration-300">
+            {applications && applications.length > 0 ? (
+              <div className="grid gap-4">
+                {applications.map((app: any) => (
+                  <Link key={app.id} href={app.opportunity.type.includes("CHALLENGE") ? `/challenges/${app.opportunity.id}` : `/opportunities/${app.opportunity.id}`} className="premium-card p-5 group hover:border-[var(--brand)]/30 transition-colors">
+                    <h3 className="text-[16px] text-ink font-medium mb-1">{app.opportunity.title}</h3>
+                    <p className="text-[13px] text-g5 uppercase tracking-wider mono text-[11px] mb-2">{app.opportunity.type}</p>
+                    <span className="inline-block px-2 py-1 bg-g2 text-ink text-[12px] rounded border border-g3">Status: {app.status}</span>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className="py-12 text-center text-g5 text-[14px] border border-dashed border-g3 rounded-xl flex flex-col items-center">
+                <Layout size={24} className="text-g4 mb-3" />
+                <p>No applications yet.</p>
+              </div>
+            )}
+          </div>
+        )}
+
         {activeTab === "certificates" && (
           <div className="space-y-6 animate-in fade-in duration-300">
-            <div className="py-16 text-center text-g5 text-[14px] border border-dashed border-g3 rounded-xl flex flex-col items-center bg-g1/20">
-              <Award size={32} className="text-[var(--brand)] mb-4" />
-              <p className="font-medium text-ink mb-1 text-[16px]">Verified Credentials</p>
-              <p className="max-w-[40ch]">Meet participation certificates and digital badges will appear here once issued by organizers.</p>
-            </div>
+            {certificates && certificates.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {certificates.map((c: any) => (
+                  <div key={c.id} className="premium-card p-5 group flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 mb-3">
+                        <Award size={18} className="text-[var(--brand)]" />
+                        <span className="mono text-[11px] text-g5 uppercase tracking-wider">{c.issuer}</span>
+                      </div>
+                      <h3 className="text-[16px] text-ink font-medium mb-1">{c.title}</h3>
+                      <p className="text-[12px] text-g5 mb-4">Issued: {new Date(c.issueDate).toLocaleDateString()}</p>
+                    </div>
+                    <div className="flex gap-3">
+                      {c.fileUrl && (
+                        <a href={c.fileUrl} target="_blank" rel="noopener noreferrer" className="ink-button px-3 py-1.5 text-[12px] h-auto rounded border border-g3 hover:border-g4 transition-colors bg-g1 flex items-center gap-1.5 text-ink w-fit">
+                          <FileText size={13} />
+                          Download
+                        </a>
+                      )}
+                      {c.url && (
+                        <a href={c.url} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 text-[12px] flex items-center gap-1.5 text-g5 hover:text-ink transition-colors w-fit">
+                          <ExternalLink size={13} />
+                          Verify
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="py-16 text-center text-g5 text-[14px] border border-dashed border-g3 rounded-xl flex flex-col items-center bg-g1/20">
+                <Award size={32} className="text-[var(--brand)] mb-4" />
+                <p className="font-medium text-ink mb-1 text-[16px]">Verified Credentials</p>
+                <p className="max-w-[40ch]">Meet participation certificates and digital badges will appear here once issued by organizers.</p>
+              </div>
+            )}
           </div>
         )}
       </div>

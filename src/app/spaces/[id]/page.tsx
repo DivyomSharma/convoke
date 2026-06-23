@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Metadata } from "next";
 import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
-import { Building2, CalendarDays, ChevronRight, FileText, Hash, Image as ImageIcon, Trophy, Users, CheckCircle } from "lucide-react";
+import { Building2, CalendarDays, ChevronRight, FileText, Hash, Image as ImageIcon, Trophy, Users, CheckCircle, Settings } from "lucide-react";
 import { Shell } from "@/components/Shell";
 import { AmbientGlow } from "@/components/AmbientGlow";
 import { prisma } from "@/lib/prisma";
@@ -137,12 +137,18 @@ export default async function SpaceDetailPage(props: { params?: Promise<{ id: st
                 <button className="rounded-full bg-ink px-5 py-2 text-[13px] font-semibold text-paper transition-colors hover:bg-ink-2">
                   Join Space
                 </button>
-                <FollowButton 
-                  targetId={space.id} 
-                  targetType="SPACE" 
-                  initialFollowing={initialFollowing} 
-                  className="px-5 py-2"
-                />
+                {dbUser && dbUser.id !== space.organization?.ownerId && (
+                  <FollowButton 
+                    targetId={space.id} 
+                    targetType="SPACE" 
+                    initialFollowing={initialFollowing} 
+                  />
+                )}
+                {dbUser && space.members.some(m => m.userId === dbUser.id && ["FOUNDER", "LEAD", "ORGANIZER"].includes(m.role)) && (
+                  <Link href={`/spaces/${space.id}/manage`} className="rounded-full px-5 py-2 text-[13px] font-semibold transition-colors bg-g2 text-ink border border-g3 hover:bg-g3 flex items-center gap-2">
+                    <Settings size={14} /> Manage Space
+                  </Link>
+                )}
                 <div className="flex h-9 items-center rounded-full border border-g3 bg-g1/50 px-4 text-[12px] font-medium text-g6">
                   {space.members.length} Members
                 </div>
