@@ -59,9 +59,14 @@ model User {
   projects      Project[]
   research      Research[]
   bookmarks     Bookmark[]
+  referralsGiven Referral[]
   settings      Settings?
   sessions      Session[]
   activity      Activity[]
+  spaceMemberships SpaceMembership[]
+  ledTeams      Team[]            @relation("TeamLeader")
+  teamMemberships TeamMember[]
+  teamRequests  TeamRequest[]
 }
 
 model Organization {
@@ -77,6 +82,13 @@ model Organization {
   location    String?
   website     String?
   views       Int      @default(0)
+  
+  // Organization Capabilities
+  isRecruitingEnabled  Boolean @default(false)
+  isSponsorshipEnabled Boolean @default(false)
+  isMerchandiseEnabled Boolean @default(false)
+  isResearchEnabled    Boolean @default(false)
+  
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -112,15 +124,24 @@ model Membership {
 model Space {
   id             String   @id @default(uuid())
   name           String
+  type           String?  @default("Community") // Club, Society, Chapter, Community, Circle, Collective
   description    String?  @db.Text
   bannerUrl      String?
   rules          String?  @db.Text
-  organizationId String
+  organizationId String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  members      SpaceMembership[]
   meets        Meet[]
+  opportunities Opportunity[]
+  projects     Project[]
+  research     Research[]
+  resources    Resource[]
+  faqs         FAQ[]
+  gallery      GalleryImage[]
+  timeline     TimelineEvent[]
   discord      String?
   instagram    String?
   whatsapp     String?
@@ -184,6 +205,11 @@ model Opportunity {
   id             String    @id @default(uuid())
   title          String
   type           String // ROLE, FELLOWSHIP, GRANT, HACKATHON/CHALLENGE
+  participation  String?   // INDIVIDUAL, TEAM
+  minTeamSize    Int?
+  maxTeamSize    Int?
+  crossCollegeTeams Boolean @default(false)
+  teamFormationEnabled Boolean @default(false)
   description    String?   @db.Text
   department     String?
   employmentType String?
@@ -206,14 +232,18 @@ model Opportunity {
   linkedin       String?
   deadline       DateTime?
   views          Int       @default(0)
-  organizationId String
+  organizationId String?
+  spaceId        String?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
-  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  space        Space?        @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   applications Application[]
+  teams        Team[]
   faqs         FAQ[]
   resources    Resource[]
+  referrals    Referral[]
 }
 
 model Application {
@@ -243,14 +273,17 @@ model Project {
   views       Int      @default(0)
   downloads   Int      @default(0)
   userId      String
+  spaceId     String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  space     Space?          @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   faqs      FAQ[]
   gallery   GalleryImage[]
   timeline  TimelineEvent[]
   resources Resource[]
+  buildLogs BuildLog[]
 }
 
 model Research {
@@ -259,10 +292,12 @@ model Research {
   abstract  String?  @db.Text
   url       String?
   userId    String
+  spaceId   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  space Space? @relation(fields: [spaceId], references: [id], onDelete: Cascade)
 }
 
 // ==========================================
@@ -277,9 +312,11 @@ model FAQ {
   organizationId String?
   opportunityId  String?
   projectId      String?
+  spaceId        String?
 
   meet         Meet?         @relation(fields: [meetId], references: [id], onDelete: Cascade)
   organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  space        Space?        @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   opportunity  Opportunity?  @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
   project      Project?      @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }
@@ -314,9 +351,11 @@ model GalleryImage {
   meetId         String?
   organizationId String?
   projectId      String?
+  spaceId        String?
 
   meet         Meet?         @relation(fields: [meetId], references: [id], onDelete: Cascade)
   organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  space        Space?        @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   project      Project?      @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }
 
@@ -327,8 +366,10 @@ model TimelineEvent {
   description    String?  @db.Text
   organizationId String?
   projectId      String?
+  spaceId        String?
 
   organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  space        Space?        @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   project      Project?      @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }
 
@@ -341,11 +382,33 @@ model Resource {
   organizationId String?
   projectId      String?
   opportunityId  String?
+  spaceId        String?
 
   meet         Meet?         @relation(fields: [meetId], references: [id], onDelete: Cascade)
   organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  space        Space?        @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   project      Project?      @relation(fields: [projectId], references: [id], onDelete: Cascade)
   opportunity  Opportunity?  @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+}
+
+model BuildLog {
+  id          String   @id @default(uuid())
+  projectId   String
+  summary     String
+  createdAt   DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Referral {
+  id            String   @id @default(uuid())
+  opportunityId String
+  userId        String
+  note          String?  @db.Text
+  createdAt     DateTime @default(now())
+
+  opportunity Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 // ==========================================
@@ -410,5 +473,60 @@ model Activity {
   metadata  String? // JSON string
   createdAt DateTime @default(now())
 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SpaceMembership {
+  id        String   @id @default(uuid())
+  userId    String
+  spaceId   String
+  role      String   // Founder, Lead, Organizer, Core Team, Member, Alumni
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  space Space @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, spaceId])
+}
+
+model Team {
+  id            String   @id @default(uuid())
+  name          String
+  opportunityId String
+  leaderId      String
+  about         String?  @db.Text
+  lookingFor    String?  @db.Text // JSON or comma separated string of skills
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  opportunity Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  leader      User        @relation("TeamLeader", fields: [leaderId], references: [id], onDelete: Cascade)
+  members     TeamMember[]
+  requests    TeamRequest[]
+}
+
+model TeamMember {
+  id        String   @id @default(uuid())
+  teamId    String
+  userId    String
+  role      String?
+  createdAt DateTime @default(now())
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, userId])
+}
+
+model TeamRequest {
+  id        String   @id @default(uuid())
+  teamId    String
+  userId    String
+  status    String // PENDING, ACCEPTED, REJECTED
+  type      String // APPLY, INVITE
+  message   String?  @db.Text
+  createdAt DateTime @default(now())
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

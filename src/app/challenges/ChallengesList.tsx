@@ -51,6 +51,11 @@ export function ChallengesList({
   const [twitter, setTwitter] = useState("");
   const [linkedin, setLinkedin] = useState("");
   const [mode, setMode] = useState("ONLINE");
+  const [participation, setParticipation] = useState<"INDIVIDUAL" | "TEAM">("TEAM");
+  const [minTeamSize, setMinTeamSize] = useState("2");
+  const [maxTeamSize, setMaxTeamSize] = useState("5");
+  const [crossCollegeTeams, setCrossCollegeTeams] = useState(true);
+  const [teamFormationEnabled, setTeamFormationEnabled] = useState(true);
   const [brochureUrl, setBrochureUrl] = useState("");
   const [brochureFileName, setBrochureFileName] = useState("");
   const [currentTab, setCurrentTab] = useState(0);
@@ -87,7 +92,12 @@ export function ChallengesList({
         compensation: compensation || undefined,
         bannerUrl: bannerUrl || undefined,
         deadline: deadline || undefined,
-      discord: discord || undefined,
+        participation,
+        minTeamSize: participation === "TEAM" ? Number(minTeamSize) || undefined : undefined,
+        maxTeamSize: participation === "TEAM" ? Number(maxTeamSize) || undefined : undefined,
+        crossCollegeTeams: participation === "TEAM" ? crossCollegeTeams : false,
+        teamFormationEnabled: participation === "TEAM" ? teamFormationEnabled : false,
+        discord: discord || undefined,
         instagram: instagram || undefined,
         whatsapp: whatsapp || undefined,
         twitter: twitter || undefined,
@@ -103,6 +113,11 @@ export function ChallengesList({
         setDescription("");
         setLocation("ONLINE");
         setMode("ONLINE");
+        setParticipation("TEAM");
+        setMinTeamSize("2");
+        setMaxTeamSize("5");
+        setCrossCollegeTeams(true);
+        setTeamFormationEnabled(true);
         setCompensation("");
         setBannerUrl("");
         setBannerFileName("");
@@ -325,6 +340,66 @@ export function ChallengesList({
 
                   {currentTab === 1 && (
                     <div className="space-y-5 max-w-2xl mx-auto w-full">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-ink font-medium text-xs mb-1.5 block">Participation</label>
+                          <select
+                            value={participation}
+                            onChange={(e) => setParticipation(e.target.value as "INDIVIDUAL" | "TEAM")}
+                            className="w-full h-11 px-4 rounded-xl border border-g3 bg-paper text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                          >
+                            <option value="INDIVIDUAL">Individual</option>
+                            <option value="TEAM">Team</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-ink font-medium text-xs mb-1.5 block">Team formation</label>
+                          <select
+                            value={teamFormationEnabled ? "YES" : "NO"}
+                            onChange={(e) => setTeamFormationEnabled(e.target.value === "YES")}
+                            disabled={participation !== "TEAM"}
+                            className="w-full h-11 px-4 rounded-xl border border-g3 bg-paper text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all disabled:opacity-50"
+                          >
+                            <option value="YES">Enabled</option>
+                            <option value="NO">Disabled</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {participation === "TEAM" ? (
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-ink font-medium text-xs mb-1.5 block">Min team size</label>
+                            <input
+                              type="number"
+                              min={1}
+                              value={minTeamSize}
+                              onChange={(e) => setMinTeamSize(e.target.value)}
+                              className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-ink font-medium text-xs mb-1.5 block">Max team size</label>
+                            <input
+                              type="number"
+                              min={1}
+                              value={maxTeamSize}
+                              onChange={(e) => setMaxTeamSize(e.target.value)}
+                              className="w-full h-11 px-4 rounded-xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)]/55 focus:ring-1 focus:ring-[var(--brand)]/20 transition-all"
+                            />
+                          </div>
+                          <label className="flex items-center gap-3 rounded-xl border border-g3 bg-g1/25 px-4 py-3 text-sm text-ink">
+                            <input
+                              type="checkbox"
+                              checked={crossCollegeTeams}
+                              onChange={(e) => setCrossCollegeTeams(e.target.checked)}
+                              className="h-4 w-4 rounded border-g3 text-[var(--brand)] focus:ring-[var(--brand)]/30"
+                            />
+                            Cross-college teams allowed
+                          </label>
+                        </div>
+                      ) : null}
+
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <label className="text-ink font-medium text-xs mb-1.5 block">Awards & Prize Pool</label>

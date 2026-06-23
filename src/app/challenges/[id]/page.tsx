@@ -8,6 +8,7 @@ import {
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { RegisterClient } from "./RegisterClient";
+import { ChallengeTeamHub } from "./ChallengeTeamHub";
 import Link from "next/link";
 import { Metadata } from "next";
 import { isChallengeType } from "@/lib/challenge-types";
@@ -84,6 +85,24 @@ export default async function ChallengeDetailPage(props: { params?: Promise<{ id
     ? new Date(opp.deadline).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
     : "Open Enrollment";
 
+  let teams: any[] = [];
+  let myTeam: any = null;
+  let incomingRequests: any[] = [];
+
+  if (opp.participation === "TEAM") {
+    teams = await prisma.team.findMany({
+      where: { opportunityId: opp.id },
+      include: { members: { include: { user: true } } }
+    });
+    myTeam = dbUser ? teams.find(t => t.members.some(m => m.userId === dbUser.id)) || null : null;
+    if (myTeam) {
+      incomingRequests = await prisma.teamRequest.findMany({
+        where: { teamId: myTeam.id, status: "PENDING" },
+        include: { user: true }
+      });
+    }
+  }
+
   return (
     <Shell wide>
       <div className="relative min-h-screen bg-paper pb-20">
@@ -154,6 +173,31 @@ export default async function ChallengeDetailPage(props: { params?: Promise<{ id
                 </Link>
               </div>
 
+              <section id="team-hub">
+                <h2 className="serif text-2xl mb-4">Team Hub</h2>
+                <div className="space-y-4">
+                  <div className="rounded-md border border-g3 bg-g1/30 p-4">
+                    <div className="text-[12px] uppercase tracking-wider text-g5 font-medium">Participation</div>
+                    <div className="mt-1 text-[15px] font-semibold text-ink">{opp.participation || "Team-ready"}</div>
+                    <div className="mt-2 text-[13px] leading-relaxed text-g5">
+                      {opp.participation === "TEAM"
+                        ? `Teams: ${opp.minTeamSize || 2} to ${opp.maxTeamSize || 5}${opp.crossCollegeTeams ? " · cross-college enabled" : ""}${opp.teamFormationEnabled ? " · team formation on" : ""}`
+                        : "Individual participation is enabled."}
+                    </div>
+                  </div>
+
+                  {opp.participation === "TEAM" && (
+                    <ChallengeTeamHub 
+                      opportunityId={opp.id}
+                      userId={dbUser?.id || ""}
+                      teams={teams}
+                      myTeam={myTeam}
+                      incomingRequests={incomingRequests}
+                    />
+                  )}
+                </div>
+              </section>
+
               {/* Description */}
               <section>
                 <h2 className="serif text-2xl mb-4">About Challenge</h2>
@@ -200,6 +244,8 @@ export default async function ChallengeDetailPage(props: { params?: Promise<{ id
                   </div>
                 </section>
               )}
+
+              {/* End Team Content Placeholder replaced by TeamHub */}
 
             </div>
 

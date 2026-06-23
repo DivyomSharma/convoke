@@ -314,6 +314,11 @@ export async function createEvent(data: {
 export async function createOpportunity(data: {
   title: string;
   type: string;
+  participation?: string;
+  minTeamSize?: number;
+  maxTeamSize?: number;
+  crossCollegeTeams?: boolean;
+  teamFormationEnabled?: boolean;
   description?: string;
   department?: string;
   employmentType?: string;
@@ -344,6 +349,11 @@ export async function createOpportunity(data: {
     data: {
       title: data.title,
       type: data.type,
+      participation: data.participation,
+      minTeamSize: data.minTeamSize ? Number(data.minTeamSize) : undefined,
+      maxTeamSize: data.maxTeamSize ? Number(data.maxTeamSize) : undefined,
+      crossCollegeTeams: data.crossCollegeTeams ?? false,
+      teamFormationEnabled: data.teamFormationEnabled ?? false,
       description: data.description,
       department: data.department,
       employmentType: data.employmentType,
@@ -443,7 +453,7 @@ export async function getWorkspaceContexts() {
     organizations: memberships.map((membership) => ({
       id: membership.organization.id,
       label: membership.organization.name,
-      href: `/org/${membership.organization.slug}`,
+      href: `/workspace/org/${membership.organization.slug}`,
     })),
   };
 }
