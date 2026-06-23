@@ -74,7 +74,7 @@ export default async function CreateResearchPage() {
                   <option value="">-- No Space --</option>
                   {spaceMemberships.map((m) => (
                     <option key={m.space.id} value={m.space.id}>
-                      {m.space.organization.name} / {m.space.name}
+                      {m.space.organization?.name} / {m.space.name}
                     </option>
                   ))}
                 </select>

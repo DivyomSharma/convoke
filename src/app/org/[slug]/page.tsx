@@ -11,7 +11,8 @@ import {
   ArrowRight,
   Plus,
   ArrowUpRight,
-  Settings
+  Settings,
+  ChevronDown
 } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
 import { prisma } from "@/lib/prisma";

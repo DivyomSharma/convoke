@@ -54,7 +54,7 @@ export default async function Profile(props: { params?: Promise<{ handle: string
     include: {
       projects: { orderBy: { createdAt: "desc" } },
       research: { orderBy: { createdAt: "desc" } },
-      meetAttendance: {
+      meets: {
         include: { meet: true }
       },
       applications: {
@@ -179,7 +179,7 @@ export default async function Profile(props: { params?: Promise<{ handle: string
             <ProfileTabsClient 
               projects={projects} 
               research={research} 
-              meetAttendance={user.meetAttendance}
+              meetAttendance={user.meets}
               applications={user.applications}
               certificates={user.certificates}
               activityDates={activityDates} 

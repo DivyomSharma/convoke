@@ -21,7 +21,7 @@ export default async function SpaceManagePage(props: { params?: Promise<{ id: st
       organization: true,
       members: {
         include: { user: true },
-        orderBy: { joinedAt: "asc" }
+        orderBy: { createdAt: "asc" }
       }
     }
   });

@@ -20,7 +20,7 @@ export default async function OrgManagePage(props: { params?: Promise<{ id: stri
     include: {
       members: {
         include: { user: true },
-        orderBy: { joinedAt: "asc" }
+        orderBy: { createdAt: "asc" }
       },
       spaces: true,
     }

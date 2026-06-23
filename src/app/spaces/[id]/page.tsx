@@ -137,7 +137,7 @@ export default async function SpaceDetailPage(props: { params?: Promise<{ id: st
                 <button className="rounded-full bg-ink px-5 py-2 text-[13px] font-semibold text-paper transition-colors hover:bg-ink-2">
                   Join Space
                 </button>
-                {dbUser && dbUser.id !== space.organization?.ownerId && (
+                {dbUser && (
                   <FollowButton 
                     targetId={space.id} 
                     targetType="SPACE" 

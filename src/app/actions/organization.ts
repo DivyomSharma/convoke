@@ -8,19 +8,21 @@ export async function createOrganization(formData: FormData) {
   const user = await requireUser();
 
   const name = formData.get("name") as string;
-  const type = formData.get("type") as string;
+  const industry = formData.get("type") as string;
   const description = formData.get("description") as string;
   const website = formData.get("website") as string;
 
   if (!name) return { error: "Organization name is required" };
 
+  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + Date.now().toString().slice(-4);
+
   const org = await prisma.organization.create({
     data: {
       name,
-      type: type || "Community",
+      slug,
+      industry: industry || "Community",
       description,
       website,
-      ownerId: user.id,
       members: {
         create: {
           userId: user.id,
@@ -37,9 +39,16 @@ export async function createOrganization(formData: FormData) {
 
 export async function updateOrganization(organizationId: string, formData: FormData) {
   const user = await requireUser();
-  const org = await prisma.organization.findUnique({ where: { id: organizationId } });
+  const membership = await prisma.membership.findUnique({
+    where: {
+      userId_organizationId: {
+        userId: user.id,
+        organizationId: organizationId
+      }
+    }
+  });
   
-  if (!org || org.ownerId !== user.id) {
+  if (!membership || (membership.role !== "ADMIN" && membership.role !== "FOUNDER")) {
     return { error: "Unauthorized" };
   }
 
