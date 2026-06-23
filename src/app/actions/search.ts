@@ -75,7 +75,7 @@ export async function globalSearch(query: string): Promise<SearchResult[]> {
       id: `space-${s.id}`,
       type: "Space",
       title: s.name,
-      subtitle: s.organization.name,
+      subtitle: s.organization?.name || "Community Space",
       href: `/spaces/${s.id}`,
     });
   });
@@ -98,7 +98,7 @@ export async function globalSearch(query: string): Promise<SearchResult[]> {
       id: `opp-${o.id}`,
       type: isChallenge ? "Challenge" : "Opportunity",
       title: o.title,
-      subtitle: o.organization.name,
+      subtitle: o.organization?.name || "Opportunity",
       href: isChallenge ? `/challenges/${o.id}` : `/opportunities/${o.id}`,
     });
   });

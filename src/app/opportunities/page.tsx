@@ -11,6 +11,7 @@ export default async function OpportunitiesPage() {
   const opportunities = await prisma.opportunity.findMany({
     include: {
       organization: true,
+      space: true,
       _count: {
         select: {
           applications: true,

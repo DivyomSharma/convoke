@@ -44,7 +44,7 @@ export default async function Workspace() {
 
   const myApps = dbUser ? await prisma.application.findMany({
     where: { userId: dbUser.id },
-    include: { opportunity: { include: { organization: true } } },
+    include: { opportunity: { include: { organization: true, space: true } } },
     take: 4,
     orderBy: { createdAt: "desc" }
   }) : [];
@@ -227,7 +227,7 @@ export default async function Workspace() {
                         {a.opportunity.title}
                       </div>
                       <div className="text-g5 text-[13px] mt-0.5">
-                        {a.opportunity.organization.name} · <span className="mono text-[10px] uppercase font-semibold text-ink-muted">{a.status}</span>
+                        {a.opportunity.organization?.name || a.opportunity.space?.name || "Community"} · <span className="mono text-[10px] uppercase font-semibold text-ink-muted">{a.status}</span>
                       </div>
                     </div>
                     <Link

@@ -50,6 +50,7 @@ export default async function MyTicketsPage() {
         opportunity: {
           include: {
             organization: true,
+            space: true,
           },
         },
       },
@@ -63,7 +64,7 @@ export default async function MyTicketsPage() {
     return {
       ticketId: passId("EVT", registration.id),
       eventName: meet.title,
-      orgName: meet.space.organization.name,
+      orgName: meet.space.organization?.name || "Community",
       date: new Date(meet.startTime).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
       time: new Date(meet.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       venue: meet.venue || meet.location || "Online",
@@ -73,7 +74,7 @@ export default async function MyTicketsPage() {
       type: registration.status === "INTERESTED" ? "Interested" : "Meet pass",
       state: passState(registration.status),
       bannerUrl: meet.bannerUrl || undefined,
-      orgLogo: meet.space.organization.logoUrl || undefined,
+      orgLogo: meet.space.organization?.logoUrl || undefined,
     };
   });
 
@@ -83,7 +84,7 @@ export default async function MyTicketsPage() {
     return {
       ticketId: passId("CHL", application.id),
       eventName: opportunity.title,
-      orgName: opportunity.organization.name,
+      orgName: opportunity.organization?.name || opportunity.space?.name || "Community",
       date: opportunity.deadline
         ? new Date(opportunity.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
         : "Rolling",
@@ -95,7 +96,7 @@ export default async function MyTicketsPage() {
       type: opportunity.type === "HACKATHON" ? "Hackathon" : "Challenge",
       state: passState(application.status),
       bannerUrl: opportunity.bannerUrl || undefined,
-      orgLogo: opportunity.organization.logoUrl || undefined,
+      orgLogo: opportunity.organization?.logoUrl || undefined,
     };
   });
 

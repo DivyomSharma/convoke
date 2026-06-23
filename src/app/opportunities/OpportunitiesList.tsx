@@ -25,7 +25,10 @@ interface OpportunityWithDetails {
   bannerUrl: string | null;
   organization: {
     name: string;
-  };
+  } | null;
+  space?: {
+    name: string;
+  } | null;
   _count: {
     applications: number;
   };
@@ -123,7 +126,7 @@ export function OpportunitiesList({
   const filteredOpportunities = opportunities.filter((opp) => {
     const matchesSearch = 
       opp.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      opp.organization.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (opp.organization?.name || opp.space?.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
       (opp.description && opp.description.toLowerCase().includes(searchTerm.toLowerCase()));
     
     const matchesType = selectedType === "ALL" || opp.type === selectedType;
@@ -239,7 +242,7 @@ export function OpportunitiesList({
                       </span>
                       <span className="text-g4 text-[10px]">•</span>
                       <span className="mono text-[10px] uppercase tracking-[0.15em] text-g5">
-                        {opportunity.organization.name}
+                        {opportunity.organization?.name || opportunity.space?.name || "Community"}
                       </span>
                     </div>
                     <h2 className="serif text-2xl md:text-3xl font-light text-ink group-hover:text-g5 transition-colors line-clamp-1">

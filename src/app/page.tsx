@@ -149,8 +149,8 @@ export default async function HomePage() {
       link: `/meets/${e.id}`,
       actionText: isLive ? "Join" : "RSVP",
       timestamp: e.startTime.getTime(),
-      logoUrl: e.space.organization.logoUrl,
-      logoName: e.space.organization.name,
+      logoUrl: e.space.organization?.logoUrl,
+      logoName: e.space.organization?.name || "Community",
     });
   });
 
@@ -193,8 +193,8 @@ export default async function HomePage() {
       link: `/spaces/${s.id}`,
       actionText: "Join",
       timestamp: s.createdAt.getTime(),
-      logoUrl: s.organization.logoUrl,
-      logoName: s.organization.name,
+      logoUrl: s.organization?.logoUrl,
+      logoName: s.organization?.name || "Community",
     });
   });
 

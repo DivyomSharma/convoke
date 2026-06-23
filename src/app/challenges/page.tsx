@@ -17,6 +17,7 @@ export default async function ChallengesPage() {
     },
     include: {
       organization: true,
+      space: true,
       applications: true,
     },
     orderBy: {

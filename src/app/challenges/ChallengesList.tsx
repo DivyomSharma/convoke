@@ -24,7 +24,11 @@ interface ChallengeWithDetails {
   organization: {
     name: string;
     logoUrl: string | null;
-  };
+  } | null;
+  space?: {
+    name: string;
+    logoUrl?: string | null;
+  } | null;
   applications: any[];
 }
 
@@ -177,9 +181,13 @@ export function ChallengesList({
               <div className="h-36 relative overflow-hidden bg-g1 flex items-center justify-center border-b border-g3 z-10">
                 {challenge.bannerUrl ? (
                   <img src={challenge.bannerUrl} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-                ) : challenge.organization.logoUrl ? (
+                ) : challenge.organization?.logoUrl ? (
                   <div className="w-16 h-16 rounded-sm overflow-hidden border border-g3/80">
                     <img src={challenge.organization.logoUrl} alt="" className="w-full h-full object-cover" />
+                  </div>
+                ) : challenge.space?.logoUrl ? (
+                  <div className="w-16 h-16 rounded-sm overflow-hidden border border-g3/80">
+                    <img src={challenge.space.logoUrl} alt="" className="w-full h-full object-cover" />
                   </div>
                 ) : (
                   <Code size={40} className="text-g3 group-hover:scale-110 transition-transform duration-500" />
@@ -190,7 +198,7 @@ export function ChallengesList({
               </div>
               <div className="p-6 flex-1 flex flex-col z-10 relative">
                 <h3 className="serif text-2xl group-hover:text-[var(--brand)] transition-colors font-light leading-tight">{challenge.title}</h3>
-                <p className="text-g5 text-[13px] mt-2 font-sans">by {challenge.organization.name}</p>
+                <p className="text-g5 text-[13px] mt-2 font-sans">by {challenge.organization?.name || challenge.space?.name || "Community"}</p>
                 
                 <div className="mt-8 flex-1 flex flex-col justify-end gap-3.5 text-[13px] text-g6 font-sans">
                   <div className="flex items-center gap-2.5">

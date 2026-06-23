@@ -60,6 +60,7 @@ export default async function ChallengeDetailPage(props: { params?: Promise<{ id
     where: { id: id },
     include: {
       organization: true,
+      space: true,
       applications: true,
       faqs: true,
       resources: true,
@@ -94,7 +95,7 @@ export default async function ChallengeDetailPage(props: { params?: Promise<{ id
       where: { opportunityId: opp.id },
       include: { members: { include: { user: true } } }
     });
-    myTeam = dbUser ? teams.find(t => t.members.some(m => m.userId === dbUser.id)) || null : null;
+    myTeam = dbUser ? teams.find(t => t.members.some((m: any) => m.userId === dbUser.id)) || null : null;
     if (myTeam) {
       incomingRequests = await prisma.teamRequest.findMany({
         where: { teamId: myTeam.id, status: "PENDING" },
@@ -138,8 +139,8 @@ export default async function ChallengeDetailPage(props: { params?: Promise<{ id
                 <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-[15px] text-g6">
                   <div className="flex items-center gap-2">
                     <Building2 size={18} className="text-[var(--brand)]" />
-                    <Link href={`/org/${opp.organization.slug}`} className="font-medium text-ink hover:underline">
-                      {opp.organization.name}
+                    <Link href={opp.organization?.slug ? `/org/${opp.organization.slug}` : "#"} className="font-medium text-ink hover:underline">
+                      {opp.organization?.name || opp.space?.name || "Community"}
                     </Link>
                   </div>
                   <div className="flex items-center gap-2">
@@ -157,7 +158,7 @@ export default async function ChallengeDetailPage(props: { params?: Promise<{ id
               <div className="flex items-center justify-between p-4 rounded-md glass-panel">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-sm bg-g1 flex-shrink-0 flex items-center justify-center border border-g3 overflow-hidden">
-                    {opp.organization.logoUrl ? (
+                    {opp.organization?.logoUrl ? (
                       <img src={opp.organization.logoUrl} alt="" className="w-full h-full object-cover" />
                     ) : (
                       <Building2 size={16} className="text-g4" />
@@ -165,10 +166,10 @@ export default async function ChallengeDetailPage(props: { params?: Promise<{ id
                   </div>
                   <div>
                     <div className="text-[12px] text-g5 uppercase tracking-wider font-medium">Organized By</div>
-                    <div className="text-[15px] font-semibold text-ink">{opp.organization.name}</div>
+                    <div className="text-[15px] font-semibold text-ink">{opp.organization?.name || opp.space?.name || "Community"}</div>
                   </div>
                 </div>
-                <Link href={`/org/${opp.organization.slug}`} className="text-[13px] font-medium px-4 py-1.5 rounded-full border border-g3 hover:bg-g2 transition-colors">
+                <Link href={opp.organization?.slug ? `/org/${opp.organization.slug}` : "#"} className="text-[13px] font-medium px-4 py-1.5 rounded-full border border-g3 hover:bg-g2 transition-colors">
                   View Org
                 </Link>
               </div>

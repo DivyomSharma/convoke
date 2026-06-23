@@ -503,9 +503,9 @@ export async function promoteAttendee(meetId: string, userId: string, status: st
 
   if (!meet) throw new Error("Meet not found.");
 
-  const isOrganizer = meet.space.organization.members.some(
+  const isOrganizer = meet.space.organization?.members.some(
     (m) => m.userId === viewer.id && (m.role === "ADMIN" || m.role === "FOUNDER")
-  );
+  ) || false;
 
   if (!isOrganizer) throw new Error("Unauthorized.");
 
@@ -563,9 +563,9 @@ export async function checkInAttendee(meetId: string, userId: string) {
 
   if (!meet) throw new Error("Meet not found.");
 
-  const isOrganizer = meet.space.organization.members.some(
+  const isOrganizer = meet.space.organization?.members.some(
     (m) => m.userId === viewer.id && (m.role === "ADMIN" || m.role === "FOUNDER")
-  );
+  ) || false;
 
   if (!isOrganizer) throw new Error("Unauthorized.");
 

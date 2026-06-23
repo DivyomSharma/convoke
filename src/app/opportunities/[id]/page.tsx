@@ -128,8 +128,8 @@ export default async function OpportunityDetailPage(props: { params?: Promise<{ 
                 <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-[15px] text-g6">
                   <div className="flex items-center gap-2">
                     <Building2 size={18} className="text-[var(--brand)]" />
-                    <Link href={`/org/${opp.organization.slug}`} className="font-medium text-ink hover:underline">
-                      {opp.organization.name}
+                    <Link href={opp.organization?.slug ? `/org/${opp.organization.slug}` : "#"} className="font-medium text-ink hover:underline">
+                      {opp.organization?.name || "Community"}
                     </Link>
                   </div>
                   <div className="flex items-center gap-2">
@@ -147,15 +147,15 @@ export default async function OpportunityDetailPage(props: { params?: Promise<{ 
               <div className="flex items-center justify-between p-5 rounded-md glass-panel">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-sm bg-g1 flex-shrink-0 flex items-center justify-center border border-g3 overflow-hidden">
-                    {opp.organization.logoUrl ? (
+                    {opp.organization?.logoUrl ? (
                       <img src={opp.organization.logoUrl} alt="" className="w-full h-full object-cover" />
                     ) : (
                       <Building2 size={16} className="text-g4" />
                     )}
                   </div>
                   <div>
-                    <h3 className="serif text-xl text-ink leading-tight">{opp.organization.name}</h3>
-                    <p className="text-[13px] text-g5 mt-1 line-clamp-2">{opp.organization.description || "Building future-facing tools."}</p>
+                    <h3 className="serif text-xl text-ink leading-tight">{opp.organization?.name || "Community"}</h3>
+                    <p className="text-[13px] text-g5 mt-1 line-clamp-2">{opp.organization?.description || "Building future-facing tools."}</p>
                   </div>
                 </div>
               </div>

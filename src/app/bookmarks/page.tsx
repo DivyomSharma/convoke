@@ -67,7 +67,7 @@ export default async function BookmarksPage() {
                       <div className="flex justify-between items-start mb-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-xl bg-g1 overflow-hidden flex items-center justify-center shrink-0">
-                            {opp.organization.logoUrl ? (
+                            {opp.organization?.logoUrl ? (
                               <img src={opp.organization.logoUrl} alt="" className="w-full h-full object-cover" />
                             ) : (
                               <Building2 size={16} className="text-g4" />
@@ -75,7 +75,7 @@ export default async function BookmarksPage() {
                           </div>
                           <div>
                             <div className="font-medium text-ink group-hover:text-[var(--brand)] transition-colors">{opp.title}</div>
-                            <div className="text-[13px] text-g5">{opp.organization.name}</div>
+                            <div className="text-[13px] text-g5">{opp.organization?.name || "Community"}</div>
                           </div>
                         </div>
                         <ExternalLink size={14} className="text-g4 group-hover:text-[var(--brand)] transition-colors" />

@@ -26,7 +26,7 @@ interface MeetWithDetails {
     name: string;
     organization: {
       name: string;
-    };
+    } | null;
   };
   _count: {
     attendance: number;
@@ -38,7 +38,7 @@ interface SpaceOption {
   name: string;
   organization: {
     name: string;
-  };
+  } | null;
 }
 
 export function MeetsList({ 
@@ -83,7 +83,7 @@ export function MeetsList({
   const endOfWeekForFilters = new Date(todayForFilters.getTime() + 7 * 24 * 60 * 60 * 1000);
   const visibleEvents = meets
     .filter((meet) => {
-      const haystack = `${meet.title} ${meet.description || ""} ${meet.space.name} ${meet.space.organization.name} ${meet.location || ""}`.toLowerCase();
+      const haystack = `${meet.title} ${meet.description || ""} ${meet.space.name} ${meet.space.organization?.name || "Community"} ${meet.location || ""}`.toLowerCase();
       const startsOn = new Date(meet.startTime);
       const matchesQuery = !query.trim() || haystack.includes(query.toLowerCase().trim());
       const matchesTimeframe =
@@ -478,7 +478,7 @@ export function MeetsList({
                               <option value="">Select a space...</option>
                               {spaces.map((sp) => (
                                 <option key={sp.id} value={sp.id}>
-                                  {sp.name} ({sp.organization.name})
+                                  {sp.name} ({sp.organization?.name || "Community"})
                                 </option>
                               ))}
                             </select>

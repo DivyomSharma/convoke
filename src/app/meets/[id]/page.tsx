@@ -102,7 +102,7 @@ export default async function EventDetailPage(props: { params?: Promise<{ id: st
   const myAttendance = viewer ? meet.attendance.find((entry) => entry.userId === viewer.id) : null;
   const initialStatus = myAttendance ? myAttendance.status : null;
   
-  const isOrganizer = viewer ? meet.space.organization.members.some(
+  const isOrganizer = viewer ? meet.space.organization?.members.some(
     (m) => m.userId === viewer.id && (m.role === "ADMIN" || m.role === "FOUNDER")
   ) : false;
 
@@ -170,21 +170,21 @@ export default async function EventDetailPage(props: { params?: Promise<{ id: st
               <section className="grid gap-6 md:grid-cols-2">
                 <div className="border border-g3 rounded-sm p-6 bg-paper-card">
                   <div className="eyebrow">Host</div>
-                  <Link href={`/org/${meet.space.organization.slug}`} className="mt-4 flex items-center gap-4 group">
+                  <Link href={meet.space.organization?.slug ? `/org/${meet.space.organization.slug}` : "#"} className="mt-4 flex items-center gap-4 group">
                     <div className="flex h-12 w-12 items-center justify-center rounded-sm border border-g3 bg-g1 overflow-hidden">
-                      {meet.space.organization.logoUrl ? (
+                      {meet.space.organization?.logoUrl ? (
                         <img src={meet.space.organization.logoUrl} alt="" className="h-full w-full object-cover" />
                       ) : (
                         <Building2 size={16} className="text-brand" />
                       )}
                     </div>
                     <div>
-                      <div className="serif text-xl group-hover:underline">{meet.space.organization.name}</div>
+                      <div className="serif text-xl group-hover:underline">{meet.space.organization?.name || meet.space.name}</div>
                       <div className="text-[11px] mono uppercase text-g4">{meet.space.name}</div>
                     </div>
                   </Link>
                   <p className="mt-4 text-[13px] leading-relaxed text-g5">
-                    {meet.space.organization.description || "Collective space updates are synced here."}
+                    {meet.space.organization?.description || "Collective space updates are synced here."}
                   </p>
                 </div>
 

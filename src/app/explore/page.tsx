@@ -54,7 +54,7 @@ export default async function Explore(props: { searchParams?: Promise<{ f?: stri
       .catch(() => []),
     prisma.opportunity
       .findMany({
-        include: { organization: true },
+        include: { organization: true, space: true },
         orderBy: { createdAt: "desc" },
         take: 24,
       })
@@ -84,8 +84,8 @@ export default async function Explore(props: { searchParams?: Promise<{ f?: stri
         banner: meet.bannerUrl || getFallbackPhoto(meet.id, 'meet'),
         who: {
           name: meet.space.name,
-          role: meet.space.organization.name,
-          avatar: meet.space.organization.logoUrl || "",
+          role: meet.space.organization?.name || "Community",
+          avatar: meet.space.organization?.logoUrl || "",
           href: `/spaces/${meet.space.id}`,
         },
       });
@@ -106,16 +106,16 @@ export default async function Explore(props: { searchParams?: Promise<{ f?: stri
           kind: challenge ? "Challenge" : "Opportunity",
           title: opportunity.title,
           body: opportunity.description,
-          meta: `${opportunity.organization.name} · ${opportunity.location || "Remote"} · ${opportunity.compensation || "Competitive"}`,
+          meta: `${opportunity.organization?.name || opportunity.space?.name || "Community"} · ${opportunity.location || "Remote"} · ${opportunity.compensation || "Competitive"}`,
           at: opportunity.createdAt,
           href: challenge ? `/challenges/${opportunity.id}` : `/opportunities/${opportunity.id}`,
           icon: challenge ? Sparkles : UsersRound,
           banner: opportunity.bannerUrl || getFallbackPhoto(opportunity.id, 'opportunity'),
           who: {
-            name: opportunity.organization.name,
-            role: opportunity.organization.industry || "Organization",
-            avatar: opportunity.organization.logoUrl || "",
-            href: `/org/${opportunity.organization.slug}`,
+            name: opportunity.organization?.name || opportunity.space?.name || "Community",
+            role: opportunity.organization?.industry || "Organization",
+            avatar: opportunity.organization?.logoUrl || "",
+            href: opportunity.organization?.slug ? `/org/${opportunity.organization.slug}` : "#",
           },
         });
       });

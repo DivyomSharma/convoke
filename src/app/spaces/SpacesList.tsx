@@ -18,7 +18,7 @@ interface SpaceWithDetails {
   organization: {
     name: string;
     members: any[];
-  };
+  } | null;
 }
 
 interface OrganizationOption {
@@ -153,7 +153,7 @@ export function SpacesList({
                   <div className="flex items-center gap-3 mono text-[10px] uppercase tracking-[0.25em] font-medium text-[var(--brand)] mb-3">
                     <span>(0{index + 1})</span>
                     <span>•</span>
-                    <span className="truncate">{space.organization.name}</span>
+                    <span className="truncate">{space.organization?.name || "Community"}</span>
                   </div>
 
                   <Link href={`/spaces/${space.id}`} className="block mb-2">
@@ -168,7 +168,7 @@ export function SpacesList({
 
                   <div className="mt-4 pt-4 border-t border-g3/50 flex items-center justify-between text-[12px] font-sans text-g5">
                     <div className="flex items-center gap-2">
-                      <span className="text-ink font-medium">{space.organization.members.length}</span> Builders
+                      <span className="text-ink font-medium">{space.organization?.members?.length || 0}</span> Builders
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-ink font-medium">Identity</span> Container

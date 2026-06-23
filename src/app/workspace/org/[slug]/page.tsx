@@ -31,10 +31,13 @@ export default async function OrganizationWorkspacePage(props: { params?: Promis
       members: {
         include: { user: true }
       },
-      spaces: true,
-      meets: {
-        orderBy: { startTime: "desc" },
-        take: 5
+      spaces: {
+        include: {
+          meets: {
+            orderBy: { startTime: "desc" },
+            take: 5
+          }
+        }
       },
       opportunities: {
         orderBy: { createdAt: "desc" },
@@ -105,7 +108,7 @@ export default async function OrganizationWorkspacePage(props: { params?: Promis
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <MetricBox label="Spaces" value={organization.spaces.length} />
               <MetricBox label="Core Team" value={organization.members.length} />
-              <MetricBox label="Meets Hosted" value={organization.meets.length} />
+              <MetricBox label="Meets Hosted" value={organization.spaces.reduce((acc, space) => acc + space.meets.length, 0)} />
               <MetricBox label="Active Roles" value={organization.opportunities.length} />
             </div>
 
@@ -217,8 +220,8 @@ export default async function OrganizationWorkspacePage(props: { params?: Promis
                 </Link>
               </div>
               <div className="space-y-3">
-                {organization.meets.length > 0 ? (
-                  organization.meets.map(meet => (
+                {organization.spaces.flatMap(s => s.meets).length > 0 ? (
+                  organization.spaces.flatMap(s => s.meets).slice(0, 5).map((meet) => (
                     <Link key={meet.id} href={`/meets/${meet.id}`} className="group flex items-center justify-between rounded-lg border border-g3/60 bg-paper-elevated/50 p-3 transition hover:border-brand/30">
                       <div>
                         <div className="text-[13px] font-medium text-ink group-hover:text-brand truncate w-48">{meet.title}</div>
