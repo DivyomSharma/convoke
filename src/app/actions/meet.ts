@@ -15,6 +15,8 @@ export async function createMeet(formData: FormData) {
   const startTime = new Date(formData.get("startTime") as string);
   const endTime = new Date(formData.get("endTime") as string);
   const capacity = formData.get("capacity") ? parseInt(formData.get("capacity") as string, 10) : null;
+  const categoryRaw = formData.get("category") as string;
+  const region = formData.get("region") as string;
 
   if (!title || !spaceId || !startTime || !endTime) {
     return { error: "Missing required fields" };
@@ -29,6 +31,8 @@ export async function createMeet(formData: FormData) {
     return { error: "Unauthorized to create meets in this space" };
   }
 
+  const categoryArray = categoryRaw ? categoryRaw.split(",").map(s => s.trim()).filter(Boolean) : [];
+
   const meet = await prisma.meet.create({
     data: {
       title,
@@ -39,6 +43,8 @@ export async function createMeet(formData: FormData) {
       startTime,
       endTime,
       capacity,
+      category: categoryArray,
+      region: region || null,
     }
   });
 

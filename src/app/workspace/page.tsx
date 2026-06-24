@@ -5,12 +5,12 @@ import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { Ticket, Calendar, Clock, MapPin, CheckCircle, ArrowRight, UserPlus, Building2, Bookmark as BookmarkIcon, Code2, FlaskConical, Sparkles } from "lucide-react";
 import { isChallengeType } from "@/lib/challenge-types";
+import { IntroResponseClient } from "./IntroResponseClient";
 
 export const revalidate = 0;
 
 export default async function Workspace() {
   const dbUser = await requireUser();
-
 
   const memberships = dbUser ? await prisma.membership.findMany({
     where: { userId: dbUser.id },
@@ -42,6 +42,12 @@ export default async function Workspace() {
     where: { userId: dbUser.id },
     include: { opportunity: { include: { organization: true, space: true } } },
     take: 4,
+    orderBy: { createdAt: "desc" }
+  }) : [];
+
+  const introRequests = dbUser ? await prisma.introductionRequest.findMany({
+    where: { targetId: dbUser.id, status: "PENDING" },
+    include: { requester: true },
     orderBy: { createdAt: "desc" }
   }) : [];
 
@@ -287,6 +293,43 @@ export default async function Workspace() {
               </div>
             )}
           </div>
+
+          {/* Intro Requests */}
+          {introRequests.length > 0 && (
+            <div>
+              <div className="hairline-b pb-4 flex items-center justify-between">
+                <div>
+                  <div className="eyebrow">Network</div>
+                  <h2 className="serif text-3xl mt-1">Warm Introductions</h2>
+                </div>
+                <span className="mono text-[10px] uppercase bg-brand/10 text-brand px-2 py-0.5 rounded">
+                  {introRequests.length} Pending
+                </span>
+              </div>
+              <div className="mt-6 space-y-4">
+                {introRequests.map(req => (
+                  <div key={req.id} className="border border-g3 rounded-xl p-5">
+                    <div className="flex items-start justify-between gap-4 mb-3">
+                      <div className="flex items-center gap-3">
+                        <Avatar src={req.requester.avatarUrl || ""} name={req.requester.name || "User"} size={40} />
+                        <div>
+                          <div className="font-semibold text-ink text-[14px]">{req.requester.name}</div>
+                          <div className="text-[12px] text-g5">@{req.requester.handle || req.requester.username}</div>
+                        </div>
+                      </div>
+                      <span className="text-[10px] uppercase tracking-wider text-g5">{new Date(req.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    <div className="bg-g1 rounded p-3 text-[13px] text-ink mb-4 italic">
+                      "{req.reason}"
+                    </div>
+                    <div className="flex items-center justify-end gap-2">
+                      <IntroResponseClient requestId={req.id} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Explore / Campus Timeline Suggestions */}
           <div>

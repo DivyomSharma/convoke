@@ -282,12 +282,16 @@ export async function createEvent(data: {
   whatsapp?: string;
   twitter?: string;
   linkedin?: string;
+  category?: string;
+  region?: string;
 }) {
   await requireUser();
 
   if (!data.title || !data.spaceId || !data.startTime || !data.endTime) {
     throw new Error("Meet title, space, start time, and end time are required.");
   }
+
+  const categoryArray = data.category ? data.category.split(",").map(s => s.trim()).filter(Boolean) : [];
 
   const meet = await prisma.meet.create({
     data: {
@@ -307,6 +311,8 @@ export async function createEvent(data: {
       whatsapp: data.whatsapp,
       twitter: data.twitter,
       linkedin: data.linkedin,
+      category: categoryArray,
+      region: data.region || null,
     },
   });
 
@@ -397,12 +403,16 @@ export async function createProject(data: {
   githubUrl?: string;
   figmaUrl?: string;
   stack?: string;
+  category?: string;
+  region?: string;
 }) {
   const user = await requireUser();
 
   if (!data.title) {
     throw new Error("Project title is required.");
   }
+
+  const categoryArray = data.category ? data.category.split(",").map(s => s.trim()).filter(Boolean) : [];
 
   const project = await prisma.project.create({
     data: {
@@ -414,6 +424,8 @@ export async function createProject(data: {
       githubUrl: data.githubUrl,
       figmaUrl: data.figmaUrl,
       stack: data.stack,
+      category: categoryArray,
+      region: data.region,
       userId: user.id,
     },
   });
@@ -476,14 +488,17 @@ export async function getWorkspaceContexts() {
   }
 
   return {
-    personal: { label: "Personal", id: undefined },
+    personal: { label: "Personal", id: undefined, href: "/workspace" },
     organizations: memberships.map((m) => ({
       id: m.organization.id,
       label: m.organization.name,
+      slug: m.organization.slug,
+      href: `/workspace/org/${m.organization.slug}`
     })),
     spaces: spaceMemberships.map((m) => ({
       id: m.space.id,
       label: m.space.name,
+      href: `/workspace/space/${m.space.id}`
     })),
     activeContext: {
       type: activeIdentity.type,

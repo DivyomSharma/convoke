@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Settings, Users, QrCode, CheckCircle2, XCircle, Award } from "lucide-react";
+import { ArrowLeft, Settings, Users, QrCode, CheckCircle2, XCircle, Award, Banknote } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
 import { approveMeetApplication } from "@/app/actions/meet";
+import { createSponsorshipRequest } from "@/app/actions/sponsorship";
 
 type MeetApp = {
   id: string;
@@ -28,20 +29,34 @@ type MeetAttendance = {
   };
 };
 
+type SponsorshipRequest = {
+  id: string;
+  title: string | null;
+  status: string;
+  requestType: string[];
+  sponsor: {
+    name: string;
+  } | null;
+  createdAt: Date;
+};
+
 type MeetData = {
   id: string;
   title: string;
   applications: MeetApp[];
   attendance: MeetAttendance[];
+  sponsorshipRequests: SponsorshipRequest[];
 };
 
 export function MeetManageClient({ meet, currentUserId }: { meet: MeetData; currentUserId: string }) {
   const [activeTab, setActiveTab] = useState("applications");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isCreatingSponsorship, setIsCreatingSponsorship] = useState(false);
 
   const tabs = [
     { id: "applications", label: "Applications", icon: <Users size={16} /> },
     { id: "attendance", label: "Attendance & Check-in", icon: <QrCode size={16} /> },
+    { id: "sponsorship", label: "Sponsorships", icon: <Banknote size={16} /> },
     { id: "certificates", label: "Certificates", icon: <Award size={16} /> },
     { id: "settings", label: "Event Settings", icon: <Settings size={16} /> },
   ];
@@ -50,6 +65,16 @@ export function MeetManageClient({ meet, currentUserId }: { meet: MeetData; curr
     setIsProcessing(true);
     await approveMeetApplication(appId);
     setIsProcessing(false);
+  };
+
+  const handleCreateSponsorship = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsProcessing(true);
+    const formData = new FormData(e.currentTarget);
+    formData.append("meetId", meet.id);
+    await createSponsorshipRequest(formData);
+    setIsProcessing(false);
+    setIsCreatingSponsorship(false);
   };
 
   const pendingApps = meet.applications.filter((a: MeetApp) => a.status === "PENDING");
@@ -196,6 +221,84 @@ export function MeetManageClient({ meet, currentUserId }: { meet: MeetData; curr
             </div>
           )}
 
+          {activeTab === "sponsorship" && (
+            <div className="space-y-8 animate-in fade-in duration-300">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-semibold text-ink mb-1">Sponsorships</h2>
+                  <p className="text-[14px] text-g5">Request and manage event sponsors.</p>
+                </div>
+                {!isCreatingSponsorship && (
+                  <button onClick={() => setIsCreatingSponsorship(true)} className="ink-button px-4 py-2 text-[13px] font-medium flex items-center gap-2">
+                    <Banknote size={16} /> New Request
+                  </button>
+                )}
+              </div>
+
+              {isCreatingSponsorship ? (
+                <form onSubmit={handleCreateSponsorship} className="space-y-6 border border-g3 rounded-xl p-6 bg-g1/20">
+                  <div className="flex items-center justify-between border-b border-g3 pb-4">
+                    <h3 className="font-medium text-ink">Create Sponsorship Request</h3>
+                    <button type="button" onClick={() => setIsCreatingSponsorship(false)} className="text-g5 hover:text-ink"><XCircle size={18} /></button>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="col-span-2 md:col-span-1 space-y-2">
+                      <label className="text-[12px] uppercase tracking-wider text-g5 font-medium">Audience Size</label>
+                      <input name="audienceSize" required placeholder="e.g. 500+ students" className="w-full bg-g1 border border-g3 rounded-lg px-3 py-2 text-[14px] text-ink outline-none focus:border-g4" />
+                    </div>
+                    <div className="col-span-2 md:col-span-1 space-y-2">
+                      <label className="text-[12px] uppercase tracking-wider text-g5 font-medium">Budget Needed</label>
+                      <input name="budget" placeholder="e.g. $1,000" className="w-full bg-g1 border border-g3 rounded-lg px-3 py-2 text-[14px] text-ink outline-none focus:border-g4" />
+                    </div>
+                    <div className="col-span-2 space-y-2">
+                      <label className="text-[12px] uppercase tracking-wider text-g5 font-medium">Deliverables (What you need)</label>
+                      <textarea name="deliverables" required rows={3} placeholder="Financial support, venue space, merch..." className="w-full bg-g1 border border-g3 rounded-lg px-3 py-2 text-[14px] text-ink outline-none focus:border-g4 resize-none" />
+                    </div>
+                    <div className="col-span-2 space-y-2">
+                      <label className="text-[12px] uppercase tracking-wider text-g5 font-medium">Benefits (What sponsors get)</label>
+                      <textarea name="benefits" required rows={3} placeholder="Logo on banners, speaking slot, email shoutout..." className="w-full bg-g1 border border-g3 rounded-lg px-3 py-2 text-[14px] text-ink outline-none focus:border-g4 resize-none" />
+                    </div>
+                    <div className="col-span-2 md:col-span-1 space-y-2">
+                      <label className="text-[12px] uppercase tracking-wider text-g5 font-medium">Pitch Deck URL (Optional)</label>
+                      <input name="deckUrl" placeholder="https://..." className="w-full bg-g1 border border-g3 rounded-lg px-3 py-2 text-[14px] text-ink outline-none focus:border-g4" />
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-g3 flex justify-end gap-3">
+                    <button type="button" onClick={() => setIsCreatingSponsorship(false)} className="px-4 py-2 text-[13px] font-medium text-g5 hover:text-ink">Cancel</button>
+                    <button type="submit" disabled={isProcessing} className="ink-button px-6 py-2 text-[13px] font-medium">
+                      {isProcessing ? "Submitting..." : "Submit Request"}
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <div className="space-y-4">
+                  {meet.sponsorshipRequests?.length === 0 ? (
+                     <div className="py-12 text-center text-g5 italic rounded-md bg-g1/30 text-[14px]">
+                       No sponsorship requests created yet.
+                     </div>
+                  ) : (
+                    meet.sponsorshipRequests?.map((req) => (
+                      <div key={req.id} className="border border-g3 rounded-xl p-5 flex items-center justify-between">
+                        <div>
+                          <div className="flex items-center gap-3 mb-1">
+                            <span className="font-medium text-ink">{req.sponsor ? req.sponsor.name : "Open Request (Marketplace)"}</span>
+                            <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-g2 text-g5 border border-g3">
+                              {req.status}
+                            </span>
+                          </div>
+                          <div className="text-[13px] text-g5">Created {new Date(req.createdAt).toLocaleDateString()}</div>
+                        </div>
+                        <button className="text-[13px] font-medium text-g5 hover:text-ink">View Details</button>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
           {(activeTab === "settings" || activeTab === "certificates") && (
             <div className="flex flex-col items-center justify-center h-full text-center p-8">
               <div className="w-16 h-16 rounded-full bg-g1 flex items-center justify-center mb-6">
@@ -213,3 +316,4 @@ export function MeetManageClient({ meet, currentUserId }: { meet: MeetData; curr
     </div>
   );
 }
+

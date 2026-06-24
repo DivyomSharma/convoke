@@ -11,6 +11,8 @@ export async function createSpace(formData: FormData) {
   const type = formData.get("type") as string;
   const description = formData.get("description") as string;
   const organizationId = formData.get("organizationId") as string;
+  const categoryRaw = formData.get("category") as string;
+  const region = formData.get("region") as string;
 
   if (!name || !organizationId) {
     return { error: "Name and Organization are required" };
@@ -25,12 +27,16 @@ export async function createSpace(formData: FormData) {
     return { error: "Not authorized to create spaces for this organization" };
   }
 
+  const categoryArray = categoryRaw ? categoryRaw.split(",").map(s => s.trim()).filter(Boolean) : [];
+
   const space = await prisma.space.create({
     data: {
       name,
       type,
       description,
       organizationId,
+      category: categoryArray,
+      region: region || null,
       members: {
         create: {
           userId: user.id,

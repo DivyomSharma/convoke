@@ -17,6 +17,8 @@ import {
 import { Shell } from "@/components/Shell";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { OrgWorkspaceClient } from "./OrgWorkspaceClient";
+import { getSponsorInbox } from "@/app/actions/sponsorship";
 
 export default async function OrganizationWorkspacePage(props: { params?: Promise<{ slug: string }> }) {
   const params = await props.params;
@@ -54,13 +56,8 @@ export default async function OrganizationWorkspacePage(props: { params?: Promis
     redirect("/workspace");
   }
 
-  // Define the operations tabs based on user's vision
-  const operations = [
-    { id: "crm", icon: <Users size={16} />, label: "People CRM", desc: "Members, Leads, Mentors", active: true },
-    { id: "outreach", icon: <Megaphone size={16} />, label: "Outreach", desc: "Cold DMs & Comm", active: false },
-    { id: "speakers", icon: <Mic2 size={16} />, label: "Speakers", desc: "Session management", active: false },
-    { id: "sponsors", icon: <Handshake size={16} />, label: "Sponsorships", desc: "Partner pipeline", active: false },
-  ];
+  // Fetch Sponsorship Requests where this org is the sponsor
+  const sponsorshipRequests = await getSponsorInbox(organization.id);
 
   return (
     <Shell wide>
@@ -112,69 +109,8 @@ export default async function OrganizationWorkspacePage(props: { params?: Promis
               <MetricBox label="Active Roles" value={organization.opportunities.length} />
             </div>
 
-            {/* Operations Dashboard (The Missing CRM) */}
-            <div className="premium-card p-6">
-              <div className="mb-5 flex items-center justify-between">
-                <div>
-                  <h2 className="serif text-2xl text-ink">Operations HQ</h2>
-                  <p className="mt-1 text-[13px] text-g5">Manage your entire ecosystem from one place.</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="relative">
-                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-g4" />
-                    <input 
-                      type="text" 
-                      placeholder="Search CRM..." 
-                      className="h-9 w-64 rounded-full border border-g3 bg-g1/30 pl-9 pr-4 text-[13px] text-ink placeholder:text-g4 outline-none focus:border-brand/50 focus:ring-1 focus:ring-brand/50 transition-all"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 mb-6">
-                {operations.map(op => (
-                  <button 
-                    key={op.id} 
-                    className={`flex items-start gap-3 rounded-xl border p-4 text-left transition-all ${
-                      op.active 
-                        ? "border-brand/30 bg-brand/5 shadow-[0_0_15px_rgba(var(--brand-rgb),0.05)]" 
-                        : "border-g3/60 bg-paper-elevated/30 hover:border-g4 hover:bg-paper-card"
-                    }`}
-                  >
-                    <div className={`mt-0.5 rounded-lg p-2 ${op.active ? "bg-brand/10 text-brand" : "bg-g2 text-g5"}`}>
-                      {op.icon}
-                    </div>
-                    <div>
-                      <div className={`font-semibold text-[14px] ${op.active ? "text-brand" : "text-ink"}`}>
-                        {op.label}
-                      </div>
-                      <div className="mt-1 text-[12px] text-g5">{op.desc}</div>
-                    </div>
-                  </button>
-                ))}
-              </div>
-
-              {/* People CRM Placeholder view */}
-              <div className="rounded-xl border border-g3 bg-paper-card overflow-hidden">
-                <div className="flex items-center justify-between border-b border-g3 bg-g1/30 px-4 py-3">
-                  <div className="flex items-center gap-4">
-                    <span className="text-[13px] font-medium text-ink">All Contacts</span>
-                    <span className="text-[13px] font-medium text-g5 hover:text-ink cursor-pointer">Leads</span>
-                    <span className="text-[13px] font-medium text-g5 hover:text-ink cursor-pointer">Alumni</span>
-                  </div>
-                  <button className="flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-[12px] font-medium text-paper transition-colors hover:bg-ink-2">
-                    <Plus size={14} /> Add Contact
-                  </button>
-                </div>
-                <div className="p-8 text-center">
-                  <Users size={32} className="mx-auto text-g4 mb-3" />
-                  <h3 className="text-[14px] font-medium text-ink">Community CRM</h3>
-                  <p className="mt-1 max-w-md mx-auto text-[13px] text-g5 leading-relaxed">
-                    Track leads, members, volunteers, and partners. The full CRM interface with pipeline stages (New, Contacted, Active) will be available here.
-                  </p>
-                </div>
-              </div>
-            </div>
+            {/* Client Dashboard Component */}
+            <OrgWorkspaceClient organization={organization} sponsorshipRequests={sponsorshipRequests} />
 
           </div>
 

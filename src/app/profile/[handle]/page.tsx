@@ -7,6 +7,7 @@ import { Metadata } from "next";
 import { ProfileTabsClient } from "./ProfileTabsClient";
 import { requireUser } from "@/lib/auth";
 import { FollowButton } from "@/components/FollowButton";
+import { IntroRequestButton } from "@/components/IntroRequestButton";
 
 export async function generateMetadata(props: { params?: Promise<{ handle: string }> }): Promise<Metadata> {
   const params = await props.params;
@@ -83,6 +84,10 @@ export default async function Profile(props: { params?: Promise<{ handle: string
   const dbUser = await requireUser().catch(() => null);
   const initialFollowing = dbUser ? (await prisma.follow.findFirst({
     where: { followerId: dbUser.id, targetId: user.id, targetType: "USER" }
+  })) !== null : false;
+  
+  const initialIntroRequested = dbUser ? (await prisma.introductionRequest.findFirst({
+    where: { requesterId: dbUser.id, targetId: user.id, status: "PENDING" }
   })) !== null : false;
   
   const followersCount = await prisma.follow.count({
@@ -176,6 +181,7 @@ export default async function Profile(props: { params?: Promise<{ handle: string
                     Message
                   </button>
                 </form>
+                <IntroRequestButton targetId={user.id} disabled={initialIntroRequested} />
                 <FollowButton 
                   targetId={user.id} 
                   targetType="USER" 

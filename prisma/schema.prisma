@@ -9,78 +9,80 @@ datasource db {
 }
 
 model User {
-  id         String   @id @default(uuid())
-  email      String   @unique
-  displayName String?
-  username   String?  @unique
-  name       String?
-  handle     String?  @unique
-  bio        String?
-  headline   String?
-  avatarUrl  String?
-  bannerUrl  String?
-  role       String? // Student, Founder, Creator, Researcher, etc.
-  modes      String[] @default([])
-  openTo     String[] @default([])
-  skills     String[] @default([])
-  languages  String[] @default([])
-  pronouns   String?
-  dob        DateTime?
-  country    String?
-  state      String?
-  city       String?
-  timezone   String?
-  visibility String?
-  themePreference String?
-  university String?
-  degree     String?
-  graduationYear String?
-  currentRole String?
-  company    String?
-  location   String?
-  website    String?
-  portfolio  String?
-  github     String?
-  linkedin   String?
-  twitter    String?
-  instagram  String?
-  youtube    String?
-  discord    String?
-  telegram   String?
-  phone      String?
-  resumeUrl  String?
-  onboardingCompleted Boolean @default(false)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id                  String    @id @default(uuid())
+  email               String    @unique
+  displayName         String?
+  username            String?   @unique
+  name                String?
+  handle              String?   @unique
+  bio                 String?
+  headline            String?
+  avatarUrl           String?
+  bannerUrl           String?
+  role                String? // Student, Founder, Creator, Researcher, etc.
+  modes               String[]  @default([])
+  openTo              String[]  @default([])
+  skills              String[]  @default([])
+  languages           String[]  @default([])
+  pronouns            String?
+  dob                 DateTime?
+  country             String?
+  state               String?
+  city                String?
+  timezone            String?
+  visibility          String?
+  themePreference     String?
+  university          String?
+  degree              String?
+  graduationYear      String?
+  currentRole         String?
+  company             String?
+  location            String?
+  website             String?
+  portfolio           String?
+  github              String?
+  linkedin            String?
+  twitter             String?
+  instagram           String?
+  youtube             String?
+  discord             String?
+  telegram            String?
+  phone               String?
+  resumeUrl           String?
+  onboardingCompleted Boolean   @default(false)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 
-  memberships   Membership[]
-  meets         MeetAttendance[]
-  vouchesGiven  Vouch[]           @relation("VouchesGiven")
-  vouchesRecv   Vouch[]           @relation("VouchesReceived")
-  notifications Notification[]
-  applications  Application[]
-  projects      Project[]
-  research      Research[]
-  bookmarks     Bookmark[]
-  referralsGiven Referral[]
-  experiences   Experience[]
-  educations    Education[]
-  achievements  Achievement[]
-  settings      Settings?
-  sessions      Session[]
-  activity      Activity[]
-  spaceMemberships SpaceMembership[]
-  ledTeams      Team[]            @relation("TeamLeader")
-  teamMemberships TeamMember[]
-  teamRequests  TeamRequest[]
-  follows       Follow[]          @relation("UserFollows")
-  badges        Badge[]
-  certificates  Certificate[]
-  conversations ConversationParticipant[]
-  messagesSent  Message[]
-  meetApplications MeetApplication[]
-    sponsorshipRequests SponsorshipRequest[]
-  }
+  memberships         Membership[]
+  meets               MeetAttendance[]
+  vouchesGiven        Vouch[]                   @relation("VouchesGiven")
+  vouchesRecv         Vouch[]                   @relation("VouchesReceived")
+  notifications       Notification[]
+  applications        Application[]
+  projects            Project[]
+  research            Research[]
+  bookmarks           Bookmark[]
+  referralsGiven      Referral[]
+  experiences         Experience[]
+  educations          Education[]
+  achievements        Achievement[]
+  settings            Settings?
+  sessions            Session[]
+  activity            Activity[]
+  spaceMemberships    SpaceMembership[]
+  ledTeams            Team[]                    @relation("TeamLeader")
+  teamMemberships     TeamMember[]
+  teamRequests        TeamRequest[]
+  follows             Follow[]                  @relation("UserFollows")
+  badges              Badge[]
+  certificates        Certificate[]
+  conversations       ConversationParticipant[]
+  messagesSent        Message[]
+  meetApplications    MeetApplication[]
+  sponsorshipRequests SponsorshipRequest[]
+  introsRequested     IntroductionRequest[]     @relation("IntroRequester")
+  introsReceived      IntroductionRequest[]     @relation("IntroTarget")
+}
 
 model Certificate {
   id        String   @id @default(uuid())
@@ -97,58 +99,63 @@ model Certificate {
 }
 
 model Organization {
-  id          String   @id @default(uuid())
+  id          String  @id @default(uuid())
   name        String
-  slug        String   @unique
-  description String?  @db.Text
-  mission     String?  @db.Text
-  vision      String?  @db.Text
+  slug        String  @unique
+  description String? @db.Text
+  mission     String? @db.Text
+  vision      String? @db.Text
   logoUrl     String?
   bannerUrl   String?
   industry    String?
   location    String?
   website     String?
-  views       Int      @default(0)
-  
+  views       Int     @default(0)
+
   // Organization Capabilities
   isRecruitingEnabled  Boolean @default(false)
   isSponsorshipEnabled Boolean @default(false)
   isMerchandiseEnabled Boolean @default(false)
   isResearchEnabled    Boolean @default(false)
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
 
-  members       Membership[]
-  spaces        Space[]
-  opportunities Opportunity[]
-  faqs          FAQ[]
-  sponsors      Sponsor[]
-  gallery       GalleryImage[]
-  timeline      TimelineEvent[]
-  resources     Resource[]
-  partners      Partner[]
-  discord       String?
-  instagram     String?
-  whatsapp      String?
-  twitter       String?
-  linkedin      String?
-    approvalStatus          String   @default("DRAFT")
-    sponsorIndustries       String?
-    sponsorBudgetRange      String?
-    sponsorAudience         String?
-    sponsorPastSponsorships String?
-    sponsorContactEmail     String?
-    
-    challenges              Challenge[]
-    sponsorshipRequests     SponsorshipRequest[] @relation("SponsorInbox")
-    initiatedCollaborations Collaboration[] @relation("InitiatedCollaborations")
-    targetCollaborations    Collaboration[] @relation("TargetCollaborations")
-    
-    notifications           Notification[]
-    conversationParticipants ConversationParticipant[]
-    messagesSent            Message[]
-  }
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members                 Membership[]
+  spaces                  Space[]
+  opportunities           Opportunity[]
+  faqs                    FAQ[]
+  sponsors                Sponsor[]
+  gallery                 GalleryImage[]
+  timeline                TimelineEvent[]
+  resources               Resource[]
+  partners                Partner[]
+  discord                 String?
+  instagram               String?
+  whatsapp                String?
+  twitter                 String?
+  linkedin                String?
+  approvalStatus          String          @default("DRAFT")
+  sponsorIndustries       String?
+  sponsorBudgetRange      String?
+  sponsorAudience         String?
+  sponsorPastSponsorships String?
+  sponsorContactEmail     String?
+
+  challenges              Challenge[]
+  sponsorshipRequests     SponsorshipRequest[] @relation("SponsorInbox")
+  initiatedCollaborations Collaboration[]      @relation("InitiatedCollaborations")
+  targetCollaborations    Collaboration[]      @relation("TargetCollaborations")
+
+  notifications            Notification[]
+  conversationParticipants ConversationParticipant[]
+  messagesSent             Message[]
+
+  sponsorshipRequestsInitiated SponsorshipRequest[] @relation("SponsorRequesterOrg")
+  communityDrops               CommunityDrop[]
+  category                     String[]             @default([])
+  region                       String?
+}
 
 model Membership {
   id             String   @id @default(uuid())
@@ -174,25 +181,32 @@ model Space {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  members      SpaceMembership[]
-  meets        Meet[]
+  organization  Organization?     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  members       SpaceMembership[]
+  meets         Meet[]
   opportunities Opportunity[]
-  projects     Project[]
-  research     Research[]
-  resources    Resource[]
-  faqs         FAQ[]
-  gallery      GalleryImage[]
-  timeline     TimelineEvent[]
-  discord      String?
-  instagram    String?
-  whatsapp     String?
-  twitter      String?
-  linkedin     String?
+  projects      Project[]
+  research      Research[]
+  resources     Resource[]
+  faqs          FAQ[]
+  gallery       GalleryImage[]
+  timeline      TimelineEvent[]
+  discord       String?
+  instagram     String?
+  whatsapp      String?
+  twitter       String?
+  linkedin      String?
 
-  notifications           Notification[]
+  notifications            Notification[]
   conversationParticipants ConversationParticipant[]
-  messagesSent            Message[]
+  messagesSent             Message[]
+
+  category                String[]             @default([])
+  region                  String?
+  sponsorshipRequests     SponsorshipRequest[]
+  initiatedCollaborations Collaboration[]      @relation("InitiatedSpaceCollaborations")
+  targetCollaborations    Collaboration[]      @relation("TargetSpaceCollaborations")
+  communityDrops          CommunityDrop[]
 }
 
 model Meet {
@@ -218,23 +232,31 @@ model Meet {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  space      Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  attendance MeetAttendance[]
+  space        Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  attendance   MeetAttendance[]
   applications MeetApplication[]
-  faqs       FAQ[]
-  sponsors   Sponsor[]
-  gallery    GalleryImage[]
-  resources  Resource[]
-  partners   Partner[]
-  
-  mode       String?
-  discord    String?
-  instagram  String?
-  whatsapp   String?
-  twitter    String?
-  linkedin   String?
-    sponsorshipRequests SponsorshipRequest[]
-  }
+  faqs         FAQ[]
+  sponsors     Sponsor[]
+  gallery      GalleryImage[]
+  resources    Resource[]
+  partners     Partner[]
+
+  mode      String?
+  discord   String?
+  instagram String?
+  whatsapp  String?
+  twitter   String?
+  linkedin  String?
+
+  status                String   @default("PUBLISHED")
+  category              String[] @default([])
+  region                String?
+  hasEventKit           Boolean  @default(false)
+  hasOfficialCollection Boolean  @default(false)
+
+  sponsorshipRequests SponsorshipRequest[]
+  communityDrops      CommunityDrop[]
+}
 
 model MeetAttendance {
   id        String   @id @default(uuid())
@@ -265,40 +287,40 @@ model MeetApplication {
 }
 
 model Opportunity {
-  id             String    @id @default(uuid())
-  title          String
-  type           String // ROLE, FELLOWSHIP, GRANT, HACKATHON/CHALLENGE
-  participation  String?   // INDIVIDUAL, TEAM
-  minTeamSize    Int?
-  maxTeamSize    Int?
-  crossCollegeTeams Boolean @default(false)
-  teamFormationEnabled Boolean @default(false)
-  description    String?   @db.Text
-  department     String?
-  employmentType String?
-  jobType        String?
-  remoteHybrid   String?
-  openings       Int?
-  experience     String?
-  location       String?
-  compensation   String?
-  equity         String?
-  benefits       String?   @db.Text
-  stipend        String?
-  bannerUrl      String?
-  brochureUrl    String?
-  mode           String?
-  discord        String?
-  instagram      String?
-  whatsapp       String?
-  twitter        String?
-  linkedin       String?
-  deadline       DateTime?
-  views          Int       @default(0)
-  organizationId String?
-  spaceId        String?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id                   String    @id @default(uuid())
+  title                String
+  type                 String // ROLE, FELLOWSHIP, GRANT, HACKATHON/CHALLENGE
+  participation        String? // INDIVIDUAL, TEAM
+  minTeamSize          Int?
+  maxTeamSize          Int?
+  crossCollegeTeams    Boolean   @default(false)
+  teamFormationEnabled Boolean   @default(false)
+  description          String?   @db.Text
+  department           String?
+  employmentType       String?
+  jobType              String?
+  remoteHybrid         String?
+  openings             Int?
+  experience           String?
+  location             String?
+  compensation         String?
+  equity               String?
+  benefits             String?   @db.Text
+  stipend              String?
+  bannerUrl            String?
+  brochureUrl          String?
+  mode                 String?
+  discord              String?
+  instagram            String?
+  whatsapp             String?
+  twitter              String?
+  linkedin             String?
+  deadline             DateTime?
+  views                Int       @default(0)
+  organizationId       String?
+  spaceId              String?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 
   organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   space        Space?        @relation(fields: [spaceId], references: [id], onDelete: Cascade)
@@ -307,6 +329,8 @@ model Opportunity {
   faqs         FAQ[]
   resources    Resource[]
   referrals    Referral[]
+  category     String[]      @default([])
+  region       String?
 }
 
 model Application {
@@ -347,6 +371,8 @@ model Project {
   timeline  TimelineEvent[]
   resources Resource[]
   buildLogs BuildLog[]
+  category  String[]        @default([])
+  region    String?
 }
 
 model Research {
@@ -359,8 +385,10 @@ model Research {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  space Space? @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  space    Space?   @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  category String[] @default([])
+  region   String?
 }
 
 // ==========================================
@@ -455,10 +483,10 @@ model Resource {
 }
 
 model BuildLog {
-  id          String   @id @default(uuid())
-  projectId   String
-  summary     String
-  createdAt   DateTime @default(now())
+  id        String   @id @default(uuid())
+  projectId String
+  summary   String
+  createdAt DateTime @default(now())
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }
@@ -547,7 +575,7 @@ model SpaceMembership {
   id        String   @id @default(uuid())
   userId    String
   spaceId   String
-  role      String   // Founder, Lead, Organizer, Core Team, Member, Alumni
+  role      String // Founder, Lead, Organizer, Core Team, Member, Alumni
   createdAt DateTime @default(now())
 
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -566,8 +594,8 @@ model Team {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  opportunity Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
-  leader      User        @relation("TeamLeader", fields: [leaderId], references: [id], onDelete: Cascade)
+  opportunity Opportunity   @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  leader      User          @relation("TeamLeader", fields: [leaderId], references: [id], onDelete: Cascade)
   members     TeamMember[]
   requests    TeamRequest[]
 }
@@ -602,10 +630,10 @@ model Follow {
   id         String   @id @default(uuid())
   followerId String
   targetId   String
-  targetType String   // USER, SPACE, ORGANIZATION, PROJECT, RESEARCH
+  targetType String // USER, SPACE, ORGANIZATION, PROJECT, RESEARCH
   createdAt  DateTime @default(now())
 
-  follower   User     @relation("UserFollows", fields: [followerId], references: [id], onDelete: Cascade)
+  follower User @relation("UserFollows", fields: [followerId], references: [id], onDelete: Cascade)
 
   @@unique([followerId, targetId, targetType])
 }
@@ -618,18 +646,19 @@ model Badge {
   userId      String
   createdAt   DateTime @default(now())
 
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
 // ==========================================
 // MESSAGING
 // ==========================================
 
 model Conversation {
-  id           String   @id @default(uuid())
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  isGroup      Boolean  @default(false)
-  name         String?
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isGroup   Boolean  @default(false)
+  name      String?
 
   participants ConversationParticipant[]
   messages     Message[]
@@ -646,10 +675,10 @@ model ConversationParticipant {
   hasArchived    Boolean  @default(false)
   status         String   @default("ACCEPTED") // PENDING, ACCEPTED, REJECTED, BLOCKED
 
-  conversation   Conversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  space          Space?        @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  conversation Conversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  space        Space?        @relation(fields: [spaceId], references: [id], onDelete: Cascade)
 
   @@unique([conversationId, userId, organizationId, spaceId])
 }
@@ -671,99 +700,157 @@ model Message {
 }
 
 model Experience {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   company     String
   role        String
   type        String
   startDate   DateTime
   endDate     DateTime?
-  description String?  @db.Text
+  description String?   @db.Text
   userId      String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Education {
-  id           String   @id @default(uuid())
+  id           String    @id @default(uuid())
   school       String
   degree       String?
   field        String?
   startDate    DateTime?
   endDate      DateTime?
   grade        String?
-  achievements String?  @db.Text
+  achievements String?   @db.Text
   userId       String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Achievement {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   title       String
   type        String
   date        DateTime?
-  description String?  @db.Text
+  description String?   @db.Text
   url         String?
   userId      String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Challenge {
-  id            String   @id @default(uuid())
-  name          String
-  slug          String   @unique
-  description   String?  @db.Text
-  startDate     DateTime?
-  endDate       DateTime?
-  type          String?  // Hackathon, Quiz, Gaming, etc.
+  id             String    @id @default(uuid())
+  name           String
+  slug           String    @unique
+  description    String?   @db.Text
+  startDate      DateTime?
+  endDate        DateTime?
+  type           String? // Hackathon, Quiz, Gaming, etc.
   organizationId String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
-  organization  Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization        Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   sponsorshipRequests SponsorshipRequest[]
+  communityDrops      CommunityDrop[]
 }
 
 model SponsorshipRequest {
-  id             String   @id @default(uuid())
-  requesterId    String
-  sponsorId      String
-  meetId         String?
-  challengeId    String?
-  audienceSize   String?
-  college        String?
-  budget         String?
-  deliverables   String?  @db.Text
-  benefits       String?  @db.Text
-  assetsUrl      String?
-  socialLinks    String?
-  deckUrl        String?
-  status         String   @default("NEW") // NEW, VIEWED, INTERESTED, MEETING, WON, LOST
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id          String   @id @default(uuid())
+  title       String?
+  description String?  @db.Text
+  requestType String[] @default([])
 
-  requester      User         @relation(fields: [requesterId], references: [id], onDelete: Cascade)
-  sponsor        Organization @relation("SponsorInbox", fields: [sponsorId], references: [id], onDelete: Cascade)
-  meet           Meet?        @relation(fields: [meetId], references: [id], onDelete: SetNull)
-  challenge      Challenge?   @relation(fields: [challengeId], references: [id], onDelete: SetNull)
+  requesterId      String?
+  requesterSpaceId String?
+  requesterOrgId   String?
+
+  sponsorId String?
+
+  meetId      String?
+  challengeId String?
+
+  audienceSize String?
+  college      String?
+  budget       String?
+  timeline     String?
+  location     String?
+
+  deliverables String?  @db.Text
+  benefits     String?  @db.Text
+  assetsUrl    String?
+  socialLinks  String?
+  deckUrl      String?
+  status       String   @default("DRAFT")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  requester      User?         @relation(fields: [requesterId], references: [id], onDelete: Cascade)
+  requesterSpace Space?        @relation(fields: [requesterSpaceId], references: [id], onDelete: Cascade)
+  requesterOrg   Organization? @relation("SponsorRequesterOrg", fields: [requesterOrgId], references: [id], onDelete: Cascade)
+
+  sponsor   Organization? @relation("SponsorInbox", fields: [sponsorId], references: [id], onDelete: Cascade)
+  meet      Meet?         @relation(fields: [meetId], references: [id], onDelete: SetNull)
+  challenge Challenge?    @relation(fields: [challengeId], references: [id], onDelete: SetNull)
 }
 
 model Collaboration {
-  id             String   @id @default(uuid())
-  initiatorOrgId String
-  targetOrgId    String
-  status         String   @default("PROPOSED") // PROPOSED, CONFIRMED, COMPLETED
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id    String  @id @default(uuid())
+  title String?
+  type  String?
 
-  initiatorOrg   Organization @relation("InitiatedCollaborations", fields: [initiatorOrgId], references: [id], onDelete: Cascade)
-  targetOrg      Organization @relation("TargetCollaborations", fields: [targetOrgId], references: [id], onDelete: Cascade)
+  initiatorOrgId   String?
+  initiatorSpaceId String?
+  targetOrgId      String?
+  targetSpaceId    String?
+
+  status    String   @default("REQUESTED") // REQUESTED, REVIEWING, ACCEPTED, DECLINED, COMPLETED
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  initiatorOrg   Organization? @relation("InitiatedCollaborations", fields: [initiatorOrgId], references: [id], onDelete: Cascade)
+  targetOrg      Organization? @relation("TargetCollaborations", fields: [targetOrgId], references: [id], onDelete: Cascade)
+  initiatorSpace Space?        @relation("InitiatedSpaceCollaborations", fields: [initiatorSpaceId], references: [id], onDelete: Cascade)
+  targetSpace    Space?        @relation("TargetSpaceCollaborations", fields: [targetSpaceId], references: [id], onDelete: Cascade)
 }
 
+model IntroductionRequest {
+  id          String   @id @default(uuid())
+  requesterId String
+  targetId    String
+  reason      String
+  opportunity String?  @db.Text
+  note        String?  @db.Text
+  status      String   @default("PENDING") // PENDING, ACCEPTED, IGNORED
+  createdAt   DateTime @default(now())
+
+  requester User @relation("IntroRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  target    User @relation("IntroTarget", fields: [targetId], references: [id], onDelete: Cascade)
+}
+
+model CommunityDrop {
+  id          String  @id @default(uuid())
+  title       String
+  description String? @db.Text
+  type        String // OfficialCollection, EventKit, Drop
+  imageUrl    String?
+  url         String?
+
+  meetId         String?
+  challengeId    String?
+  spaceId        String?
+  organizationId String?
+
+  createdAt DateTime @default(now())
+
+  meet         Meet?         @relation(fields: [meetId], references: [id], onDelete: Cascade)
+  challenge    Challenge?    @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  space        Space?        @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}

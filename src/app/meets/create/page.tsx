@@ -148,6 +148,25 @@ export default async function CreateMeetPage() {
                 />
               </div>
 
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[13px] font-medium text-ink block">Category / Taxonomy (Optional)</label>
+                  <input 
+                    name="category" 
+                    className="w-full bg-g1 border border-g3 rounded px-3 py-2.5 text-[14px] text-ink outline-none focus:border-g4 transition-colors placeholder:text-g4" 
+                    placeholder="e.g. AI, Open Source" 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[13px] font-medium text-ink block">Region (Optional)</label>
+                  <input 
+                    name="region" 
+                    className="w-full bg-g1 border border-g3 rounded px-3 py-2.5 text-[14px] text-ink outline-none focus:border-g4 transition-colors placeholder:text-g4" 
+                    placeholder="e.g. San Francisco, CA" 
+                  />
+                </div>
+              </div>
+
               <div className="space-y-2">
                 <label className="text-[13px] font-medium text-ink block">Description</label>
                 <textarea 

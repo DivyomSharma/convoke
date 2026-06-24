@@ -247,13 +247,13 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
 
                               {contextOpen && (
                                 <div className="mt-2 rounded-lg border border-g3 bg-paper-card shadow-sm overflow-hidden animate-in fade-in slide-in-from-top-1">
-                                  <ContextSwitchBtn type="personal" label="Personal" onClick={() => { setContextOpen(false); setProfileOpen(false); }} />
+                                  <ContextSwitchBtn type="personal" label="Personal" href={workspaceContexts.personal.href} onClick={() => { setContextOpen(false); setProfileOpen(false); }} />
                                   
                                   {workspaceContexts.organizations?.length > 0 && (
                                     <div className="border-t border-g3">
                                       <div className="px-3 py-1.5 text-[10px] font-semibold text-g5 uppercase tracking-wider bg-g1/30">Organizations</div>
                                       {workspaceContexts.organizations.map((context) => (
-                                        <ContextSwitchBtn key={context.id} type="org" id={context.id} label={context.label} onClick={() => { setContextOpen(false); setProfileOpen(false); }} />
+                                        <ContextSwitchBtn key={context.id} type="org" id={context.id} label={context.label} href={context.href} onClick={() => { setContextOpen(false); setProfileOpen(false); }} />
                                       ))}
                                     </div>
                                   )}
@@ -262,7 +262,7 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
                                     <div className="border-t border-g3">
                                       <div className="px-3 py-1.5 text-[10px] font-semibold text-g5 uppercase tracking-wider bg-g1/30">Spaces</div>
                                       {workspaceContexts.spaces.map((context) => (
-                                        <ContextSwitchBtn key={context.id} type="space" id={context.id} label={context.label} onClick={() => { setContextOpen(false); setProfileOpen(false); }} />
+                                        <ContextSwitchBtn key={context.id} type="space" id={context.id} label={context.label} href={context.href} onClick={() => { setContextOpen(false); setProfileOpen(false); }} />
                                       ))}
                                     </div>
                                   )}
@@ -648,16 +648,20 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
   );
 }
 
-function ContextSwitchBtn({ type, id, label, onClick }: { type: IdentityType; id?: string; label: string; onClick: () => void }) {
+function ContextSwitchBtn({ type, id, label, href, onClick }: { type: IdentityType; id?: string; label: string; href?: string; onClick: () => void }) {
+  const router = useRouter();
   const handleSwitch = async () => {
     onClick();
     await switchIdentity(type, id);
+    if (href) {
+      router.push(href);
+    }
   };
 
   return (
     <button
       onClick={handleSwitch}
-      className="flex w-full items-center gap-3 rounded-[0px] px-3 py-2.5 text-[13px] text-g6 transition hover:bg-g1 hover:text-ink text-left"
+      className="flex w-full items-center gap-3 rounded-[0px] px-3 py-2.5 text-[13px] text-g6 transition hover:bg-g1 hover:text-ink text-left cursor-pointer"
     >
       <span className="flex h-8 w-8 items-center justify-center rounded-sm border border-g3 bg-g1 text-brand shrink-0">
         {label.slice(0, 1).toUpperCase()}

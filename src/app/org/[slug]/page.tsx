@@ -155,7 +155,7 @@ export default async function OrgDetailPage(props: { params?: Promise<{ slug: st
                 isMember={isMember}
               />
               {isAdmin && (
-                <Link href={`/organizations/${org.id}/manage`} className="rounded-full px-5 py-2 text-[13px] font-semibold transition-colors bg-g2 text-ink border border-g3 hover:bg-g3 flex items-center gap-2">
+                <Link href={`/workspace/org/${org.slug}`} className="rounded-full px-5 py-2 text-[13px] font-semibold transition-colors bg-g2 text-ink border border-g3 hover:bg-g3 flex items-center gap-2">
                   <Settings size={14} /> Manage Organization
                 </Link>
               )}

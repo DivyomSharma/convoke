@@ -31,6 +31,10 @@ export default async function MeetManagePage(props: { params?: Promise<{ id: str
       attendance: {
         include: { user: true },
         orderBy: { createdAt: "asc" }
+      },
+      sponsorshipRequests: {
+        include: { sponsor: true },
+        orderBy: { createdAt: "desc" }
       }
     }
   });

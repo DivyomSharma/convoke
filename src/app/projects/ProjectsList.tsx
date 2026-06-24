@@ -48,6 +48,8 @@ export function ProjectsList({ initialProjects }: { initialProjects: ProjectWith
   const [githubUrl, setGithubUrl] = useState("");
   const [figmaUrl, setFigmaUrl] = useState("");
   const [stack, setStack] = useState("");
+  const [category, setCategory] = useState("");
+  const [region, setRegion] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,6 +71,8 @@ export function ProjectsList({ initialProjects }: { initialProjects: ProjectWith
         githubUrl: githubUrl || undefined,
         figmaUrl: figmaUrl || undefined,
         stack: stack || undefined,
+        category: category || undefined,
+        region: region || undefined,
       });
 
       if (res.success && res.project) {
@@ -82,6 +86,8 @@ export function ProjectsList({ initialProjects }: { initialProjects: ProjectWith
         setGithubUrl("");
         setFigmaUrl("");
         setStack("");
+        setCategory("");
+        setRegion("");
         router.refresh();
       }
     } catch (err: unknown) {
@@ -322,6 +328,29 @@ export function ProjectsList({ initialProjects }: { initialProjects: ProjectWith
                           value={url}
                           onChange={(e) => setUrl(e.target.value)}
                           placeholder="https://landingpage.com"
+                          className="w-full h-11 px-4 rounded-2xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <div>
+                        <label className="text-ink font-medium text-xs mb-1.5 block">Category / Taxonomy</label>
+                        <input 
+                          type="text"
+                          value={category}
+                          onChange={(e) => setCategory(e.target.value)}
+                          placeholder="e.g. AI, Web3, SaaS (comma separated)"
+                          className="w-full h-11 px-4 rounded-2xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-ink font-medium text-xs mb-1.5 block">Region (Optional)</label>
+                        <input 
+                          type="text"
+                          value={region}
+                          onChange={(e) => setRegion(e.target.value)}
+                          placeholder="e.g. SF Bay Area"
                           className="w-full h-11 px-4 rounded-2xl border border-g3 bg-transparent text-sm text-ink outline-none focus:border-[var(--brand)] transition-all"
                         />
                       </div>

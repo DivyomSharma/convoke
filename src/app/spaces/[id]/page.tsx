@@ -145,7 +145,7 @@ export default async function SpaceDetailPage(props: { params?: Promise<{ id: st
                   />
                 )}
                 {dbUser && space.members.some(m => m.userId === dbUser.id && ["FOUNDER", "LEAD", "ORGANIZER"].includes(m.role)) && (
-                  <Link href={`/spaces/${space.id}/manage`} className="rounded-full px-5 py-2 text-[13px] font-semibold transition-colors bg-g2 text-ink border border-g3 hover:bg-g3 flex items-center gap-2">
+                  <Link href={`/workspace/space/${space.id}`} className="rounded-full px-5 py-2 text-[13px] font-semibold transition-colors bg-g2 text-ink border border-g3 hover:bg-g3 flex items-center gap-2">
                     <Settings size={14} /> Manage Space
                   </Link>
                 )}
