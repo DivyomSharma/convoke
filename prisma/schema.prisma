@@ -22,6 +22,8 @@ model User {
   role       String? // Student, Founder, Creator, Researcher, etc.
   modes      String[] @default([])
   openTo     String[] @default([])
+  skills     String[] @default([])
+  languages  String[] @default([])
   pronouns   String?
   dob        DateTime?
   country    String?
@@ -61,6 +63,9 @@ model User {
   research      Research[]
   bookmarks     Bookmark[]
   referralsGiven Referral[]
+  experiences   Experience[]
+  educations    Education[]
+  achievements  Achievement[]
   settings      Settings?
   sessions      Session[]
   activity      Activity[]
@@ -74,7 +79,8 @@ model User {
   conversations ConversationParticipant[]
   messagesSent  Message[]
   meetApplications MeetApplication[]
-}
+    sponsorshipRequests SponsorshipRequest[]
+  }
 
 model Certificate {
   id        String   @id @default(uuid())
@@ -127,7 +133,18 @@ model Organization {
   whatsapp      String?
   twitter       String?
   linkedin      String?
-}
+    approvalStatus          String   @default("DRAFT")
+    sponsorIndustries       String?
+    sponsorBudgetRange      String?
+    sponsorAudience         String?
+    sponsorPastSponsorships String?
+    sponsorContactEmail     String?
+    
+    challenges              Challenge[]
+    sponsorshipRequests     SponsorshipRequest[] @relation("SponsorInbox")
+    initiatedCollaborations Collaboration[] @relation("InitiatedCollaborations")
+    targetCollaborations    Collaboration[] @relation("TargetCollaborations")
+  }
 
 model Membership {
   id             String   @id @default(uuid())
@@ -208,7 +225,8 @@ model Meet {
   whatsapp   String?
   twitter    String?
   linkedin   String?
-}
+    sponsorshipRequests SponsorshipRequest[]
+  }
 
 model MeetAttendance {
   id        String   @id @default(uuid())
@@ -631,3 +649,101 @@ model Message {
   conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   sender       User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
 }
+
+model Experience {
+  id          String   @id @default(uuid())
+  company     String
+  role        String
+  type        String
+  startDate   DateTime
+  endDate     DateTime?
+  description String?  @db.Text
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Education {
+  id           String   @id @default(uuid())
+  school       String
+  degree       String?
+  field        String?
+  startDate    DateTime?
+  endDate      DateTime?
+  grade        String?
+  achievements String?  @db.Text
+  userId       String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Achievement {
+  id          String   @id @default(uuid())
+  title       String
+  type        String
+  date        DateTime?
+  description String?  @db.Text
+  url         String?
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Challenge {
+  id            String   @id @default(uuid())
+  name          String
+  slug          String   @unique
+  description   String?  @db.Text
+  startDate     DateTime?
+  endDate       DateTime?
+  type          String?  // Hackathon, Quiz, Gaming, etc.
+  organizationId String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  organization  Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  sponsorshipRequests SponsorshipRequest[]
+}
+
+model SponsorshipRequest {
+  id             String   @id @default(uuid())
+  requesterId    String
+  sponsorId      String
+  meetId         String?
+  challengeId    String?
+  audienceSize   String?
+  college        String?
+  budget         String?
+  deliverables   String?  @db.Text
+  benefits       String?  @db.Text
+  assetsUrl      String?
+  socialLinks    String?
+  deckUrl        String?
+  status         String   @default("NEW") // NEW, VIEWED, INTERESTED, MEETING, WON, LOST
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  requester      User         @relation(fields: [requesterId], references: [id], onDelete: Cascade)
+  sponsor        Organization @relation("SponsorInbox", fields: [sponsorId], references: [id], onDelete: Cascade)
+  meet           Meet?        @relation(fields: [meetId], references: [id], onDelete: SetNull)
+  challenge      Challenge?   @relation(fields: [challengeId], references: [id], onDelete: SetNull)
+}
+
+model Collaboration {
+  id             String   @id @default(uuid())
+  initiatorOrgId String
+  targetOrgId    String
+  status         String   @default("PROPOSED") // PROPOSED, CONFIRMED, COMPLETED
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  initiatorOrg   Organization @relation("InitiatedCollaborations", fields: [initiatorOrgId], references: [id], onDelete: Cascade)
+  targetOrg      Organization @relation("TargetCollaborations", fields: [targetOrgId], references: [id], onDelete: Cascade)
+}
+

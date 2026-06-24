@@ -488,10 +488,16 @@ function ArrowRightIcon() {
   return <span className="mono text-[10px] text-g4">Open</span>;
 }
 
+import { useCompletion } from "@ai-sdk/react";
+
 function CommandK({ onClose }: { onClose: () => void }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const { completion, complete, isLoading: aiLoading } = useCompletion({
+    api: "/api/command",
+  });
 
   const staticItems = [
     { type: "Page", title: "Explore", subtitle: "Live discovery feed", href: "/explore", id: "page-explore" },
@@ -511,12 +517,17 @@ function CommandK({ onClose }: { onClose: () => void }) {
     setLoading(true);
 
     const timeoutId = setTimeout(() => {
+      // 1. Fetch Entity Search
       globalSearch(query).then((response) => {
         if (!active) return;
         setResults(response);
         setLoading(false);
       });
-    }, 240);
+      
+      // 2. Trigger AI OS 
+      complete(query);
+
+    }, 500); // slightly longer debounce so AI doesn't trigger on every keystroke
 
     return () => {
       active = false;
@@ -529,48 +540,73 @@ function CommandK({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/45 px-4 pt-[12vh]" onClick={onClose}>
       <div
-        className="premium-card campus-frame relative w-full max-w-2xl"
+        className="premium-card campus-frame relative w-full max-w-2xl flex flex-col"
         onClick={(meet) => meet.stopPropagation()}
       >
-        <div className="flex items-center gap-3 border-b border-g3 px-5 py-4">
+        <div className="flex items-center gap-3 border-b border-g3 px-5 py-4 shrink-0">
           <Search size={16} className="text-[var(--brand)]" />
           <input
             autoFocus
             value={query}
             onChange={(meet) => setQuery(meet.target.value)}
-            placeholder="Jump into people, spaces, meets, opportunities"
+            placeholder="Search people, projects, spaces or ask anything..."
             className="w-full bg-transparent text-[15px] text-ink outline-none placeholder:text-g4"
           />
           <span className="mono text-[11px] text-g4">Esc</span>
         </div>
 
-        <ul className="max-h-[60vh] overflow-auto px-2 py-2">
-          {loading && query.length >= 2 ? (
-            <li className="px-4 py-4 text-[13px] text-g5">Searching...</li>
-          ) : null}
+        <div className="flex flex-col md:flex-row overflow-hidden max-h-[65vh]">
+          {/* Entity Search Column */}
+          <div className="flex-1 overflow-auto border-r border-g3/50 md:min-w-[50%]">
+            <div className="px-5 py-2 eyebrow border-b border-g3/30 sticky top-0 bg-paper-card z-10">Network</div>
+            <ul className="px-2 py-2">
+              {loading && query.length >= 2 ? (
+                <li className="px-4 py-4 text-[13px] text-g5">Searching...</li>
+              ) : null}
 
-          {!loading && query.length >= 2 && results.length === 0 ? (
-            <li className="px-4 py-4 text-[13px] text-g5">No results found for "{query}"</li>
-          ) : null}
+              {!loading && query.length >= 2 && results.length === 0 ? (
+                <li className="px-4 py-4 text-[13px] text-g5">No entities found for "{query}"</li>
+              ) : null}
 
-          {displayItems.map((item) => (
-            <li key={item.id}>
-              <Link
-                href={item.href}
-                onClick={onClose}
-                className="flex items-center justify-between rounded-[18px] px-4 py-3 text-[14px] transition hover:bg-g1"
-              >
-                <div>
-                  <div className="text-ink">{item.title}</div>
-                  {item.subtitle ? <div className="mt-1 text-[12px] text-g5">{item.subtitle}</div> : null}
-                </div>
-                <span className="mono text-[10px] uppercase tracking-[0.18em] text-g4">{item.type}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
+              {displayItems.map((item) => (
+                <li key={item.id}>
+                  <Link
+                    href={item.href}
+                    onClick={onClose}
+                    className="flex items-center justify-between rounded-[14px] px-4 py-3 text-[14px] transition hover:bg-g1"
+                  >
+                    <div className="min-w-0 pr-4">
+                      <div className="text-ink truncate">{item.title}</div>
+                      {item.subtitle ? <div className="mt-1 text-[12px] text-g5 truncate">{item.subtitle}</div> : null}
+                    </div>
+                    <span className="mono text-[10px] uppercase tracking-[0.18em] text-g4 shrink-0">{item.type}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-        <div className="flex items-center justify-between border-t border-g3 px-5 py-3 text-[11px] text-g4 mono">
+          {/* AI OS Column */}
+          {(query.length >= 2 || completion) && (
+            <div className="flex-1 overflow-auto bg-g1/20 md:min-w-[50%]">
+               <div className="px-5 py-2 eyebrow border-b border-g3/30 sticky top-0 bg-g1/80 backdrop-blur-md z-10 flex items-center justify-between">
+                 <span>Convoke AI</span>
+                 {aiLoading && <span className="animate-pulse w-2 h-2 rounded-full bg-[var(--brand)]"></span>}
+               </div>
+               <div className="p-5 text-[13.5px] leading-relaxed text-g6">
+                 {completion ? (
+                   <div className="prose prose-sm prose-invert max-w-none">
+                     {completion}
+                   </div>
+                 ) : (
+                   <span className="text-g5 italic">Thinking...</span>
+                 )}
+               </div>
+            </div>
+          )}
+        </div>
+
+        <div className="flex items-center justify-between border-t border-g3 px-5 py-3 text-[11px] text-g4 mono shrink-0">
           <span>Enter to open</span>
           <span>Cmd K to reopen</span>
         </div>

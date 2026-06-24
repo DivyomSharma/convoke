@@ -4,7 +4,7 @@ import { Avatar } from "@/components/Avatar";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { Ticket, Calendar, Clock, MapPin, CheckCircle, ArrowRight, UserPlus, Building2, Bookmark as BookmarkIcon, Code2, FlaskConical, Users } from "lucide-react";
+import { Ticket, Calendar, Clock, MapPin, CheckCircle, ArrowRight, UserPlus, Building2, Bookmark as BookmarkIcon, Code2, FlaskConical, Users, Sparkles } from "lucide-react";
 import { isChallengeType } from "@/lib/challenge-types";
 
 export const revalidate = 0;
@@ -108,6 +108,26 @@ export default async function Workspace() {
                 {dbUser.role} {dbUser.university && `· ${dbUser.university}`}
               </p>
             )}
+          </div>
+
+          {/* AI Workspace Card */}
+          <div className="p-5 bg-gradient-to-br from-[var(--brand)]/10 to-transparent border border-[var(--brand)]/20 rounded-xl relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-3 opacity-30 text-[var(--brand)] pointer-events-none group-hover:opacity-100 group-hover:rotate-12 transition-all duration-700">
+              <Sparkles size={48} strokeWidth={1} />
+            </div>
+            <div className="eyebrow text-[var(--brand)] flex items-center gap-2 mb-3">
+              <Sparkles size={12} />
+              Convoke AI
+            </div>
+            <div className="space-y-1 text-[13.5px] text-g6 relative z-10 leading-relaxed font-medium">
+              <p>Good evening, {dbUser?.name?.split(' ')[0] || "Builder"}.</p>
+              {myApps.length > 0 && <p className="text-ink">{myApps.filter(a => a.status === 'PENDING').length} applications pending.</p>}
+              {activeTickets.length > 0 && <p className="text-ink">{activeTickets.length} meet passes active.</p>}
+            </div>
+            <button className="mt-4 text-[12px] font-semibold flex items-center gap-1.5 text-[var(--brand)] hover:underline">
+              <span>Ask Command Center</span>
+              <ArrowRight size={12} />
+            </button>
           </div>
 
           <Momentum activities={myActivities} />

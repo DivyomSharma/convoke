@@ -23,6 +23,15 @@ export default async function OrgManagePage(props: { params?: Promise<{ id: stri
         orderBy: { createdAt: "asc" }
       },
       spaces: true,
+      challenges: true,
+      sponsorshipRequests: {
+        include: {
+          requester: true,
+          meet: true,
+          challenge: true
+        },
+        orderBy: { createdAt: "desc" }
+      }
     }
   });
 

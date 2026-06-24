@@ -71,7 +71,10 @@ export default async function Profile(props: { params?: Promise<{ handle: string
       },
       badges: true,
       follows: true,
-      certificates: { orderBy: { createdAt: "desc" } }
+      certificates: { orderBy: { createdAt: "desc" } },
+      experiences: { orderBy: { startDate: "desc" } },
+      educations: { orderBy: { startDate: "desc" } },
+      achievements: { orderBy: { date: "desc" } }
     },
   });
 
@@ -132,6 +135,28 @@ export default async function Profile(props: { params?: Promise<{ handle: string
                 {user.openTo.map(tag => (
                   <span key={tag} className="bg-green-500/10 text-green-600 border border-green-500/20 px-2 py-0.5 rounded text-[11px] font-medium">
                     {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {user.skills.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className="text-[11px] font-medium uppercase tracking-wider text-g5 self-center mr-1">Skills</span>
+                {user.skills.map(skill => (
+                  <span key={skill} className="bg-g1 text-ink border border-g3 px-2 py-0.5 rounded text-[11px] font-medium">
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {user.languages.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className="text-[11px] font-medium uppercase tracking-wider text-g5 self-center mr-1">Languages</span>
+                {user.languages.map(lang => (
+                  <span key={lang} className="bg-g1 text-ink border border-g3 px-2 py-0.5 rounded text-[11px] font-medium">
+                    {lang}
                   </span>
                 ))}
               </div>

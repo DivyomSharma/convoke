@@ -458,7 +458,7 @@ export async function getWorkspaceContexts() {
     organizations: memberships.map((membership) => ({
       id: membership.organization.id,
       label: membership.organization.name,
-      href: `/workspace/org/${membership.organization.slug}`,
+      href: `/organizations/${membership.organization.id}/manage`,
     })),
     onboardingCompleted: dbUser?.onboardingCompleted ?? false,
   };

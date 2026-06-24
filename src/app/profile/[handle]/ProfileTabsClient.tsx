@@ -10,6 +10,9 @@ export function ProfileTabsClient({
   meetAttendance,
   applications,
   certificates,
+  experiences,
+  educations,
+  achievements,
   activityDates,
   Heat
 }: {
@@ -18,6 +21,9 @@ export function ProfileTabsClient({
   meetAttendance?: any[];
   applications?: any[];
   certificates?: any[];
+  experiences?: any[];
+  educations?: any[];
+  achievements?: any[];
   activityDates: Date[];
   Heat: React.ReactNode;
 }) {
@@ -25,6 +31,7 @@ export function ProfileTabsClient({
 
   const tabs = [
     { id: "overview", label: "Overview" },
+    { id: "resume", label: "Resume" },
     { id: "projects", label: "Projects" },
     { id: "research", label: "Research" },
     { id: "meets", label: "Meets" },
@@ -80,6 +87,88 @@ export function ProfileTabsClient({
                 <div className="text-[14px] text-g5">No selected work to show yet.</div>
               )}
             </div>
+          </div>
+        )}
+
+        {activeTab === "resume" && (
+          <div className="space-y-12 animate-in fade-in duration-300">
+            {(!experiences?.length && !educations?.length && !achievements?.length) ? (
+              <div className="py-12 text-center text-g5 text-[14px] border border-dashed border-g3 rounded-xl flex flex-col items-center">
+                <FileText size={24} className="text-g4 mb-3" />
+                <p>No resume information added yet.</p>
+              </div>
+            ) : (
+              <>
+                {experiences && experiences.length > 0 && (
+                  <div>
+                    <div className="eyebrow mb-6">Experience</div>
+                    <div className="space-y-8">
+                      {experiences.map(exp => (
+                        <div key={exp.id} className="grid grid-cols-[100px_1fr] md:grid-cols-[140px_1fr] gap-4">
+                          <div className="text-[13px] text-g5 mt-0.5">
+                            {new Date(exp.startDate).toLocaleDateString(undefined, { year: 'numeric', month: 'short' })} — 
+                            {exp.endDate ? new Date(exp.endDate).toLocaleDateString(undefined, { year: 'numeric', month: 'short' }) : " Present"}
+                          </div>
+                          <div>
+                            <h3 className="text-ink font-medium text-[16px]">{exp.role}</h3>
+                            <div className="text-g6 text-[14px] mb-2">{exp.company} <span className="text-g4 mx-1">·</span> {exp.type}</div>
+                            {exp.description && <p className="text-[14px] text-g5 leading-relaxed">{exp.description}</p>}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {educations && educations.length > 0 && (
+                  <div>
+                    <div className="eyebrow mb-6">Education</div>
+                    <div className="space-y-8">
+                      {educations.map(edu => (
+                        <div key={edu.id} className="grid grid-cols-[100px_1fr] md:grid-cols-[140px_1fr] gap-4">
+                          <div className="text-[13px] text-g5 mt-0.5">
+                            {edu.startDate ? new Date(edu.startDate).getFullYear() : ""} — 
+                            {edu.endDate ? new Date(edu.endDate).getFullYear() : " Present"}
+                          </div>
+                          <div>
+                            <h3 className="text-ink font-medium text-[16px]">{edu.school}</h3>
+                            <div className="text-g6 text-[14px] mb-2">{edu.degree} {edu.field && `in ${edu.field}`} {edu.grade && <span className="text-g5 ml-2">({edu.grade})</span>}</div>
+                            {edu.achievements && <p className="text-[14px] text-g5 leading-relaxed">{edu.achievements}</p>}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {achievements && achievements.length > 0 && (
+                  <div>
+                    <div className="eyebrow mb-6">Honors & Awards</div>
+                    <div className="space-y-6">
+                      {achievements.map(ach => (
+                        <div key={ach.id} className="grid grid-cols-[100px_1fr] md:grid-cols-[140px_1fr] gap-4">
+                          <div className="text-[13px] text-g5 mt-0.5">
+                            {ach.date ? new Date(ach.date).getFullYear() : ""}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <h3 className="text-ink font-medium text-[16px]">{ach.title}</h3>
+                              {ach.url && (
+                                <a href={ach.url} target="_blank" rel="noreferrer" className="text-g4 hover:text-[var(--brand)]">
+                                  <ExternalLink size={14} />
+                                </a>
+                              )}
+                            </div>
+                            <div className="text-g5 text-[14px] mb-1">{ach.type}</div>
+                            {ach.description && <p className="text-[14px] text-g5 leading-relaxed mt-1">{ach.description}</p>}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         )}
 
