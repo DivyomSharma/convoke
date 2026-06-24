@@ -56,7 +56,7 @@ export function SpaceManageClient({ space, currentUserId }: { space: any; curren
             <div className="space-y-8 animate-in fade-in duration-300">
               <div>
                 <h2 className="text-lg font-semibold text-ink mb-1">General Settings</h2>
-                <p className="text-[14px] text-g5">Update your space's profile and basic information.</p>
+                <p className="text-[14px] text-g5">Update your space&apos;s profile and basic information.</p>
               </div>
 
               <div className="space-y-4 max-w-xl">

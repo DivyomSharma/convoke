@@ -5,7 +5,25 @@ import Link from "next/link";
 import { ArrowLeft, Settings, Users, CheckCircle2, XCircle, FileText, Trophy } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
 
-export function OppManageClient({ opp, currentUserId }: { opp: any; currentUserId: string }) {
+type OppApplicationData = {
+  id: string;
+  createdAt: string | Date;
+  user: {
+    avatarUrl: string | null;
+    name: string | null;
+    handle: string | null;
+    username?: string | null;
+  };
+};
+
+type OppData = {
+  id: string;
+  title: string;
+  type: string;
+  applications: OppApplicationData[];
+};
+
+export function OppManageClient({ opp, currentUserId }: { opp: OppData; currentUserId: string }) {
   const isHackathon = opp.type === "HACKATHON/CHALLENGE";
   const [activeTab, setActiveTab] = useState("applicants");
 
@@ -69,7 +87,7 @@ export function OppManageClient({ opp, currentUserId }: { opp: any; currentUserI
                 </div>
               ) : (
                 <div className="grid gap-4">
-                  {opp.applications.map((app: any) => (
+                  {opp.applications.map((app) => (
                     <div key={app.id} className="border border-g3 rounded-xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-6">
                       <div className="flex items-center gap-4">
                         <Avatar src={app.user.avatarUrl || ""} name={app.user.name || "User"} size={48} />

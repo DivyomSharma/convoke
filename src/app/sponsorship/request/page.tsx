@@ -43,7 +43,7 @@ export default async function RequestSponsorshipPage(props: { searchParams?: Pro
         <h1 className="serif text-4xl text-ink mb-2">Request Sponsorship</h1>
         <p className="text-[14px] text-g5 mb-8">Submit a proposal to an approved Convoke sponsor for your meet or challenge.</p>
 
-        <form action={createSponsorshipRequest as any} className="space-y-6 bg-paper-card border border-g3 rounded-xl p-8">
+        <form action={createSponsorshipRequest} className="space-y-6 bg-paper-card border border-g3 rounded-xl p-8">
           
           <div className="space-y-2">
             <label className="text-[13px] font-medium text-ink block">Select Sponsor</label>
@@ -56,7 +56,7 @@ export default async function RequestSponsorshipPage(props: { searchParams?: Pro
           <div className="space-y-2">
             <label className="text-[13px] font-medium text-ink block">Link to Meet (Optional)</label>
             <select name="meetId" defaultValue="" className="w-full bg-g1 border border-g3 rounded px-3 py-2 text-[14px] text-ink outline-none focus:border-g4">
-              <option value="">None / It's a Challenge</option>
+              <option value="">None / It&apos;s a Challenge</option>
               {myMeets.map(m => <option key={m.id} value={m.id}>{m.title}</option>)}
             </select>
           </div>
@@ -73,7 +73,7 @@ export default async function RequestSponsorshipPage(props: { searchParams?: Pro
           </div>
 
           <div className="space-y-2">
-            <label className="text-[13px] font-medium text-ink block">Requested Budget (₹ or $)</label>
+            <label className="text-[13px] font-medium text-ink block">Requested Budget (INR or USD)</label>
             <input type="text" name="budget" placeholder="e.g. ₹50,000" required className="w-full bg-g1 border border-g3 rounded px-3 py-2 text-[14px] text-ink outline-none focus:border-g4" />
           </div>
 

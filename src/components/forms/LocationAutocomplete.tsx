@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MapPin } from "lucide-react";
 
 export function LocationAutocomplete({
@@ -12,14 +12,9 @@ export function LocationAutocomplete({
   onChange: (val: string) => void;
   className?: string;
 }) {
-  const [query, setQuery] = useState(value || "");
   const [suggestions, setSuggestions] = useState<{ display_name: string }[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setQuery(value || "");
-  }, [value]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -47,28 +42,23 @@ export function LocationAutocomplete({
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (query !== value && isOpen) {
-        searchLocations(query);
+      if (isOpen) {
+        searchLocations(value);
       }
     }, 500);
     return () => clearTimeout(timeoutId);
-  }, [query, value, isOpen]);
+  }, [value, isOpen]);
 
   return (
     <div className="relative" ref={wrapperRef}>
       <input
         type="text"
-        value={query}
+        value={value}
         onChange={(e) => {
-          setQuery(e.target.value);
+          onChange(e.target.value);
           setIsOpen(true);
         }}
-        onBlur={() => {
-          // Commit custom value if not selecting a suggestion
-          if (query !== value && !isOpen) {
-            onChange(query);
-          }
-        }}
+        onBlur={() => setIsOpen(false)}
         placeholder="e.g. Bangalore, India"
         className={className}
         autoComplete="off"
@@ -79,8 +69,8 @@ export function LocationAutocomplete({
             <li
               key={i}
               className="px-4 py-2.5 hover:bg-g1 cursor-pointer text-[13px] text-ink border-b border-g3/30 last:border-b-0 flex items-start gap-2.5 transition-colors"
-              onClick={() => {
-                setQuery(suggestion.display_name);
+              onMouseDown={(event) => {
+                event.preventDefault();
                 onChange(suggestion.display_name);
                 setIsOpen(false);
               }}

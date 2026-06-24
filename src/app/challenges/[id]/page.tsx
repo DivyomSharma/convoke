@@ -1,9 +1,9 @@
+import Image from "next/image";
 import { Shell } from "@/components/Shell";
 import { AmbientGlow } from "@/components/AmbientGlow";
 import { notFound, redirect } from "next/navigation";
 import { 
-  Trophy, Calendar, Users, MapPin, Building2, ChevronDown, 
-  BookOpen, Star, FileText, Layout, Info 
+  Trophy, Users, MapPin, Building2, ChevronDown, FileText 
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
@@ -12,8 +12,25 @@ import { ChallengeTeamHub } from "./ChallengeTeamHub";
 import Link from "next/link";
 import { Metadata } from "next";
 import { isChallengeType } from "@/lib/challenge-types";
+import type { Prisma } from "@prisma/client";
 
 export const revalidate = 60;
+
+type TeamWithMembers = Prisma.TeamGetPayload<{
+  include: {
+    members: {
+      include: {
+        user: true;
+      };
+    };
+  };
+}>;
+
+type TeamRequestWithUser = Prisma.TeamRequestGetPayload<{
+  include: {
+    user: true;
+  };
+}>;
 
 export async function generateMetadata(props: { params?: Promise<{ id: string }> }): Promise<Metadata> {
   const params = await props.params;
@@ -96,16 +113,16 @@ export default async function ChallengeDetailPage(props: { params?: Promise<{ id
     }
   }
 
-  let teams: any[] = [];
-  let myTeam: any = null;
-  let incomingRequests: any[] = [];
+  let teams: TeamWithMembers[] = [];
+  let myTeam: TeamWithMembers | null = null;
+  let incomingRequests: TeamRequestWithUser[] = [];
 
   if (opp.participation === "TEAM") {
     teams = await prisma.team.findMany({
       where: { opportunityId: opp.id },
       include: { members: { include: { user: true } } }
     });
-    myTeam = dbUser ? teams.find(t => t.members.some((m: any) => m.userId === dbUser.id)) || null : null;
+    myTeam = dbUser ? teams.find((team) => team.members.some((member) => member.userId === dbUser.id)) || null : null;
     if (myTeam) {
       incomingRequests = await prisma.teamRequest.findMany({
         where: { teamId: myTeam.id, status: "PENDING" },
@@ -121,7 +138,7 @@ export default async function ChallengeDetailPage(props: { params?: Promise<{ id
         {/* HERO BANNER */}
         <div className="relative h-[220px] md:h-[300px] w-full overflow-hidden bg-g1">
           {opp.bannerUrl ? (
-            <img src={opp.bannerUrl} alt="Banner" className="w-full h-full object-cover opacity-80" />
+            <Image unoptimized fill={false} width={800} height={400} src={opp.bannerUrl} alt="Banner" className="w-full h-full object-cover opacity-80" />
           ) : (
             <div className="w-full h-full bg-g1 flex items-center justify-center">
               <AmbientGlow className="top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full opacity-10" color="var(--brand)" />
@@ -169,7 +186,7 @@ export default async function ChallengeDetailPage(props: { params?: Promise<{ id
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-sm bg-g1 flex-shrink-0 flex items-center justify-center border border-g3 overflow-hidden">
                     {opp.organization?.logoUrl ? (
-                      <img src={opp.organization.logoUrl} alt="" className="w-full h-full object-cover" />
+                      <Image unoptimized fill={false} width={800} height={400} src={opp.organization.logoUrl} alt="" className="w-full h-full object-cover" />
                     ) : (
                       <Building2 size={16} className="text-g4" />
                     )}

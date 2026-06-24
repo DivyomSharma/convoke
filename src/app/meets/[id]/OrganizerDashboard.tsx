@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { promoteAttendee, checkInAttendee } from "@/app/actions/workspace";
 import { Avatar } from "@/components/Avatar";
-import { Loader2, Search, Camera, Download, Check, X, Share2 } from "lucide-react";
+import { Loader2, Search, Camera, Download, Check, Share2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -58,8 +58,8 @@ export function OrganizerDashboard({
           );
           router.refresh();
         }
-      } catch (err) {
-        alert(err instanceof Error ? err.message : "Failed to execute action.");
+      } catch (error: unknown) {
+        alert(error instanceof Error ? error.message : "Failed to execute action.");
       }
     });
   };
@@ -292,7 +292,7 @@ export function OrganizerDashboard({
             <Share2 size={20} />
           </div>
           <div className="text-ink font-medium">Social Kit</div>
-          <div className="text-g5 text-[14px] mt-1 max-w-sm">Generate beautiful "I'm speaking" or "I'm attending" graphics for your space to share.</div>
+          <div className="text-g5 text-[14px] mt-1 max-w-sm">Generate beautiful &ldquo;I&apos;m speaking&rdquo; or &ldquo;I&apos;m attending&rdquo; graphics for your space to share.</div>
           <button className="mt-4 px-4 py-2 bg-[var(--brand)] text-white text-[13px] font-medium rounded-full hover:opacity-90 transition-opacity">Create Template</button>
         </div>
       )}

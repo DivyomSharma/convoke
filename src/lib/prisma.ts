@@ -2,8 +2,8 @@ import { PrismaClient } from "@prisma/client";
 
 export const hasDatabaseUrl = Boolean(process.env.Convoke_PRISMA_DATABASE_URL);
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined;
+const globalForPrisma = globalThis as typeof globalThis & {
+  prisma?: PrismaClient;
 };
 
 export const prisma =

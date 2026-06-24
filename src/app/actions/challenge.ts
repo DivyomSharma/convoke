@@ -14,20 +14,19 @@ function generateSlug(text: string) {
 }
 
 export async function createChallenge(formData: FormData) {
-  const user = await requireUser();
+  await requireUser();
   
   const name = formData.get("name") as string;
   const description = formData.get("description") as string;
   const type = formData.get("type") as string;
   const orgId = formData.get("organizationId") as string;
   
-  if (!name || !orgId) return { error: "Name and Organization are required." };
+  if (!name || !orgId) throw new Error("Name and Organization are required.");
 
   const slug = generateSlug(name);
 
-  let challenge;
   try {
-    challenge = await prisma.challenge.create({
+    await prisma.challenge.create({
       data: {
         name,
         slug,
@@ -36,8 +35,8 @@ export async function createChallenge(formData: FormData) {
         organizationId: orgId
       }
     });
-  } catch (error) {
-    return { error: "Failed to create challenge." };
+  } catch {
+    throw new Error("Failed to create challenge.");
   }
 
   redirect(`/organizations/${orgId}/manage`);

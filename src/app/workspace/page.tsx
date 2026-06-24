@@ -3,8 +3,7 @@ import { Shell } from "@/components/Shell";
 import { Avatar } from "@/components/Avatar";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
-import { redirect } from "next/navigation";
-import { Ticket, Calendar, Clock, MapPin, CheckCircle, ArrowRight, UserPlus, Building2, Bookmark as BookmarkIcon, Code2, FlaskConical, Users, Sparkles } from "lucide-react";
+import { Ticket, Calendar, Clock, MapPin, CheckCircle, ArrowRight, UserPlus, Building2, Bookmark as BookmarkIcon, Code2, FlaskConical, Sparkles } from "lucide-react";
 import { isChallengeType } from "@/lib/challenge-types";
 
 export const revalidate = 0;
@@ -46,16 +45,12 @@ export default async function Workspace() {
     orderBy: { createdAt: "desc" }
   }) : [];
 
-  const people = await prisma.user.findMany({
-    where: dbUser ? { id: { not: dbUser.id } } : undefined,
-    take: 5,
-    orderBy: { createdAt: "desc" }
-  });
-
+  const sixteenWeeksAgo = new Date();
+  sixteenWeeksAgo.setDate(sixteenWeeksAgo.getDate() - 16 * 7);
   const myActivities = dbUser ? await prisma.activity.findMany({
     where: {
       userId: dbUser.id,
-      createdAt: { gte: new Date(Date.now() - 16 * 7 * 24 * 60 * 60 * 1000) }
+      createdAt: { gte: sixteenWeeksAgo }
     },
     orderBy: { createdAt: "asc" }
   }) : [];
@@ -169,7 +164,7 @@ export default async function Workspace() {
               </ul>
             ) : (
               <div className="text-[13px] text-g5 italic leading-relaxed">
-                You haven't joined any workspace spaces yet. Explore spaces to join organizations.
+                You haven&apos;t joined any workspace spaces yet. Explore spaces to join organizations.
               </div>
             )}
           </div>
@@ -247,7 +242,7 @@ export default async function Workspace() {
             ) : (
               <div className="mt-8 text-center py-10 border border-dashed border-g3 rounded-md">
                 <p className="text-[13px] text-g5 max-w-[34ch] mx-auto leading-relaxed">
-                  You don't have any upcoming meet passes. Explore network happenings to RSVP.
+                  You don&apos;t have any upcoming meet passes. Explore network happenings to RSVP.
                 </p>
                 <Link href="/meets" className="mt-4 inline-flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-[var(--brand)] font-semibold hover:underline">
                   <span>Browse Network Meets</span>
@@ -361,7 +356,7 @@ export default async function Workspace() {
               </ul>
             ) : (
               <div className="text-[13px] text-g5 italic leading-relaxed">
-                You aren't following anyone yet.
+                You aren&apos;t following anyone yet.
               </div>
             )}
           </div>

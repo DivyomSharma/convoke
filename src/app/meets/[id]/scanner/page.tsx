@@ -8,6 +8,12 @@ import { Avatar } from "@/components/Avatar";
 
 export const revalidate = 0;
 
+type ScannerUser = {
+  avatarUrl: string | null;
+  name: string | null;
+  handle: string | null;
+};
+
 export default async function ScannerPage(props: {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ u?: string }>;
@@ -30,7 +36,7 @@ export default async function ScannerPage(props: {
 
   if (!meet) return notFound();
 
-  let scanResult: { success: boolean; message: string; user?: any } = {
+  let scanResult: { success: boolean; message: string; user?: ScannerUser } = {
     success: false,
     message: "No ticket scanned yet.",
   };
@@ -51,10 +57,10 @@ export default async function ScannerPage(props: {
           user,
         };
       }
-    } catch (err: any) {
+    } catch (error: unknown) {
       scanResult = {
         success: false,
-        message: err.message || "Failed to check in attendee.",
+        message: error instanceof Error ? error.message : "Failed to check in attendee.",
       };
     }
   }

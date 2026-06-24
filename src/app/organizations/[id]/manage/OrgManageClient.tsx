@@ -144,7 +144,7 @@ export function OrgManageClient({ org, currentUserId }: { org: any; currentUserI
             <div className="space-y-8 animate-in fade-in duration-300">
               <div>
                 <h2 className="text-lg font-semibold text-ink mb-1">General Settings</h2>
-                <p className="text-[14px] text-g5">Update your organization's public profile.</p>
+                <p className="text-[14px] text-g5">Update your organization&apos;s public profile.</p>
               </div>
 
               <form onSubmit={handleUpdate} className="space-y-4 max-w-xl">

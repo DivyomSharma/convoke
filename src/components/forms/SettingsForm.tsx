@@ -5,34 +5,54 @@ import { updateSettings, updatePreferences } from "@/app/actions/settings";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-export function SettingsForm({ user, settings }: { user: any; settings?: any }) {
+type SettingsFormUser = {
+  displayName?: string | null;
+  username?: string | null;
+  headline?: string | null;
+  bio?: string | null;
+  location?: string | null;
+  website?: string | null;
+  github?: string | null;
+  linkedin?: string | null;
+  twitter?: string | null;
+  portfolio?: string | null;
+};
+
+type SettingsFormSettings = {
+  theme?: string | null;
+  emailNotifs?: boolean | null;
+} | null | undefined;
+
+export function SettingsForm({ user, settings }: { user: SettingsFormUser; settings?: SettingsFormSettings }) {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("Identity");
   const [formData, setFormData] = useState({
-    displayName: user.displayName || "",
-    username: user.username || "",
-    headline: user.headline || "",
-    bio: user.bio || "",
-    location: user.location || "",
-    website: user.website || "",
-    githubUrl: user.github || "",
-    linkedinUrl: user.linkedin || "",
-    twitterUrl: user.twitter || "",
-    readcvUrl: user.portfolio || "",
+    displayName: user.displayName ?? "",
+    username: user.username ?? "",
+    headline: user.headline ?? "",
+    bio: user.bio ?? "",
+    location: user.location ?? "",
+    website: user.website ?? "",
+    githubUrl: user.github ?? "",
+    linkedinUrl: user.linkedin ?? "",
+    twitterUrl: user.twitter ?? "",
+    readcvUrl: user.portfolio ?? "",
   });
 
   const [prefData, setPrefData] = useState({
-    theme: settings?.theme || "system",
+    theme: settings?.theme ?? "system",
     emailNotifs: settings?.emailNotifs ?? true,
   });
 
   const handlePrefChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
-    const value = e.target.type === "checkbox" ? (e.target as HTMLInputElement).checked : e.target.value;
-    setPrefData({ ...prefData, [e.target.name]: value });
+    const target = e.currentTarget;
+    const value = target instanceof HTMLInputElement && target.type === "checkbox" ? target.checked : target.value;
+    setPrefData((current) => ({ ...current, [target.name]: value }));
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.currentTarget;
+    setFormData((current) => ({ ...current, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

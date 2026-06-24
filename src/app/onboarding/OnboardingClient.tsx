@@ -69,7 +69,7 @@ export function OnboardingClient({ initialUser }: { initialUser: InitialUser }) 
   const [state, setState] = useState(initialUser.state || "");
   const [city, setCity] = useState(initialUser.city || "");
   const [timezone, setTimezone] = useState(initialUser.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone);
-  const [visibility, setVisibility] = useState<"public" | "members" | "private">((initialUser.visibility as any) || "public");
+  const [visibility, setVisibility] = useState<"public" | "members" | "private">((initialUser.visibility as "public" | "members" | "private") || "public");
 
   const countries = useMemo(() => Country.getAllCountries(), []);
   const states = useMemo(() => {

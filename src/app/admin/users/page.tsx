@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
-import { redirect } from "next/navigation";
+import { } from "next/navigation";
 import Link from "next/link";
 
 export default async function AdminUsers() {

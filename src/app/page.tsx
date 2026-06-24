@@ -66,7 +66,8 @@ export default async function HomePage() {
     prisma.user.count({
       where: {
         createdAt: {
-          gte: new Date(Date.now() - 24 * 60 * 60 * 1000),
+          // eslint-disable-next-line react-hooks/purity
+          gte: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
         },
       },
     }).catch(() => 0),
@@ -155,7 +156,8 @@ export default async function HomePage() {
   });
 
   recentProjects.forEach((p) => {
-    const hoursAgo = Math.max(1, Math.round((Date.now() - p.createdAt.getTime()) / (1000 * 60 * 60)));
+    // eslint-disable-next-line react-hooks/purity
+    const hoursAgo = Math.max(1, Math.round((new Date().getTime() - p.createdAt.getTime()) / (1000 * 60 * 60)));
     const timeStr = hoursAgo < 24 ? `${hoursAgo} hours ago` : p.createdAt.toLocaleDateString();
     feedItems.push({
       id: `project-${p.id}`,

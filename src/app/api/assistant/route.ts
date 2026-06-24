@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getActiveIdentity } from "@/lib/identity";
 
 export async function POST(req: Request) {
   try {
@@ -57,7 +58,15 @@ export async function POST(req: Request) {
       }
     }
 
-    return NextResponse.json({ reply });
+    const identity = await getActiveIdentity();
+    let systemContext = "";
+    if (identity.type === "org") {
+      systemContext = `[Context: Acting as Organization - ${identity.org.name}]\n\n`;
+    } else if (identity.type === "space") {
+      systemContext = `[Context: Acting as Space - ${identity.space.name}]\n\n`;
+    }
+
+    return NextResponse.json({ reply: systemContext + reply });
   } catch (error) {
     console.error("Assistant Error:", error);
     return NextResponse.json({ error: "Failed to process request" }, { status: 500 });

@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -29,7 +30,7 @@ interface ChallengeWithDetails {
     name: string;
     logoUrl?: string | null;
   } | null;
-  applications: any[];
+  applications: Array<unknown>;
 }
 
 interface OrganizationOption {
@@ -45,7 +46,7 @@ export function ChallengesList({
   organizations: OrganizationOption[];
 }) {
   const router = useRouter();
-  const [challenges, setChallenges] = useState<ChallengeWithDetails[]>(initialChallenges);
+  const challenges = initialChallenges;
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -130,8 +131,8 @@ export function ChallengesList({
         setDeadline("");
         router.refresh();
       }
-    } catch (err: any) {
-      setError(err.message || "Failed to host challenge.");
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : "Failed to host challenge.");
     } finally {
       setLoading(false);
     }
@@ -180,14 +181,14 @@ export function ChallengesList({
 
               <div className="h-36 relative overflow-hidden bg-g1 flex items-center justify-center border-b border-g3 z-10">
                 {challenge.bannerUrl ? (
-                  <img src={challenge.bannerUrl} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <Image unoptimized fill={false} width={800} height={400} src={challenge.bannerUrl} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                 ) : challenge.organization?.logoUrl ? (
                   <div className="w-16 h-16 rounded-sm overflow-hidden border border-g3/80">
-                    <img src={challenge.organization.logoUrl} alt="" className="w-full h-full object-cover" />
+                    <Image unoptimized fill={false} width={800} height={400} src={challenge.organization.logoUrl} alt="" className="w-full h-full object-cover" />
                   </div>
                 ) : challenge.space?.logoUrl ? (
                   <div className="w-16 h-16 rounded-sm overflow-hidden border border-g3/80">
-                    <img src={challenge.space.logoUrl} alt="" className="w-full h-full object-cover" />
+                    <Image unoptimized fill={false} width={800} height={400} src={challenge.space.logoUrl} alt="" className="w-full h-full object-cover" />
                   </div>
                 ) : (
                   <Code size={40} className="text-g3 group-hover:scale-110 transition-transform duration-500" />

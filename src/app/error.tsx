@@ -22,7 +22,7 @@ export default function Error({
           <div className="eyebrow mb-4 text-destructive">System Error</div>
           <h1 className="serif text-5xl md:text-6xl mb-4">Connection lost.</h1>
           <p className="text-g5 mb-8 text-[15px]">
-            We're unable to retrieve this data right now. The error has been logged securely.
+            We&apos;re unable to retrieve this data right now. The error has been logged securely.
           </p>
           <button
             onClick={() => reset()}

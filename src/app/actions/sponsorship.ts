@@ -17,7 +17,7 @@ export async function createSponsorshipRequest(formData: FormData) {
   const benefits = formData.get("benefits") as string;
   const deckUrl = formData.get("deckUrl") as string;
 
-  if (!sponsorId) return { error: "Sponsor is required." };
+  if (!sponsorId) throw new Error("Sponsor is required.");
 
   try {
     await prisma.sponsorshipRequest.create({
@@ -34,8 +34,8 @@ export async function createSponsorshipRequest(formData: FormData) {
         deckUrl
       }
     });
-  } catch (error) {
-    return { error: "Failed to create sponsorship request." };
+  } catch {
+    throw new Error("Failed to create sponsorship request.");
   }
 
   redirect("/sponsors?success=true");

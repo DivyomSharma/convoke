@@ -20,7 +20,7 @@ interface OrganizationWithMembers {
   bannerUrl: string | null;
   industry: string | null;
   location: string | null;
-  members: any[];
+  members: unknown[];
 }
 
 export function OrganizationsList({ initialOrgs }: { initialOrgs: OrganizationWithMembers[] }) {
@@ -104,8 +104,8 @@ export function OrganizationsList({ initialOrgs }: { initialOrgs: OrganizationWi
 
         router.refresh();
       }
-    } catch (err: any) {
-      setError(err.message || "Failed to create organization.");
+    } catch (err: unknown) {
+      setError((err as Error).message || "Failed to create organization.");
     } finally {
       setLoading(false);
     }

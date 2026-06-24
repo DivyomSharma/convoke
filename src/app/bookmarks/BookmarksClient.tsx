@@ -4,6 +4,39 @@ import { useState } from "react";
 import Link from "next/link";
 import { Bookmark, CalendarDays, Sparkles, FolderKanban, UsersRound } from "lucide-react";
 
+type BookmarkRow<T> = {
+  bookmark: {
+    id: string;
+    createdAt: Date;
+  };
+  item: T;
+};
+
+type MeetItem = {
+  id: string;
+  title: string;
+  startTime: string | Date;
+};
+
+type OpportunityItem = {
+  id: string;
+  title: string;
+  location: string | null;
+  organization?: { name: string | null } | null;
+};
+
+type ProjectItem = {
+  id: string;
+  title: string;
+  user: { name: string | null };
+};
+
+type ResearchItem = {
+  id: string;
+  title: string;
+  createdAt: string | Date;
+};
+
 export function BookmarksClient({
   meets,
   opportunities,
@@ -11,11 +44,11 @@ export function BookmarksClient({
   projects,
   research
 }: {
-  meets: any[];
-  opportunities: any[];
-  challenges: any[];
-  projects: any[];
-  research: any[];
+  meets: BookmarkRow<MeetItem>[];
+  opportunities: BookmarkRow<OpportunityItem>[];
+  challenges: BookmarkRow<OpportunityItem>[];
+  projects: BookmarkRow<ProjectItem>[];
+  research: BookmarkRow<ResearchItem>[];
 }) {
   const [activeTab, setActiveTab] = useState("opportunities");
 
@@ -75,7 +108,7 @@ export function BookmarksClient({
           </div>
         ) : (
           <div className="grid gap-4 animate-in fade-in duration-300">
-            {items.map(({ bookmark, item }: any) => {
+            {items.map(({ bookmark, item }) => {
               
               let href = "#";
               let title = "";
@@ -84,19 +117,19 @@ export function BookmarksClient({
               if (activeTab === "meets") {
                 href = `/meets/${item.id}`;
                 title = item.title;
-                subtitle = `Starts ${new Date(item.startTime).toLocaleDateString()}`;
+                subtitle = `Starts ${new Date((item as MeetItem).startTime).toLocaleDateString()}`;
               } else if (activeTab === "opportunities" || activeTab === "challenges") {
                 href = activeTab === "challenges" ? `/challenges/${item.id}` : `/opportunities/${item.id}`;
                 title = item.title;
-                subtitle = `${item.organization?.name || "Community"} · ${item.location || "Remote"}`;
+                subtitle = `${(item as OpportunityItem).organization?.name || "Community"} · ${(item as OpportunityItem).location || "Remote"}`;
               } else if (activeTab === "projects") {
                 href = `/projects/${item.id}`;
                 title = item.title;
-                subtitle = `By ${item.user.name}`;
+                subtitle = `By ${(item as ProjectItem).user.name}`;
               } else if (activeTab === "research") {
                 href = `/research/${item.id}`;
                 title = item.title;
-                subtitle = `Published ${new Date(item.createdAt).toLocaleDateString()}`;
+                subtitle = `Published ${new Date((item as ResearchItem).createdAt).toLocaleDateString()}`;
               }
 
               return (

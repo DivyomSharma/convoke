@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSignIn } from "@clerk/nextjs";
 import { useTheme } from "next-themes";
 import { ArrowRight, Code2, Loader2, MessageSquare, Search } from "lucide-react";
+import { useHydrated } from "@/hooks/useHydrated";
 
 type OAuthStrategy = "oauth_google" | "oauth_discord" | "oauth_github";
 
@@ -23,17 +24,13 @@ export default function AuthPage() {
   const router = useRouter();
   const { signIn } = useSignIn();
   const { resolvedTheme } = useTheme();
+  const hydrated = useHydrated();
   const [loadingStrategy, setLoadingStrategy] = useState<OAuthStrategy | null>(null);
   const [email, setEmail] = useState("");
   const [emailLoading, setEmailLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const isDark = mounted && resolvedTheme === "dark";
+  const isDark = hydrated && resolvedTheme === "dark";
 
   const handleOAuth = async (strategy: OAuthStrategy) => {
     if (!signIn || loadingStrategy || emailLoading) return;

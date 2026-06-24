@@ -1,5 +1,5 @@
 import { requireUser } from "@/lib/auth";
-import { notFound } from "next/navigation";
+import { } from "next/navigation";
 import Link from "next/link";
 import { Shell } from "@/components/Shell";
 import { LayoutDashboard, Users, Box, Map, Target, CalendarDays, BarChart } from "lucide-react";

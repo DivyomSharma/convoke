@@ -26,7 +26,7 @@ export default function ContactPage() {
       setEmail("");
       setSubject("");
       setMessage("");
-    } catch (err: any) {
+    } catch {
       setError("Something went wrong. Please try again or email us directly.");
     } finally {
       setLoading(false);
@@ -44,7 +44,7 @@ export default function ContactPage() {
             <div>
               <p className="mono text-[11px] uppercase tracking-[0.34em] text-[var(--brand)]">Get in touch</p>
               <h1 className="serif mt-5 text-5xl leading-[0.94] tracking-[-0.05em] text-ink sm:text-7xl">
-                Let's build together.
+                Let&apos;s build together.
               </h1>
               <p className="mt-6 text-[16px] leading-8 text-g5">
                 Have a question about organizers, spaces, meets, security, or platform capabilities? We are here to help student builders and collectives.

@@ -37,7 +37,7 @@ export default async function CreateChallengePage() {
             </Link>
           </div>
         ) : (
-          <form action={createChallenge as any} className="space-y-6 bg-paper-card border border-g3 rounded-xl p-8">
+          <form action={createChallenge} className="space-y-6 bg-paper-card border border-g3 rounded-xl p-8">
             
             <div className="space-y-2">
               <label className="text-[13px] font-medium text-ink block">Hosting Organization</label>

@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
+import { getActiveIdentity } from "@/lib/identity";
 import { auth } from "@clerk/nextjs/server";
 import { isChallengeType } from "@/lib/challenge-types";
 
@@ -118,9 +119,12 @@ export async function applyToOpportunity(data: { opportunityId: string; pitch?: 
       revalidatePath(`/challenges/${data.opportunityId}`);
     }
     return { success: true };
-  } catch (err: any) {
-    console.error("Error in applyToOpportunity:", err);
-    return { success: false, error: err.message || "Failed to apply." };
+  } catch (error: unknown) {
+    console.error("Error in applyToOpportunity:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to apply.",
+    };
   }
 }
 
@@ -424,42 +428,68 @@ export async function getWorkspaceContexts() {
 
   if (!userId) {
     return {
-      personal: { label: "Personal", href: "/workspace" },
+      personal: { label: "Personal", id: undefined },
       organizations: [],
+      spaces: [],
+      activeContext: { type: "personal" as const, label: "Personal", id: undefined }
     };
   }
 
-  const memberships = await prisma.membership.findMany({
-    where: {
-      userId,
-      role: { in: ["ADMIN", "FOUNDER"] },
-    },
-    include: {
-      organization: {
-        select: {
-          id: true,
-          name: true,
-          slug: true,
+  const [memberships, spaceMemberships, activeIdentity, dbUser] = await Promise.all([
+    prisma.membership.findMany({
+      where: {
+        userId,
+        role: { in: ["ADMIN", "FOUNDER"] },
+      },
+      include: {
+        organization: {
+          select: { id: true, name: true, slug: true },
         },
       },
-    },
-    orderBy: {
-      createdAt: "asc",
-    },
-  });
+      orderBy: { createdAt: "asc" },
+    }),
+    prisma.spaceMembership.findMany({
+      where: {
+        userId,
+        role: { in: ["Founder", "Lead", "Organizer", "Core Team", "ADMIN", "FOUNDER", "LEAD", "ORGANIZER"] },
+      },
+      include: {
+        space: { select: { id: true, name: true } },
+      },
+      orderBy: { createdAt: "asc" },
+    }),
+    getActiveIdentity(),
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: { onboardingCompleted: true }
+    })
+  ]);
 
-  const dbUser = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { onboardingCompleted: true }
-  });
+  let activeLabel = "Personal";
+  let activeId: string | undefined = undefined;
+  if (activeIdentity.type === "org") {
+    activeLabel = activeIdentity.org.name;
+    activeId = activeIdentity.org.id;
+  } else if (activeIdentity.type === "space") {
+    activeLabel = activeIdentity.space.name;
+    activeId = activeIdentity.space.id;
+  }
 
   return {
-    personal: { label: "Personal", href: "/workspace" },
-    organizations: memberships.map((membership) => ({
-      id: membership.organization.id,
-      label: membership.organization.name,
-      href: `/organizations/${membership.organization.id}/manage`,
+    personal: { label: "Personal", id: undefined },
+    organizations: memberships.map((m) => ({
+      id: m.organization.id,
+      label: m.organization.name,
     })),
+    spaces: spaceMemberships.map((m) => ({
+      id: m.space.id,
+      label: m.space.name,
+    })),
+    activeContext: {
+      type: activeIdentity.type,
+      label: activeLabel,
+      id: activeId
+    },
     onboardingCompleted: dbUser?.onboardingCompleted ?? false,
   };
 }

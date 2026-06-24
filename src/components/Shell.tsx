@@ -1,18 +1,20 @@
 "use client";
+import Image from "next/image";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { type ReactNode, useEffect, useState } from "react";
 import { useUser, useClerk } from "@clerk/nextjs";
+import { useCompletion } from "@ai-sdk/react";
 import { ThemeToggle } from "./ThemeToggle";
 import { VerticalMarquee } from "./VerticalMarquee";
 import { globalSearch, type SearchResult } from "@/app/actions/search";
 import { getWorkspaceContexts } from "@/app/actions/workspace";
 import { getCommandCenterProfile } from "@/app/actions/user";
+import { switchIdentity, type IdentityType } from "@/app/actions/identity";
 import {
   Bell,
   ChevronDown,
-  FlaskConical,
   LayoutGrid,
   LayoutTemplate,
   Building2,
@@ -33,14 +35,40 @@ import {
   Palette,
   Settings as SettingsIcon,
   Code,
-  LogOut,
   MapPin
 } from "lucide-react";
 
 type WorkspaceContext = {
   id?: string;
   label: string;
-  href: string;
+  href?: string;
+  type?: "personal" | "org" | "space";
+};
+
+type WorkspaceContexts = {
+  personal: WorkspaceContext;
+  organizations: Array<WorkspaceContext>;
+  spaces: Array<WorkspaceContext>;
+  activeContext: {
+    type: "personal" | "org" | "space";
+    label: string;
+    id?: string;
+  };
+  onboardingCompleted?: boolean;
+};
+
+type CommandCenterStats = {
+  modes?: string[];
+  stats?: {
+    meets?: number;
+    spaces?: number;
+    projects?: number;
+    research?: number;
+    connections?: number;
+  };
+  aiContext?: {
+    pendingApps?: number;
+  };
 };
 
 const mainNav = [
@@ -61,16 +89,13 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
   const [commandOpen, setCommandOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [contextOpen, setContextOpen] = useState(false);
-  const [workspaceContexts, setWorkspaceContexts] = useState<{
-    personal: WorkspaceContext;
-    organizations: WorkspaceContext[];
-    onboardingCompleted?: boolean;
-  } | null>(null);
-  const [commandCenterStats, setCommandCenterStats] = useState<any>(null);
+  const [workspaceContexts, setWorkspaceContexts] = useState<WorkspaceContexts | null>(null);
+  const [commandCenterStatsData, setCommandCenterStatsData] = useState<CommandCenterStats | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, isSignedIn } = useUser();
   const { signOut } = useClerk();
   const passportHandle = user?.username || user?.fullName?.toLowerCase().replace(/\s+/g, "") || "builder";
+  const commandCenterStats = isSignedIn ? commandCenterStatsData : null;
 
   useEffect(() => {
     const handleKeydown = (meet: KeyboardEvent) => {
@@ -86,19 +111,15 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
   }, []);
 
   useEffect(() => {
-    if (!isSignedIn) {
-      setWorkspaceContexts(null);
-      setCommandCenterStats(null);
-      return;
-    }
+    if (!isSignedIn) return;
 
     let active = true;
     getWorkspaceContexts().then((contexts) => {
       if (active) setWorkspaceContexts(contexts);
     });
     getCommandCenterProfile().then((stats) => {
-      if (active) setCommandCenterStats(stats);
-    }).catch(e => console.error(e));
+      if (active) setCommandCenterStatsData(stats);
+    }).catch(console.error);
 
     return () => {
       active = false;
@@ -173,23 +194,33 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
                   <Mail size={14} strokeWidth={1.5} />
                 </Link>
                 
-                <div className="relative">
-                  <button 
-                    onClick={() => setProfileOpen(!profileOpen)}
-                    className="h-9 w-9 rounded-full overflow-hidden border border-g3 hover:border-[var(--brand)] transition-colors shrink-0 outline-none cursor-pointer flex items-center justify-center"
-                  >
-                    {user?.imageUrl ? (
-                      <img src={user.imageUrl} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-g1 text-g5 text-[14px] font-semibold">
-                        {(user?.fullName || "U").slice(0, 1)}
-                      </div>
-                    )}
-                  </button>
+                <div className="flex items-center gap-3 relative">
+                  {/* Global Context Indicator */}
+                  {workspaceContexts?.activeContext && workspaceContexts.activeContext.type !== "personal" && (
+                    <div className="hidden md:flex items-center gap-1.5 text-[12px] font-medium text-g5">
+                      <span className="truncate max-w-[120px] text-ink">{workspaceContexts.activeContext.label}</span>
+                      <span className="text-g4">•</span>
+                      <span className="text-g4 capitalize">{workspaceContexts.activeContext.type === "org" ? "Organization" : "Space"}</span>
+                    </div>
+                  )}
+
+                  <div className="relative">
+                    <button 
+                      onClick={() => setProfileOpen(!profileOpen)}
+                      className="h-9 w-9 rounded-full overflow-hidden border border-g3 hover:border-[var(--brand)] transition-colors shrink-0 outline-none cursor-pointer flex items-center justify-center"
+                    >
+                      {user?.imageUrl ? (
+                        <Image unoptimized fill={false} width={800} height={400} src={user.imageUrl} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-g1 text-g5 text-[14px] font-semibold">
+                          {(user?.fullName || "U").slice(0, 1)}
+                        </div>
+                      )}
+                    </button>
                   
                   {profileOpen && (
-                    <>
-                      <div className="fixed inset-0 z-40" onClick={() => setProfileOpen(false)} />
+                    <div className="fixed inset-0 z-40">
+                      <div className="absolute inset-0" onClick={() => setProfileOpen(false)} />
                       <div className="absolute right-0 mt-2.5 w-[380px] sm:w-[400px] overflow-hidden rounded-[24px] border border-g3 bg-paper-card/95 shadow-2xl shadow-black/20 z-50 animate-in fade-in-50 slide-in-from-top-3 duration-200 backdrop-blur-xl flex flex-col max-h-[85vh]">
                         
                         {/* Header & Identity */}
@@ -198,7 +229,7 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
                           {workspaceContexts && (
                             <div className="mb-4">
                               <div className="flex items-center justify-between mb-1.5">
-                                <span className="text-[10px] uppercase tracking-wider text-g5 font-bold">Personal Context Switch</span>
+                                <span className="text-[10px] uppercase tracking-wider text-g5 font-bold">Active Identity</span>
                               </div>
                               <button
                                 type="button"
@@ -208,9 +239,7 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
                                 <div className="flex items-center gap-2">
                                   <LayoutGrid size={14} className="text-brand" />
                                   <span className="truncate">
-                                    {pathname.startsWith("/workspace/org/") || pathname.startsWith("/org/")
-                                      ? workspaceContexts.organizations.find((context) => pathname.includes(context.href.split('/').pop() || ''))?.label || "Organization"
-                                      : "Personal"}
+                                    {workspaceContexts.activeContext?.label || "Personal"}
                                   </span>
                                 </div>
                                 <ChevronDown size={14} className="text-g5" />
@@ -218,16 +247,28 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
 
                               {contextOpen && (
                                 <div className="mt-2 rounded-lg border border-g3 bg-paper-card shadow-sm overflow-hidden animate-in fade-in slide-in-from-top-1">
-                                  <ContextLink context={workspaceContexts.personal} onClick={() => { setContextOpen(false); setProfileOpen(false); }} />
-                                  {workspaceContexts.organizations.length > 0 && (
+                                  <ContextSwitchBtn type="personal" label="Personal" onClick={() => { setContextOpen(false); setProfileOpen(false); }} />
+                                  
+                                  {workspaceContexts.organizations?.length > 0 && (
                                     <div className="border-t border-g3">
+                                      <div className="px-3 py-1.5 text-[10px] font-semibold text-g5 uppercase tracking-wider bg-g1/30">Organizations</div>
                                       {workspaceContexts.organizations.map((context) => (
-                                        <ContextLink key={context.id || context.href} context={context} onClick={() => { setContextOpen(false); setProfileOpen(false); }} />
+                                        <ContextSwitchBtn key={context.id} type="org" id={context.id} label={context.label} onClick={() => { setContextOpen(false); setProfileOpen(false); }} />
                                       ))}
                                     </div>
                                   )}
+
+                                  {workspaceContexts.spaces?.length > 0 && (
+                                    <div className="border-t border-g3">
+                                      <div className="px-3 py-1.5 text-[10px] font-semibold text-g5 uppercase tracking-wider bg-g1/30">Spaces</div>
+                                      {workspaceContexts.spaces.map((context) => (
+                                        <ContextSwitchBtn key={context.id} type="space" id={context.id} label={context.label} onClick={() => { setContextOpen(false); setProfileOpen(false); }} />
+                                      ))}
+                                    </div>
+                                  )}
+
                                   <div className="px-3 py-2 bg-g1/30 text-[10px] text-g5 border-t border-g3 italic">
-                                    Switching changes workspace context.
+                                    Switching changes global identity context.
                                   </div>
                                 </div>
                               )}
@@ -264,7 +305,7 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
                                 {commandCenterStats.modes.map((mode: string, i: number) => (
                                   <span key={mode} className="flex items-center">
                                     {mode}
-                                    {i < commandCenterStats.modes.length - 1 && <span className="text-brand mx-2">●</span>}
+                                    {i < commandCenterStats.modes!.length - 1 && <span className="text-brand mx-2">●</span>}
                                   </span>
                                 ))}
                               </div>
@@ -401,10 +442,11 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
                           </button>
                         </div>
                       </div>
-                    </>
+                    </div>
                   )}
                 </div>
-              </>
+              </div>
+            </>
             ) : (
               <Link href="/auth" className="ink-button px-5 text-[13px] font-medium flex items-center justify-center">
                 Join
@@ -606,27 +648,29 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
   );
 }
 
-function ContextLink({ context, onClick }: { context: WorkspaceContext; onClick: () => void }) {
+function ContextSwitchBtn({ type, id, label, onClick }: { type: IdentityType; id?: string; label: string; onClick: () => void }) {
+  const handleSwitch = async () => {
+    onClick();
+    await switchIdentity(type, id);
+  };
+
   return (
-    <Link
-      href={context.href}
-      onClick={onClick}
-      className="flex items-center gap-3 rounded-[14px] px-3 py-2.5 text-[13px] text-g6 transition hover:bg-g1 hover:text-ink"
+    <button
+      onClick={handleSwitch}
+      className="flex w-full items-center gap-3 rounded-[0px] px-3 py-2.5 text-[13px] text-g6 transition hover:bg-g1 hover:text-ink text-left"
     >
-      <span className="flex h-8 w-8 items-center justify-center rounded-sm border border-g3 bg-g1 text-brand">
-        {context.label.slice(0, 1).toUpperCase()}
+      <span className="flex h-8 w-8 items-center justify-center rounded-sm border border-g3 bg-g1 text-brand shrink-0">
+        {label.slice(0, 1).toUpperCase()}
       </span>
-      <span className="min-w-0 flex-1 truncate">{context.label}</span>
-      <ArrowRightIcon />
-    </Link>
+      <span className="min-w-0 flex-1 truncate">{label}</span>
+      <span className="mono text-[10px] text-g4">Switch</span>
+    </button>
   );
 }
 
 function ArrowRightIcon() {
   return <span className="mono text-[10px] text-g4">Open</span>;
 }
-
-import { useCompletion } from "@ai-sdk/react";
 
 function CommandK({ onClose }: { onClose: () => void }) {
   const [query, setQuery] = useState("");
@@ -646,20 +690,19 @@ function CommandK({ onClose }: { onClose: () => void }) {
 
   useEffect(() => {
     if (query.length < 2) {
-      setResults([]);
-      setLoading(false);
       return;
     }
 
     let active = true;
-    setLoading(true);
-
     const timeoutId = setTimeout(() => {
+      setLoading(true);
+
       // 1. Fetch Entity Search
       globalSearch(query).then((response) => {
         if (!active) return;
         setResults(response);
-        setLoading(false);
+      }).catch(console.error).finally(() => {
+        if (active) setLoading(false);
       });
       
       // 2. Trigger AI OS 
@@ -671,7 +714,7 @@ function CommandK({ onClose }: { onClose: () => void }) {
       active = false;
       clearTimeout(timeoutId);
     };
-  }, [query]);
+  }, [query, complete]);
 
   const displayItems = query.length < 2 ? staticItems : results;
 
@@ -703,7 +746,7 @@ function CommandK({ onClose }: { onClose: () => void }) {
               ) : null}
 
               {!loading && query.length >= 2 && results.length === 0 ? (
-                <li className="px-4 py-4 text-[13px] text-g5">No entities found for "{query}"</li>
+                <li className="px-4 py-4 text-[13px] text-g5">No entities found for &quot;{query}&quot;</li>
               ) : null}
 
               {displayItems.map((item) => (
@@ -732,7 +775,7 @@ function CommandK({ onClose }: { onClose: () => void }) {
                  {aiLoading && <span className="animate-pulse w-2 h-2 rounded-full bg-[var(--brand)]"></span>}
                </div>
                <div className="p-5 text-[13.5px] leading-relaxed text-g6">
-                 {completion ? (
+                 {query.length >= 2 && completion ? (
                    <div className="prose prose-sm prose-invert max-w-none">
                      {completion}
                    </div>

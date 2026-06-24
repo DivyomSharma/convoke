@@ -23,9 +23,9 @@ export default function AboutPage() {
         {/* Circular Marquee Ribbon Moment */}
         <section className="relative my-24 py-6 border-y border-g3/80 overflow-hidden bg-g1/10 backdrop-blur-sm">
           <div className="flex whitespace-nowrap animate-marquee mono text-[12px] uppercase tracking-[0.25em] text-[var(--brand)] font-medium">
-            <span className="mx-4">CONVOKE • FOR PEOPLE BUILDING THE FUTURE • CONVOKE • FOR PEOPLE BUILDING THE FUTURE • </span>
-            <span className="mx-4">CONVOKE • FOR PEOPLE BUILDING THE FUTURE • CONVOKE • FOR PEOPLE BUILDING THE FUTURE • </span>
-            <span className="mx-4">CONVOKE • FOR PEOPLE BUILDING THE FUTURE • CONVOKE • FOR PEOPLE BUILDING THE FUTURE • </span>
+            <span className="mx-4">CONVOKE &bull; FOR PEOPLE BUILDING THE FUTURE &bull; CONVOKE &bull; FOR PEOPLE BUILDING THE FUTURE &bull; </span>
+            <span className="mx-4">CONVOKE &bull; FOR PEOPLE BUILDING THE FUTURE &bull; CONVOKE &bull; FOR PEOPLE BUILDING THE FUTURE &bull; </span>
+            <span className="mx-4">CONVOKE &bull; FOR PEOPLE BUILDING THE FUTURE &bull; CONVOKE &bull; FOR PEOPLE BUILDING THE FUTURE &bull; </span>
           </div>
         </section>
 
@@ -71,7 +71,7 @@ export default function AboutPage() {
         {/* Editorial Story */}
         <section className="mt-28 max-w-[800px] mx-auto border-t border-g3/80 pt-16">
           <h2 className="serif text-3xl sm:text-4xl text-ink leading-snug">
-            Our goal is to organize the world's most capable builder network.
+            Our goal is to organize the world&apos;s most capable builder network.
           </h2>
           <div className="mt-8 space-y-6 text-[15px] leading-8 text-g5">
             <p>
@@ -81,7 +81,7 @@ export default function AboutPage() {
               Convoke brings these elements into a unified operating surface. We provide the infrastructure for organizers to run high-trust communities, host curated gatherings, and post impactful roles—all tied to a verified builder passport.
             </p>
             <p className="serif text-[18px] text-ink italic pt-4">
-              "We don't build software to sell ads. We build tools for the people who will write the history of the next century."
+              &ldquo;We don&apos;t build software to sell ads. We build tools for the people who will write the history of the next century.&rdquo;
             </p>
           </div>
         </section>

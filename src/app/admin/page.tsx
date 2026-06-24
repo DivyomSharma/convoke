@@ -1,4 +1,4 @@
-import { Shell } from "@/components/Shell";
+import { } from "@/components/Shell";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { redirect } from "next/navigation";

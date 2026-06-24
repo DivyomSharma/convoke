@@ -84,8 +84,8 @@ export function ProjectsList({ initialProjects }: { initialProjects: ProjectWith
         setStack("");
         router.refresh();
       }
-    } catch (err: any) {
-      setError(err.message || "Failed to launch project.");
+    } catch (err: unknown) {
+      setError((err as Error).message || "Failed to launch project.");
     } finally {
       setLoading(false);
     }

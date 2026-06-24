@@ -12,7 +12,7 @@ export default async function ApplicationsPage() {
           </button>
         ))}
       </div>
-      <div className="text-[13px] text-g5">You haven't submitted any applications yet.</div>
+      <div className="text-[13px] text-g5">You haven&apos;t submitted any applications yet.</div>
     </div>
   );
 }

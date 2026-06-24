@@ -189,8 +189,8 @@ export function MeetsList({
         setRequirements("");
         router.refresh();
       }
-    } catch (err: any) {
-      setError(err.message || "Failed to host meet.");
+    } catch (err: unknown) {
+      setError((err as Error).message || "Failed to host meet.");
     } finally {
       setLoading(false);
     }

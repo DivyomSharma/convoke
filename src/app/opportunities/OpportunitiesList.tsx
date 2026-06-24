@@ -116,8 +116,8 @@ export function OpportunitiesList({
         setDeadline("");
         router.refresh();
       }
-    } catch (err: any) {
-      setError(err.message || "Failed to post opportunity.");
+    } catch (err: unknown) {
+      setError((err as Error).message || "Failed to post opportunity.");
     } finally {
       setLoading(false);
     }

@@ -2,18 +2,14 @@
 
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useHydrated } from "@/hooks/useHydrated";
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const hydrated = useHydrated();
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return <div className="w-[18px] h-[18px]" />; // Placeholder to prevent layout shift
+  if (!hydrated) {
+    return <div className="h-[18px] w-[18px]" />;
   }
 
   return (

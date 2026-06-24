@@ -1,11 +1,13 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/auth";
+import { } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
+import { getActiveIdentity } from "@/lib/identity";
+
 export async function sendMessage(conversationId: string, content: string) {
-  const user = await requireUser();
+  const identity = await getActiveIdentity();
 
   const conversation = await prisma.conversation.findUnique({
     where: { id: conversationId },
@@ -13,13 +15,22 @@ export async function sendMessage(conversationId: string, content: string) {
   });
 
   if (!conversation) return { error: "Conversation not found" };
-  const isParticipant = conversation.participants.some(p => p.userId === user.id);
+  
+  // Check if participant is in conversation
+  const isParticipant = conversation.participants.some(p => {
+    if (identity.type === "org") return p.organizationId === identity.org.id;
+    if (identity.type === "space") return p.spaceId === identity.space.id;
+    return p.userId === identity.user.id;
+  });
+
   if (!isParticipant) return { error: "Not a participant" };
 
   const message = await prisma.message.create({
     data: {
       conversationId,
-      senderId: user.id,
+      senderId: identity.user.id,
+      senderOrgId: identity.type === "org" ? identity.org.id : undefined,
+      senderSpaceId: identity.type === "space" ? identity.space.id : undefined,
       content,
     },
   });
@@ -29,8 +40,8 @@ export async function sendMessage(conversationId: string, content: string) {
 }
 
 export async function startDirectMessage(targetUserId: string) {
-  const user = await requireUser();
-  if (user.id === targetUserId) return { error: "Cannot message yourself" };
+  const identity = await getActiveIdentity();
+  if (identity.type === "personal" && identity.user.id === targetUserId) return { error: "Cannot message yourself" };
 
   // Check if they already have a 1-on-1 DM conversation
   const existingConv = await prisma.conversation.findFirst({
@@ -38,7 +49,14 @@ export async function startDirectMessage(targetUserId: string) {
       isGroup: false,
       participants: {
         every: {
-          userId: { in: [user.id, targetUserId] }
+          OR: [
+            { 
+              userId: identity.user.id,
+              organizationId: identity.type === "org" ? identity.org.id : null,
+              spaceId: identity.type === "space" ? identity.space.id : null
+            },
+            { userId: targetUserId }
+          ]
         }
       }
     },
@@ -53,7 +71,7 @@ export async function startDirectMessage(targetUserId: string) {
 
   // Check if targetUser follows user to determine status
   const follow = await prisma.follow.findFirst({
-    where: { followerId: targetUserId, targetId: user.id, targetType: "USER" }
+    where: { followerId: targetUserId, targetId: identity.user.id, targetType: "USER" }
   });
   
   const status = follow ? "ACCEPTED" : "PENDING"; // Needs to accept if not mutual
@@ -63,7 +81,12 @@ export async function startDirectMessage(targetUserId: string) {
       isGroup: false,
       participants: {
         create: [
-          { userId: user.id, status: "ACCEPTED" },
+          { 
+            userId: identity.user.id, 
+            organizationId: identity.type === "org" ? identity.org.id : undefined,
+            spaceId: identity.type === "space" ? identity.space.id : undefined,
+            status: "ACCEPTED" 
+          },
           { userId: targetUserId, status }
         ]
       }
@@ -75,9 +98,14 @@ export async function startDirectMessage(targetUserId: string) {
 }
 
 export async function acceptMessageRequest(conversationId: string) {
-  const user = await requireUser();
-  await prisma.conversationParticipant.update({
-    where: { conversationId_userId: { conversationId, userId: user.id } },
+  const identity = await getActiveIdentity();
+  await prisma.conversationParticipant.updateMany({
+    where: { 
+      conversationId, 
+      userId: identity.user.id,
+      organizationId: identity.type === "org" ? identity.org.id : null,
+      spaceId: identity.type === "space" ? identity.space.id : null,
+    },
     data: { status: "ACCEPTED" }
   });
   revalidatePath("/messages");
@@ -85,9 +113,14 @@ export async function acceptMessageRequest(conversationId: string) {
 }
 
 export async function rejectMessageRequest(conversationId: string) {
-  const user = await requireUser();
-  await prisma.conversationParticipant.update({
-    where: { conversationId_userId: { conversationId, userId: user.id } },
+  const identity = await getActiveIdentity();
+  await prisma.conversationParticipant.updateMany({
+    where: { 
+      conversationId, 
+      userId: identity.user.id,
+      organizationId: identity.type === "org" ? identity.org.id : null,
+      spaceId: identity.type === "space" ? identity.space.id : null,
+    },
     data: { status: "REJECTED" }
   });
   revalidatePath("/messages");

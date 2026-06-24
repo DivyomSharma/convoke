@@ -6,14 +6,22 @@ import Link from "next/link";
 import { Avatar } from "@/components/Avatar";
 import { sendMessage, acceptMessageRequest, rejectMessageRequest } from "@/app/actions/messages";
 
+type ConversationData = {
+  id: string;
+  status?: string;
+  messages: { id: string; content: string; senderId: string; createdAt: Date | string }[];
+  participants: { userId: string; status: string; user: { id: string; name: string | null; handle: string | null; avatarUrl: string | null; username?: string | null } }[];
+  updatedAt: string | Date;
+};
+
 export function MessagesClient({ 
   currentUserId, 
   initialConversations 
 }: { 
   currentUserId: string; 
-  initialConversations: any[]; 
+  initialConversations: ConversationData[]; 
 }) {
-  const [conversations, setConversations] = useState(initialConversations);
+  const [conversations, setConversations] = useState<ConversationData[]>(initialConversations);
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
   const [content, setContent] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -25,12 +33,12 @@ export function MessagesClient({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [activeThread?.messages]);
 
-  const getOtherParticipant = (conv: any) => {
-    return conv.participants.find((p: any) => p.userId !== currentUserId)?.user;
+  const getOtherParticipant = (conv: ConversationData) => {
+    return conv.participants.find((p) => p.userId !== currentUserId)?.user;
   };
 
-  const getMyParticipant = (conv: any) => {
-    return conv.participants.find((p: any) => p.userId === currentUserId);
+  const getMyParticipant = (conv: ConversationData) => {
+    return conv.participants.find((p) => p.userId === currentUserId);
   };
 
   const handleSend = async (e: React.FormEvent) => {
@@ -60,7 +68,7 @@ export function MessagesClient({
       if (c.id === convId) {
         return { 
           ...c, 
-          participants: c.participants.map((p: any) => 
+          participants: c.participants.map((p) => 
             p.userId === currentUserId ? { ...p, status: "ACCEPTED" } : p
           ) 
         };
@@ -171,7 +179,7 @@ export function MessagesClient({
             {/* Messages Area */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {activeThread.messages.length > 0 ? (
-                activeThread.messages.map((msg: any) => {
+                activeThread.messages.map((msg) => {
                   const isMe = msg.senderId === currentUserId;
                   return (
                     <div key={msg.id} className={`flex flex-col max-w-[75%] ${isMe ? "ml-auto items-end" : "mr-auto items-start"}`}>

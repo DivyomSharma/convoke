@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { X, ArrowRight } from "lucide-react";
@@ -8,13 +8,7 @@ import { X, ArrowRight } from "lucide-react";
 export function OnboardingPrompt() {
   const [dismissed, setDismissed] = useState(false);
   const pathname = usePathname();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted || dismissed || pathname?.startsWith("/onboarding")) return null;
+  if (dismissed || pathname?.startsWith("/onboarding")) return null;
 
   return (
     <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5 fade-in duration-500">

@@ -6,7 +6,36 @@ import { ArrowLeft, Settings, Users, QrCode, CheckCircle2, XCircle, Award } from
 import { Avatar } from "@/components/Avatar";
 import { approveMeetApplication } from "@/app/actions/meet";
 
-export function MeetManageClient({ meet, currentUserId }: { meet: any; currentUserId: string }) {
+type MeetApp = {
+  id: string;
+  status: string;
+  user: {
+    name?: string | null;
+    avatarUrl?: string | null;
+    handle?: string | null;
+    username?: string | null;
+  };
+  answers?: string | null;
+};
+
+type MeetAttendance = {
+  id: string;
+  role: string;
+  status: string;
+  user: {
+    name?: string | null;
+    avatarUrl?: string | null;
+  };
+};
+
+type MeetData = {
+  id: string;
+  title: string;
+  applications: MeetApp[];
+  attendance: MeetAttendance[];
+};
+
+export function MeetManageClient({ meet, currentUserId }: { meet: MeetData; currentUserId: string }) {
   const [activeTab, setActiveTab] = useState("applications");
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -23,8 +52,8 @@ export function MeetManageClient({ meet, currentUserId }: { meet: any; currentUs
     setIsProcessing(false);
   };
 
-  const pendingApps = meet.applications.filter((a: any) => a.status === "PENDING");
-  const approvedApps = meet.applications.filter((a: any) => a.status === "APPROVED");
+  const pendingApps = meet.applications.filter((a: MeetApp) => a.status === "PENDING");
+  const approvedApps = meet.applications.filter((a: MeetApp) => a.status === "APPROVED");
 
   return (
     <div className="mx-auto max-w-[1240px] mt-8 mb-16">
@@ -81,7 +110,7 @@ export function MeetManageClient({ meet, currentUserId }: { meet: any; currentUs
                 </div>
               ) : (
                 <div className="grid gap-4">
-                  {pendingApps.map((app: any) => (
+                  {pendingApps.map((app: MeetApp) => (
                     <div key={app.id} className="border border-g3 rounded-xl p-5 flex flex-col md:flex-row md:items-start justify-between gap-6">
                       <div className="flex items-start gap-4">
                         <Avatar src={app.user.avatarUrl || ""} name={app.user.name || "User"} size={48} />
@@ -136,7 +165,7 @@ export function MeetManageClient({ meet, currentUserId }: { meet: any; currentUs
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-g3">
-                    {meet.attendance.map((a: any) => (
+                    {meet.attendance.map((a: MeetAttendance) => (
                       <tr key={a.id} className="hover:bg-g1/20 transition-colors">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">

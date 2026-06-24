@@ -17,7 +17,7 @@ interface SpaceWithDetails {
   bannerUrl: string | null;
   organization: {
     name: string;
-    members: any[];
+    members: unknown[];
   } | null;
 }
 
@@ -87,8 +87,8 @@ export function SpacesList({
         setRules("");
         router.refresh();
       }
-    } catch (err: any) {
-      setError(err.message || "Failed to create space.");
+    } catch (err: unknown) {
+      setError((err as Error).message || "Failed to create space.");
     } finally {
       setLoading(false);
     }

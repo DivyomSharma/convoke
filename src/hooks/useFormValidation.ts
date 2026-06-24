@@ -8,7 +8,7 @@ export type FieldError = {
 export function useFormValidation() {
   const [errors, setErrors] = useState<FieldError[]>([]);
 
-  const validate = (fields: { field: string; value: any; message: string; condition?: boolean }[]) => {
+  const validate = (fields: { field: string; value: unknown; message: string; condition?: boolean }[]) => {
     const newErrors: FieldError[] = [];
     
     for (const f of fields) {
