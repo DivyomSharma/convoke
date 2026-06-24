@@ -5,7 +5,7 @@ import { useTheme } from "next-themes";
 import { useHydrated } from "@/hooks/useHydrated";
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   const hydrated = useHydrated();
 
   if (!hydrated) {
@@ -14,11 +14,11 @@ export function ThemeToggle() {
 
   return (
     <button
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
       className="text-g5 hover:text-ink transition-colors flex items-center justify-center"
       aria-label="Toggle theme"
     >
-      {theme === "dark" ? (
+      {resolvedTheme === "dark" ? (
         <Sun strokeWidth={1.5} size={18} />
       ) : (
         <Moon strokeWidth={1.5} size={18} />
