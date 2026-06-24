@@ -120,39 +120,7 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
             Convoke.
           </Link>
 
-          {isSignedIn && workspaceContexts ? (
-            <div className="relative hidden md:block">
-              <button
-                type="button"
-                onClick={() => setContextOpen((current) => !current)}
-                className="flex h-8 items-center gap-2 rounded-sm border border-g3 bg-paper-card px-3 text-[12px] text-g6 transition hover:border-g4 hover:text-ink"
-              >
-                <LayoutGrid size={13} className="text-brand" />
-                <span className="max-w-32 truncate">
-                  {pathname.startsWith("/workspace/org/") || pathname.startsWith("/org/")
-                    ? workspaceContexts.organizations.find((context) => pathname.includes(context.href.split('/').pop() || ''))?.label || "Organization"
-                    : "Personal"}
-                </span>
-                <ChevronDown size={13} />
-              </button>
 
-              {contextOpen ? (
-                <>
-                  <div className="fixed inset-0 z-40" onClick={() => setContextOpen(false)} />
-                  <div className="absolute left-0 z-50 mt-2 w-72 overflow-hidden rounded-[18px] border border-g3 bg-paper-card/95 p-2 shadow-2xl shadow-black/20 backdrop-blur-xl">
-                    <ContextLink context={workspaceContexts.personal} onClick={() => setContextOpen(false)} />
-                    {workspaceContexts.organizations.length > 0 ? (
-                      <div className="mt-2 border-t border-g3 pt-2">
-                        {workspaceContexts.organizations.map((context) => (
-                          <ContextLink key={context.id || context.href} context={context} onClick={() => setContextOpen(false)} />
-                        ))}
-                      </div>
-                    ) : null}
-                  </div>
-                </>
-              ) : null}
-            </div>
-          ) : null}
 
           <nav className="hidden items-center gap-6 mono text-[11px] uppercase tracking-[0.14em] text-g5 xl:flex">
             {mainNav.map((item) => (
@@ -222,127 +190,201 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
                   {profileOpen && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setProfileOpen(false)} />
-                      <div className="absolute right-0 mt-2.5 w-[380px] overflow-hidden rounded-[24px] border border-g3 bg-paper-card/95 shadow-2xl shadow-black/20 z-50 animate-in fade-in-50 slide-in-from-top-3 duration-200 backdrop-blur-xl">
-                        {/* Header Section */}
-                        <div className="px-5 py-5 pb-4 border-b border-g3/60">
-                          <div className="flex gap-4 mb-3">
-                            <div className="h-16 w-16 overflow-hidden rounded-2xl border border-g3 bg-g1 shrink-0 shadow-sm">
-                              {user?.imageUrl ? <img src={user.imageUrl} alt="" className="h-full w-full object-cover" /> : null}
-                            </div>
-                            <div className="min-w-0 flex flex-col justify-center">
-                              <div className="text-[17px] font-bold text-ink leading-tight flex items-center gap-2">
-                                <span className="truncate">{user?.fullName || "Builder"}</span>
-                                {user?.publicMetadata?.role ? (
-                                  <span className="text-[10px] uppercase bg-brand/10 text-brand px-1.5 py-0.5 rounded font-bold tracking-wider">
-                                    {String(user.publicMetadata.role)}
+                      <div className="absolute right-0 mt-2.5 w-[380px] sm:w-[400px] overflow-hidden rounded-[24px] border border-g3 bg-paper-card/95 shadow-2xl shadow-black/20 z-50 animate-in fade-in-50 slide-in-from-top-3 duration-200 backdrop-blur-xl flex flex-col max-h-[85vh]">
+                        
+                        {/* Header & Identity */}
+                        <div className="px-5 py-5 pb-4 border-b border-g3/60 shrink-0">
+                          {/* Context Switcher Integrated */}
+                          {workspaceContexts && (
+                            <div className="mb-4">
+                              <div className="flex items-center justify-between mb-1.5">
+                                <span className="text-[10px] uppercase tracking-wider text-g5 font-bold">Personal Context Switch</span>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => setContextOpen(!contextOpen)}
+                                className="flex w-full items-center justify-between rounded-lg border border-g3 bg-g1/50 px-3 py-2 text-[13px] font-medium text-ink transition hover:border-g4 hover:bg-g2"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <LayoutGrid size={14} className="text-brand" />
+                                  <span className="truncate">
+                                    {pathname.startsWith("/workspace/org/") || pathname.startsWith("/org/")
+                                      ? workspaceContexts.organizations.find((context) => pathname.includes(context.href.split('/').pop() || ''))?.label || "Organization"
+                                      : "Personal"}
                                   </span>
-                                ) : null}
-                              </div>
-                              <div className="flex items-center gap-1.5 text-[13px] text-g5 mt-0.5">
-                                <span className="truncate">@{passportHandle}</span>
-                                {user?.publicMetadata?.location ? (
-                                  <>
-                                    <span className="text-g4 text-[10px]">●</span>
-                                    <span className="truncate flex items-center gap-1"><MapPin size={11} /> {String(user.publicMetadata.location)}</span>
-                                  </>
-                                ) : null}
-                              </div>
-                            </div>
-                          </div>
-                          
-                          {commandCenterStats?.modes && commandCenterStats.modes.length > 0 && (
-                            <div className="text-[12px] font-medium text-ink flex flex-wrap items-center gap-x-2 gap-y-1 mb-3 bg-g1/50 px-3 py-2 rounded-xl border border-g3/50">
-                              {commandCenterStats.modes.map((mode: string, i: number) => (
-                                <span key={mode} className="flex items-center">
-                                  {mode}
-                                  {i < commandCenterStats.modes.length - 1 && <span className="text-g4 mx-2 text-[10px]">●</span>}
-                                </span>
-                              ))}
+                                </div>
+                                <ChevronDown size={14} className="text-g5" />
+                              </button>
+
+                              {contextOpen && (
+                                <div className="mt-2 rounded-lg border border-g3 bg-paper-card shadow-sm overflow-hidden animate-in fade-in slide-in-from-top-1">
+                                  <ContextLink context={workspaceContexts.personal} onClick={() => { setContextOpen(false); setProfileOpen(false); }} />
+                                  {workspaceContexts.organizations.length > 0 && (
+                                    <div className="border-t border-g3">
+                                      {workspaceContexts.organizations.map((context) => (
+                                        <ContextLink key={context.id || context.href} context={context} onClick={() => { setContextOpen(false); setProfileOpen(false); }} />
+                                      ))}
+                                    </div>
+                                  )}
+                                  <div className="px-3 py-2 bg-g1/30 text-[10px] text-g5 border-t border-g3 italic">
+                                    Switching changes workspace context.
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           )}
 
-                          <div className="flex items-center justify-between mt-3 px-1">
+                          {/* Avatar Identity */}
+                          <div className="flex flex-col mt-2">
+                            <div className="flex items-center gap-2 mb-3">
+                              <div className="h-4 w-4 rounded-full border-[3px] border-brand flex items-center justify-center shrink-0">
+                                <div className="h-1.5 w-1.5 rounded-full bg-brand"></div>
+                              </div>
+                              <span className="text-[13px] font-semibold text-g5 uppercase tracking-wider">Avatar</span>
+                            </div>
+                            
+                            <div className="text-[20px] font-bold text-ink leading-tight">
+                              {user?.fullName || "Builder"}
+                            </div>
+                            
+                            {user?.publicMetadata?.role ? (
+                              <div className="text-[14px] text-g6 mt-1 font-medium">
+                                {String(user.publicMetadata.role)}
+                              </div>
+                            ) : null}
+
+                            {user?.publicMetadata?.location ? (
+                              <div className="text-[13px] text-g5 mt-1 flex items-center gap-1.5">
+                                <MapPin size={12} /> {String(user.publicMetadata.location)}
+                              </div>
+                            ) : null}
+
+                            {commandCenterStats?.modes && commandCenterStats.modes.length > 0 && (
+                              <div className="text-[13px] font-medium text-ink flex flex-wrap items-center mt-3 gap-x-2">
+                                {commandCenterStats.modes.map((mode: string, i: number) => (
+                                  <span key={mode} className="flex items-center">
+                                    {mode}
+                                    {i < commandCenterStats.modes.length - 1 && <span className="text-brand mx-2">●</span>}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+
+                            <div className="mt-3 inline-block">
+                              <span className="bg-g1/50 border border-g3/60 px-2.5 py-1 rounded-md text-[12px] font-medium text-g6">
+                                @{passportHandle}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          {/* Mono Stats Row */}
+                          <div className="flex items-center justify-between mt-6 px-1 mono bg-g1/20 border border-g3/40 rounded-xl py-3">
                             <div className="flex flex-col items-center">
-                              <span className="font-bold text-ink text-[15px] leading-tight">{commandCenterStats?.stats?.meets || 0}</span>
-                              <span className="text-[11px] text-g5 uppercase tracking-wider">Meets</span>
+                              <span className="font-bold text-ink text-[14px] leading-tight">{commandCenterStats?.stats?.meets || 0}</span>
+                              <span className="text-[10px] text-g5 uppercase tracking-wider mt-1">Meets</span>
                             </div>
                             <div className="flex flex-col items-center">
-                              <span className="font-bold text-ink text-[15px] leading-tight">{commandCenterStats?.stats?.spaces || 0}</span>
-                              <span className="text-[11px] text-g5 uppercase tracking-wider">Spaces</span>
+                              <span className="font-bold text-ink text-[14px] leading-tight">{commandCenterStats?.stats?.spaces || 0}</span>
+                              <span className="text-[10px] text-g5 uppercase tracking-wider mt-1">Spaces</span>
                             </div>
                             <div className="flex flex-col items-center">
-                              <span className="font-bold text-ink text-[15px] leading-tight">{commandCenterStats?.stats?.projects || 0}</span>
-                              <span className="text-[11px] text-g5 uppercase tracking-wider">Projects</span>
+                              <span className="font-bold text-ink text-[14px] leading-tight">{commandCenterStats?.stats?.projects || 0}</span>
+                              <span className="text-[10px] text-g5 uppercase tracking-wider mt-1">Projects</span>
                             </div>
                             <div className="flex flex-col items-center">
-                              <span className="font-bold text-ink text-[15px] leading-tight">{commandCenterStats?.stats?.connections || 0}</span>
-                              <span className="text-[11px] text-g5 uppercase tracking-wider">Conns</span>
+                              <span className="font-bold text-ink text-[14px] leading-tight">{commandCenterStats?.stats?.research || 0}</span>
+                              <span className="text-[10px] text-g5 uppercase tracking-wider mt-1">Research</span>
+                            </div>
+                            <div className="flex flex-col items-center">
+                              <span className="font-bold text-ink text-[14px] leading-tight">{commandCenterStats?.stats?.connections || 0}</span>
+                              <span className="text-[10px] text-g5 uppercase tracking-wider mt-1">Conns</span>
                             </div>
                           </div>
                         </div>
 
-                        <div className="max-h-[50vh] overflow-y-auto no-scrollbar">
+                        <div className="overflow-y-auto no-scrollbar flex-1 relative">
                           {/* Navigation Sections */}
                           <div className="p-3 border-b border-g3/40">
                             <div className="grid grid-cols-2 gap-1">
-                              <Link href={`/profile/${passportHandle}`} onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium text-ink hover:bg-g2 transition-colors">
-                                <span className="bg-g2 text-g6 p-1.5 rounded-lg border border-g3"><LayoutTemplate size={14} /></span> Passport
+                              <Link href={`/profile/${passportHandle}`} onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-[13px] font-medium text-ink hover:bg-g2 transition-colors">
+                                <span className="text-g5"><LayoutTemplate size={16} /></span> Passport
                               </Link>
-                              <Link href="/workspace" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium text-ink hover:bg-g2 transition-colors">
-                                <span className="bg-g2 text-g6 p-1.5 rounded-lg border border-g3"><Briefcase size={14} /></span> Workspace
+                              <Link href="/workspace" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-[13px] font-medium text-ink hover:bg-g2 transition-colors">
+                                <span className="text-g5"><Briefcase size={16} /></span> Workspace
                               </Link>
-                              <Link href="/workspace/tickets" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium text-ink hover:bg-g2 transition-colors">
-                                <span className="bg-g2 text-g6 p-1.5 rounded-lg border border-g3"><CalendarDays size={14} /></span> Applications
+                              <Link href="/applications" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-[13px] font-medium text-ink hover:bg-g2 transition-colors">
+                                <span className="text-g5"><CalendarDays size={16} /></span> Applications
                               </Link>
-                              <Link href="/bookmarks" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium text-ink hover:bg-g2 transition-colors">
-                                <span className="bg-g2 text-g6 p-1.5 rounded-lg border border-g3"><Bookmark size={14} /></span> Bookmarks
+                              <Link href="/bookmarks" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-[13px] font-medium text-ink hover:bg-g2 transition-colors">
+                                <span className="text-g5"><Bookmark size={16} /></span> Bookmarks
                               </Link>
-                              <Link href="/notifications" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium text-ink hover:bg-g2 transition-colors">
-                                <span className="bg-g2 text-g6 p-1.5 rounded-lg border border-g3"><Bell size={14} /></span> Notifications
+                              <Link href="/notifications" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-[13px] font-medium text-ink hover:bg-g2 transition-colors">
+                                <span className="text-g5"><Bell size={16} /></span> Notifications
                               </Link>
-                              <Link href="/workspace/tickets" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium text-ink hover:bg-g2 transition-colors">
-                                <span className="bg-g2 text-g6 p-1.5 rounded-lg border border-g3"><Award size={14} /></span> Certificates
+                              <Link href="/calendar" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-[13px] font-medium text-ink hover:bg-g2 transition-colors">
+                                <span className="text-g5"><CalendarDays size={16} /></span> Calendar
+                              </Link>
+                              <Link href="/workspace/tickets" onClick={() => setProfileOpen(false)} className="col-span-2 flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-[13px] font-medium text-ink hover:bg-g2 transition-colors">
+                                <span className="text-g5"><Award size={16} /></span> Certificates
                               </Link>
                             </div>
                           </div>
 
                           <div className="p-3 border-b border-g3/40">
                             <div className="grid grid-cols-2 gap-1">
-                              <Link href="/projects" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium text-ink hover:bg-g2 transition-colors">
-                                <span className="text-g5"><Folder size={15} /></span> Projects
+                              <Link href="/projects" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-[13px] font-medium text-ink hover:bg-g2 transition-colors">
+                                <span className="text-g5"><Folder size={16} /></span> Projects
                               </Link>
-                              <Link href="/research" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium text-ink hover:bg-g2 transition-colors">
-                                <span className="text-g5"><BookOpen size={15} /></span> Research
+                              <Link href="/research" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-[13px] font-medium text-ink hover:bg-g2 transition-colors">
+                                <span className="text-g5"><BookOpen size={16} /></span> Research
                               </Link>
-                              <Link href="/spaces" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium text-ink hover:bg-g2 transition-colors">
-                                <span className="text-g5"><Users size={15} /></span> Spaces
+                              <Link href="/spaces" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-[13px] font-medium text-ink hover:bg-g2 transition-colors">
+                                <span className="text-g5"><Users size={16} /></span> Spaces
                               </Link>
-                              <Link href="/organizations" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium text-ink hover:bg-g2 transition-colors">
-                                <span className="text-g5"><Building2 size={15} /></span> Organizations
+                              <Link href="/organizations" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-[13px] font-medium text-ink hover:bg-g2 transition-colors">
+                                <span className="text-g5"><Building2 size={16} /></span> Organizations
                               </Link>
-                              <Link href={`/profile/${passportHandle}`} onClick={() => setProfileOpen(false)} className="col-span-2 flex items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium text-ink hover:bg-g2 transition-colors">
-                                <span className="text-g5"><LinkIcon size={15} /></span> Connections
+                              <Link href="/connections" onClick={() => setProfileOpen(false)} className="col-span-2 flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-[13px] font-medium text-ink hover:bg-g2 transition-colors">
+                                <span className="text-g5"><LinkIcon size={16} /></span> Connections
                               </Link>
                             </div>
                           </div>
 
-                          <div className="p-3 bg-g1/10">
+                          <div className="p-3">
                             <div className="grid grid-cols-1 gap-1">
-                              <button className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium text-ink hover:bg-g2 transition-colors text-left w-full">
-                                <span className="text-g5"><Palette size={15} /></span> Appearance
+                              <button className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-[13px] font-medium text-ink hover:bg-g2 transition-colors text-left w-full">
+                                <span className="text-g5"><Palette size={16} /></span> Appearance
                               </button>
-                              <Link href="/settings" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium text-ink hover:bg-g2 transition-colors">
-                                <span className="text-g5"><SettingsIcon size={15} /></span> Settings
+                              <Link href="/settings" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-[13px] font-medium text-ink hover:bg-g2 transition-colors">
+                                <span className="text-g5"><SettingsIcon size={16} /></span> Settings
                               </Link>
-                              <button className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium text-ink hover:bg-g2 transition-colors text-left w-full opacity-60 cursor-not-allowed">
-                                <span className="text-g5"><Code size={15} /></span> Developer Integrations
+                              <button className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-[13px] font-medium text-ink hover:bg-g2 transition-colors text-left w-full opacity-60 cursor-not-allowed">
+                                <span className="text-g5"><Code size={16} /></span> Developer Integrations
                               </button>
                             </div>
+                          </div>
+
+                          {/* Convoke Assistant AI Block */}
+                          <div className="p-5 bg-[#0a0a0a] border-t border-brand/20 relative mx-3 mb-3 rounded-2xl shadow-inner">
+                            <div className="absolute top-0 left-1/4 w-1/2 h-[1px] bg-gradient-to-r from-transparent via-brand/60 to-transparent shadow-[0_0_8px_rgba(198,163,107,0.8)]" />
+                            <div className="flex items-center gap-2 mb-3">
+                              <Sparkles size={14} className="text-brand" />
+                              <span className="text-[13px] font-serif text-brand tracking-wide">Convoke Assistant</span>
+                            </div>
+                            <div className="text-[13px] text-g5 leading-relaxed mb-4 font-medium space-y-1">
+                              <p className="text-ink">Good evening, {user?.firstName || "Builder"}.</p>
+                              <p>{commandCenterStats?.aiContext?.pendingApps || 0} applications pending.</p>
+                              <p>AI Saturdays starts tomorrow.</p>
+                              <p>3 opportunities match your profile.</p>
+                            </div>
+                            <button className="w-full text-center text-[12px] py-2 bg-paper border border-g3 hover:border-brand/50 hover:bg-brand/5 transition-all rounded-lg text-ink font-medium">
+                              Ask Convoke
+                            </button>
                           </div>
                         </div>
 
                         {/* Footer */}
-                        <div className="px-5 py-4 bg-g1/40 flex items-center justify-between border-t border-g3/60 shrink-0">
+                        <div className="px-5 py-4 bg-g1/30 flex items-center justify-between border-t border-g3/60 shrink-0 mt-auto">
                           <div className="text-[11px] text-g5 mono tracking-wide flex flex-col leading-tight">
                             <span>Build quietly.</span>
                             <span>Convoke MMXXVI</span>
@@ -353,10 +395,9 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
                               await signOut();
                               router.push("/");
                             }}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded border border-red-500/20 bg-red-500/10 text-red-500 text-[11px] font-bold uppercase tracking-wider hover:bg-red-500/20 transition-colors"
+                            className="text-[12px] text-g5 hover:text-ink transition-colors flex items-center gap-1.5 font-medium group"
                           >
-                            <LogOut size={12} strokeWidth={2.5} />
-                            Sign Out
+                            Sign Out <ArrowRightIcon />
                           </button>
                         </div>
                       </div>

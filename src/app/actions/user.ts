@@ -16,6 +16,7 @@ export async function getCommandCenterProfile() {
           meets: true,
           projects: true,
           follows: true,
+          research: true,
         }
       }
     }
@@ -25,13 +26,21 @@ export async function getCommandCenterProfile() {
     where: { userId: user.id }
   });
 
+  const pendingApps = await prisma.application.count({
+    where: { userId: user.id, status: "PENDING" }
+  });
+
   return {
     modes: dbUser?.modes || [],
     stats: {
       meets: dbUser?._count.meets || 0,
       spaces: spacesCount,
       projects: dbUser?._count.projects || 0,
+      research: dbUser?._count.research || 0,
       connections: dbUser?._count.follows || 0,
+    },
+    aiContext: {
+      pendingApps,
     }
   };
 }
