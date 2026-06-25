@@ -1,14 +1,14 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
-import { motion, useScroll, useTransform, useSpring, useMotionTemplate, MotionValue } from "framer-motion";
+import { useRef, useEffect } from "react";
+import { motion, useScroll, useTransform, useSpring, useMotionTemplate, MotionValue, useMotionValue } from "framer-motion";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ArrowRight, Globe, Layers, Sparkles, Users, Zap } from "lucide-react";
 
 const TOTAL_FRAMES = 7;
 
-function GlassFrame({ smoothProgress, index, mousePosition }: { smoothProgress: MotionValue<number>, index: number, mousePosition: { x: number, y: number } }) {
+function GlassFrame({ smoothProgress, index, mouseX, mouseY }: { smoothProgress: MotionValue<number>, index: number, mouseX: MotionValue<number>, mouseY: MotionValue<number> }) {
   const startScale = 1 - (index * 0.15);
   const endScale = startScale + 2.5;
 
@@ -30,6 +30,10 @@ function GlassFrame({ smoothProgress, index, mousePosition }: { smoothProgress: 
   });
 
   const backdropFilter = useMotionTemplate`blur(${blurAmount}px)`;
+  
+  const mouseXPercent = useTransform(mouseX, x => x * 100);
+  const mouseYPercent = useTransform(mouseY, y => y * 100);
+  const highlightGradient = useMotionTemplate`radial-gradient(circle at ${mouseXPercent}% ${mouseYPercent}%, color-mix(in srgb, var(--paper) 90%, transparent) 0%, transparent 60%)`;
 
   return (
     <motion.div
@@ -48,10 +52,10 @@ function GlassFrame({ smoothProgress, index, mousePosition }: { smoothProgress: 
         boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--paper) 12%, transparent), 0 20px 60px rgba(0,0,0,0.03)"
       }}
     >
-      <div 
-        className="absolute inset-0 opacity-50 mix-blend-overlay pointer-events-none transition-colors duration-300"
+      <motion.div 
+        className="absolute inset-0 opacity-50 mix-blend-overlay pointer-events-none"
         style={{
-          background: `radial-gradient(circle at ${mousePosition.x * 100}% ${mousePosition.y * 100}%, color-mix(in srgb, var(--paper) 90%, transparent) 0%, transparent 60%)`
+          background: highlightGradient
         }}
       />
     </motion.div>
@@ -71,18 +75,28 @@ export default function JoinClient() {
     restDelta: 0.001,
   });
 
-  const [mousePosition, setMousePosition] = useState({ x: 0.5, y: 0.5 });
+  const mouseX = useMotionValue(0.5);
+  const mouseY = useMotionValue(0.5);
 
   useEffect(() => {
+    let ticking = false;
     const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({
-        x: e.clientX / window.innerWidth,
-        y: e.clientY / window.innerHeight,
-      });
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          mouseX.set(e.clientX / window.innerWidth);
+          mouseY.set(e.clientY / window.innerHeight);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
-    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
     return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
+  }, [mouseX, mouseY]);
+
+  const mouseXPercent = useTransform(mouseX, x => x * 100);
+  const mouseYPercent = useTransform(mouseY, y => y * 100);
+  const ambientGradient = useMotionTemplate`radial-gradient(circle at ${mouseXPercent}% ${mouseYPercent}%, var(--g2) 0%, var(--paper) 80%)`;
 
   // Content Sections mapping
   const heroOpacity = useTransform(smoothProgress, [0, 0.1], [1, 0]);
@@ -107,11 +121,9 @@ export default function JoinClient() {
       <div className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center overflow-hidden bg-paper">
         
         {/* Deep ambient background responding to mouse */}
-        <div 
+        <motion.div 
           className="absolute inset-0 transition-opacity duration-1000"
-          style={{
-            background: `radial-gradient(circle at ${mousePosition.x * 100}% ${mousePosition.y * 100}%, var(--g2) 0%, var(--paper) 80%)`,
-          }}
+          style={{ background: ambientGradient }}
         />
 
         {/* Generate nested glass frames */}
@@ -120,7 +132,8 @@ export default function JoinClient() {
             key={i} 
             index={TOTAL_FRAMES - 1 - i} 
             smoothProgress={smoothProgress} 
-            mousePosition={mousePosition} 
+            mouseX={mouseX} 
+            mouseY={mouseY} 
           />
         ))}
         
