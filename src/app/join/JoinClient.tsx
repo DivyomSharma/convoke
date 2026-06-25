@@ -1,10 +1,62 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring, useMotionTemplate, MotionValue } from "framer-motion";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ArrowRight, Globe, Layers, Sparkles, Users, Zap } from "lucide-react";
+
+const TOTAL_FRAMES = 7;
+
+function GlassFrame({ smoothProgress, index, mousePosition }: { smoothProgress: MotionValue<number>, index: number, mousePosition: { x: number, y: number } }) {
+  const startScale = 1 - (index * 0.15);
+  const endScale = startScale + 2.5;
+
+  const scale = useTransform(smoothProgress, [0, 1], [startScale, endScale]);
+  
+  const opacity = useTransform(smoothProgress, (p: number) => {
+    const currentScale = startScale + (p * 2.5);
+    if (currentScale < 0.05) return 0;
+    if (currentScale < 0.2) return (currentScale - 0.05) / 0.15;
+    if (currentScale > 1.4) return 0;
+    if (currentScale > 1.1) return 1 - ((currentScale - 1.1) / 0.3);
+    return 1;
+  });
+
+  const blurAmount = useTransform(smoothProgress, (p: number) => {
+    const currentScale = startScale + (p * 2.5);
+    if (currentScale > 1) return 2;
+    return 2 + ((1 - currentScale) * 8);
+  });
+
+  const backdropFilter = useMotionTemplate`blur(${blurAmount}px)`;
+
+  return (
+    <motion.div
+      className="absolute rounded-[40px] md:rounded-[60px] border flex items-center justify-center overflow-hidden"
+      style={{
+        width: "80vw",
+        height: "80vh",
+        maxWidth: "1200px",
+        maxHeight: "800px",
+        scale,
+        opacity,
+        backdropFilter,
+        WebkitBackdropFilter: backdropFilter,
+        borderColor: "color-mix(in srgb, var(--brand) 18%, transparent)",
+        background: "color-mix(in srgb, var(--paper-card) 25%, transparent)",
+        boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--paper) 12%, transparent), 0 20px 60px rgba(0,0,0,0.03)"
+      }}
+    >
+      <div 
+        className="absolute inset-0 opacity-50 mix-blend-overlay pointer-events-none transition-colors duration-300"
+        style={{
+          background: `radial-gradient(circle at ${mousePosition.x * 100}% ${mousePosition.y * 100}%, color-mix(in srgb, var(--paper) 90%, transparent) 0%, transparent 60%)`
+        }}
+      />
+    </motion.div>
+  );
+}
 
 export default function JoinClient() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -13,18 +65,16 @@ export default function JoinClient() {
     offset: ["start start", "end end"],
   });
 
-  // Smooth out the scroll progress for animations
   const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
+    stiffness: 80,
+    damping: 25,
     restDelta: 0.001,
   });
 
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [mousePosition, setMousePosition] = useState({ x: 0.5, y: 0.5 });
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      // Normalize mouse coordinates to a percentage (0 to 1)
       setMousePosition({
         x: e.clientX / window.innerWidth,
         y: e.clientY / window.innerHeight,
@@ -34,60 +84,48 @@ export default function JoinClient() {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  // Living Glass dynamic values based on scroll
-  const glassOpacity = useTransform(smoothProgress, [0, 0.2, 0.8, 1], [0.8, 0.95, 0.95, 0.8]);
-  const glassBlur = useTransform(smoothProgress, [0, 0.5, 1], [20, 30, 20]);
-  
-  // Section transitions
-  const heroOpacity = useTransform(smoothProgress, [0, 0.08], [1, 0]);
-  const heroY = useTransform(smoothProgress, [0, 0.08], [0, -50]);
+  // Content Sections mapping
+  const heroOpacity = useTransform(smoothProgress, [0, 0.1], [1, 0]);
+  const heroY = useTransform(smoothProgress, [0, 0.1], [0, -40]);
 
-  const problemOpacity = useTransform(smoothProgress, [0.08, 0.15, 0.22, 0.28], [0, 1, 1, 0]);
-  const problemY = useTransform(smoothProgress, [0.08, 0.15, 0.22, 0.28], [50, 0, 0, -50]);
+  const problemOpacity = useTransform(smoothProgress, [0.1, 0.2, 0.3, 0.4], [0, 1, 1, 0]);
+  const problemY = useTransform(smoothProgress, [0.1, 0.2, 0.3, 0.4], [40, 0, 0, -40]);
 
-  const flywheelOpacity = useTransform(smoothProgress, [0.28, 0.35, 0.42, 0.48], [0, 1, 1, 0]);
-  const flywheelY = useTransform(smoothProgress, [0.28, 0.35, 0.42, 0.48], [50, 0, 0, -50]);
+  const flywheelOpacity = useTransform(smoothProgress, [0.4, 0.5, 0.6, 0.65], [0, 1, 1, 0]);
+  const flywheelY = useTransform(smoothProgress, [0.4, 0.5, 0.6, 0.65], [40, 0, 0, -40]);
 
-  const sponsorOpacity = useTransform(smoothProgress, [0.48, 0.55, 0.62, 0.68], [0, 1, 1, 0]);
-  const sponsorY = useTransform(smoothProgress, [0.48, 0.55, 0.62, 0.68], [50, 0, 0, -50]);
+  const sponsorOpacity = useTransform(smoothProgress, [0.65, 0.7, 0.8, 0.85], [0, 1, 1, 0]);
+  const sponsorY = useTransform(smoothProgress, [0.65, 0.7, 0.8, 0.85], [40, 0, 0, -40]);
 
-  const collabOpacity = useTransform(smoothProgress, [0.68, 0.75, 0.82, 0.88], [0, 1, 1, 0]);
-  const collabY = useTransform(smoothProgress, [0.68, 0.75, 0.82, 0.88], [50, 0, 0, -50]);
-
-  const finalOpacity = useTransform(smoothProgress, [0.88, 0.95], [0, 1]);
-  const finalY = useTransform(smoothProgress, [0.88, 0.95], [50, 0]);
+  const finalOpacity = useTransform(smoothProgress, [0.85, 0.95], [0, 1]);
+  const finalY = useTransform(smoothProgress, [0.85, 0.95], [40, 0]);
 
   return (
-    <div ref={containerRef} className="relative w-full h-[600vh] bg-paper">
+    <div ref={containerRef} className="relative w-full h-[600vh] bg-paper overflow-hidden">
       
-      {/* Living Glass Background Component */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-paper">
-        {/* Subtle base gradient that shifts with mouse */}
-        <motion.div 
+      {/* Infinite Glass Corridor */}
+      <div className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center overflow-hidden bg-paper">
+        
+        {/* Deep ambient background responding to mouse */}
+        <div 
           className="absolute inset-0 transition-opacity duration-1000"
           style={{
-            background: `radial-gradient(circle at ${mousePosition.x * 100}% ${mousePosition.y * 100}%, var(--g1) 0%, transparent 60%)`,
-            opacity: glassOpacity,
+            background: `radial-gradient(circle at ${mousePosition.x * 100}% ${mousePosition.y * 100}%, var(--g2) 0%, var(--paper) 80%)`,
           }}
         />
-        
-        {/* Architectural structural lines (subtle reflections) */}
-        <div className="absolute top-0 left-1/4 w-[1px] h-full bg-gradient-to-b from-transparent via-g3 to-transparent opacity-30" />
-        <div className="absolute top-0 right-1/4 w-[1px] h-full bg-gradient-to-b from-transparent via-g3 to-transparent opacity-30" />
-        <div className="absolute top-1/3 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-g3 to-transparent opacity-30" />
 
-        {/* The actual "glass" plane using backdrop filter */}
-        <motion.div 
-          className="absolute inset-0"
-          style={{
-            backdropFilter: `blur(${glassBlur.get()}px) saturate(120%)`,
-            WebkitBackdropFilter: `blur(${glassBlur.get()}px) saturate(120%)`,
-            boxShadow: `inset 0 0 0 1px color-mix(in srgb, var(--g3) 40%, transparent)`,
-          }}
-        />
+        {/* Generate nested glass frames */}
+        {Array.from({ length: TOTAL_FRAMES }).map((_, i) => (
+          <GlassFrame 
+            key={i} 
+            index={TOTAL_FRAMES - 1 - i} 
+            smoothProgress={smoothProgress} 
+            mousePosition={mousePosition} 
+          />
+        ))}
         
-        {/* Cinematic vignette */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,var(--paper)_100%)] opacity-80" />
+        {/* Master overlay vignette to focus center and hide edges */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,var(--paper)_100%)] opacity-95" />
       </div>
 
       {/* Minimal Header */}
@@ -119,10 +157,10 @@ export default function JoinClient() {
             One platform where communities organize, collaborate, fund, publish, hire and grow.
           </p>
           <div className="flex flex-col sm:flex-row items-center gap-4">
-            <Link href="/login" className="ink-button text-base px-8 py-3">
+            <Link href="/login" className="ink-button text-base px-8 py-3 shadow-none">
               Start Your Community
             </Link>
-            <button className="ghost-button text-base px-8 py-3" onClick={() => window.scrollTo({ top: window.innerHeight, behavior: "smooth" })}>
+            <button className="ghost-button text-base px-8 py-3" onClick={() => window.scrollTo({ top: window.innerHeight * 1.5, behavior: "smooth" })}>
               See How It Works
               <ArrowRight className="w-4 h-4 ml-1" />
             </button>
@@ -139,8 +177,7 @@ export default function JoinClient() {
             Communities have<br />
             outgrown their tools.
           </h2>
-          <div className="glass-panel p-8 md:p-12 w-full text-left relative overflow-hidden group">
-            <div className="absolute inset-0 bg-gradient-to-br from-g1 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+          <div className="border border-g3 rounded-[24px] bg-paper-elevated p-8 md:p-12 w-full text-left relative overflow-hidden">
             <p className="text-g6 text-lg md:text-xl leading-relaxed font-medium relative z-10">
               Everything is fragmented. Members in one app, events in another. Sponsors lost in emails. Identity scattered across the internet. We build complex workflows just to bring people together.
             </p>
@@ -162,21 +199,21 @@ export default function JoinClient() {
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full text-left">
-            <div className="premium-card p-8 flex flex-col gap-4">
+            <div className="border border-g3 rounded-[24px] bg-paper-card p-8 flex flex-col gap-4">
               <Users className="w-6 h-6 text-brand" />
               <h3 className="serif text-2xl text-ink">People & Events</h3>
               <p className="text-g5 leading-relaxed">
                 Seamless RSVPs, beautifully crafted event pages, and an integrated timeline for your community's history.
               </p>
             </div>
-            <div className="premium-card p-8 flex flex-col gap-4">
+            <div className="border border-g3 rounded-[24px] bg-paper-card p-8 flex flex-col gap-4">
               <Sparkles className="w-6 h-6 text-brand" />
               <h3 className="serif text-2xl text-ink">Identity</h3>
               <p className="text-g5 leading-relaxed">
                 One unified profile. Members carry their reputation, projects, and research across every community.
               </p>
             </div>
-            <div className="premium-card p-8 flex flex-col gap-4">
+            <div className="border border-g3 rounded-[24px] bg-paper-card p-8 flex flex-col gap-4">
               <Layers className="w-6 h-6 text-brand" />
               <h3 className="serif text-2xl text-ink">Growth</h3>
               <p className="text-g5 leading-relaxed">
@@ -195,7 +232,7 @@ export default function JoinClient() {
           <h2 className="serif text-4xl md:text-6xl leading-[1.1] text-ink mb-8">
             Infrastructure,<br />not just outreach.
           </h2>
-          <div className="glass-panel p-8 md:p-12 w-full text-left">
+          <div className="border border-g3 rounded-[24px] bg-paper-elevated p-8 md:p-12 w-full text-left">
             <div className="flex flex-col md:flex-row gap-12">
               <div className="flex-1">
                 <h3 className="text-ink font-semibold mb-3 font-sans">Sponsorships</h3>
@@ -215,34 +252,7 @@ export default function JoinClient() {
           </div>
         </motion.div>
 
-        {/* 5. Collaboration & AI */}
-        <motion.div 
-          style={{ opacity: collabOpacity, y: collabY }}
-          className="absolute w-full max-w-4xl px-6 md:px-12 text-center pointer-events-auto flex flex-col items-center"
-        >
-          <span className="eyebrow mb-6">Network Effects</span>
-          <h2 className="serif text-4xl md:text-6xl leading-[1.1] text-ink mb-8">
-            Built for collaboration.
-          </h2>
-          <p className="text-g5 text-lg md:text-xl font-medium max-w-2xl mx-auto mb-12 font-sans tracking-tight">
-            Communities shouldn't compete. They should build together. Joint events. Speaker exchanges. Collaborative research. Shared organizations.
-          </p>
-          
-          <div className="premium-card p-6 md:p-8 w-full flex items-center justify-between text-left group cursor-default">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-g2 flex items-center justify-center border border-g3 transition-colors group-hover:bg-ink group-hover:border-ink">
-                <Zap className="w-5 h-5 text-ink group-hover:text-paper transition-colors" />
-              </div>
-              <div>
-                <h3 className="text-ink font-medium">AI Operating Layer</h3>
-                <p className="text-g5 text-sm">Search becomes action. Find the right people instantly.</p>
-              </div>
-            </div>
-            <ArrowRight className="w-5 h-5 text-g4 group-hover:text-ink transition-colors" />
-          </div>
-        </motion.div>
-
-        {/* 6. Final CTA */}
+        {/* 5. Final CTA */}
         <motion.div 
           style={{ opacity: finalOpacity, y: finalY }}
           className="absolute w-full max-w-3xl px-6 md:px-12 text-center pointer-events-auto flex flex-col items-center"
@@ -254,7 +264,7 @@ export default function JoinClient() {
           <p className="serif text-2xl md:text-3xl text-g5 mb-12">
             We're building where they belong.
           </p>
-          <Link href="/login" className="ink-button text-lg px-10 py-4 shadow-[0_0_40px_color-mix(in_srgb,var(--brand)_20%,transparent)] hover:shadow-[0_0_60px_color-mix(in_srgb,var(--brand)_40%,transparent)] transition-all">
+          <Link href="/login" className="ink-button text-lg px-10 py-4 shadow-none">
             Start Your Community
           </Link>
         </motion.div>
