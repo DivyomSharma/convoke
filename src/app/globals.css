@@ -32,9 +32,9 @@
 :root {
   color-scheme: light;
 
-  --paper: #f7f4ef;
-  --paper-elevated: rgba(246, 242, 234, 0.58);
-  --paper-card: rgba(246, 242, 234, 0.42);
+  --paper: #fff5f5;
+  --paper-elevated: rgba(255, 245, 245, 0.58);
+  --paper-card: rgba(255, 245, 245, 0.42);
 
   --ink: #111111;
   --ink-muted: #666666;
@@ -80,7 +80,7 @@
 }
 
 html:not(.dark) .hero-light-flat {
-  background: radial-gradient(circle at center, #fbfaf7 0%, #f6f4ef 100%);
+  background: radial-gradient(circle at center, #fffafa 0%, #fff5f5 100%);
 }
 
 html:not(.dark) .hero-light-flat *::before,
