@@ -4,6 +4,7 @@ import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { PublishStatus } from "@prisma/client";
 
 export async function createSponsorshipRequest(formData: FormData) {
   const user = await requireUser();
@@ -21,6 +22,7 @@ export async function createSponsorshipRequest(formData: FormData) {
   try {
     await prisma.sponsorshipRequest.create({
       data: {
+        status: "PENDING",
         requesterId: user.id,
         sponsorId: sponsorId || undefined,
         meetId: meetId || undefined,

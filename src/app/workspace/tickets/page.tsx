@@ -40,14 +40,10 @@ export default async function MyTicketsPage() {
     prisma.application.findMany({
       where: {
         userId: user.id,
-        opportunity: {
-          type: {
-            in: challengeTypes.map((type) => type.value),
-          },
-        },
+        challengeId: { not: null },
       },
       include: {
-        opportunity: {
+        challenge: {
           include: {
             organization: true,
             space: true,
@@ -79,26 +75,27 @@ export default async function MyTicketsPage() {
   });
 
   const challengePasses = challengeApplications.map((application, index) => {
-    const opportunity = application.opportunity;
+    const challenge = application.challenge;
+    if (!challenge) return null;
 
     return {
       ticketId: passId("CHL", application.id),
-      eventName: opportunity.title,
-      orgName: opportunity.organization?.name || opportunity.space?.name || "Community",
-      date: opportunity.deadline
-        ? new Date(opportunity.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+      eventName: challenge.name,
+      orgName: challenge.organization?.name || challenge.space?.name || "Community",
+      date: challenge.endDate
+        ? new Date(challenge.endDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
         : "Rolling",
       time: "Submission window",
-      venue: opportunity.location || "Online",
+      venue: challenge.location || "Online",
       userName: user.name || "Convoke member",
       userAvatar: user.avatarUrl || "",
       seat: `TEAM-${String(index + 1).padStart(2, "0")}`,
-      type: opportunity.type === "HACKATHON" ? "Hackathon" : "Challenge",
+      type: "Challenge",
       state: passState(application.status),
-      bannerUrl: opportunity.bannerUrl || undefined,
-      orgLogo: opportunity.organization?.logoUrl || undefined,
+      bannerUrl: challenge.bannerUrl || undefined,
+      orgLogo: challenge.organization?.logoUrl || undefined,
     };
-  });
+  }).filter(Boolean) as any[];
 
   const passes = [...eventPasses, ...challengePasses];
 

@@ -8,6 +8,15 @@ datasource db {
   directUrl = env("Convoke_POSTGRES_URL")
 }
 
+enum PublishStatus {
+  DRAFT
+  PREVIEW
+  REVIEW
+  PUBLISHED
+  ARCHIVED
+  DELETED
+}
+
 model User {
   id                  String    @id @default(uuid())
   email               String    @unique
@@ -111,6 +120,7 @@ model Organization {
   location    String?
   website     String?
   views       Int     @default(0)
+  status      PublishStatus @default(DRAFT)
 
   // Organization Capabilities
   isRecruitingEnabled  Boolean @default(false)
@@ -135,7 +145,7 @@ model Organization {
   whatsapp                String?
   twitter                 String?
   linkedin                String?
-  approvalStatus          String          @default("DRAFT")
+  
   sponsorIndustries       String?
   sponsorBudgetRange      String?
   sponsorAudience         String?
@@ -178,6 +188,7 @@ model Space {
   bannerUrl      String?
   rules          String?  @db.Text
   organizationId String?
+  status         PublishStatus @default(DRAFT)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -185,6 +196,7 @@ model Space {
   members       SpaceMembership[]
   meets         Meet[]
   opportunities Opportunity[]
+  challenges    Challenge[]
   projects      Project[]
   research      Research[]
   resources     Resource[]
@@ -229,6 +241,7 @@ model Meet {
   views         Int      @default(0)
   capacity      Int?
   waitlistCount Int      @default(0)
+  status        PublishStatus @default(DRAFT)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -248,7 +261,6 @@ model Meet {
   twitter   String?
   linkedin  String?
 
-  status                String   @default("PUBLISHED")
   category              String[] @default([])
   region                String?
   hasEventKit           Boolean  @default(false)
@@ -289,12 +301,7 @@ model MeetApplication {
 model Opportunity {
   id                   String    @id @default(uuid())
   title                String
-  type                 String // ROLE, FELLOWSHIP, GRANT, HACKATHON/CHALLENGE
-  participation        String? // INDIVIDUAL, TEAM
-  minTeamSize          Int?
-  maxTeamSize          Int?
-  crossCollegeTeams    Boolean   @default(false)
-  teamFormationEnabled Boolean   @default(false)
+  type                 String // INTERNSHIP, JOB, VOLUNTEER, GRANT, FELLOWSHIP, OPEN_CALL, RESIDENCY, SCHOLARSHIP, RESEARCH_ASSISTANT, TEACHING_ASSISTANT
   description          String?   @db.Text
   department           String?
   employmentType       String?
@@ -319,13 +326,13 @@ model Opportunity {
   views                Int       @default(0)
   organizationId       String?
   spaceId              String?
+  status               PublishStatus @default(DRAFT)
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
 
   organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   space        Space?        @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   applications Application[]
-  teams        Team[]
   faqs         FAQ[]
   resources    Resource[]
   referrals    Referral[]
@@ -333,10 +340,47 @@ model Opportunity {
   region       String?
 }
 
+model Challenge {
+  id                   String    @id @default(uuid())
+  name                 String
+  slug                 String    @unique
+  description          String?   @db.Text
+  startDate            DateTime?
+  endDate              DateTime?
+  type                 String? // Hackathon, Competition, Innovation Challenge, Bounty, Case Competition
+  participation        String? // INDIVIDUAL, TEAM
+  minTeamSize          Int?
+  maxTeamSize          Int?
+  crossCollegeTeams    Boolean   @default(false)
+  teamFormationEnabled Boolean   @default(false)
+  location             String?
+  mode                 String? // In-person, Virtual, Hybrid
+  bannerUrl            String?
+  discord              String?
+  twitter              String?
+  website              String?
+  views                Int       @default(0)
+  organizationId       String
+  spaceId              String?
+  status               PublishStatus @default(DRAFT)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  organization        Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  space               Space?               @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  sponsorshipRequests SponsorshipRequest[]
+  communityDrops      CommunityDrop[]
+  teams               Team[]
+  applications        Application[]
+  faqs                FAQ[]
+  resources           Resource[]
+}
+
 model Application {
   id            String   @id @default(uuid())
   userId        String
-  opportunityId String
+  opportunityId String?
+  challengeId   String?
   status        String // PENDING, ACCEPTED, REJECTED, INTERVIEW
   pitch         String?  @db.Text
   resumeUrl     String?
@@ -344,7 +388,8 @@ model Application {
   updatedAt     DateTime @updatedAt
 
   user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  opportunity Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  opportunity Opportunity? @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  challenge   Challenge?   @relation(fields: [challengeId], references: [id], onDelete: Cascade)
 }
 
 model Project {
@@ -361,6 +406,8 @@ model Project {
   downloads   Int      @default(0)
   userId      String
   spaceId     String?
+  challengeId String?
+  status      PublishStatus @default(DRAFT)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -373,6 +420,7 @@ model Project {
   buildLogs BuildLog[]
   category  String[]        @default([])
   region    String?
+  teams     Team[]
 }
 
 model Research {
@@ -382,6 +430,8 @@ model Research {
   url       String?
   userId    String
   spaceId   String?
+  projectId String?
+  status    PublishStatus @default(DRAFT)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -402,6 +452,7 @@ model FAQ {
   meetId         String?
   organizationId String?
   opportunityId  String?
+  challengeId    String?
   projectId      String?
   spaceId        String?
 
@@ -409,6 +460,7 @@ model FAQ {
   organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   space        Space?        @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   opportunity  Opportunity?  @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  challenge    Challenge?    @relation(fields: [challengeId], references: [id], onDelete: Cascade)
   project      Project?      @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }
 
@@ -473,6 +525,7 @@ model Resource {
   organizationId String?
   projectId      String?
   opportunityId  String?
+  challengeId    String?
   spaceId        String?
 
   meet         Meet?         @relation(fields: [meetId], references: [id], onDelete: Cascade)
@@ -480,6 +533,7 @@ model Resource {
   space        Space?        @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   project      Project?      @relation(fields: [projectId], references: [id], onDelete: Cascade)
   opportunity  Opportunity?  @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  challenge    Challenge?    @relation(fields: [challengeId], references: [id], onDelete: Cascade)
 }
 
 model BuildLog {
@@ -587,14 +641,18 @@ model SpaceMembership {
 model Team {
   id            String   @id @default(uuid())
   name          String
-  opportunityId String
+  avatarUrl     String?
+  challengeId   String?
+  projectId     String?
   leaderId      String
   about         String?  @db.Text
   lookingFor    String?  @db.Text // JSON or comma separated string of skills
+  status        PublishStatus @default(DRAFT)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  opportunity Opportunity   @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  challenge   Challenge?    @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  project     Project?      @relation(fields: [projectId], references: [id], onDelete: Cascade)
   leader      User          @relation("TeamLeader", fields: [leaderId], references: [id], onDelete: Cascade)
   members     TeamMember[]
   requests    TeamRequest[]
@@ -604,7 +662,7 @@ model TeamMember {
   id        String   @id @default(uuid())
   teamId    String
   userId    String
-  role      String?
+  role      String   @default("MEMBER") // LEADER, CO_LEADER, MEMBER, MENTOR, JUDGE, VOLUNTEER
   createdAt DateTime @default(now())
 
   team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
@@ -617,7 +675,7 @@ model TeamRequest {
   id        String   @id @default(uuid())
   teamId    String
   userId    String
-  status    String // PENDING, ACCEPTED, REJECTED
+  status    String // PENDING, ACCEPTED, REJECTED, WITHDRAWN
   type      String // APPLY, INVITE
   message   String?  @db.Text
   createdAt DateTime @default(now())
@@ -744,23 +802,6 @@ model Achievement {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model Challenge {
-  id             String    @id @default(uuid())
-  name           String
-  slug           String    @unique
-  description    String?   @db.Text
-  startDate      DateTime?
-  endDate        DateTime?
-  type           String? // Hackathon, Quiz, Gaming, etc.
-  organizationId String
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-
-  organization        Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  sponsorshipRequests SponsorshipRequest[]
-  communityDrops      CommunityDrop[]
-}
-
 model SponsorshipRequest {
   id          String   @id @default(uuid())
   title       String?
@@ -787,7 +828,7 @@ model SponsorshipRequest {
   assetsUrl    String?
   socialLinks  String?
   deckUrl      String?
-  status       String   @default("DRAFT")
+  status       String   @default("PENDING") // PENDING, APPROVED, REJECTED
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -846,6 +887,8 @@ model CommunityDrop {
   challengeId    String?
   spaceId        String?
   organizationId String?
+  
+  status PublishStatus @default(DRAFT)
 
   createdAt DateTime @default(now())
 

@@ -10,13 +10,13 @@ type TeamRequest = { id: string; status: string; message: string | null; user: U
 type Team = { id: string; name: string; about: string | null; leaderId: string; members: TeamMember[] };
 
 export function ChallengeTeamHub({
-  opportunityId,
+  challengeId,
   userId,
   teams,
   myTeam,
   incomingRequests,
 }: {
-  opportunityId: string;
+  challengeId: string;
   userId: string;
   teams: Team[];
   myTeam: Team | null;
@@ -31,7 +31,7 @@ export function ChallengeTeamHub({
   const handleCreateTeam = async () => {
     if (!newTeamName.trim() || submitting) return;
     setSubmitting(true);
-    const res = await createTeam(opportunityId, newTeamName, newTeamAbout);
+    const res = await createTeam(challengeId, newTeamName, newTeamAbout);
     if (res.success) {
       setIsCreating(false);
       setActiveTab("MY_TEAM");

@@ -37,14 +37,14 @@ export async function generateMetadata(props: { params?: Promise<{ id: string }>
   const id = params?.id;
   if (!id) return { title: "Challenge not found" };
 
-  const opp = await prisma.opportunity.findUnique({
+  const opp = await prisma.challenge.findUnique({
     where: { id: id },
   });
 
   if (!opp) return { title: "Challenge not found" };
 
-  const title = `${opp.title} | Convoke Challenge`;
-  const description = opp.description || `${opp.title} on Convoke.`;
+  const title = `${opp.name} | Convoke Challenge`;
+  const description = opp.description || `${opp.name} on Convoke.`;
   const image = opp.bannerUrl || "https://convoke.xyz/og-challenge.jpg";
 
   return {
@@ -73,7 +73,7 @@ export default async function ChallengeDetailPage(props: { params?: Promise<{ id
   const id = params?.id;
   if (!id) return notFound();
 
-  const opp = await prisma.opportunity.findUnique({
+  const opp = await prisma.challenge.findUnique({
     where: { id: id },
     include: {
       organization: true,
@@ -88,19 +88,16 @@ export default async function ChallengeDetailPage(props: { params?: Promise<{ id
     return notFound();
   }
 
-  // Redirect standard job roles to opportunities
-  if (!isChallengeType(opp.type)) {
-    redirect(`/opportunities/${opp.id}`);
-  }
+
 
   const dbUser = await requireUser().catch(() => null);
   const initialRegistered = dbUser ? opp.applications.some(a => a.userId === dbUser.id) : false;
   const initialBookmarked = dbUser ? (await prisma.bookmark.findFirst({
-    where: { userId: dbUser.id, itemId: opp.id, itemType: "OPPORTUNITY" }
+    where: { userId: dbUser.id, itemId: opp.id, itemType: "CHALLENGE" }
   })) !== null : false;
 
-  const deadlineStr = opp.deadline 
-    ? new Date(opp.deadline).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
+  const deadlineStr = opp.endDate 
+    ? new Date(opp.endDate).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
     : "Open Enrollment";
 
   let isAdmin = false;
@@ -119,7 +116,7 @@ export default async function ChallengeDetailPage(props: { params?: Promise<{ id
 
   if (opp.participation === "TEAM") {
     teams = await prisma.team.findMany({
-      where: { opportunityId: opp.id },
+      where: { challengeId: opp.id },
       include: { members: { include: { user: true } } }
     });
     myTeam = dbUser ? teams.find((team) => team.members.some((member) => member.userId === dbUser.id)) || null : null;
@@ -161,7 +158,7 @@ export default async function ChallengeDetailPage(props: { params?: Promise<{ id
                 <div className="inline-block mono text-[11px] font-medium uppercase tracking-wider bg-[var(--brand)]/10 text-[var(--brand)] px-3 py-1 rounded-full mb-4">
                   {opp.type}
                 </div>
-                <h1 className="serif text-4xl md:text-5xl tracking-tight leading-[1.1] mb-6">{opp.title}</h1>
+                <h1 className="serif text-4xl md:text-5xl tracking-tight leading-[1.1] mb-6">{opp.name}</h1>
                 
                 <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-[15px] text-g6">
                   <div className="flex items-center gap-2">
@@ -176,7 +173,7 @@ export default async function ChallengeDetailPage(props: { params?: Promise<{ id
                   </div>
                   <div className="flex items-center gap-2">
                     <Trophy size={18} className="text-[var(--brand)]" />
-                    <span className="font-medium text-ink">{opp.compensation || "Awards & Prizes"}</span>
+                    <span className="font-medium text-ink">Awards & Prizes</span>
                   </div>
                 </div>
               </div>
@@ -216,7 +213,7 @@ export default async function ChallengeDetailPage(props: { params?: Promise<{ id
 
                   {opp.participation === "TEAM" && (
                     <ChallengeTeamHub 
-                      opportunityId={opp.id}
+                      challengeId={opp.id}
                       userId={dbUser?.id || ""}
                       teams={teams}
                       myTeam={myTeam}
@@ -234,13 +231,7 @@ export default async function ChallengeDetailPage(props: { params?: Promise<{ id
                 </div>
               </section>
 
-              {/* Prizes / Tracks section */}
-              {opp.benefits && (
-                <section>
-                  <h2 className="serif text-2xl mb-4">Prizes & Tracks</h2>
-                  <div className="text-g6 text-[15px] leading-relaxed whitespace-pre-line p-5 rounded-md glass-panel border border-[var(--brand)]/10">
-                    {opp.benefits}
-                  </div>
+
                   
                   {/* Contextual Commerce */}
                   <div className="mt-4 flex items-center justify-between p-4 rounded-md bg-g1/50 border border-g3/50">
@@ -252,8 +243,7 @@ export default async function ChallengeDetailPage(props: { params?: Promise<{ id
                       Order Swag
                     </a>
                   </div>
-                </section>
-              )}
+
 
               {/* FAQs */}
               {opp.faqs.length > 0 && (
@@ -286,7 +276,7 @@ export default async function ChallengeDetailPage(props: { params?: Promise<{ id
                   <div className="border border-[var(--brand)] rounded-sm p-5 bg-[var(--brand)]/5 text-center">
                     <h3 className="serif text-lg text-[var(--brand)] mb-1">Host Dashboard</h3>
                     <p className="text-[13px] text-[var(--brand)]/80 mb-3">View and manage hackers.</p>
-                    <Link href={`/opportunities/${opp.id}/manage`} className="inline-block rounded-md bg-[var(--brand)] px-4 py-2 text-[13px] font-semibold text-black hover:bg-[var(--brand)]/90 transition-colors w-full">
+                    <Link href={`/challenges/${opp.id}/manage`} className="inline-block rounded-md bg-[var(--brand)] px-4 py-2 text-[13px] font-semibold text-black hover:bg-[var(--brand)]/90 transition-colors w-full">
                       Manage Challenge
                     </Link>
                   </div>

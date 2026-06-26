@@ -10,6 +10,7 @@ import { ThemeToggle } from "./ThemeToggle";
 import { VerticalMarquee } from "./VerticalMarquee";
 import { globalSearch, type SearchResult } from "@/app/actions/search";
 import { getWorkspaceContexts } from "@/app/actions/workspace";
+import { CommandCenter } from "./CommandCenter";
 import { getCommandCenterProfile } from "@/app/actions/user";
 import { switchIdentity, type IdentityType } from "@/app/actions/identity";
 import {
@@ -533,7 +534,7 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
         </div>
       </footer>
 
-      {commandOpen ? <CommandK onClose={() => setCommandOpen(false)} /> : null}
+      {commandOpen ? <CommandCenter onClose={() => setCommandOpen(false)} /> : null}
 
       {/* Mobile Bottom Tab Bar */}
       <div className="xl:hidden fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t border-g3 bg-paper/95 backdrop-blur-xl px-2 pb-[env(safe-area-inset-bottom)] pt-2">
@@ -676,126 +677,4 @@ function ArrowRightIcon() {
   return <span className="mono text-[10px] text-g4">Open</span>;
 }
 
-function CommandK({ onClose }: { onClose: () => void }) {
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState<SearchResult[]>([]);
-  const [loading, setLoading] = useState(false);
 
-  const { completion, complete, isLoading: aiLoading } = useCompletion({
-    api: "/api/command",
-  });
-
-  const staticItems = [
-    { type: "Page", title: "Explore", subtitle: "Live discovery feed", href: "/explore", id: "page-explore" },
-    { type: "Page", title: "Meets", subtitle: "Upcoming and live gatherings", href: "/meets", id: "page-events" },
-    { type: "Page", title: "Spaces", subtitle: "Communities and collectives", href: "/spaces", id: "page-spaces" },
-    { type: "Page", title: "Workspace", subtitle: "Your private operating surface", href: "/workspace", id: "page-workspace" },
-  ];
-
-  useEffect(() => {
-    if (query.length < 2) {
-      return;
-    }
-
-    let active = true;
-    const timeoutId = setTimeout(() => {
-      setLoading(true);
-
-      // 1. Fetch Entity Search
-      globalSearch(query).then((response) => {
-        if (!active) return;
-        setResults(response);
-      }).catch(console.error).finally(() => {
-        if (active) setLoading(false);
-      });
-      
-      // 2. Trigger AI OS 
-      complete(query);
-
-    }, 500); // slightly longer debounce so AI doesn't trigger on every keystroke
-
-    return () => {
-      active = false;
-      clearTimeout(timeoutId);
-    };
-  }, [query, complete]);
-
-  const displayItems = query.length < 2 ? staticItems : results;
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/45 px-4 pt-[12vh]" onClick={onClose}>
-      <div
-        className="premium-card campus-frame relative w-full max-w-2xl flex flex-col"
-        onClick={(meet) => meet.stopPropagation()}
-      >
-        <div className="flex items-center gap-3 border-b border-g3 px-5 py-4 shrink-0">
-          <Search size={16} className="text-[var(--brand)]" />
-          <input
-            autoFocus
-            value={query}
-            onChange={(meet) => setQuery(meet.target.value)}
-            placeholder="Search people, projects, spaces or ask anything..."
-            className="w-full bg-transparent text-[15px] text-ink outline-none placeholder:text-g4"
-          />
-          <span className="mono text-[11px] text-g4">Esc</span>
-        </div>
-
-        <div className="flex flex-col md:flex-row overflow-hidden max-h-[65vh]">
-          {/* Entity Search Column */}
-          <div className="flex-1 overflow-auto border-r border-g3/50 md:min-w-[50%]">
-            <div className="px-5 py-2 eyebrow border-b border-g3/30 sticky top-0 bg-paper-card z-10">Network</div>
-            <ul className="px-2 py-2">
-              {loading && query.length >= 2 ? (
-                <li className="px-4 py-4 text-[13px] text-g5">Searching...</li>
-              ) : null}
-
-              {!loading && query.length >= 2 && results.length === 0 ? (
-                <li className="px-4 py-4 text-[13px] text-g5">No entities found for &quot;{query}&quot;</li>
-              ) : null}
-
-              {displayItems.map((item) => (
-                <li key={item.id}>
-                  <Link
-                    href={item.href}
-                    onClick={onClose}
-                    className="flex items-center justify-between rounded-[14px] px-4 py-3 text-[14px] transition hover:bg-g1"
-                  >
-                    <div className="min-w-0 pr-4">
-                      <div className="text-ink truncate">{item.title}</div>
-                      {item.subtitle ? <div className="mt-1 text-[12px] text-g5 truncate">{item.subtitle}</div> : null}
-                    </div>
-                    <span className="mono text-[10px] uppercase tracking-[0.18em] text-g4 shrink-0">{item.type}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* AI OS Column */}
-          {(query.length >= 2 || completion) && (
-            <div className="flex-1 overflow-auto bg-g1/20 md:min-w-[50%]">
-               <div className="px-5 py-2 eyebrow border-b border-g3/30 sticky top-0 bg-g1/80 backdrop-blur-md z-10 flex items-center justify-between">
-                 <span>Convoke AI</span>
-                 {aiLoading && <span className="animate-pulse w-2 h-2 rounded-full bg-[var(--brand)]"></span>}
-               </div>
-               <div className="p-5 text-[13.5px] leading-relaxed text-g6">
-                 {query.length >= 2 && completion ? (
-                   <div className="prose prose-sm prose-invert max-w-none">
-                     {completion}
-                   </div>
-                 ) : (
-                   <span className="text-g5 italic">Thinking...</span>
-                 )}
-               </div>
-            </div>
-          )}
-        </div>
-
-        <div className="flex items-center justify-between border-t border-g3 px-5 py-3 text-[11px] text-g4 mono shrink-0">
-          <span>Enter to open</span>
-          <span>Cmd K to reopen</span>
-        </div>
-      </div>
-    </div>
-  );
-}

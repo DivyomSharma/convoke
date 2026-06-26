@@ -1,4 +1,5 @@
 import { Shell } from "@/components/Shell";
+import { PublishStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { createSponsorshipRequest } from "@/app/actions/sponsorship";
@@ -13,7 +14,7 @@ export default async function RequestSponsorshipPage(props: { searchParams?: Pro
   const sponsorId = searchParams?.sponsorId;
 
   const sponsors = await prisma.organization.findMany({
-    where: { approvalStatus: "VERIFIED", isSponsorshipEnabled: true },
+    where: { status: PublishStatus.PUBLISHED, isSponsorshipEnabled: true },
     select: { id: true, name: true }
   });
 

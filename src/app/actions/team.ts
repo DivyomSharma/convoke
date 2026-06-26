@@ -4,14 +4,14 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 
-export async function createTeam(opportunityId: string, name: string, about: string) {
+export async function createTeam(challengeId: string, name: string, about: string) {
   const user = await requireUser();
 
   // Check if user is already in a team for this opportunity
   const existingMember = await prisma.teamMember.findFirst({
     where: {
       userId: user.id,
-      team: { opportunityId }
+      team: { challengeId }
     }
   });
 
@@ -23,7 +23,7 @@ export async function createTeam(opportunityId: string, name: string, about: str
     data: {
       name,
       about,
-      opportunityId,
+      challengeId,
       leaderId: user.id,
       members: {
         create: {
@@ -34,7 +34,7 @@ export async function createTeam(opportunityId: string, name: string, about: str
     }
   });
 
-  revalidatePath(`/challenges/${opportunityId}`);
+  revalidatePath(`/challenges/${challengeId}`);
   return { success: true, teamId: team.id };
 }
 
@@ -62,7 +62,7 @@ export async function requestToJoinTeam(teamId: string, message: string) {
     }
   });
 
-  revalidatePath(`/challenges/${team.opportunityId}`);
+  revalidatePath(`/challenges/${team.challengeId}`);
   return { success: true };
 }
 
@@ -95,6 +95,6 @@ export async function respondToTeamRequest(requestId: string, status: "ACCEPTED"
     }
   });
 
-  revalidatePath(`/challenges/${request.team.opportunityId}`);
+  revalidatePath(`/challenges/${request.team.challengeId}`);
   return { success: true };
 }

@@ -359,11 +359,7 @@ export async function createOpportunity(data: {
     data: {
       title: data.title,
       type: data.type,
-      participation: data.participation,
-      minTeamSize: data.minTeamSize ? Number(data.minTeamSize) : undefined,
-      maxTeamSize: data.maxTeamSize ? Number(data.maxTeamSize) : undefined,
-      crossCollegeTeams: data.crossCollegeTeams ?? false,
-      teamFormationEnabled: data.teamFormationEnabled ?? false,
+
       description: data.description,
       department: data.department,
       employmentType: data.employmentType,

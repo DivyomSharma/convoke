@@ -1,4 +1,5 @@
 import { Shell } from "@/components/Shell";
+import { PublishStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { AmbientGlow } from "@/components/AmbientGlow";
@@ -16,7 +17,7 @@ export default async function SponsorsPage(props: { searchParams?: Promise<{ ind
 
   const sponsors = await prisma.organization.findMany({
     where: {
-      approvalStatus: "VERIFIED",
+      status: PublishStatus.PUBLISHED,
       isSponsorshipEnabled: true,
       ...(industry ? { industry } : {})
     },

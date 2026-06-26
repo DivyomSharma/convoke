@@ -40,7 +40,7 @@ export default async function Workspace() {
 
   const myApps = dbUser ? await prisma.application.findMany({
     where: { userId: dbUser.id },
-    include: { opportunity: { include: { organization: true, space: true } } },
+    include: { opportunity: { include: { organization: true, space: true } }, challenge: { include: { organization: true, space: true } } },
     take: 4,
     orderBy: { createdAt: "desc" }
   }) : [];
@@ -267,25 +267,28 @@ export default async function Workspace() {
 
             {myApps.length > 0 ? (
               <ul className="mt-6 divide-y divide-g3">
-                {myApps.map((a) => (
+                {myApps.map((a) => {
+                  const target = a.opportunity || a.challenge;
+                  if (!target) return null;
+                  return (
                   <li key={a.id} className="py-4 flex items-center justify-between gap-4 group">
                     <div>
                       <div className="text-[15px] font-medium text-ink group-hover:text-[var(--brand)] transition-colors">
-                        {a.opportunity.title}
+                        {'title' in target ? target.title : target.name}
                       </div>
                       <div className="text-g5 text-[13px] mt-0.5">
-                        {a.opportunity.organization?.name || a.opportunity.space?.name || "Community"} · <span className="mono text-[10px] uppercase font-semibold text-ink-muted">{a.status}</span>
+                        {target.organization?.name || target.space?.name || "Community"} · <span className="mono text-[10px] uppercase font-semibold text-ink-muted">{a.status}</span>
                       </div>
                     </div>
                     <Link
-                      href={isChallengeType(a.opportunity.type) ? `/challenges/${a.opportunity.id}` : `/opportunities/${a.opportunity.id}`}
+                      href={'title' in target ? (isChallengeType(target.type) ? `/challenges/${target.id}` : `/opportunities/${target.id}`) : `/challenges/${target.id}`}
                       className="mono text-[11px] uppercase tracking-wider text-g5 hover:text-ink transition-colors flex items-center gap-1"
                     >
                       <span>Review</span>
                       <ArrowRight size={11} />
                     </Link>
                   </li>
-                ))}
+                )})}
               </ul>
             ) : (
               <div className="mt-6 text-[13px] text-g5 italic leading-relaxed py-4 border border-dashed border-g3 rounded-md text-center">

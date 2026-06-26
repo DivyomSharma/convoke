@@ -1,0 +1,39 @@
+/* cmdk custom styles for Convoke CommandCenter */
+
+.command-center-root {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border-radius: 14px;
+}
+
+.command-group [cmdk-group-heading] {
+  padding-left: 0.75rem;
+  padding-bottom: 0.25rem;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--g5);
+  font-weight: 600;
+}
+
+.command-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  cursor: pointer;
+  color: var(--ink);
+  font-size: 0.875rem;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.command-item[data-selected="true"] {
+  background-color: var(--g2);
+}
+
+.command-item[data-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
